@@ -5,14 +5,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhsyourai/teddy-backend/common/gin-jwt"
 	"github.com/zhsyourai/teddy-backend/common/types"
-	"github.com/zhsyourai/teddy-backend/uaa/services"
+	"github.com/zhsyourai/teddy-backend/uaa/services/account"
 	"net/http"
 	"time"
 )
 
 func NewAccountController(middleware *gin_jwt.JwtMiddleware, generator *gin_jwt.JwtGenerator) *AccountController {
 	return &AccountController{
-		service:    services.NewAccountService(),
+		service:    account.GetInstance(),
 		middleware: middleware,
 		generator:  generator,
 	}
@@ -20,7 +20,7 @@ func NewAccountController(middleware *gin_jwt.JwtMiddleware, generator *gin_jwt.
 
 // AccountController is our /uaa controller.
 type AccountController struct {
-	service    services.AccountService
+	service    account.Service
 	middleware *gin_jwt.JwtMiddleware
 	generator  *gin_jwt.JwtGenerator
 }
@@ -28,7 +28,6 @@ type AccountController struct {
 func (c *AccountController) Handler(root *gin.RouterGroup) {
 	root.GET("/register", c.RegisterHandler)
 	root.POST("/login", c.LoginHandler)
-	root.POST("/logout", c.middleware.Handler, c.LogoutHandler)
 	root.POST("/change_password", c.middleware.Handler, c.ChangePassword)
 }
 
@@ -62,7 +61,7 @@ func (c *AccountController) LoginHandler(ctx *gin.Context) {
 	}
 
 	token, err := c.generator.GenerateJwt(time.Hour, time.Hour*3, jwt.MapClaims{
-		"uid":      user.ID,
+		"uid":      user.UID,
 		"username": user.Username,
 		"roles":    user.Roles,
 	})
@@ -94,12 +93,4 @@ func (c *AccountController) ChangePassword(ctx *gin.Context) {
 		changePasswordRequest.OldPassword, changePasswordRequest.NewPassword); err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 	}
-}
-
-func (c *AccountController) LogoutHandler(ctx *gin.Context) {
-	//token, ok := ctx.Get("jwt")
-	//if !ok {
-	//}
-	//jwtToken := token.(*jwt.Token)
-	//claims := jwtToken.Claims.(jwt.MapClaims)
 }
