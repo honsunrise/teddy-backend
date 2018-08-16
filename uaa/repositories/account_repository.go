@@ -2,8 +2,8 @@ package repositories
 
 import (
 	"errors"
+	"github.com/zhsyourai/teddy-backend/common/models"
 	"sync"
-	"github.com/zhsyourai/teddy-backend/uaa/models"
 )
 
 // Query represents the visitor and action queries.
@@ -39,7 +39,7 @@ const (
 	// ReadOnlyMode will RLock(read) the data .
 	ReadOnlyMode = iota
 	// ReadWriteMode will Lock(read/write) the data.
-	ReadWriteMode 
+	ReadWriteMode
 )
 
 func (r *accountMemoryRepository) Exec(query Query, action Query, actionLimit int, mode int) (ok bool) {

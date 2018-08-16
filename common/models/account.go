@@ -5,7 +5,7 @@ import "time"
 type OAuthType int
 
 const (
-	GOOGLE   OAuthType = iota
+	GOOGLE OAuthType = iota
 	WECHAT
 	QQ
 	SINA

@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/zhsyourai/teddy-backend/uaa/models"
+	"github.com/zhsyourai/teddy-backend/common/models"
 	"github.com/zhsyourai/teddy-backend/uaa/repositories"
 )
 

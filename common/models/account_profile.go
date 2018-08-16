@@ -5,7 +5,7 @@ import "time"
 type GenderType int
 
 const (
-	MAN     GenderType = iota
+	MAN GenderType = iota
 	WOMAN
 	UNKNOWN
 )

@@ -1,116 +1,106 @@
 package controllers
 
 import (
-	"github.com/kataras/iris/mvc"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"github.com/zhsyourai/URCF-engine/api/http/controllers/shard"
+	"github.com/zhsyourai/teddy-backend/common/gin-jwt"
+	"github.com/zhsyourai/teddy-backend/common/types"
 	"github.com/zhsyourai/teddy-backend/uaa/services"
-	"github.com/kataras/iris"
+	"net/http"
+	"time"
 )
 
-type RegisterRequest struct {
-}
-
-type RegisterResponse struct {
+func NewAccountController(middleware *gin_jwt.JwtMiddleware, generator *gin_jwt.JwtGenerator) *AccountController {
+	return &AccountController{
+		service:    services.NewAccountService(),
+		middleware: middleware,
+		generator:  generator,
+	}
 }
 
 // AccountController is our /uaa controller.
 type AccountController struct {
-	mvc.C
-	Service services.AccountService
+	service    services.AccountService
+	middleware *gin_jwt.JwtMiddleware
+	generator  *gin_jwt.JwtGenerator
 }
 
-// PostRegister handles POST:/uaa/register.
-func (c *AccountController) PostRegister() (RegisterResponse, error) {
-	registerRequest := &RegisterRequest{}
+func (c *AccountController) Handler(root *gin.RouterGroup) {
+	root.GET("/register", c.RegisterHandler)
+	root.POST("/login", c.LoginHandler)
+	root.POST("/logout", c.middleware.Handler, c.LogoutHandler)
+	root.POST("/change_password", c.middleware.Handler, c.ChangePassword)
+}
 
-	if err := c.Ctx.ReadJSON(registerRequest); err != nil {
-		return RegisterResponse{}, err
-	}
+func (c *AccountController) RegisterHandler(ctx *gin.Context) {
+	registerRequest := &types.RegisterRequest{}
+	ctx.Bind(registerRequest)
 
-	user, err := c.Service.CreateUser()
+	user, err := c.service.Register(registerRequest.Username, registerRequest.Password, registerRequest.Roles)
 	if err != nil {
-		return RegisterResponse{}, err
-	}
-
-	registerResponse := RegisterResponse{}
-
-	return registerResponse, nil
-}
-
-//DeletePassword handles DELETE:/uaa/password
-func (c *AccountController) DeletePassword() () {
-
-}
-
-//PutPassword handles PUT:/uaa/password
-func (c *AccountController) PutPassword() () {
-
-}
-
-// GetLogin handles GET:/user/login.
-func (c *AccountController) GetLogin() () {
-	if c.isLoggedIn() {
-		c.logout()
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	c.Data["Title"] = "User Login"
-	c.Tmpl = PathLogin + ".html"
+
+	registerResponse := types.RegisterResponse{
+		Username:   user.Username,
+		Role:       user.Roles,
+		CreateDate: user.CreateDate,
+	}
+
+	ctx.JSON(http.StatusOK, registerResponse)
 }
 
-// PostLogin handles POST:/user/login.
-func (c *AccountController) PostLogin() {
-	var (
-		username = c.Ctx.FormValue("username")
-		password = c.Ctx.FormValue("password")
-	)
+func (c *AccountController) LoginHandler(ctx *gin.Context) {
+	loginRequest := &types.LoginRequest{}
+	ctx.Bind(loginRequest)
 
-	user, err := c.verify(username, password)
+	user, err := c.service.Verify(loginRequest.Username, loginRequest.Password)
 	if err != nil {
-		c.fireError(err)
+		ctx.AbortWithError(http.StatusUnauthorized, err)
 		return
 	}
 
-	c.Session.Set(sessionIDKey, user.ID)
-	c.Path = pathMyProfile
-}
+	token, err := c.generator.GenerateJwt(time.Hour, time.Hour*3, jwt.MapClaims{
+		"uid":      user.ID,
+		"username": user.Username,
+		"roles":    user.Roles,
+	})
 
-// AnyLogout handles any method on path /user/logout.
-func (c *AccountController) AnyLogout() {
-	c.logout()
-}
-
-// GetMe handles GET:/user/me.
-func (c *AccountController) GetMe() {
-	id, err := c.Session.GetInt64(sessionIDKey)
-	if err != nil || id <= 0 {
-		// when not already logged in.
-		c.Path = PathLogin
+	if err != nil {
+		ctx.AbortWithError(http.StatusUnauthorized, err)
 		return
 	}
 
-	u, found := c.Source.GetByID(id)
-	if !found {
-		// if the  session exists but for some reason the user doesn't exist in the "database"
-		// then logout him and redirect to the register page.
-		c.logout()
-		return
-	}
-
-	// set the model and render the view template.
-	c.User = u
-	c.Data["Title"] = "Profile of " + u.Username
-	c.Tmpl = pathMyProfile + ".html"
+	ctx.JSON(http.StatusOK, gin.H{
+		"access_token": token,
+		"type":         "bearer",
+		"expire_in":    time.Hour.Seconds(),
+	})
 }
 
+func (c *AccountController) ChangePassword(ctx *gin.Context) {
+	changePasswordRequest := &shard.ChangePasswordRequest{}
+	ctx.Bind(changePasswordRequest)
 
-// GetBy handles GET:/user/{id:long},
-// i.e http://localhost:8080/user/1
-func (c *AccountController) GetBy(userID int64) {
-	// we have /user/{id}
-	// fetch and render user json.
-	if user, found := c.Source.GetByID(userID); !found {
-		// not user found with that ID.
-		c.renderNotFound(userID)
-	} else {
-		c.Ctx.JSON(user)
+	token, err := c.middleware.ExtractToken(ctx)
+	if err != nil {
+		ctx.AbortWithError(http.StatusUnauthorized, err)
+		return
 	}
+	claims := token.Claims.(jwt.MapClaims)
+
+	if err := c.service.ChangePassword(claims["uid"].(string),
+		changePasswordRequest.OldPassword, changePasswordRequest.NewPassword); err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+	}
+}
+
+func (c *AccountController) LogoutHandler(ctx *gin.Context) {
+	//token, ok := ctx.Get("jwt")
+	//if !ok {
+	//}
+	//jwtToken := token.(*jwt.Token)
+	//claims := jwtToken.Claims.(jwt.MapClaims)
 }
