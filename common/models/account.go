@@ -14,15 +14,14 @@ const (
 )
 
 type Account struct {
-	UID                   string
-	Email                 string
-	CreateDate            time.Time
-	UnionIds              map[OAuthType]string
-	Password              string
-	AccountNonExpired     bool
-	AccountNonLocked      bool
-	CredentialsNonExpired bool
-	Role                  []string
-	Enabled               bool
-	UpdateDate            time.Time
+	UID                string               `bson:"_id" json:"uid"`
+	Email              string               `bson:"email" json:"email"`
+	CreateDate         time.Time            `bson:"create_date" json:"create_date"`
+	OAuthUserIds       map[OAuthType]string `bson:"oauth_user_ids" json:"oauth_user_ids"`
+	Password           string               `bson:"password" json:"password"`
+	AccountExpired     bool                 `bson:"account_expired" json:"account_expired"`
+	AccountLocked      bool                 `bson:"account_locked" json:"account_locked"`
+	CredentialsExpired bool                 `bson:"credentials_expired" json:"credentials_expired"`
+	Roles              []string             `bson:"roles" json:"roles"`
+	UpdateDate         time.Time            `bson:"update_date" json:"update_date"`
 }

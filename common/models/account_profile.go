@@ -11,16 +11,13 @@ const (
 )
 
 type AccountProfile struct {
-	UID string `json:"uid"`
-	/**
-	 * Account profile
-	 */
-	Firstname  string     `json:"firstname"`
-	Lastname   string     `json:"lastname"`
-	AvatarUrl  string     `json:"avatarUrl"`
-	Bio        string     `json:"bio"`
-	Birthday   time.Time  `json:"birthday"`
-	Gender     GenderType `json:"gender"`
-	UpdateDate time.Time  `json:"updateDate"`
-	Locale     string     `json:"locale"`
+	UID        string     `bson:"_id" json:"uid"`
+	Firstname  string     `bson:"firstname" json:"firstname"`
+	Lastname   string     `bson:"lastname" json:"lastname"`
+	AvatarUrl  string     `bson:"avatar_url" json:"avatar_url"`
+	Bio        string     `bson:"bio" json:"bio"`
+	Birthday   time.Time  `bson:"birthday" json:"birthday"`
+	Gender     GenderType `bson:"gender" json:"gender"`
+	UpdateDate time.Time  `bson:"update_date" json:"update_date"`
+	Locale     string     `bson:"locale" json:"locale"`
 }
