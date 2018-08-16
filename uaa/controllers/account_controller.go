@@ -3,7 +3,6 @@ package controllers
 import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/zhsyourai/URCF-engine/api/http/controllers/shard"
 	"github.com/zhsyourai/teddy-backend/common/gin-jwt"
 	"github.com/zhsyourai/teddy-backend/common/types"
 	"github.com/zhsyourai/teddy-backend/uaa/services"
@@ -81,7 +80,7 @@ func (c *AccountController) LoginHandler(ctx *gin.Context) {
 }
 
 func (c *AccountController) ChangePassword(ctx *gin.Context) {
-	changePasswordRequest := &shard.ChangePasswordRequest{}
+	changePasswordRequest := &types.ChangePasswordRequest{}
 	ctx.Bind(changePasswordRequest)
 
 	token, err := c.middleware.ExtractToken(ctx)
