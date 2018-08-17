@@ -16,7 +16,7 @@ var PasswordModifyErr = errors.New("password modify error")
 type Service interface {
 	GetAll() ([]models.Account, error)
 	GetByUsername(username string) (models.Account, error)
-	DeleteByUsername(username string) (models.Account, error)
+	DeleteByUsername(username string) error
 	Register(username string, password string, role []string) (models.Account, error)
 	Verify(username string, password string) (models.Account, error)
 	ChangePassword(username string, oldPassword string, newPassword string) error
@@ -72,13 +72,13 @@ func (s *accountService) GetByUsername(username string) (models.Account, error) 
 	return acc, nil
 }
 
-func (s *accountService) DeleteByUsername(username string) (models.Account, error) {
-	acc, err := s.repo.DeleteAccountByUsername(username)
+func (s *accountService) DeleteByUsername(username string) error {
+	err := s.repo.DeleteAccountByUsername(username)
 	if err != nil {
 		log.Error(err)
-		return models.Account{}, UserNotFoundErr
+		return UserNotFoundErr
 	}
-	return acc, nil
+	return nil
 }
 
 func (s *accountService) Verify(username string, password string) (models.Account, error) {
