@@ -14,18 +14,6 @@
   version = "v3.2.0"
 
 [[projects]]
-  name = "github.com/gin-contrib/cors"
-  packages = ["."]
-  revision = "cf4846e6a636a76237a28d9286f163c132e841bc"
-  version = "v1.2"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/gin-contrib/secure"
-  packages = ["."]
-  revision = "321782f6f9299d7ce1bda0467f2cf5db186bec7d"
-
-[[projects]]
   branch = "master"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
@@ -43,6 +31,15 @@
   version = "v1.3.0"
 
 [[projects]]
+  name = "github.com/go-log/log"
+  packages = [
+    ".",
+    "log"
+  ]
+  revision = "37e2e1f19306361e1fc152a1839f1236149cb4e4"
+  version = "v0.1.0"
+
+[[projects]]
   name = "github.com/go-stack/stack"
   packages = ["."]
   revision = "259ab82a6cad3992b4e21ff5cac294ccb06474bc"
@@ -51,8 +48,8 @@
 [[projects]]
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
-  version = "v1.1.0"
+  revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
@@ -65,6 +62,33 @@
   packages = ["."]
   revision = "064e2069ce9c359c118179501254f67d7d37ba24"
   version = "0.2"
+
+[[projects]]
+  name = "github.com/hashicorp/consul"
+  packages = [
+    "api",
+    "watch"
+  ]
+  revision = "e716d1b5f8be252b3e53906c6d5632e0228f30fa"
+  version = "v1.2.2"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/go-cleanhttp"
+  packages = ["."]
+  revision = "d5fe4b57a186c716b0e00b8c301cbd9b4182694d"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/go-rootcerts"
+  packages = ["."]
+  revision = "6bb64b370b90e7ef1fa532be9e591a81c3493e00"
+
+[[projects]]
+  name = "github.com/hashicorp/serf"
+  packages = ["coordinate"]
+  revision = "d6574a5bb1226678d7010325fb6c985db20ee458"
+  version = "v0.8.1"
 
 [[projects]]
   name = "github.com/iris-contrib/go.uuid"
@@ -89,6 +113,94 @@
   packages = ["."]
   revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
   version = "v0.0.3"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/micro/cli"
+  packages = ["."]
+  revision = "3d2263bb092286dde294a31049c92665f8373820"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/micro/go-log"
+  packages = ["."]
+  revision = "cbfa9447f9b655f8e66583237e51f40ca9bff860"
+
+[[projects]]
+  name = "github.com/micro/go-micro"
+  packages = [
+    ".",
+    "broker",
+    "broker/codec",
+    "broker/codec/json",
+    "broker/http",
+    "client",
+    "cmd",
+    "codec",
+    "codec/jsonrpc",
+    "codec/protorpc",
+    "errors",
+    "metadata",
+    "registry",
+    "registry/consul",
+    "registry/mdns",
+    "selector",
+    "selector/cache",
+    "server",
+    "server/debug",
+    "server/debug/proto",
+    "transport",
+    "transport/codec",
+    "transport/http"
+  ]
+  revision = "88505388c1d32136d5203876218f5f54d53a0e46"
+  version = "v0.10.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/micro/go-rcache"
+  packages = ["."]
+  revision = "a581a57b513351792b9f21fc8b95d87b1c5a95da"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/micro/mdns"
+  packages = ["."]
+  revision = "cdf30746f9f70dc7a366d3d885792a092fd83102"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/micro/util"
+  packages = [
+    "go/lib/addr",
+    "go/lib/net",
+    "go/lib/tls"
+  ]
+  revision = "4b7ed83e8520ab8fe6e5ef61fa2ede94b32f8602"
+
+[[projects]]
+  name = "github.com/miekg/dns"
+  packages = ["."]
+  revision = "5a2b9fab83ff0f8bfc99684bd5f43a37abe560f1"
+  version = "v1.0.8"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/go-homedir"
+  packages = ["."]
+  revision = "58046073cbffe2f25d425fe1331102f55cf719de"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/hashstructure"
+  packages = ["."]
+  revision = "2bca23e0e452137f789efbc8610126fd8b94f73b"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/mapstructure"
+  packages = ["."]
+  revision = "f15292f7a699fcc1a38a80977f80a046874ba8ac"
 
 [[projects]]
   name = "github.com/modern-go/concurrent"
@@ -159,6 +271,18 @@
   version = "v0.0.11"
 
 [[projects]]
+  name = "github.com/pborman/uuid"
+  packages = ["."]
+  revision = "e790cca94e6cc75c7064b1332e63811d4aae1a53"
+  version = "v1.1"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   revision = "3e01752db0189b9157070a0e1668a620f9a85da2"
@@ -185,24 +309,30 @@
   packages = [
     "bcrypt",
     "blowfish",
+    "ed25519",
+    "ed25519/internal/edwards25519",
     "pbkdf2",
     "ssh/terminal"
   ]
-  revision = "de0752318171da717af4ce24d0a2e8626afaeb11"
+  revision = "614d502a4dac94afa3a6ce146bd1736da82514c6"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["context"]
-  revision = "aaf60122140d3fcf75376d319f0554393160eb50"
+  packages = [
+    "bpf",
+    "context",
+    "internal/iana",
+    "internal/socket",
+    "ipv4",
+    "ipv6"
+  ]
+  revision = "922f4815f713f213882e8ef45e0d315b164d705c"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sync"
-  packages = [
-    "errgroup",
-    "semaphore"
-  ]
+  packages = ["semaphore"]
   revision = "1d60e4601c6fd243af51cc01ddf169918a5407ca"
 
 [[projects]]
@@ -212,7 +342,7 @@
     "unix",
     "windows"
   ]
-  revision = "1c9583448a9c3aa0f9a6a5241bf73c0bd8aafded"
+  revision = "3b58ed4ad3395d483fc92d5d14123ce2c3581fec"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v8"
@@ -229,6 +359,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d76b67756a83e61c1558f80bac06f6d069916765c077107f4796d9c3bc8e8752"
+  inputs-digest = "a666f8e47b2b4e7021e7aa0d0a45cc761cb220ee92eca941b95cd624480eb1d7"
   solver-name = "gps-cdcl"
   solver-version = 1

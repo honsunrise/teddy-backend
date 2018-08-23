@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package com.teddy.srv.uaa;
+
+option go_package = "proto";
+
+import "github.com/golang/protobuf/ptypes/empty/empty.proto";
+import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+service UAA {
+	rpc GetAll(google.protobuf.Empty) returns (GetAllResp) {}
+	rpc GetByUsername(GetByUsernameReq) returns (Account) {}
+    rpc DeleteByUsername(DeleteByUsernameReq) returns (google.protobuf.Empty) {}
+    rpc Register(RegisterReq) returns (Account) {}
+    rpc VerifyPassword(VerifyPasswordReq) returns (Account) {}
+    rpc ChangePassword(ChangePasswordReq) returns (google.protobuf.Empty) {}
+}
+
+enum OAuthType {
+    GOOGLE = 0;
+    WECHAT = 1;
+    QQ = 2;
+    SINA = 3;
+    FACEBOOK = 4;
+    TWITTER = 5;
+}
+
+message Account {
+    string uid = 1;
+    string username = 2;
+    string email = 3;
+    bytes password = 4;
+    bool accountExpired = 5;
+    bool accountLocked = 6;
+    bool credentialsExpired = 7;
+    repeated string roles = 8;
+    map<uint32, string> oauthUserIds = 9;
+    google.protobuf.Timestamp createDate = 10;
+    google.protobuf.Timestamp updateDate = 11;
+}
+
+message GetAllResp {
+    repeated Account accounts = 1;
+}
+
+message GetByUsernameReq {
+    string username = 1;
+}
+
+message DeleteByUsernameReq {
+    string username = 1;
+}
+
+message RegisterReq {
+    string username = 1;
+    string password = 2;
+    repeated string roles = 3;
+}
+
+message VerifyPasswordReq {
+    string username = 1;
+    string password = 2;
+}
+
+message ChangePasswordReq {
+    string username = 1;
+    string oldPassword = 2;
+    string newPassword = 3;
+}

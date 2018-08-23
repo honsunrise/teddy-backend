@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type OAuthType int
+type OAuthType uint32
 
 const (
 	GOOGLE OAuthType = iota
