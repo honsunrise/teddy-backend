@@ -4,6 +4,7 @@ import (
 	"github.com/micro/go-log"
 	"github.com/micro/go-micro"
 
+	"github.com/zhsyourai/teddy-backend/uaa/client"
 	"github.com/zhsyourai/teddy-backend/uaa/handler/account"
 	uaa "github.com/zhsyourai/teddy-backend/uaa/proto"
 )
@@ -16,7 +17,9 @@ func main() {
 	)
 
 	// Initialise service
-	service.Init()
+	service.Init(
+		// create wrap for the Example srv client
+		micro.WrapHandler(client.NotifyWrapper(service)))
 
 	// Register Handler
 	uaa.RegisterUAAHandler(service.Server(), account.GetInstance())
