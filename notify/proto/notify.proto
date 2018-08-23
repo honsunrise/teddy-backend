@@ -11,6 +11,20 @@ service Notify {
 	rpc SendEmail(SendEmailRequest) returns (google.protobuf.Empty) {}
 	rpc SendInBox(SendInBoxRequest) returns (google.protobuf.Empty) {}
 	rpc SendNotify(SendNotifyRequest) returns (google.protobuf.Empty) {}
+
+    rpc GetInBox(GetInBoxRequest) returns (stream InBoxEntry) {}
+    rpc GetNotify(GetNotifyRequest) returns (stream NotifyEntry) {}
+}
+
+message InBoxEntry {
+    string id = 1;
+    string topic = 2;
+    string cotent = 3;
+}
+
+message NotifyEntry {
+    string topic = 1;
+    string detail = 2;
 }
 
 message SendEmailRequest {
@@ -31,4 +45,12 @@ message SendNotifyRequest {
     string username = 1;
     string topic = 2;
     string detail = 3;
+}
+
+message GetInBoxRequest {
+    string username = 1;
+}
+
+message GetNotifyRequest {
+    string username = 1;
 }

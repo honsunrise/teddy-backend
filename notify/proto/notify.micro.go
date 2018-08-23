@@ -8,9 +8,13 @@ It is generated from these files:
 	proto/notify.proto
 
 It has these top-level messages:
+	InBoxEntry
+	NotifyEntry
 	SendEmailRequest
 	SendInBoxRequest
 	SendNotifyRequest
+	GetInBoxRequest
+	GetNotifyRequest
 */
 package proto
 
@@ -49,6 +53,8 @@ type NotifyService interface {
 	SendEmail(ctx context.Context, in *SendEmailRequest, opts ...client.CallOption) (*google_protobuf.Empty, error)
 	SendInBox(ctx context.Context, in *SendInBoxRequest, opts ...client.CallOption) (*google_protobuf.Empty, error)
 	SendNotify(ctx context.Context, in *SendNotifyRequest, opts ...client.CallOption) (*google_protobuf.Empty, error)
+	GetInBox(ctx context.Context, in *GetInBoxRequest, opts ...client.CallOption) (Notify_GetInBoxService, error)
+	GetNotify(ctx context.Context, in *GetNotifyRequest, opts ...client.CallOption) (Notify_GetNotifyService, error)
 }
 
 type notifyService struct {
@@ -99,12 +105,102 @@ func (c *notifyService) SendNotify(ctx context.Context, in *SendNotifyRequest, o
 	return out, nil
 }
 
+func (c *notifyService) GetInBox(ctx context.Context, in *GetInBoxRequest, opts ...client.CallOption) (Notify_GetInBoxService, error) {
+	req := c.c.NewRequest(c.name, "Notify.GetInBox", &GetInBoxRequest{})
+	stream, err := c.c.Stream(ctx, req, opts...)
+	if err != nil {
+		return nil, err
+	}
+	if err := stream.Send(in); err != nil {
+		return nil, err
+	}
+	return &notifyServiceGetInBox{stream}, nil
+}
+
+type Notify_GetInBoxService interface {
+	SendMsg(interface{}) error
+	RecvMsg(interface{}) error
+	Close() error
+	Recv() (*InBoxEntry, error)
+}
+
+type notifyServiceGetInBox struct {
+	stream client.Stream
+}
+
+func (x *notifyServiceGetInBox) Close() error {
+	return x.stream.Close()
+}
+
+func (x *notifyServiceGetInBox) SendMsg(m interface{}) error {
+	return x.stream.Send(m)
+}
+
+func (x *notifyServiceGetInBox) RecvMsg(m interface{}) error {
+	return x.stream.Recv(m)
+}
+
+func (x *notifyServiceGetInBox) Recv() (*InBoxEntry, error) {
+	m := new(InBoxEntry)
+	err := x.stream.Recv(m)
+	if err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *notifyService) GetNotify(ctx context.Context, in *GetNotifyRequest, opts ...client.CallOption) (Notify_GetNotifyService, error) {
+	req := c.c.NewRequest(c.name, "Notify.GetNotify", &GetNotifyRequest{})
+	stream, err := c.c.Stream(ctx, req, opts...)
+	if err != nil {
+		return nil, err
+	}
+	if err := stream.Send(in); err != nil {
+		return nil, err
+	}
+	return &notifyServiceGetNotify{stream}, nil
+}
+
+type Notify_GetNotifyService interface {
+	SendMsg(interface{}) error
+	RecvMsg(interface{}) error
+	Close() error
+	Recv() (*NotifyEntry, error)
+}
+
+type notifyServiceGetNotify struct {
+	stream client.Stream
+}
+
+func (x *notifyServiceGetNotify) Close() error {
+	return x.stream.Close()
+}
+
+func (x *notifyServiceGetNotify) SendMsg(m interface{}) error {
+	return x.stream.Send(m)
+}
+
+func (x *notifyServiceGetNotify) RecvMsg(m interface{}) error {
+	return x.stream.Recv(m)
+}
+
+func (x *notifyServiceGetNotify) Recv() (*NotifyEntry, error) {
+	m := new(NotifyEntry)
+	err := x.stream.Recv(m)
+	if err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // Server API for Notify service
 
 type NotifyHandler interface {
 	SendEmail(context.Context, *SendEmailRequest, *google_protobuf.Empty) error
 	SendInBox(context.Context, *SendInBoxRequest, *google_protobuf.Empty) error
 	SendNotify(context.Context, *SendNotifyRequest, *google_protobuf.Empty) error
+	GetInBox(context.Context, *GetInBoxRequest, Notify_GetInBoxStream) error
+	GetNotify(context.Context, *GetNotifyRequest, Notify_GetNotifyStream) error
 }
 
 func RegisterNotifyHandler(s server.Server, hdlr NotifyHandler, opts ...server.HandlerOption) error {
@@ -112,6 +208,8 @@ func RegisterNotifyHandler(s server.Server, hdlr NotifyHandler, opts ...server.H
 		SendEmail(ctx context.Context, in *SendEmailRequest, out *google_protobuf.Empty) error
 		SendInBox(ctx context.Context, in *SendInBoxRequest, out *google_protobuf.Empty) error
 		SendNotify(ctx context.Context, in *SendNotifyRequest, out *google_protobuf.Empty) error
+		GetInBox(ctx context.Context, stream server.Stream) error
+		GetNotify(ctx context.Context, stream server.Stream) error
 	}
 	type Notify struct {
 		notify
@@ -134,4 +232,74 @@ func (h *notifyHandler) SendInBox(ctx context.Context, in *SendInBoxRequest, out
 
 func (h *notifyHandler) SendNotify(ctx context.Context, in *SendNotifyRequest, out *google_protobuf.Empty) error {
 	return h.NotifyHandler.SendNotify(ctx, in, out)
+}
+
+func (h *notifyHandler) GetInBox(ctx context.Context, stream server.Stream) error {
+	m := new(GetInBoxRequest)
+	if err := stream.Recv(m); err != nil {
+		return err
+	}
+	return h.NotifyHandler.GetInBox(ctx, m, &notifyGetInBoxStream{stream})
+}
+
+type Notify_GetInBoxStream interface {
+	SendMsg(interface{}) error
+	RecvMsg(interface{}) error
+	Close() error
+	Send(*InBoxEntry) error
+}
+
+type notifyGetInBoxStream struct {
+	stream server.Stream
+}
+
+func (x *notifyGetInBoxStream) Close() error {
+	return x.stream.Close()
+}
+
+func (x *notifyGetInBoxStream) SendMsg(m interface{}) error {
+	return x.stream.Send(m)
+}
+
+func (x *notifyGetInBoxStream) RecvMsg(m interface{}) error {
+	return x.stream.Recv(m)
+}
+
+func (x *notifyGetInBoxStream) Send(m *InBoxEntry) error {
+	return x.stream.Send(m)
+}
+
+func (h *notifyHandler) GetNotify(ctx context.Context, stream server.Stream) error {
+	m := new(GetNotifyRequest)
+	if err := stream.Recv(m); err != nil {
+		return err
+	}
+	return h.NotifyHandler.GetNotify(ctx, m, &notifyGetNotifyStream{stream})
+}
+
+type Notify_GetNotifyStream interface {
+	SendMsg(interface{}) error
+	RecvMsg(interface{}) error
+	Close() error
+	Send(*NotifyEntry) error
+}
+
+type notifyGetNotifyStream struct {
+	stream server.Stream
+}
+
+func (x *notifyGetNotifyStream) Close() error {
+	return x.stream.Close()
+}
+
+func (x *notifyGetNotifyStream) SendMsg(m interface{}) error {
+	return x.stream.Send(m)
+}
+
+func (x *notifyGetNotifyStream) RecvMsg(m interface{}) error {
+	return x.stream.Recv(m)
+}
+
+func (x *notifyGetNotifyStream) Send(m *NotifyEntry) error {
+	return x.stream.Send(m)
 }
