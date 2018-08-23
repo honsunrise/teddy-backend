@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package com.teddy.srv.notify;
+
+option go_package = "proto";
+
+import "github.com/golang/protobuf/ptypes/empty/empty.proto";
+import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
+
+service Notify {
+	rpc SendEmail(SendEmailRequest) returns (google.protobuf.Empty) {}
+	rpc SendInBox(SendInBoxRequest) returns (google.protobuf.Empty) {}
+	rpc SendNotify(SendNotifyRequest) returns (google.protobuf.Empty) {}
+}
+
+message SendEmailRequest {
+	string email = 1;
+    string topic = 2;
+    string cotent = 3;
+    google.protobuf.Timestamp until = 4;
+}
+
+message SendInBoxRequest {
+    string username = 1;
+    string topic = 2;
+    string content = 3;
+    google.protobuf.Timestamp until = 4;
+}
+
+message SendNotifyRequest {
+    string username = 1;
+    string topic = 2;
+    string detail = 3;
+}
