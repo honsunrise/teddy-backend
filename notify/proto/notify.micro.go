@@ -10,11 +10,12 @@ It is generated from these files:
 It has these top-level messages:
 	InBoxEntry
 	NotifyEntry
-	SendEmailRequest
-	SendInBoxRequest
-	SendNotifyRequest
-	GetInBoxRequest
-	GetNotifyRequest
+	SendEmailReq
+	SendInBoxReq
+	SendNotifyReq
+	SendSMSReq
+	GetInBoxReq
+	GetNotifyReq
 */
 package proto
 
@@ -50,11 +51,12 @@ var _ server.Option
 // Client API for Notify service
 
 type NotifyService interface {
-	SendEmail(ctx context.Context, in *SendEmailRequest, opts ...client.CallOption) (*google_protobuf.Empty, error)
-	SendInBox(ctx context.Context, in *SendInBoxRequest, opts ...client.CallOption) (*google_protobuf.Empty, error)
-	SendNotify(ctx context.Context, in *SendNotifyRequest, opts ...client.CallOption) (*google_protobuf.Empty, error)
-	GetInBox(ctx context.Context, in *GetInBoxRequest, opts ...client.CallOption) (Notify_GetInBoxService, error)
-	GetNotify(ctx context.Context, in *GetNotifyRequest, opts ...client.CallOption) (Notify_GetNotifyService, error)
+	SendEmail(ctx context.Context, in *SendEmailReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
+	SendInBox(ctx context.Context, in *SendInBoxReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
+	SendNotify(ctx context.Context, in *SendNotifyReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
+	SendSMS(ctx context.Context, in *SendSMSReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
+	GetInBox(ctx context.Context, in *GetInBoxReq, opts ...client.CallOption) (Notify_GetInBoxService, error)
+	GetNotify(ctx context.Context, in *GetNotifyReq, opts ...client.CallOption) (Notify_GetNotifyService, error)
 }
 
 type notifyService struct {
@@ -75,7 +77,7 @@ func NewNotifyService(name string, c client.Client) NotifyService {
 	}
 }
 
-func (c *notifyService) SendEmail(ctx context.Context, in *SendEmailRequest, opts ...client.CallOption) (*google_protobuf.Empty, error) {
+func (c *notifyService) SendEmail(ctx context.Context, in *SendEmailReq, opts ...client.CallOption) (*google_protobuf.Empty, error) {
 	req := c.c.NewRequest(c.name, "Notify.SendEmail", in)
 	out := new(google_protobuf.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
@@ -85,7 +87,7 @@ func (c *notifyService) SendEmail(ctx context.Context, in *SendEmailRequest, opt
 	return out, nil
 }
 
-func (c *notifyService) SendInBox(ctx context.Context, in *SendInBoxRequest, opts ...client.CallOption) (*google_protobuf.Empty, error) {
+func (c *notifyService) SendInBox(ctx context.Context, in *SendInBoxReq, opts ...client.CallOption) (*google_protobuf.Empty, error) {
 	req := c.c.NewRequest(c.name, "Notify.SendInBox", in)
 	out := new(google_protobuf.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
@@ -95,7 +97,7 @@ func (c *notifyService) SendInBox(ctx context.Context, in *SendInBoxRequest, opt
 	return out, nil
 }
 
-func (c *notifyService) SendNotify(ctx context.Context, in *SendNotifyRequest, opts ...client.CallOption) (*google_protobuf.Empty, error) {
+func (c *notifyService) SendNotify(ctx context.Context, in *SendNotifyReq, opts ...client.CallOption) (*google_protobuf.Empty, error) {
 	req := c.c.NewRequest(c.name, "Notify.SendNotify", in)
 	out := new(google_protobuf.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
@@ -105,8 +107,18 @@ func (c *notifyService) SendNotify(ctx context.Context, in *SendNotifyRequest, o
 	return out, nil
 }
 
-func (c *notifyService) GetInBox(ctx context.Context, in *GetInBoxRequest, opts ...client.CallOption) (Notify_GetInBoxService, error) {
-	req := c.c.NewRequest(c.name, "Notify.GetInBox", &GetInBoxRequest{})
+func (c *notifyService) SendSMS(ctx context.Context, in *SendSMSReq, opts ...client.CallOption) (*google_protobuf.Empty, error) {
+	req := c.c.NewRequest(c.name, "Notify.SendSMS", in)
+	out := new(google_protobuf.Empty)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notifyService) GetInBox(ctx context.Context, in *GetInBoxReq, opts ...client.CallOption) (Notify_GetInBoxService, error) {
+	req := c.c.NewRequest(c.name, "Notify.GetInBox", &GetInBoxReq{})
 	stream, err := c.c.Stream(ctx, req, opts...)
 	if err != nil {
 		return nil, err
@@ -149,8 +161,8 @@ func (x *notifyServiceGetInBox) Recv() (*InBoxEntry, error) {
 	return m, nil
 }
 
-func (c *notifyService) GetNotify(ctx context.Context, in *GetNotifyRequest, opts ...client.CallOption) (Notify_GetNotifyService, error) {
-	req := c.c.NewRequest(c.name, "Notify.GetNotify", &GetNotifyRequest{})
+func (c *notifyService) GetNotify(ctx context.Context, in *GetNotifyReq, opts ...client.CallOption) (Notify_GetNotifyService, error) {
+	req := c.c.NewRequest(c.name, "Notify.GetNotify", &GetNotifyReq{})
 	stream, err := c.c.Stream(ctx, req, opts...)
 	if err != nil {
 		return nil, err
@@ -196,18 +208,20 @@ func (x *notifyServiceGetNotify) Recv() (*NotifyEntry, error) {
 // Server API for Notify service
 
 type NotifyHandler interface {
-	SendEmail(context.Context, *SendEmailRequest, *google_protobuf.Empty) error
-	SendInBox(context.Context, *SendInBoxRequest, *google_protobuf.Empty) error
-	SendNotify(context.Context, *SendNotifyRequest, *google_protobuf.Empty) error
-	GetInBox(context.Context, *GetInBoxRequest, Notify_GetInBoxStream) error
-	GetNotify(context.Context, *GetNotifyRequest, Notify_GetNotifyStream) error
+	SendEmail(context.Context, *SendEmailReq, *google_protobuf.Empty) error
+	SendInBox(context.Context, *SendInBoxReq, *google_protobuf.Empty) error
+	SendNotify(context.Context, *SendNotifyReq, *google_protobuf.Empty) error
+	SendSMS(context.Context, *SendSMSReq, *google_protobuf.Empty) error
+	GetInBox(context.Context, *GetInBoxReq, Notify_GetInBoxStream) error
+	GetNotify(context.Context, *GetNotifyReq, Notify_GetNotifyStream) error
 }
 
 func RegisterNotifyHandler(s server.Server, hdlr NotifyHandler, opts ...server.HandlerOption) error {
 	type notify interface {
-		SendEmail(ctx context.Context, in *SendEmailRequest, out *google_protobuf.Empty) error
-		SendInBox(ctx context.Context, in *SendInBoxRequest, out *google_protobuf.Empty) error
-		SendNotify(ctx context.Context, in *SendNotifyRequest, out *google_protobuf.Empty) error
+		SendEmail(ctx context.Context, in *SendEmailReq, out *google_protobuf.Empty) error
+		SendInBox(ctx context.Context, in *SendInBoxReq, out *google_protobuf.Empty) error
+		SendNotify(ctx context.Context, in *SendNotifyReq, out *google_protobuf.Empty) error
+		SendSMS(ctx context.Context, in *SendSMSReq, out *google_protobuf.Empty) error
 		GetInBox(ctx context.Context, stream server.Stream) error
 		GetNotify(ctx context.Context, stream server.Stream) error
 	}
@@ -222,20 +236,24 @@ type notifyHandler struct {
 	NotifyHandler
 }
 
-func (h *notifyHandler) SendEmail(ctx context.Context, in *SendEmailRequest, out *google_protobuf.Empty) error {
+func (h *notifyHandler) SendEmail(ctx context.Context, in *SendEmailReq, out *google_protobuf.Empty) error {
 	return h.NotifyHandler.SendEmail(ctx, in, out)
 }
 
-func (h *notifyHandler) SendInBox(ctx context.Context, in *SendInBoxRequest, out *google_protobuf.Empty) error {
+func (h *notifyHandler) SendInBox(ctx context.Context, in *SendInBoxReq, out *google_protobuf.Empty) error {
 	return h.NotifyHandler.SendInBox(ctx, in, out)
 }
 
-func (h *notifyHandler) SendNotify(ctx context.Context, in *SendNotifyRequest, out *google_protobuf.Empty) error {
+func (h *notifyHandler) SendNotify(ctx context.Context, in *SendNotifyReq, out *google_protobuf.Empty) error {
 	return h.NotifyHandler.SendNotify(ctx, in, out)
 }
 
+func (h *notifyHandler) SendSMS(ctx context.Context, in *SendSMSReq, out *google_protobuf.Empty) error {
+	return h.NotifyHandler.SendSMS(ctx, in, out)
+}
+
 func (h *notifyHandler) GetInBox(ctx context.Context, stream server.Stream) error {
-	m := new(GetInBoxRequest)
+	m := new(GetInBoxReq)
 	if err := stream.Recv(m); err != nil {
 		return err
 	}
@@ -270,7 +288,7 @@ func (x *notifyGetInBoxStream) Send(m *InBoxEntry) error {
 }
 
 func (h *notifyHandler) GetNotify(ctx context.Context, stream server.Stream) error {
-	m := new(GetNotifyRequest)
+	m := new(GetNotifyReq)
 	if err := stream.Recv(m); err != nil {
 		return err
 	}

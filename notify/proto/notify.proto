@@ -8,12 +8,13 @@ import "github.com/golang/protobuf/ptypes/empty/empty.proto";
 import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
 
 service Notify {
-	rpc SendEmail(SendEmailRequest) returns (google.protobuf.Empty) {}
-	rpc SendInBox(SendInBoxRequest) returns (google.protobuf.Empty) {}
-	rpc SendNotify(SendNotifyRequest) returns (google.protobuf.Empty) {}
+	rpc SendEmail(SendEmailReq) returns (google.protobuf.Empty) {}
+	rpc SendInBox(SendInBoxReq) returns (google.protobuf.Empty) {}
+	rpc SendNotify(SendNotifyReq) returns (google.protobuf.Empty) {}
+    rpc SendSMS(SendSMSReq) returns (google.protobuf.Empty) {}
 
-    rpc GetInBox(GetInBoxRequest) returns (stream InBoxEntry) {}
-    rpc GetNotify(GetNotifyRequest) returns (stream NotifyEntry) {}
+    rpc GetInBox(GetInBoxReq) returns (stream InBoxEntry) {}
+    rpc GetNotify(GetNotifyReq) returns (stream NotifyEntry) {}
 }
 
 message InBoxEntry {
@@ -27,30 +28,36 @@ message NotifyEntry {
     string detail = 2;
 }
 
-message SendEmailRequest {
+message SendEmailReq {
 	string email = 1;
     string topic = 2;
     string cotent = 3;
     google.protobuf.Timestamp until = 4;
 }
 
-message SendInBoxRequest {
+message SendInBoxReq {
     string username = 1;
     string topic = 2;
     string content = 3;
     google.protobuf.Timestamp until = 4;
 }
 
-message SendNotifyRequest {
+message SendNotifyReq {
     string username = 1;
     string topic = 2;
     string detail = 3;
 }
 
-message GetInBoxRequest {
+message SendSMSReq {
+    string phoneNumber = 1;
+    string content = 2;
+    google.protobuf.Timestamp until = 3;
+}
+
+message GetInBoxReq {
     string username = 1;
 }
 
-message GetNotifyRequest {
+message GetNotifyReq {
     string username = 1;
 }

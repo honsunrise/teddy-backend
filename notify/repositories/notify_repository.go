@@ -6,99 +6,195 @@ import (
 	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
+	"github.com/mongodb/mongo-go-driver/mongo/findopt"
 	"github.com/zhsyourai/teddy-backend/common/models"
 	"reflect"
 )
 
-type AccountRepository interface {
-	InsertAccount(account *models.Account) error
-	FindAccountByUsername(username string) (models.Account, error)
-	FindAll() ([]models.Account, error)
-	DeleteAccountByUsername(username string) error
-	UpdateAccountByUsername(username string, account map[string]interface{}) (models.Account, error)
+type InBoxRepository interface {
+	InsertInBoxItem(uid string, item *models.InBoxItem) error
+	FindInBoxItems(uid string, itemType models.InBoxType, page uint32, size uint32) ([]models.InBoxItem, error)
+	FindInBoxItem(uid string, id string) (models.InBoxItem, error)
+	DeleteAllInBoxItem(uid string) error
+	DeleteInBoxItems(uid string, ids []string) error
+	UpdateInBoxItem(uid string, id string, fields map[string]interface{}) error
+	UpdateInBoxItems(uid string, ids []string, fields map[string]interface{}) error
 }
 
-func NewAccountRepository(client *mongo.Client) AccountRepository {
-	return &accountMemoryRepository{
+func NewInBoxRepository(client *mongo.Client) InBoxRepository {
+	return &inboxRepository{
 		ctx:         context.Background(),
 		client:      client,
-		collections: client.Database("Account").Collection("Account"),
+		collections: client.Database("InBox").Collection("InBox"),
 	}
 }
 
-type accountMemoryRepository struct {
+type inboxRepository struct {
 	ctx         context.Context
 	client      *mongo.Client
 	collections *mongo.Collection
 }
 
-func (repo *accountMemoryRepository) InsertAccount(account *models.Account) error {
-	_, err := repo.collections.InsertOne(repo.ctx, account)
+func (repo *inboxRepository) InsertInBoxItem(uid string, item *models.InBoxItem) error {
+	filter := bson.NewDocument(bson.EC.String("uid", uid))
+	update := bson.NewDocument(
+		bson.EC.SubDocumentFromElements("$addToSet", bson.EC.Interface("items", item)),
+		bson.EC.SubDocumentFromElements("$inc", bson.EC.Int64("unread_count", 1)))
+	result := repo.collections.FindOneAndUpdate(repo.ctx, filter, update)
+	if result.Decode(nil) == mongo.ErrNoDocuments {
+		inbox := models.InBox{
+			Uid: uid,
+			Items: []models.InBoxItem{
+				*item,
+			},
+		}
+		_, err := repo.collections.InsertOne(repo.ctx, &inbox)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (repo *inboxRepository) FindInBoxItems(uid string, itemType models.InBoxType, page uint32,
+	size uint32) (items []models.InBoxItem, err error) {
+	filter := bson.NewDocument(
+		bson.EC.String("uid", uid),
+		bson.EC.SubDocumentFromElements("items",
+			bson.EC.ArrayFromElements("$slice", bson.VC.Int64(int64(page*size)), bson.VC.Int64(int64(size))),
+		),
+	)
+	var inbox models.InBox
+	err = repo.collections.FindOne(repo.ctx, filter).Decode(&inbox)
+	if err != nil {
+		return
+	}
+	items = append(items, inbox.Items...)
+	return
+}
+
+func (repo *inboxRepository) FindInBoxItem(uid string, id string) (item models.InBoxItem, err error) {
+	filter := bson.NewDocument(
+		bson.EC.String("uid", uid),
+		bson.EC.SubDocumentFromElements("items",
+			bson.EC.SubDocumentFromElements("$elemMatch", bson.EC.String("id", id)),
+		),
+	)
+	var inbox models.InBox
+	err = repo.collections.FindOne(repo.ctx, filter, findopt.Projection(bson.NewDocument(
+		bson.EC.Int32("items.$", 1),
+		bson.EC.Int32("uid", 1),
+	))).Decode(&inbox)
+	if err != nil {
+		return
+	}
+	item = inbox.Items[0]
+	return
+}
+
+func (repo *inboxRepository) DeleteAllInBoxItem(uid string) error {
+	filter := bson.NewDocument(bson.EC.String("uid", uid))
+	update := bson.NewDocument(
+		bson.EC.SubDocumentFromElements("$set", bson.EC.Int64("unread_count", 0)),
+		bson.EC.SubDocumentFromElements("$unset", bson.EC.String("items", "")),
+	)
+	_, err := repo.collections.UpdateOne(repo.ctx, filter, update)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (repo *accountMemoryRepository) FindAccountByUsername(username string) (account models.Account, err error) {
-	filter := bson.NewDocument(bson.EC.String("username", username))
-	err = repo.collections.FindOne(repo.ctx, filter).Decode(&account)
-	if err != nil {
-		return
+func (repo *inboxRepository) DeleteInBoxItems(uid string, ids []string) error {
+	filter := bson.NewDocument(bson.EC.String("uid", uid))
+	var bsonIds []*bson.Value
+	for _, id := range ids {
+		bsonIds = append(bsonIds, bson.VC.String(id))
 	}
-	return
+	update := bson.NewDocument(
+		bson.EC.SubDocumentFromElements("$pull",
+			bson.EC.SubDocumentFromElements("items",
+				bson.EC.SubDocumentFromElements("id", bson.EC.ArrayFromElements("$in", bsonIds...)),
+			),
+		),
+	)
+	_, err := repo.collections.UpdateOne(repo.ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (repo *accountMemoryRepository) FindAll() (accounts []models.Account, err error) {
-	var cur mongo.Cursor
-	cur, err = repo.collections.Find(repo.ctx, nil)
+func (repo *inboxRepository) UpdateInBoxItem(uid string, id string, fields map[string]interface{}) error {
+	var inbox models.InBox
+	filter := bson.NewDocument(
+		bson.EC.String("uid", uid),
+		bson.EC.SubDocumentFromElements("items",
+			bson.EC.SubDocumentFromElements("$elemMatch", bson.EC.String("id", id)),
+		),
+	)
+	err := repo.collections.FindOne(repo.ctx, filter).Decode(&inbox)
 	if err != nil {
-		return
-	}
-	defer cur.Close(repo.ctx)
-	for cur.Next(repo.ctx) {
-		var elem models.Account
-		err = cur.Decode(&elem)
-		if err != nil {
-			return
-		}
-		accounts = append(accounts, elem)
-	}
-	err = cur.Err()
-	return
-}
-
-func (repo *accountMemoryRepository) DeleteAccountByUsername(username string) (err error) {
-	filter := bson.NewDocument(bson.EC.String("username", username))
-	_, err = repo.collections.DeleteOne(repo.ctx, filter)
-	if err != nil {
-		return
-	}
-	return
-}
-
-func (repo *accountMemoryRepository) UpdateAccountByUsername(username string,
-	fields map[string]interface{}) (account models.Account, err error) {
-	filter := bson.NewDocument(bson.EC.String("username", username))
-	err = repo.collections.FindOne(repo.ctx, filter).Decode(&account)
-	if err != nil {
-		return
+		return err
 	}
 
-	s := reflect.ValueOf(&account).Elem()
+	s := reflect.ValueOf(&inbox.Items[0]).Elem()
 	for k, v := range fields {
 		field := s.FieldByName(k)
 		if field.IsValid() {
 			field.Set(reflect.ValueOf(v))
 		} else {
-			err = errors.New(fmt.Sprintf("field %s not exist", k))
-			return
+			return errors.New(fmt.Sprintf("field %s not exist", k))
 		}
 	}
 
-	_, err = repo.collections.UpdateOne(repo.ctx, filter, account)
+	update := bson.NewDocument(
+		bson.EC.SubDocumentFromElements("$set",
+			bson.EC.Interface("items.$", inbox.Items[0])),
+	)
+	_, err = repo.collections.UpdateOne(repo.ctx, filter, update)
 	if err != nil {
-		return
+		return err
 	}
-	return
+	return nil
+}
+
+func (repo *inboxRepository) UpdateInBoxItems(uid string, ids []string, fields map[string]interface{}) error {
+	var inbox models.InBox
+	var bsonIds []*bson.Value
+	for _, id := range ids {
+		bsonIds = append(bsonIds, bson.VC.String(id))
+	}
+	filter := bson.NewDocument(
+		bson.EC.String("uid", uid),
+		bson.EC.SubDocumentFromElements("items",
+			bson.EC.SubDocumentFromElements("$elemMatch",
+				bson.EC.SubDocumentFromElements("id", bson.EC.ArrayFromElements("$in", bsonIds...)),
+			),
+		),
+	)
+	err := repo.collections.FindOne(repo.ctx, filter).Decode(&inbox)
+	if err != nil {
+		return err
+	}
+
+	s := reflect.ValueOf(&inbox.Items[0]).Elem()
+	for k, v := range fields {
+		field := s.FieldByName(k)
+		if field.IsValid() {
+			field.Set(reflect.ValueOf(v))
+		} else {
+			return errors.New(fmt.Sprintf("field %s not exist", k))
+		}
+	}
+
+	update := bson.NewDocument(
+		bson.EC.SubDocumentFromElements("$set",
+			bson.EC.Interface("items.$", inbox.Items[0])),
+	)
+	_, err = repo.collections.UpdateOne(repo.ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
