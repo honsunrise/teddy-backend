@@ -5,7 +5,7 @@ This is the Uaa-Srv service
 Generated with
 
 ```
-micro new github.com/zhsyourai/teddy-backend/uaa-srv --namespace=go.micro --fqdn=com.teddy.srv.uaa --type=srv
+micro new github.com/zhsyourai/teddy-backend/uaa --namespace=go.micro --fqdn=com.teddy.srv.uaa --type=srv
 ```
 
 ## Getting Started
