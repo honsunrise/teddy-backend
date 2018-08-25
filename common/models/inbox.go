@@ -9,6 +9,7 @@ const (
 	AT
 	REVIEW
 	PRIVATE
+	ALL
 )
 
 type InBoxItem struct {
@@ -23,7 +24,6 @@ type InBoxItem struct {
 }
 
 type InBox struct {
-	Uid         string
-	Items       []InBoxItem
-	UnReadCount uint64 `json:"unread_count"`
+	Uid   string
+	Items []InBoxItem
 }

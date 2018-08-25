@@ -2,22 +2,20 @@ package repositories
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/mongodb/mongo-go-driver/mongo/findopt"
 	"github.com/zhsyourai/teddy-backend/common/models"
-	"reflect"
+	"github.com/zhsyourai/teddy-backend/common/types"
 )
 
 type InBoxRepository interface {
 	InsertInBoxItem(uid string, item *models.InBoxItem) error
-	FindInBoxItems(uid string, itemType models.InBoxType, page uint32, size uint32) ([]models.InBoxItem, error)
+	FindInBoxItems(uid string, itemType models.InBoxType, page uint32, size uint32, sorts []types.Sort) ([]models.InBoxItem, error)
 	FindInBoxItem(uid string, id string) (models.InBoxItem, error)
+	FindInBoxUnreadCount(uid string) (int64, error)
 	DeleteAllInBoxItem(uid string) error
 	DeleteInBoxItems(uid string, ids []string) error
-	UpdateInBoxItem(uid string, id string, fields map[string]interface{}) error
 	UpdateInBoxItems(uid string, ids []string, fields map[string]interface{}) error
 }
 
@@ -39,7 +37,7 @@ func (repo *inboxRepository) InsertInBoxItem(uid string, item *models.InBoxItem)
 	filter := bson.NewDocument(bson.EC.String("uid", uid))
 	update := bson.NewDocument(
 		bson.EC.SubDocumentFromElements("$addToSet", bson.EC.Interface("items", item)),
-		bson.EC.SubDocumentFromElements("$inc", bson.EC.Int64("unread_count", 1)))
+	)
 	result := repo.collections.FindOneAndUpdate(repo.ctx, filter, update)
 	if result.Decode(nil) == mongo.ErrNoDocuments {
 		inbox := models.InBox{
@@ -56,46 +54,105 @@ func (repo *inboxRepository) InsertInBoxItem(uid string, item *models.InBoxItem)
 	return nil
 }
 
-func (repo *inboxRepository) FindInBoxItems(uid string, itemType models.InBoxType, page uint32,
-	size uint32) (items []models.InBoxItem, err error) {
-	filter := bson.NewDocument(
-		bson.EC.String("uid", uid),
-		bson.EC.SubDocumentFromElements("items",
-			bson.EC.ArrayFromElements("$slice", bson.VC.Int64(int64(page*size)), bson.VC.Int64(int64(size))),
-		),
-	)
-	var inbox models.InBox
-	err = repo.collections.FindOne(repo.ctx, filter).Decode(&inbox)
-	if err != nil {
-		return
+func (repo *inboxRepository) internalFindInBoxItems(uid string, itemType models.InBoxType, ids []string, page uint32,
+	size uint32, sorts []types.Sort) ([]models.InBoxItem, error) {
+	var cur mongo.Cursor
+	var itemsTypeFilter *bson.Element = nil
+	if itemType != models.ALL {
+		itemsTypeFilter = bson.EC.Int64("items.type", int64(itemType))
 	}
-	items = append(items, inbox.Items...)
-	return
+	var itemsIdsFilter *bson.Element = nil
+	if len(ids) != 0 {
+		var bsonIds = make([]*bson.Value, 0, len(ids))
+		for _, id := range ids {
+			bsonIds = append(bsonIds, bson.VC.String(id))
+		}
+		itemsIdsFilter = bson.EC.SubDocumentFromElements("items.id",
+			bson.EC.ArrayFromElements("$in", bsonIds...),
+		)
+	}
+	var dynFilter = make([]*bson.Element, 0, 2)
+	if itemsTypeFilter != nil {
+		dynFilter = append(dynFilter, itemsTypeFilter)
+	}
+	if itemsIdsFilter != nil {
+		dynFilter = append(dynFilter, itemsIdsFilter)
+	}
+	var itemsSorts []*bson.Element
+	if len(sorts) != 0 {
+		itemsSorts = make([]*bson.Element, 0, len(sorts))
+		for _, sort := range sorts {
+			itemsSorts = append(itemsSorts, bson.EC.Int32(sort.Name, int32(sort.Order)))
+		}
+	}
+	pipeline := bson.NewDocument(
+		bson.EC.SubDocumentFromElements("$match", bson.EC.String("uid", uid)),
+		bson.EC.String("$unwind", "$items"),
+		bson.EC.SubDocumentFromElements("$match", dynFilter...),
+		bson.EC.String("$count", "count"),
+		bson.EC.Int64("$skip", int64(size*page)),
+		bson.EC.Int64("$limit", int64(size)),
+		bson.EC.SubDocumentFromElements("$sort", itemsSorts...),
+	)
+	repo.collections.Aggregate(repo.ctx, pipeline)
+	items := make([]models.InBoxItem, 0, 50)
+	defer cur.Close(repo.ctx)
+	for cur.Next(repo.ctx) {
+		var item models.InBoxItem
+		err := cur.Decode(&item)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+	err := cur.Err()
+	if err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
-func (repo *inboxRepository) FindInBoxItem(uid string, id string) (item models.InBoxItem, err error) {
-	filter := bson.NewDocument(
-		bson.EC.String("uid", uid),
-		bson.EC.SubDocumentFromElements("items",
-			bson.EC.SubDocumentFromElements("$elemMatch", bson.EC.String("id", id)),
-		),
-	)
-	var inbox models.InBox
-	err = repo.collections.FindOne(repo.ctx, filter, findopt.Projection(bson.NewDocument(
-		bson.EC.Int32("items.$", 1),
-		bson.EC.Int32("uid", 1),
-	))).Decode(&inbox)
+func (repo *inboxRepository) FindInBoxItems(uid string, itemType models.InBoxType, page uint32,
+	size uint32, sorts []types.Sort) ([]models.InBoxItem, error) {
+	return repo.internalFindInBoxItems(uid, itemType, nil, page, size, sorts)
+}
+
+func (repo *inboxRepository) FindInBoxItem(uid string, id string) (models.InBoxItem, error) {
+	result, err := repo.internalFindInBoxItems(uid, models.ALL, []string{id}, 0, 1, nil)
 	if err != nil {
-		return
+		return models.InBoxItem{}, nil
 	}
-	item = inbox.Items[0]
-	return
+	return result[0], nil
+}
+
+func (repo *inboxRepository) FindInBoxUnreadCount(uid string) (int64, error) {
+	var cur mongo.Cursor
+	pipeline := bson.NewDocument(
+		bson.EC.SubDocumentFromElements("$match", bson.EC.String("uid", uid)),
+		bson.EC.String("$unwind", "$items"),
+		bson.EC.SubDocumentFromElements("$match", bson.EC.Boolean("items.unread", true)),
+		bson.EC.String("$count", "count"),
+	)
+	repo.collections.Aggregate(repo.ctx, pipeline)
+	elem := make(map[string]interface{})
+	defer cur.Close(repo.ctx)
+	for cur.Next(repo.ctx) {
+		err := cur.Decode(&elem)
+		if err != nil {
+			return 0, err
+		}
+		break
+	}
+	err := cur.Err()
+	if err != nil {
+		return 0, err
+	}
+	return elem["count"].(int64), nil
 }
 
 func (repo *inboxRepository) DeleteAllInBoxItem(uid string) error {
 	filter := bson.NewDocument(bson.EC.String("uid", uid))
 	update := bson.NewDocument(
-		bson.EC.SubDocumentFromElements("$set", bson.EC.Int64("unread_count", 0)),
 		bson.EC.SubDocumentFromElements("$unset", bson.EC.String("items", "")),
 	)
 	_, err := repo.collections.UpdateOne(repo.ctx, filter, update)
@@ -107,7 +164,7 @@ func (repo *inboxRepository) DeleteAllInBoxItem(uid string) error {
 
 func (repo *inboxRepository) DeleteInBoxItems(uid string, ids []string) error {
 	filter := bson.NewDocument(bson.EC.String("uid", uid))
-	var bsonIds []*bson.Value
+	var bsonIds = make([]*bson.Value, 0, len(ids))
 	for _, id := range ids {
 		bsonIds = append(bsonIds, bson.VC.String(id))
 	}
@@ -125,42 +182,7 @@ func (repo *inboxRepository) DeleteInBoxItems(uid string, ids []string) error {
 	return nil
 }
 
-func (repo *inboxRepository) UpdateInBoxItem(uid string, id string, fields map[string]interface{}) error {
-	var inbox models.InBox
-	filter := bson.NewDocument(
-		bson.EC.String("uid", uid),
-		bson.EC.SubDocumentFromElements("items",
-			bson.EC.SubDocumentFromElements("$elemMatch", bson.EC.String("id", id)),
-		),
-	)
-	err := repo.collections.FindOne(repo.ctx, filter).Decode(&inbox)
-	if err != nil {
-		return err
-	}
-
-	s := reflect.ValueOf(&inbox.Items[0]).Elem()
-	for k, v := range fields {
-		field := s.FieldByName(k)
-		if field.IsValid() {
-			field.Set(reflect.ValueOf(v))
-		} else {
-			return errors.New(fmt.Sprintf("field %s not exist", k))
-		}
-	}
-
-	update := bson.NewDocument(
-		bson.EC.SubDocumentFromElements("$set",
-			bson.EC.Interface("items.$", inbox.Items[0])),
-	)
-	_, err = repo.collections.UpdateOne(repo.ctx, filter, update)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (repo *inboxRepository) UpdateInBoxItems(uid string, ids []string, fields map[string]interface{}) error {
-	var inbox models.InBox
 	var bsonIds []*bson.Value
 	for _, id := range ids {
 		bsonIds = append(bsonIds, bson.VC.String(id))
@@ -173,26 +195,15 @@ func (repo *inboxRepository) UpdateInBoxItems(uid string, ids []string, fields m
 			),
 		),
 	)
-	err := repo.collections.FindOne(repo.ctx, filter).Decode(&inbox)
-	if err != nil {
-		return err
-	}
 
-	s := reflect.ValueOf(&inbox.Items[0]).Elem()
+	var bsonFields []*bson.Element
 	for k, v := range fields {
-		field := s.FieldByName(k)
-		if field.IsValid() {
-			field.Set(reflect.ValueOf(v))
-		} else {
-			return errors.New(fmt.Sprintf("field %s not exist", k))
-		}
+		bsonFields = append(bsonFields, bson.EC.Interface(fmt.Sprintf("items.%s", k), v))
 	}
-
 	update := bson.NewDocument(
-		bson.EC.SubDocumentFromElements("$set",
-			bson.EC.Interface("items.$", inbox.Items[0])),
+		bson.EC.SubDocumentFromElements("$set", bsonFields...),
 	)
-	_, err = repo.collections.UpdateOne(repo.ctx, filter, update)
+	_, err := repo.collections.UpdateOne(repo.ctx, filter, update)
 	if err != nil {
 		return err
 	}
