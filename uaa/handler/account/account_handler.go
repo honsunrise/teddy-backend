@@ -4,40 +4,22 @@ import (
 	"context"
 	"errors"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/mongodb/mongo-go-driver/mongo/clientopt"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/models"
 	"github.com/zhsyourai/teddy-backend/uaa/converter"
 	"github.com/zhsyourai/teddy-backend/uaa/proto"
 	"github.com/zhsyourai/teddy-backend/uaa/repositories"
 	"golang.org/x/crypto/bcrypt"
-	"sync"
 )
 
 var UserNotFoundErr = errors.New("user not found")
 var OldPasswordNotCorrectErr = errors.New("old password not correct")
 var PasswordModifyErr = errors.New("password modify error")
 
-var client *mongo.Client
-var instance *accountHandler
-var once sync.Once
-
-func init() {
-	var err error
-	client, err = mongo.Connect(context.Background(), "", clientopt.BundleClient())
-	if err != nil {
-		panic(err)
-	}
-}
-
-func GetInstance() proto.UAAHandler {
-	once.Do(func() {
-		instance = &accountHandler{
-			repo: repositories.NewAccountRepository(client),
-		}
-	})
-	return instance
+func NewAccountHandler(repo repositories.AccountRepository) (proto.UAAHandler, error) {
+	return &accountHandler{
+		repo: repo,
+	}, nil
 }
 
 type accountHandler struct {

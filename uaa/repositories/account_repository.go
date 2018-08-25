@@ -18,12 +18,12 @@ type AccountRepository interface {
 	UpdateAccountByUsername(username string, account map[string]interface{}) (models.Account, error)
 }
 
-func NewAccountRepository(client *mongo.Client) AccountRepository {
+func NewAccountRepository(client *mongo.Client) (AccountRepository, error) {
 	return &accountMemoryRepository{
 		ctx:         context.Background(),
 		client:      client,
 		collections: client.Database("Account").Collection("Account"),
-	}
+	}, nil
 }
 
 type accountMemoryRepository struct {
