@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package com.teddy.api.uaa;
+
+option go_package = "proto";
+
+import "github.com/micro/go-api/proto/api.proto";
+
+service UaaApi {
+	rpc Register(go.api.Request) returns (go.api.Response) {}
+}
