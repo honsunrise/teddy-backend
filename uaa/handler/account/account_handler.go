@@ -13,6 +13,7 @@ import (
 )
 
 var UserNotFoundErr = errors.New("user not found")
+var UserHasBeenRegisteredErr = errors.New("user has been registered")
 var OldPasswordNotCorrectErr = errors.New("old password not correct")
 var PasswordModifyErr = errors.New("password modify error")
 
@@ -62,6 +63,10 @@ func (h *accountHandler) DeleteByUsername(ctx context.Context, req *proto.Delete
 }
 
 func (h *accountHandler) Register(ctx context.Context, req *proto.RegisterReq, resp *proto.Account) error {
+	_, err := h.repo.FindAccountByUsername(req.GetUsername())
+	if err == nil {
+		return UserHasBeenRegisteredErr
+	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.GetPassword()), bcrypt.DefaultCost)
 	if err != nil {
 		return err

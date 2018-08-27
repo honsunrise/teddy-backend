@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/micro/go-log"
 	"github.com/micro/go-micro"
+	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/utils"
 
 	"context"
