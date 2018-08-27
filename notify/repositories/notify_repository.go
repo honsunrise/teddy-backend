@@ -19,12 +19,12 @@ type InBoxRepository interface {
 	UpdateInBoxItems(uid string, ids []string, fields map[string]interface{}) error
 }
 
-func NewInBoxRepository(client *mongo.Client) InBoxRepository {
+func NewInBoxRepository(client *mongo.Client) (InBoxRepository, error) {
 	return &inboxRepository{
 		ctx:         context.Background(),
 		client:      client,
 		collections: client.Database("InBox").Collection("InBox"),
-	}
+	}, nil
 }
 
 type inboxRepository struct {
