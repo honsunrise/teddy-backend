@@ -11,21 +11,30 @@ import (
 	"github.com/zhsyourai/teddy-backend/uaa/proto"
 )
 
-type UaaApi struct{}
+type Uaa struct{}
 
-func extractValue(pair *api.Pair) string {
-	if pair == nil {
-		return ""
-	}
-	if len(pair.Values) == 0 {
-		return ""
-	}
-	return pair.Values[0]
-}
+// Uaa.Register is called by the API as /uaa/Register with post body
+func (e *Uaa) Register(ctx context.Context, req *api.Request, rsp *api.Response) error {
+	log.Log("Received Uaa.Register request")
 
-// UaaApi.Call is called by the API as /uaa/Register with post body {"name": "foo"}
-func (e *UaaApi) Register(ctx context.Context, req *api.Request, rsp *api.Response) error {
-	log.Log("Received UaaApi.Register request")
+	// check method
+	if req.Method != "POST" {
+		return errors.BadRequest("com.micro.api.uaa", "require post")
+	}
+
+	// let's make sure we get json
+	ct, ok := req.Header["Content-Type"]
+	if !ok || len(ct.Values) == 0 {
+		return errors.BadRequest("go.micro.api.uaa", "need content-type")
+	}
+
+	if ct.Values[0] != "application/json" {
+		return errors.BadRequest("go.micro.api.uaa", "expect application/json")
+	}
+
+	// parse body
+	var body map[string]interface{}
+	json.Unmarshal([]byte(req.Body), &body)
 
 	// extract the client from the context
 	uaaClient, ok := client.UaaFromContext(ctx)
@@ -35,8 +44,8 @@ func (e *UaaApi) Register(ctx context.Context, req *api.Request, rsp *api.Respon
 
 	// make request
 	response, err := uaaClient.Register(ctx, &proto.RegisterReq{
-		Username: extractValue(req.Post["username"]),
-		Password: extractValue(req.Post["password"]),
+		Username: body["username"].(string),
+		Password: body["password"].(string),
 	})
 	if err != nil {
 		return errors.InternalServerError("com.teddy.api.uaa.register", err.Error())

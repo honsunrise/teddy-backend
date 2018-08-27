@@ -6,6 +6,6 @@ option go_package = "proto";
 
 import "github.com/micro/go-api/proto/api.proto";
 
-service UaaApi {
+service Uaa {
 	rpc Register(go.api.Request) returns (go.api.Response) {}
 }

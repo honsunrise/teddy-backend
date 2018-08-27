@@ -13,18 +13,18 @@ import (
 func main() {
 	// New Service
 	service := micro.NewService(
-		micro.Name("com.teddy.api.uaa"),
+		micro.Name("go.micro.api.uaa"),
 		micro.Version("latest"),
 	)
 
 	// Initialise service
 	service.Init(
-		// create wrap for the UaaApi srv client
+		// create wrap for the Uaa srv client
 		micro.WrapHandler(client.UaaWrapper(service)),
 	)
 
 	// Register Handler
-	proto.RegisterUaaApiHandler(service.Server(), new(handler.UaaApi))
+	proto.RegisterUaaHandler(service.Server(), new(handler.Uaa))
 
 	// Run service
 	if err := service.Run(); err != nil {

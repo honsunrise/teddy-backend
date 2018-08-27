@@ -39,32 +39,32 @@ var _ context.Context
 var _ client.Option
 var _ server.Option
 
-// Client API for UaaApi service
+// Client API for Uaa service
 
-type UaaApiService interface {
+type UaaService interface {
 	Register(ctx context.Context, in *go_api.Request, opts ...client.CallOption) (*go_api.Response, error)
 }
 
-type uaaApiService struct {
+type uaaService struct {
 	c    client.Client
 	name string
 }
 
-func NewUaaApiService(name string, c client.Client) UaaApiService {
+func NewUaaService(name string, c client.Client) UaaService {
 	if c == nil {
 		c = client.NewClient()
 	}
 	if len(name) == 0 {
 		name = "com.teddy.api.uaa"
 	}
-	return &uaaApiService{
+	return &uaaService{
 		c:    c,
 		name: name,
 	}
 }
 
-func (c *uaaApiService) Register(ctx context.Context, in *go_api.Request, opts ...client.CallOption) (*go_api.Response, error) {
-	req := c.c.NewRequest(c.name, "UaaApi.Register", in)
+func (c *uaaService) Register(ctx context.Context, in *go_api.Request, opts ...client.CallOption) (*go_api.Response, error) {
+	req := c.c.NewRequest(c.name, "Uaa.Register", in)
 	out := new(go_api.Response)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -73,27 +73,27 @@ func (c *uaaApiService) Register(ctx context.Context, in *go_api.Request, opts .
 	return out, nil
 }
 
-// Server API for UaaApi service
+// Server API for Uaa service
 
-type UaaApiHandler interface {
+type UaaHandler interface {
 	Register(context.Context, *go_api.Request, *go_api.Response) error
 }
 
-func RegisterUaaApiHandler(s server.Server, hdlr UaaApiHandler, opts ...server.HandlerOption) error {
-	type uaaApi interface {
+func RegisterUaaHandler(s server.Server, hdlr UaaHandler, opts ...server.HandlerOption) error {
+	type uaa interface {
 		Register(ctx context.Context, in *go_api.Request, out *go_api.Response) error
 	}
-	type UaaApi struct {
-		uaaApi
+	type Uaa struct {
+		uaa
 	}
-	h := &uaaApiHandler{hdlr}
-	return s.Handle(s.NewHandler(&UaaApi{h}, opts...))
+	h := &uaaHandler{hdlr}
+	return s.Handle(s.NewHandler(&Uaa{h}, opts...))
 }
 
-type uaaApiHandler struct {
-	UaaApiHandler
+type uaaHandler struct {
+	UaaHandler
 }
 
-func (h *uaaApiHandler) Register(ctx context.Context, in *go_api.Request, out *go_api.Response) error {
-	return h.UaaApiHandler.Register(ctx, in, out)
+func (h *uaaHandler) Register(ctx context.Context, in *go_api.Request, out *go_api.Response) error {
+	return h.UaaHandler.Register(ctx, in, out)
 }
