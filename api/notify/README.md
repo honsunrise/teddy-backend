@@ -1,11 +1,11 @@
-# Uaa Service API
+# Notify Service API
 
-This is the Uaa service API
+This is the Notify service API
 
 Generated with
 
 ```
-micro new github.com/zhsyourai/teddy-backend/api/uaa --namespace=go.micro --fqdn=go.micro.api.uaa --type=api
+micro new github.com/zhsyourai/teddy-backend/api/notify --namespace=go.micro --fqdn=go.micro.api.notify --type=api
 ```
 
 ## Getting Started
@@ -16,9 +16,9 @@ micro new github.com/zhsyourai/teddy-backend/api/uaa --namespace=go.micro --fqdn
 
 ## Configuration
 
-- FQDN: com.teddy.api.uaa
+- FQDN: go.micro.api.notify
 - Type: api
-- Alias: uaa
+- Alias: notify
 
 ## Dependencies
 
@@ -44,7 +44,7 @@ make build
 
 Run the service
 ```
-./uaa-api
+./notify-api
 ```
 
 Build a docker image

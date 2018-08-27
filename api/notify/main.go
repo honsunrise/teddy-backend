@@ -13,7 +13,7 @@ import (
 func main() {
 	// New Service
 	service := micro.NewService(
-		micro.Name("go.micro.api.uaa"),
+		micro.Name("go.micro.api.notify"),
 		micro.Version("latest"),
 	)
 
