@@ -6,13 +6,13 @@ type Server struct {
 }
 
 type Database struct {
-	Address  []string `json:"address"`
-	Username string   `json:"username"`
-	Password string   `json:"password"`
-	AuthDB   string   `json:"auth_db"`
+	Address  string `json:"address"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	AuthDB   string `json:"auth_db"`
 }
 
 type Config struct {
-	Server    Server              `json:"server"`
-	Databases map[string]Database `json:"databases"`
+	Server    Server                `json:"server"`
+	Databases map[string][]Database `json:"databases"`
 }

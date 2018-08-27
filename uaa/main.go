@@ -3,11 +3,11 @@ package main
 import (
 	"github.com/micro/go-log"
 	"github.com/micro/go-micro"
+	"github.com/zhsyourai/teddy-backend/common/utils"
 
 	"context"
 	"flag"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/mongodb/mongo-go-driver/mongo/clientopt"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/uaa/client"
 	"github.com/zhsyourai/teddy-backend/uaa/handler/account"
@@ -24,7 +24,7 @@ func main() {
 	}
 	// New Mongodb client
 	conf := config.GetConfig()
-	mongodbClient, err := mongo.Connect(context.Background(), conf.Databases["mongodb"].Address[0], clientopt.BundleClient())
+	mongodbClient, err := mongo.Connect(context.Background(), utils.BuildMongodbURI(conf.Databases["mongodb"]))
 	if err != nil {
 		log.Fatal(err)
 	}
