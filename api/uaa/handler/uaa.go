@@ -3,10 +3,9 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"github.com/micro/go-log"
-
 	api "github.com/micro/go-api/proto"
 	"github.com/micro/go-micro/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/uaa/client"
 	"github.com/zhsyourai/teddy-backend/uaa/proto"
 )
@@ -15,7 +14,7 @@ type Uaa struct{}
 
 // Uaa.Register is called by the API as /uaa/Register with post body
 func (e *Uaa) Register(ctx context.Context, req *api.Request, rsp *api.Response) error {
-	log.Log("Received Uaa.Register request")
+	log.Info("Received Uaa.Register request")
 
 	// check method
 	if req.Method != "POST" {
@@ -57,4 +56,29 @@ func (e *Uaa) Register(ctx context.Context, req *api.Request, rsp *api.Response)
 	rsp.Body = string(b)
 
 	return nil
+}
+
+// Uaa.Login is called by the API as /uaa/Login with post body
+func (e *Uaa) Login(context.Context, *api.Request, *api.Response) error {
+	panic("implement me")
+}
+
+// Uaa.Logout is called by the API as /uaa/Login with post body
+func (e *Uaa) Logout(context.Context, *api.Request, *api.Response) error {
+	panic("implement me")
+}
+
+// Uaa.ChangePassword is called by the API as /uaa/ChangePassword with post body
+func (e *Uaa) ChangePassword(context.Context, *api.Request, *api.Response) error {
+	panic("implement me")
+}
+
+// Uaa.SendEmailVerify is called by the API as /uaa/Register with post body
+func (e *Uaa) SendEmailVerify(context.Context, *api.Request, *api.Response) error {
+	panic("implement me")
+}
+
+// Uaa.SendEmailResetPassword is called by the API as /uaa/Register with post body
+func (e *Uaa) SendEmailResetPassword(context.Context, *api.Request, *api.Response) error {
+	panic("implement me")
 }

@@ -8,4 +8,9 @@ import "github.com/micro/go-api/proto/api.proto";
 
 service Uaa {
 	rpc Register(go.api.Request) returns (go.api.Response) {}
+	rpc Login(go.api.Request) returns (go.api.Response) {}
+    rpc Logout(go.api.Request) returns (go.api.Response) {}
+    rpc ChangePassword(go.api.Request) returns (go.api.Response) {}
+    rpc SendEmailVerify(go.api.Request) returns (go.api.Response) {}
+    rpc SendEmailResetPassword(go.api.Request) returns (go.api.Response) {}
 }
