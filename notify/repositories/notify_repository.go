@@ -82,7 +82,11 @@ func (repo *inboxRepository) internalFindInBoxItems(uid string, itemType models.
 	if len(sorts) != 0 {
 		itemsSorts = make([]*bson.Element, 0, len(sorts))
 		for _, sort := range sorts {
-			itemsSorts = append(itemsSorts, bson.EC.Int32(sort.Name, int32(sort.Order)))
+			if sort.Order == types.ASC {
+				itemsSorts = append(itemsSorts, bson.EC.Int32(sort.Name, 1))
+			} else {
+				itemsSorts = append(itemsSorts, bson.EC.Int32(sort.Name, -1))
+			}
 		}
 	}
 	pipeline := bson.NewDocument(

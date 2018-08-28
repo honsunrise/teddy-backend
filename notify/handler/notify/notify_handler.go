@@ -27,7 +27,7 @@ type notifyService struct {
 
 func (h *notifyService) startMailSender() {
 	go func() {
-		d := gomail.NewDialer("smtp.example.com", 587, "user", "123456")
+		d := gomail.NewPlainDialer("smtp.example.com", 587, "user", "123456")
 
 		var s gomail.SendCloser
 		var err error
@@ -92,5 +92,5 @@ func (h *notifyService) GetInBox(ctx context.Context, req *proto.GetInBoxReq, re
 }
 
 func (h *notifyService) GetNotify(ctx context.Context, req *proto.GetNotifyReq, resp proto.Notify_GetNotifyStream) error {
-
+	panic("implement me")
 }
