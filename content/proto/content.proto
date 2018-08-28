@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package com.teddy.srv.content;
+
+option go_package = "proto";
+
+import "github.com/golang/protobuf/ptypes/empty/empty.proto";
+import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
+
+service Content {
+	rpc GetTags(GetTagsReq) returns (GetTagsResp) {}
+	rpc PublishInfo(SendInBoxReq) returns (google.protobuf.Empty) {}
+	rpc EditInfo(SendNotifyReq) returns (google.protobuf.Empty) {}
+    rpc GetInfos(SendSMSReq) returns (google.protobuf.Empty) {}
+    rpc DeleteInfo(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+    rpc WatchInfo(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+
+    rpc LikeInfo(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+    rpc UnLikeInfo(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+    rpc GetUserLikes(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+    rpc GetUserUnlikes(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+    rpc GetInfoLiked(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+    rpc GetInfoUnliked(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+
+    rpc FavoriteInfo(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+    rpc GetInfoFavorited(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+    rpc GetUserFavorite(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+}
+
+message Tag {
+    string tag = 1;
+    uint64 hot = 2;
+    google.protobuf.Timestamp firstShow = 3;
+    google.protobuf.Timestamp lastUse = 4;
+    string lastUseBy = 5;
+}
+
+message GetTagsReq {
+    uint32 page = 1;
+    uint32 size = 2;
+    string uid = 3;
+}
+
+message GetTagsResp {
+    repeated Tag tags = 1;
+}
+
+message InBoxEntry {
+    string id = 1;
+    string topic = 2;
+    string cotent = 3;
+}
+
+message NotifyEntry {
+    string topic = 1;
+    string detail = 2;
+}
+
+message SendEmailReq {
+	string email = 1;
+    string topic = 2;
+    string cotent = 3;
+    google.protobuf.Timestamp until = 4;
+}
+
+message SendInBoxReq {
+    string username = 1;
+    string topic = 2;
+    string content = 3;
+    google.protobuf.Timestamp until = 4;
+}
+
+message SendNotifyReq {
+    string username = 1;
+    string topic = 2;
+    string detail = 3;
+}
+
+message SendSMSReq {
+    string phoneNumber = 1;
+    string content = 2;
+    google.protobuf.Timestamp until = 3;
+}
+
+message GetInBoxReq {
+    string username = 1;
+}
+
+message GetNotifyReq {
+    string username = 1;
+}
