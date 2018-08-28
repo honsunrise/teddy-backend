@@ -7,7 +7,7 @@ option go_package = "proto";
 import "github.com/golang/protobuf/ptypes/empty/empty.proto";
 import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
 
-service Notify {
+service Message {
 	rpc SendEmail(SendEmailReq) returns (google.protobuf.Empty) {}
 	rpc SendInBox(SendInBoxReq) returns (google.protobuf.Empty) {}
 	rpc SendNotify(SendNotifyReq) returns (google.protobuf.Empty) {}

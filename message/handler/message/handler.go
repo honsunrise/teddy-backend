@@ -1,15 +1,15 @@
-package notify
+package message
 
 import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/zhsyourai/teddy-backend/notify/proto"
-	"github.com/zhsyourai/teddy-backend/notify/repositories"
+	"github.com/zhsyourai/teddy-backend/message/proto"
+	"github.com/zhsyourai/teddy-backend/message/repositories"
 	"gopkg.in/gomail.v2"
 	"time"
 )
 
-func NewNotifyHandler(repo repositories.InBoxRepository) (proto.NotifyHandler, error) {
+func NewMessageHandler(repo repositories.InBoxRepository) (proto.MessageHandler, error) {
 	instance := &notifyService{
 		repo:    repo,
 		mailCh:  make(chan *gomail.Message),
@@ -61,6 +61,10 @@ func (h *notifyService) startMailSender() {
 }
 
 func (h *notifyService) SendEmail(ctx context.Context, req *proto.SendEmailReq, resp *empty.Empty) error {
+	if err := validateSendEmailReq(req); err != nil {
+		return err
+	}
+
 	m := gomail.NewMessage()
 	m.SetHeader("From", "alex@example.com")
 	m.SetHeader("To", req.Email)
@@ -76,21 +80,36 @@ func (h *notifyService) SendEmail(ctx context.Context, req *proto.SendEmailReq, 
 }
 
 func (h *notifyService) SendInBox(ctx context.Context, req *proto.SendInBoxReq, resp *empty.Empty) error {
-	panic("implement me")
+	if err := validateSendInBoxReq(req); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (h *notifyService) SendNotify(ctx context.Context, req *proto.SendNotifyReq, resp *empty.Empty) error {
-	panic("implement me")
+	if err := validateSendNotifyReq(req); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (h *notifyService) SendSMS(ctx context.Context, req *proto.SendSMSReq, resp *empty.Empty) error {
-	panic("implement me")
+	if err := validateSendSMSReq(req); err != nil {
+		return err
+	}
+	return nil
 }
 
-func (h *notifyService) GetInBox(ctx context.Context, req *proto.GetInBoxReq, resp proto.Notify_GetInBoxStream) error {
-	panic("implement me")
+func (h *notifyService) GetInBox(ctx context.Context, req *proto.GetInBoxReq, resp proto.Message_GetInBoxStream) error {
+	if err := validateGetInBoxReq(req); err != nil {
+		return err
+	}
+	return nil
 }
 
-func (h *notifyService) GetNotify(ctx context.Context, req *proto.GetNotifyReq, resp proto.Notify_GetNotifyStream) error {
-	panic("implement me")
+func (h *notifyService) GetNotify(ctx context.Context, req *proto.GetNotifyReq, resp proto.Message_GetNotifyStream) error {
+	if err := validateGetNotifyReq(req); err != nil {
+		return err
+	}
+	return nil
 }

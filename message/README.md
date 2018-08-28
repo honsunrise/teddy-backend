@@ -1,11 +1,11 @@
-# Notify-Srv Service
+# Message-Srv Service
 
-This is the Notify-Srv service
+This is the Message-Srv service
 
 Generated with
 
 ```
-micro new github.com/zhsyourai/teddy-backend/notify-srv --namespace=go.micro --fqdn=com.teddy.srv.notify --type=srv
+micro new github.com/zhsyourai/teddy-backend/message --namespace=go.micro --fqdn=com.teddy.srv.message --type=srv
 ```
 
 ## Getting Started
@@ -16,9 +16,9 @@ micro new github.com/zhsyourai/teddy-backend/notify-srv --namespace=go.micro --f
 
 ## Configuration
 
-- FQDN: com.teddy.srv.notify
+- FQDN: com.teddy.srv.message
 - Type: srv
-- Alias: notify-srv
+- Alias: message
 
 ## Dependencies
 
@@ -44,7 +44,7 @@ make build
 
 Run the service
 ```
-./micro-srv-srv
+./message-srv
 ```
 
 Build a docker image

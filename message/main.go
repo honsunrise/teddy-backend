@@ -8,9 +8,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/common/utils"
-	"github.com/zhsyourai/teddy-backend/notify/handler/notify"
-	"github.com/zhsyourai/teddy-backend/notify/proto"
-	"github.com/zhsyourai/teddy-backend/notify/repositories"
+	"github.com/zhsyourai/teddy-backend/message/handler/message"
+	"github.com/zhsyourai/teddy-backend/message/proto"
+	"github.com/zhsyourai/teddy-backend/message/repositories"
 )
 
 func main() {
@@ -27,7 +27,7 @@ func main() {
 		log.Fatal(err)
 	}
 	// New Repository
-	notifyRepo, err := repositories.NewInBoxRepository(mongodbClient)
+	inboxRepo, err := repositories.NewInBoxRepository(mongodbClient)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,12 +41,12 @@ func main() {
 	// Initialise service
 	service.Init()
 	// New Handler
-	notifyHandler, err := notify.NewNotifyHandler(notifyRepo)
+	messageHandler, err := message.NewMessageHandler(inboxRepo)
 	if err != nil {
 		log.Fatal(err)
 	}
 	// Register Handler
-	proto.RegisterNotifyHandler(service.Server(), notifyHandler)
+	proto.RegisterMessageHandler(service.Server(), messageHandler)
 
 	// Run service
 	if err := service.Run(); err != nil {
