@@ -8,14 +8,19 @@ It is generated from these files:
 	proto/content.proto
 
 It has these top-level messages:
-	InBoxEntry
-	NotifyEntry
-	SendEmailReq
-	SendInBoxReq
-	SendNotifyReq
-	SendSMSReq
-	GetInBoxReq
-	GetNotifyReq
+	Tag
+	Info
+	GetTagReq
+	UidPageReq
+	GetTagsResp
+	PublishInfoReq
+	EditInfoReq
+	GetInfosReq
+	GetInfosResp
+	InfoIdReq
+	InfoIdPageReq
+	UserIdsResp
+	InfoIdsResp
 */
 package proto
 
@@ -51,12 +56,21 @@ var _ server.Option
 // Client API for Content service
 
 type ContentService interface {
-	SendEmail(ctx context.Context, in *SendEmailReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
-	SendInBox(ctx context.Context, in *SendInBoxReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
-	SendNotify(ctx context.Context, in *SendNotifyReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
-	SendSMS(ctx context.Context, in *SendSMSReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
-	GetInBox(ctx context.Context, in *GetInBoxReq, opts ...client.CallOption) (Content_GetInBoxService, error)
-	GetNotify(ctx context.Context, in *GetNotifyReq, opts ...client.CallOption) (Content_GetNotifyService, error)
+	GetTags(ctx context.Context, in *GetTagReq, opts ...client.CallOption) (*GetTagsResp, error)
+	PublishInfo(ctx context.Context, in *PublishInfoReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
+	EditInfo(ctx context.Context, in *EditInfoReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
+	GetInfos(ctx context.Context, in *GetInfosReq, opts ...client.CallOption) (*GetInfosResp, error)
+	DeleteInfo(ctx context.Context, in *InfoIdReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
+	WatchInfo(ctx context.Context, in *InfoIdReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
+	LikeInfo(ctx context.Context, in *InfoIdReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
+	UnLikeInfo(ctx context.Context, in *InfoIdReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
+	GetUserLikes(ctx context.Context, in *UidPageReq, opts ...client.CallOption) (*InfoIdsResp, error)
+	GetUserUnlikes(ctx context.Context, in *UidPageReq, opts ...client.CallOption) (*InfoIdsResp, error)
+	GetInfoLiked(ctx context.Context, in *InfoIdPageReq, opts ...client.CallOption) (*UserIdsResp, error)
+	GetInfoUnliked(ctx context.Context, in *InfoIdPageReq, opts ...client.CallOption) (*UserIdsResp, error)
+	FavoriteInfo(ctx context.Context, in *InfoIdReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
+	GetUserFavorite(ctx context.Context, in *UidPageReq, opts ...client.CallOption) (*InfoIdsResp, error)
+	GetInfoFavorited(ctx context.Context, in *InfoIdPageReq, opts ...client.CallOption) (*UserIdsResp, error)
 }
 
 type contentService struct {
@@ -77,8 +91,18 @@ func NewContentService(name string, c client.Client) ContentService {
 	}
 }
 
-func (c *contentService) SendEmail(ctx context.Context, in *SendEmailReq, opts ...client.CallOption) (*google_protobuf.Empty, error) {
-	req := c.c.NewRequest(c.name, "Content.SendEmail", in)
+func (c *contentService) GetTags(ctx context.Context, in *GetTagReq, opts ...client.CallOption) (*GetTagsResp, error) {
+	req := c.c.NewRequest(c.name, "Content.GetTags", in)
+	out := new(GetTagsResp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentService) PublishInfo(ctx context.Context, in *PublishInfoReq, opts ...client.CallOption) (*google_protobuf.Empty, error) {
+	req := c.c.NewRequest(c.name, "Content.PublishInfo", in)
 	out := new(google_protobuf.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -87,8 +111,8 @@ func (c *contentService) SendEmail(ctx context.Context, in *SendEmailReq, opts .
 	return out, nil
 }
 
-func (c *contentService) SendInBox(ctx context.Context, in *SendInBoxReq, opts ...client.CallOption) (*google_protobuf.Empty, error) {
-	req := c.c.NewRequest(c.name, "Content.SendInBox", in)
+func (c *contentService) EditInfo(ctx context.Context, in *EditInfoReq, opts ...client.CallOption) (*google_protobuf.Empty, error) {
+	req := c.c.NewRequest(c.name, "Content.EditInfo", in)
 	out := new(google_protobuf.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -97,8 +121,18 @@ func (c *contentService) SendInBox(ctx context.Context, in *SendInBoxReq, opts .
 	return out, nil
 }
 
-func (c *contentService) SendNotify(ctx context.Context, in *SendNotifyReq, opts ...client.CallOption) (*google_protobuf.Empty, error) {
-	req := c.c.NewRequest(c.name, "Content.SendNotify", in)
+func (c *contentService) GetInfos(ctx context.Context, in *GetInfosReq, opts ...client.CallOption) (*GetInfosResp, error) {
+	req := c.c.NewRequest(c.name, "Content.GetInfos", in)
+	out := new(GetInfosResp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentService) DeleteInfo(ctx context.Context, in *InfoIdReq, opts ...client.CallOption) (*google_protobuf.Empty, error) {
+	req := c.c.NewRequest(c.name, "Content.DeleteInfo", in)
 	out := new(google_protobuf.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -107,8 +141,8 @@ func (c *contentService) SendNotify(ctx context.Context, in *SendNotifyReq, opts
 	return out, nil
 }
 
-func (c *contentService) SendSMS(ctx context.Context, in *SendSMSReq, opts ...client.CallOption) (*google_protobuf.Empty, error) {
-	req := c.c.NewRequest(c.name, "Content.SendSMS", in)
+func (c *contentService) WatchInfo(ctx context.Context, in *InfoIdReq, opts ...client.CallOption) (*google_protobuf.Empty, error) {
+	req := c.c.NewRequest(c.name, "Content.WatchInfo", in)
 	out := new(google_protobuf.Empty)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -117,113 +151,133 @@ func (c *contentService) SendSMS(ctx context.Context, in *SendSMSReq, opts ...cl
 	return out, nil
 }
 
-func (c *contentService) GetInBox(ctx context.Context, in *GetInBoxReq, opts ...client.CallOption) (Content_GetInBoxService, error) {
-	req := c.c.NewRequest(c.name, "Content.GetInBox", &GetInBoxReq{})
-	stream, err := c.c.Stream(ctx, req, opts...)
+func (c *contentService) LikeInfo(ctx context.Context, in *InfoIdReq, opts ...client.CallOption) (*google_protobuf.Empty, error) {
+	req := c.c.NewRequest(c.name, "Content.LikeInfo", in)
+	out := new(google_protobuf.Empty)
+	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	if err := stream.Send(in); err != nil {
-		return nil, err
-	}
-	return &contentServiceGetInBox{stream}, nil
+	return out, nil
 }
 
-type Content_GetInBoxService interface {
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*InBoxEntry, error)
-}
-
-type contentServiceGetInBox struct {
-	stream client.Stream
-}
-
-func (x *contentServiceGetInBox) Close() error {
-	return x.stream.Close()
-}
-
-func (x *contentServiceGetInBox) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *contentServiceGetInBox) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *contentServiceGetInBox) Recv() (*InBoxEntry, error) {
-	m := new(InBoxEntry)
-	err := x.stream.Recv(m)
+func (c *contentService) UnLikeInfo(ctx context.Context, in *InfoIdReq, opts ...client.CallOption) (*google_protobuf.Empty, error) {
+	req := c.c.NewRequest(c.name, "Content.UnLikeInfo", in)
+	out := new(google_protobuf.Empty)
+	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return m, nil
+	return out, nil
 }
 
-func (c *contentService) GetNotify(ctx context.Context, in *GetNotifyReq, opts ...client.CallOption) (Content_GetNotifyService, error) {
-	req := c.c.NewRequest(c.name, "Content.GetNotify", &GetNotifyReq{})
-	stream, err := c.c.Stream(ctx, req, opts...)
+func (c *contentService) GetUserLikes(ctx context.Context, in *UidPageReq, opts ...client.CallOption) (*InfoIdsResp, error) {
+	req := c.c.NewRequest(c.name, "Content.GetUserLikes", in)
+	out := new(InfoIdsResp)
+	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	if err := stream.Send(in); err != nil {
-		return nil, err
-	}
-	return &contentServiceGetNotify{stream}, nil
+	return out, nil
 }
 
-type Content_GetNotifyService interface {
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*NotifyEntry, error)
-}
-
-type contentServiceGetNotify struct {
-	stream client.Stream
-}
-
-func (x *contentServiceGetNotify) Close() error {
-	return x.stream.Close()
-}
-
-func (x *contentServiceGetNotify) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *contentServiceGetNotify) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *contentServiceGetNotify) Recv() (*NotifyEntry, error) {
-	m := new(NotifyEntry)
-	err := x.stream.Recv(m)
+func (c *contentService) GetUserUnlikes(ctx context.Context, in *UidPageReq, opts ...client.CallOption) (*InfoIdsResp, error) {
+	req := c.c.NewRequest(c.name, "Content.GetUserUnlikes", in)
+	out := new(InfoIdsResp)
+	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return m, nil
+	return out, nil
+}
+
+func (c *contentService) GetInfoLiked(ctx context.Context, in *InfoIdPageReq, opts ...client.CallOption) (*UserIdsResp, error) {
+	req := c.c.NewRequest(c.name, "Content.GetInfoLiked", in)
+	out := new(UserIdsResp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentService) GetInfoUnliked(ctx context.Context, in *InfoIdPageReq, opts ...client.CallOption) (*UserIdsResp, error) {
+	req := c.c.NewRequest(c.name, "Content.GetInfoUnliked", in)
+	out := new(UserIdsResp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentService) FavoriteInfo(ctx context.Context, in *InfoIdReq, opts ...client.CallOption) (*google_protobuf.Empty, error) {
+	req := c.c.NewRequest(c.name, "Content.FavoriteInfo", in)
+	out := new(google_protobuf.Empty)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentService) GetUserFavorite(ctx context.Context, in *UidPageReq, opts ...client.CallOption) (*InfoIdsResp, error) {
+	req := c.c.NewRequest(c.name, "Content.GetUserFavorite", in)
+	out := new(InfoIdsResp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentService) GetInfoFavorited(ctx context.Context, in *InfoIdPageReq, opts ...client.CallOption) (*UserIdsResp, error) {
+	req := c.c.NewRequest(c.name, "Content.GetInfoFavorited", in)
+	out := new(UserIdsResp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 // Server API for Content service
 
 type ContentHandler interface {
-	SendEmail(context.Context, *SendEmailReq, *google_protobuf.Empty) error
-	SendInBox(context.Context, *SendInBoxReq, *google_protobuf.Empty) error
-	SendNotify(context.Context, *SendNotifyReq, *google_protobuf.Empty) error
-	SendSMS(context.Context, *SendSMSReq, *google_protobuf.Empty) error
-	GetInBox(context.Context, *GetInBoxReq, Content_GetInBoxStream) error
-	GetNotify(context.Context, *GetNotifyReq, Content_GetNotifyStream) error
+	GetTags(context.Context, *GetTagReq, *GetTagsResp) error
+	PublishInfo(context.Context, *PublishInfoReq, *google_protobuf.Empty) error
+	EditInfo(context.Context, *EditInfoReq, *google_protobuf.Empty) error
+	GetInfos(context.Context, *GetInfosReq, *GetInfosResp) error
+	DeleteInfo(context.Context, *InfoIdReq, *google_protobuf.Empty) error
+	WatchInfo(context.Context, *InfoIdReq, *google_protobuf.Empty) error
+	LikeInfo(context.Context, *InfoIdReq, *google_protobuf.Empty) error
+	UnLikeInfo(context.Context, *InfoIdReq, *google_protobuf.Empty) error
+	GetUserLikes(context.Context, *UidPageReq, *InfoIdsResp) error
+	GetUserUnlikes(context.Context, *UidPageReq, *InfoIdsResp) error
+	GetInfoLiked(context.Context, *InfoIdPageReq, *UserIdsResp) error
+	GetInfoUnliked(context.Context, *InfoIdPageReq, *UserIdsResp) error
+	FavoriteInfo(context.Context, *InfoIdReq, *google_protobuf.Empty) error
+	GetUserFavorite(context.Context, *UidPageReq, *InfoIdsResp) error
+	GetInfoFavorited(context.Context, *InfoIdPageReq, *UserIdsResp) error
 }
 
 func RegisterContentHandler(s server.Server, hdlr ContentHandler, opts ...server.HandlerOption) error {
 	type content interface {
-		SendEmail(ctx context.Context, in *SendEmailReq, out *google_protobuf.Empty) error
-		SendInBox(ctx context.Context, in *SendInBoxReq, out *google_protobuf.Empty) error
-		SendNotify(ctx context.Context, in *SendNotifyReq, out *google_protobuf.Empty) error
-		SendSMS(ctx context.Context, in *SendSMSReq, out *google_protobuf.Empty) error
-		GetInBox(ctx context.Context, stream server.Stream) error
-		GetNotify(ctx context.Context, stream server.Stream) error
+		GetTags(ctx context.Context, in *GetTagReq, out *GetTagsResp) error
+		PublishInfo(ctx context.Context, in *PublishInfoReq, out *google_protobuf.Empty) error
+		EditInfo(ctx context.Context, in *EditInfoReq, out *google_protobuf.Empty) error
+		GetInfos(ctx context.Context, in *GetInfosReq, out *GetInfosResp) error
+		DeleteInfo(ctx context.Context, in *InfoIdReq, out *google_protobuf.Empty) error
+		WatchInfo(ctx context.Context, in *InfoIdReq, out *google_protobuf.Empty) error
+		LikeInfo(ctx context.Context, in *InfoIdReq, out *google_protobuf.Empty) error
+		UnLikeInfo(ctx context.Context, in *InfoIdReq, out *google_protobuf.Empty) error
+		GetUserLikes(ctx context.Context, in *UidPageReq, out *InfoIdsResp) error
+		GetUserUnlikes(ctx context.Context, in *UidPageReq, out *InfoIdsResp) error
+		GetInfoLiked(ctx context.Context, in *InfoIdPageReq, out *UserIdsResp) error
+		GetInfoUnliked(ctx context.Context, in *InfoIdPageReq, out *UserIdsResp) error
+		FavoriteInfo(ctx context.Context, in *InfoIdReq, out *google_protobuf.Empty) error
+		GetUserFavorite(ctx context.Context, in *UidPageReq, out *InfoIdsResp) error
+		GetInfoFavorited(ctx context.Context, in *InfoIdPageReq, out *UserIdsResp) error
 	}
 	type Content struct {
 		content
@@ -236,88 +290,62 @@ type contentHandler struct {
 	ContentHandler
 }
 
-func (h *contentHandler) SendEmail(ctx context.Context, in *SendEmailReq, out *google_protobuf.Empty) error {
-	return h.ContentHandler.SendEmail(ctx, in, out)
+func (h *contentHandler) GetTags(ctx context.Context, in *GetTagReq, out *GetTagsResp) error {
+	return h.ContentHandler.GetTags(ctx, in, out)
 }
 
-func (h *contentHandler) SendInBox(ctx context.Context, in *SendInBoxReq, out *google_protobuf.Empty) error {
-	return h.ContentHandler.SendInBox(ctx, in, out)
+func (h *contentHandler) PublishInfo(ctx context.Context, in *PublishInfoReq, out *google_protobuf.Empty) error {
+	return h.ContentHandler.PublishInfo(ctx, in, out)
 }
 
-func (h *contentHandler) SendNotify(ctx context.Context, in *SendNotifyReq, out *google_protobuf.Empty) error {
-	return h.ContentHandler.SendNotify(ctx, in, out)
+func (h *contentHandler) EditInfo(ctx context.Context, in *EditInfoReq, out *google_protobuf.Empty) error {
+	return h.ContentHandler.EditInfo(ctx, in, out)
 }
 
-func (h *contentHandler) SendSMS(ctx context.Context, in *SendSMSReq, out *google_protobuf.Empty) error {
-	return h.ContentHandler.SendSMS(ctx, in, out)
+func (h *contentHandler) GetInfos(ctx context.Context, in *GetInfosReq, out *GetInfosResp) error {
+	return h.ContentHandler.GetInfos(ctx, in, out)
 }
 
-func (h *contentHandler) GetInBox(ctx context.Context, stream server.Stream) error {
-	m := new(GetInBoxReq)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.ContentHandler.GetInBox(ctx, m, &contentGetInBoxStream{stream})
+func (h *contentHandler) DeleteInfo(ctx context.Context, in *InfoIdReq, out *google_protobuf.Empty) error {
+	return h.ContentHandler.DeleteInfo(ctx, in, out)
 }
 
-type Content_GetInBoxStream interface {
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*InBoxEntry) error
+func (h *contentHandler) WatchInfo(ctx context.Context, in *InfoIdReq, out *google_protobuf.Empty) error {
+	return h.ContentHandler.WatchInfo(ctx, in, out)
 }
 
-type contentGetInBoxStream struct {
-	stream server.Stream
+func (h *contentHandler) LikeInfo(ctx context.Context, in *InfoIdReq, out *google_protobuf.Empty) error {
+	return h.ContentHandler.LikeInfo(ctx, in, out)
 }
 
-func (x *contentGetInBoxStream) Close() error {
-	return x.stream.Close()
+func (h *contentHandler) UnLikeInfo(ctx context.Context, in *InfoIdReq, out *google_protobuf.Empty) error {
+	return h.ContentHandler.UnLikeInfo(ctx, in, out)
 }
 
-func (x *contentGetInBoxStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
+func (h *contentHandler) GetUserLikes(ctx context.Context, in *UidPageReq, out *InfoIdsResp) error {
+	return h.ContentHandler.GetUserLikes(ctx, in, out)
 }
 
-func (x *contentGetInBoxStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
+func (h *contentHandler) GetUserUnlikes(ctx context.Context, in *UidPageReq, out *InfoIdsResp) error {
+	return h.ContentHandler.GetUserUnlikes(ctx, in, out)
 }
 
-func (x *contentGetInBoxStream) Send(m *InBoxEntry) error {
-	return x.stream.Send(m)
+func (h *contentHandler) GetInfoLiked(ctx context.Context, in *InfoIdPageReq, out *UserIdsResp) error {
+	return h.ContentHandler.GetInfoLiked(ctx, in, out)
 }
 
-func (h *contentHandler) GetNotify(ctx context.Context, stream server.Stream) error {
-	m := new(GetNotifyReq)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.ContentHandler.GetNotify(ctx, m, &contentGetNotifyStream{stream})
+func (h *contentHandler) GetInfoUnliked(ctx context.Context, in *InfoIdPageReq, out *UserIdsResp) error {
+	return h.ContentHandler.GetInfoUnliked(ctx, in, out)
 }
 
-type Content_GetNotifyStream interface {
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*NotifyEntry) error
+func (h *contentHandler) FavoriteInfo(ctx context.Context, in *InfoIdReq, out *google_protobuf.Empty) error {
+	return h.ContentHandler.FavoriteInfo(ctx, in, out)
 }
 
-type contentGetNotifyStream struct {
-	stream server.Stream
+func (h *contentHandler) GetUserFavorite(ctx context.Context, in *UidPageReq, out *InfoIdsResp) error {
+	return h.ContentHandler.GetUserFavorite(ctx, in, out)
 }
 
-func (x *contentGetNotifyStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *contentGetNotifyStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *contentGetNotifyStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *contentGetNotifyStream) Send(m *NotifyEntry) error {
-	return x.stream.Send(m)
+func (h *contentHandler) GetInfoFavorited(ctx context.Context, in *InfoIdPageReq, out *UserIdsResp) error {
+	return h.ContentHandler.GetInfoFavorited(ctx, in, out)
 }

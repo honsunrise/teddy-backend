@@ -8,23 +8,23 @@ import "github.com/golang/protobuf/ptypes/empty/empty.proto";
 import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
 
 service Content {
-	rpc GetTags(GetTagsReq) returns (GetTagsResp) {}
-	rpc PublishInfo(SendInBoxReq) returns (google.protobuf.Empty) {}
-	rpc EditInfo(SendNotifyReq) returns (google.protobuf.Empty) {}
-    rpc GetInfos(SendSMSReq) returns (google.protobuf.Empty) {}
-    rpc DeleteInfo(google.protobuf.Empty) returns (google.protobuf.Empty) {}
-    rpc WatchInfo(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+    rpc GetTags (GetTagReq) returns (GetTagsResp) {}
+    rpc PublishInfo (PublishInfoReq) returns (google.protobuf.Empty) {}
+    rpc EditInfo (EditInfoReq) returns (google.protobuf.Empty) {}
+    rpc GetInfos (GetInfosReq) returns (GetInfosResp) {}
+    rpc DeleteInfo (InfoIdReq) returns (google.protobuf.Empty) {}
+    rpc WatchInfo (InfoIdReq) returns (google.protobuf.Empty) {}
 
-    rpc LikeInfo(google.protobuf.Empty) returns (google.protobuf.Empty) {}
-    rpc UnLikeInfo(google.protobuf.Empty) returns (google.protobuf.Empty) {}
-    rpc GetUserLikes(google.protobuf.Empty) returns (google.protobuf.Empty) {}
-    rpc GetUserUnlikes(google.protobuf.Empty) returns (google.protobuf.Empty) {}
-    rpc GetInfoLiked(google.protobuf.Empty) returns (google.protobuf.Empty) {}
-    rpc GetInfoUnliked(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+    rpc LikeInfo (InfoIdReq) returns (google.protobuf.Empty) {}
+    rpc UnLikeInfo (InfoIdReq) returns (google.protobuf.Empty) {}
+    rpc GetUserLikes (UidPageReq) returns (InfoIdsResp) {}
+    rpc GetUserUnlikes(UidPageReq) returns (InfoIdsResp) {}
+    rpc GetInfoLiked(InfoIdPageReq) returns (UserIdsResp) {}
+    rpc GetInfoUnliked (InfoIdPageReq) returns (UserIdsResp) {}
 
-    rpc FavoriteInfo(google.protobuf.Empty) returns (google.protobuf.Empty) {}
-    rpc GetInfoFavorited(google.protobuf.Empty) returns (google.protobuf.Empty) {}
-    rpc GetUserFavorite(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+    rpc FavoriteInfo (InfoIdReq) returns (google.protobuf.Empty) {}
+    rpc GetUserFavorite (UidPageReq) returns (InfoIdsResp) {}
+    rpc GetInfoFavorited (InfoIdPageReq) returns (UserIdsResp) {}
 }
 
 message Tag {
@@ -35,7 +35,39 @@ message Tag {
     string lastUseBy = 5;
 }
 
-message GetTagsReq {
+message Info {
+    string uid = 1;
+    string id = 2;
+    string title = 3;
+    uint32 type = 4;
+    string content = 5;
+    repeated string coverList = 6;
+    string coverVideo = 7;
+    google.protobuf.Timestamp publishTime = 8;
+    google.protobuf.Timestamp lastReviewTime = 9;
+    bool valid = 10;
+    int64 watchCount = 11;
+    repeated string tags = 12;
+    int64 likes = 13;
+    bool isLike = 14;
+    repeated string likeList = 15;
+    int64 unlike = 16;
+    bool isUnlike = 17;
+    repeated string unlikeList = 18;
+    int64 favorites = 19;
+    bool isFavorite = 20;
+    repeated string favoriteList = 21;
+    google.protobuf.Timestamp lastModifyTime = 22;
+    bool canReview = 23;
+}
+
+message GetTagReq {
+    uint32 page = 1;
+    uint32 size = 2;
+    string uid = 3;
+}
+
+message UidPageReq {
     uint32 page = 1;
     uint32 size = 2;
     string uid = 3;
@@ -45,47 +77,53 @@ message GetTagsResp {
     repeated Tag tags = 1;
 }
 
-message InBoxEntry {
-    string id = 1;
-    string topic = 2;
-    string cotent = 3;
-}
-
-message NotifyEntry {
-    string topic = 1;
-    string detail = 2;
-}
-
-message SendEmailReq {
-	string email = 1;
-    string topic = 2;
-    string cotent = 3;
-    google.protobuf.Timestamp until = 4;
-}
-
-message SendInBoxReq {
-    string username = 1;
-    string topic = 2;
+message PublishInfoReq {
+    string uid = 1;
+    string title = 2;
     string content = 3;
-    google.protobuf.Timestamp until = 4;
+    repeated string tags = 4;
+    map<string, string> imgList = 5;
+    map<string, string> videoList = 6;
+    bool external = 7;
+    bool canReview = 8;
 }
 
-message SendNotifyReq {
-    string username = 1;
-    string topic = 2;
-    string detail = 3;
+message EditInfoReq {
+    string id = 1;
+    string uid = 2;
+    string title = 3;
+    string content = 4;
+    repeated string tags = 5;
+    map<string, string> imgList = 6;
+    map<string, string> videoList = 7;
+    bool external = 8;
+    bool canReview = 9;
 }
 
-message SendSMSReq {
-    string phoneNumber = 1;
-    string content = 2;
-    google.protobuf.Timestamp until = 3;
+message GetInfosReq {
+    uint32 page = 1;
+    uint32 size = 2;
+    string uid = 3;
 }
 
-message GetInBoxReq {
-    string username = 1;
+message GetInfosResp {
+    repeated Info infos = 1;
 }
 
-message GetNotifyReq {
-    string username = 1;
+message InfoIdReq {
+    string id = 1;
+}
+
+message InfoIdPageReq {
+    string id = 1;
+    uint32 size = 2;
+    string uid = 3;
+}
+
+message UserIdsResp {
+    repeated string uids = 1;
+}
+
+message InfoIdsResp {
+    repeated string ids = 1;
 }

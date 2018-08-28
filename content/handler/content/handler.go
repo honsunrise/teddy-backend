@@ -23,26 +23,62 @@ type contentHandler struct {
 	mailErr chan error
 }
 
-func (h *contentHandler) SendEmail(context.Context, *proto.SendEmailReq, *empty.Empty) error {
+func (h *contentHandler) GetTags(context.Context, *proto.GetTagReq, *proto.GetTagsResp) error {
 	panic("implement me")
 }
 
-func (h *contentHandler) SendInBox(context.Context, *proto.SendInBoxReq, *empty.Empty) error {
+func (h *contentHandler) PublishInfo(context.Context, *proto.PublishInfoReq, *empty.Empty) error {
 	panic("implement me")
 }
 
-func (h *contentHandler) SendNotify(context.Context, *proto.SendNotifyReq, *empty.Empty) error {
+func (h *contentHandler) EditInfo(context.Context, *proto.EditInfoReq, *empty.Empty) error {
 	panic("implement me")
 }
 
-func (h *contentHandler) SendSMS(context.Context, *proto.SendSMSReq, *empty.Empty) error {
+func (h *contentHandler) GetInfos(context.Context, *proto.GetInfosReq, *proto.GetInfosResp) error {
 	panic("implement me")
 }
 
-func (h *contentHandler) GetInBox(context.Context, *proto.GetInBoxReq, proto.Content_GetInBoxStream) error {
+func (h *contentHandler) DeleteInfo(context.Context, *proto.InfoIdReq, *empty.Empty) error {
 	panic("implement me")
 }
 
-func (h *contentHandler) GetNotify(context.Context, *proto.GetNotifyReq, proto.Content_GetNotifyStream) error {
+func (h *contentHandler) WatchInfo(context.Context, *proto.InfoIdReq, *empty.Empty) error {
+	panic("implement me")
+}
+
+func (h *contentHandler) LikeInfo(context.Context, *proto.InfoIdReq, *empty.Empty) error {
+	panic("implement me")
+}
+
+func (h *contentHandler) UnLikeInfo(context.Context, *proto.InfoIdReq, *empty.Empty) error {
+	panic("implement me")
+}
+
+func (h *contentHandler) GetUserLikes(context.Context, *proto.UidPageReq, *proto.InfoIdsResp) error {
+	panic("implement me")
+}
+
+func (h *contentHandler) GetUserUnlikes(context.Context, *proto.UidPageReq, *proto.InfoIdsResp) error {
+	panic("implement me")
+}
+
+func (h *contentHandler) GetInfoLiked(context.Context, *proto.InfoIdPageReq, *proto.UserIdsResp) error {
+	panic("implement me")
+}
+
+func (h *contentHandler) GetInfoUnliked(context.Context, *proto.InfoIdPageReq, *proto.UserIdsResp) error {
+	panic("implement me")
+}
+
+func (h *contentHandler) FavoriteInfo(context.Context, *proto.InfoIdReq, *empty.Empty) error {
+	panic("implement me")
+}
+
+func (h *contentHandler) GetUserFavorite(context.Context, *proto.UidPageReq, *proto.InfoIdsResp) error {
+	panic("implement me")
+}
+
+func (h *contentHandler) GetInfoFavorited(context.Context, *proto.InfoIdPageReq, *proto.UserIdsResp) error {
 	panic("implement me")
 }
