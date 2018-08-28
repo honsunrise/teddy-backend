@@ -44,6 +44,10 @@ func (h *accountHandler) GetAll(ctx context.Context, req *empty.Empty, resp *pro
 }
 
 func (h *accountHandler) GetByUsername(ctx context.Context, req *proto.GetByUsernameReq, resp *proto.Account) error {
+	if err := validateGetByUsernameReq(req); err != nil {
+		return err
+	}
+
 	acc, err := h.repo.FindAccountByUsername(req.GetUsername())
 	if err != nil {
 		log.Error(err)
@@ -54,6 +58,10 @@ func (h *accountHandler) GetByUsername(ctx context.Context, req *proto.GetByUser
 }
 
 func (h *accountHandler) DeleteByUsername(ctx context.Context, req *proto.DeleteByUsernameReq, resp *empty.Empty) error {
+	if err := validateDeleteByUsernameReq(req); err != nil {
+		return err
+	}
+
 	err := h.repo.DeleteAccountByUsername(req.GetUsername())
 	if err != nil {
 		log.Error(err)
@@ -63,6 +71,10 @@ func (h *accountHandler) DeleteByUsername(ctx context.Context, req *proto.Delete
 }
 
 func (h *accountHandler) Register(ctx context.Context, req *proto.RegisterReq, resp *proto.Account) error {
+	if err := validateRegisterReq(req); err != nil {
+		return err
+	}
+
 	_, err := h.repo.FindAccountByUsername(req.GetUsername())
 	if err == nil {
 		return UserHasBeenRegisteredErr
@@ -85,6 +97,10 @@ func (h *accountHandler) Register(ctx context.Context, req *proto.RegisterReq, r
 }
 
 func (h *accountHandler) VerifyPassword(ctx context.Context, req *proto.VerifyPasswordReq, resp *proto.Account) error {
+	if err := validateVerifyPasswordReq(req); err != nil {
+		return err
+	}
+
 	acc, err := h.repo.FindAccountByUsername(req.GetUsername())
 	if err != nil {
 		log.Error(err)
@@ -100,6 +116,10 @@ func (h *accountHandler) VerifyPassword(ctx context.Context, req *proto.VerifyPa
 }
 
 func (h *accountHandler) ChangePassword(ctx context.Context, req *proto.ChangePasswordReq, resp *empty.Empty) error {
+	if err := validateChangePasswordReq(req); err != nil {
+		return err
+	}
+
 	acc, err := h.repo.FindAccountByUsername(req.GetUsername())
 	if err != nil {
 		log.Error(err)
