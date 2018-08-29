@@ -119,23 +119,23 @@ func (repo *infoRepository) internalFindInfo(uid string, title string, tags []st
 }
 
 func (repo *infoRepository) FindAll(page uint32, size uint32, sorts []types.Sort) ([]models.Info, error) {
-
+	return repo.internalFindInfo("", "", nil, page, size, sorts)
 }
 
 func (repo *infoRepository) FindByTags(tags []string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error) {
-	panic("implement me")
+	return repo.internalFindInfo("", "", tags, page, size, sorts)
 }
 
 func (repo *infoRepository) FindByUser(uid string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error) {
-	panic("implement me")
+	return repo.internalFindInfo(uid, "", nil, page, size, sorts)
 }
 
 func (repo *infoRepository) FindByTitle(title string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error) {
-	panic("implement me")
+	return repo.internalFindInfo("", title, nil, page, size, sorts)
 }
 
-func (repo *infoRepository) FindBYTitleAndUser(title string, uid string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error) {
-	panic("implement me")
+func (repo *infoRepository) FindByTitleAndUser(title string, uid string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error) {
+	return repo.internalFindInfo(uid, title, nil, page, size, sorts)
 }
 
 func (repo *infoRepository) DeleteInfo(id string) error {
