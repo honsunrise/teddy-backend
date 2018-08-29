@@ -93,7 +93,6 @@ func (repo *inboxRepository) internalFindInBoxItems(uid string, itemType models.
 		bson.EC.SubDocumentFromElements("$match", bson.EC.String("uid", uid)),
 		bson.EC.String("$unwind", "$items"),
 		bson.EC.SubDocumentFromElements("$match", dynFilter...),
-		bson.EC.String("$count", "count"),
 		bson.EC.Int64("$skip", int64(size*page)),
 		bson.EC.Int64("$limit", int64(size)),
 		bson.EC.SubDocumentFromElements("$sort", itemsSorts...),

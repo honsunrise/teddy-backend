@@ -68,6 +68,10 @@ func (repo *infoRepository) internalFindInfo(uid string, title string, tags []st
 		)
 	}
 	var titleFilter *bson.Element = nil
+	if title != "" {
+		titleFilter = bson.EC.SubDocumentFromElements("$text",
+			bson.EC.String("$search", title))
+	}
 
 	var dynFilter = make([]*bson.Element, 0, 3)
 	if uidFilter != nil {
@@ -91,19 +95,16 @@ func (repo *infoRepository) internalFindInfo(uid string, title string, tags []st
 		}
 	}
 	pipeline := bson.NewDocument(
-		bson.EC.SubDocumentFromElements("$match", bson.EC.String("uid", uid)),
-		bson.EC.String("$unwind", "$items"),
 		bson.EC.SubDocumentFromElements("$match", dynFilter...),
-		bson.EC.String("$count", "count"),
 		bson.EC.Int64("$skip", int64(size*page)),
 		bson.EC.Int64("$limit", int64(size)),
 		bson.EC.SubDocumentFromElements("$sort", itemsSorts...),
 	)
 	repo.collections.Aggregate(repo.ctx, pipeline)
-	items := make([]models.InBoxItem, 0, 50)
+	items := make([]models.Info, 0, 50)
 	defer cur.Close(repo.ctx)
 	for cur.Next(repo.ctx) {
-		var item models.InBoxItem
+		var item models.Info
 		err := cur.Decode(&item)
 		if err != nil {
 			return nil, err
