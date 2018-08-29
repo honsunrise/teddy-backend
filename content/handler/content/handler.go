@@ -8,7 +8,7 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-func NewContentHandler(repo repositories.ContentRepository) (proto.ContentHandler, error) {
+func NewContentHandler(repo repositories.InfoRepository) (proto.ContentHandler, error) {
 	instance := &contentHandler{
 		repo:    repo,
 		mailCh:  make(chan *gomail.Message),
@@ -18,7 +18,7 @@ func NewContentHandler(repo repositories.ContentRepository) (proto.ContentHandle
 }
 
 type contentHandler struct {
-	repo    repositories.ContentRepository
+	repo    repositories.InfoRepository
 	mailCh  chan *gomail.Message
 	mailErr chan error
 }

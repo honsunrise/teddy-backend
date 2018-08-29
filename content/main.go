@@ -27,7 +27,7 @@ func main() {
 		log.Fatal(err)
 	}
 	// New Repository
-	contentRepo, err := repositories.NewContentRepository(mongodbClient)
+	contentRepo, err := repositories.NewInfoRepository(mongodbClient)
 	if err != nil {
 		log.Fatal(err)
 	}
