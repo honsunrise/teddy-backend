@@ -17,7 +17,7 @@ type InfoRepository interface {
 	FindByTags(tags []string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error)
 	FindByUser(uid string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error)
 	FindByTitle(title string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error)
-	FindBYTitleAndUser(title string, uid string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error)
+	FindByTitleAndUser(title string, uid string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error)
 	DeleteInfo(id string) error
 	UpdateInfo(id string, info *models.Info) error
 }
