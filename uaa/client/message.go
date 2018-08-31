@@ -5,24 +5,24 @@ import (
 
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/server"
-	example "github.com/zhsyourai/teddy-backend/notify/proto"
+	proto "github.com/zhsyourai/teddy-backend/message/proto"
 )
 
-type exampleKey struct{}
+type protoKey struct{}
 
 // FromContext retrieves the client from the Context
-func NotifyFromContext(ctx context.Context) (example.NotifyService, bool) {
-	c, ok := ctx.Value(exampleKey{}).(example.NotifyService)
+func MessageFromContext(ctx context.Context) (proto.MessageService, bool) {
+	c, ok := ctx.Value(protoKey{}).(proto.MessageService)
 	return c, ok
 }
 
 // Client returns a wrapper for the NotifyClient
 func NotifyWrapper(service micro.Service) server.HandlerWrapper {
-	client := example.NewNotifyService("com.teddy.srv.notify", service.Client())
+	client := proto.NewMessageService("com.teddy.srv.message", service.Client())
 
 	return func(fn server.HandlerFunc) server.HandlerFunc {
 		return func(ctx context.Context, req server.Request, rsp interface{}) error {
-			ctx = context.WithValue(ctx, exampleKey{}, client)
+			ctx = context.WithValue(ctx, protoKey{}, client)
 			return fn(ctx, req, rsp)
 		}
 	}

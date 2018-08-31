@@ -17,6 +17,7 @@ type Account struct {
 	UID                string               `bson:"_id" json:"uid"`
 	Username           string               `bson:"username" json:"username"`
 	Email              string               `bson:"email" json:"email"`
+	Phone              string               `bson:"phone" json:"phone"`
 	CreateDate         time.Time            `bson:"create_date" json:"create_date"`
 	OAuthUserIds       map[OAuthType]string `bson:"oauth_user_ids" json:"oauth_user_ids"`
 	Password           []byte               `bson:"password" json:"password"`

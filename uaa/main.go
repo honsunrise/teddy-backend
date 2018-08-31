@@ -4,6 +4,7 @@ import (
 	"github.com/micro/go-micro"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/utils"
+	"github.com/zhsyourai/teddy-backend/uaa/components"
 
 	"context"
 	"flag"
@@ -43,8 +44,13 @@ func main() {
 	service.Init(
 		// create wrap for the Example srv client
 		micro.WrapHandler(client.NotifyWrapper(service)))
+	// New components
+	uidGenerator, err := components.NewUidGenerator(accountRepo)
+	if err != nil {
+		log.Fatal(err)
+	}
 	// New Handler
-	accountHandler, err := account.NewAccountHandler(accountRepo)
+	accountHandler, err := account.NewAccountHandler(accountRepo, uidGenerator)
 	if err != nil {
 		log.Fatal(err)
 	}

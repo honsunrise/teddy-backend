@@ -3,36 +3,36 @@ package repositories
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/zhsyourai/teddy-backend/common/models"
-	"reflect"
 )
+
+var ErrUpdateAccount = errors.New("account update error")
 
 type AccountRepository interface {
 	InsertAccount(account *models.Account) error
 	FindAccountByUsername(username string) (models.Account, error)
 	FindAll() ([]models.Account, error)
 	DeleteAccountByUsername(username string) error
-	UpdateAccountByUsername(username string, account map[string]interface{}) (models.Account, error)
+	UpdateAccountByUsername(username string, account map[string]interface{}) error
 }
 
 func NewAccountRepository(client *mongo.Client) (AccountRepository, error) {
-	return &accountMemoryRepository{
+	return &accountRepository{
 		ctx:         context.Background(),
 		client:      client,
 		collections: client.Database("Teddy").Collection("Account"),
 	}, nil
 }
 
-type accountMemoryRepository struct {
+type accountRepository struct {
 	ctx         context.Context
 	client      *mongo.Client
 	collections *mongo.Collection
 }
 
-func (repo *accountMemoryRepository) InsertAccount(account *models.Account) error {
+func (repo *accountRepository) InsertAccount(account *models.Account) error {
 	_, err := repo.collections.InsertOne(repo.ctx, account)
 	if err != nil {
 		return err
@@ -40,7 +40,7 @@ func (repo *accountMemoryRepository) InsertAccount(account *models.Account) erro
 	return nil
 }
 
-func (repo *accountMemoryRepository) FindAccountByUsername(username string) (account models.Account, err error) {
+func (repo *accountRepository) FindAccountByUsername(username string) (account models.Account, err error) {
 	filter := bson.NewDocument(bson.EC.String("username", username))
 	err = repo.collections.FindOne(repo.ctx, filter).Decode(&account)
 	if err != nil {
@@ -49,7 +49,7 @@ func (repo *accountMemoryRepository) FindAccountByUsername(username string) (acc
 	return
 }
 
-func (repo *accountMemoryRepository) FindAll() (accounts []models.Account, err error) {
+func (repo *accountRepository) FindAll() (accounts []models.Account, err error) {
 	var cur mongo.Cursor
 	cur, err = repo.collections.Find(repo.ctx, nil)
 	if err != nil {
@@ -68,7 +68,7 @@ func (repo *accountMemoryRepository) FindAll() (accounts []models.Account, err e
 	return
 }
 
-func (repo *accountMemoryRepository) DeleteAccountByUsername(username string) (err error) {
+func (repo *accountRepository) DeleteAccountByUsername(username string) (err error) {
 	filter := bson.NewDocument(bson.EC.String("username", username))
 	_, err = repo.collections.DeleteOne(repo.ctx, filter)
 	if err != nil {
@@ -77,28 +77,24 @@ func (repo *accountMemoryRepository) DeleteAccountByUsername(username string) (e
 	return
 }
 
-func (repo *accountMemoryRepository) UpdateAccountByUsername(username string,
-	fields map[string]interface{}) (account models.Account, err error) {
-	filter := bson.NewDocument(bson.EC.String("username", username))
-	err = repo.collections.FindOne(repo.ctx, filter).Decode(&account)
-	if err != nil {
-		return
-	}
+func (repo *accountRepository) UpdateAccountByUsername(username string,
+	fields map[string]interface{}) error {
+	filter := bson.NewDocument(
+		bson.EC.String("username", username),
+	)
 
-	s := reflect.ValueOf(&account).Elem()
+	var bsonFields []*bson.Element
 	for k, v := range fields {
-		field := s.FieldByName(k)
-		if field.IsValid() {
-			field.Set(reflect.ValueOf(v))
-		} else {
-			err = errors.New(fmt.Sprintf("field %s not exist", k))
-			return
-		}
+		bsonFields = append(bsonFields, bson.EC.Interface(k, v))
 	}
-
-	_, err = repo.collections.UpdateOne(repo.ctx, filter, account)
+	update := bson.NewDocument(
+		bson.EC.SubDocumentFromElements("$set", bsonFields...),
+	)
+	ur, err := repo.collections.UpdateOne(repo.ctx, filter, update)
 	if err != nil {
-		return
+		return err
+	} else if ur.ModifiedCount == 0 {
+		return ErrUpdateAccount
 	}
-	return
+	return nil
 }

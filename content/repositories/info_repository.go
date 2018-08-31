@@ -10,6 +10,7 @@ import (
 )
 
 var ErrTitleExisted = errors.New("info title has been existed")
+var ErrUpdateInfo = errors.New("info update error")
 
 type InfoRepository interface {
 	InsertInfo(info *models.Info) error
@@ -159,9 +160,11 @@ func (repo *infoRepository) UpdateInfo(id string, fields map[string]interface{})
 	update := bson.NewDocument(
 		bson.EC.SubDocumentFromElements("$set", bsonFields...),
 	)
-	_, err := repo.collections.UpdateOne(repo.ctx, filter, update)
+	ur, err := repo.collections.UpdateOne(repo.ctx, filter, update)
 	if err != nil {
 		return err
+	} else if ur.ModifiedCount == 0 {
+		return ErrUpdateInfo
 	}
 	return nil
 }

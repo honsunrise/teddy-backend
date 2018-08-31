@@ -6,10 +6,12 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/models"
+	"github.com/zhsyourai/teddy-backend/uaa/components"
 	"github.com/zhsyourai/teddy-backend/uaa/converter"
 	"github.com/zhsyourai/teddy-backend/uaa/proto"
 	"github.com/zhsyourai/teddy-backend/uaa/repositories"
 	"golang.org/x/crypto/bcrypt"
+	"time"
 )
 
 var UserNotFoundErr = errors.New("user not found")
@@ -17,14 +19,16 @@ var UserHasBeenRegisteredErr = errors.New("user has been registered")
 var OldPasswordNotCorrectErr = errors.New("old password not correct")
 var PasswordModifyErr = errors.New("password modify error")
 
-func NewAccountHandler(repo repositories.AccountRepository) (proto.UAAHandler, error) {
+func NewAccountHandler(repo repositories.AccountRepository, uidGen components.UidGenerator) (proto.UAAHandler, error) {
 	return &accountHandler{
-		repo: repo,
+		repo:   repo,
+		uidGen: uidGen,
 	}, nil
 }
 
 type accountHandler struct {
-	repo repositories.AccountRepository
+	repo   repositories.AccountRepository
+	uidGen components.UidGenerator
 }
 
 func (h *accountHandler) GetAll(ctx context.Context, req *empty.Empty, resp *proto.GetAllResp) error {
@@ -83,13 +87,27 @@ func (h *accountHandler) Register(ctx context.Context, req *proto.RegisterReq, r
 	if err != nil {
 		return err
 	}
+	uid, err := h.uidGen.NexID()
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
 	var account models.Account
+	account.UID = uid
 	account.Username = req.GetUsername()
 	account.Password = hashedPassword
+	// TODO: Check Roles
 	account.Roles = req.GetRoles()
+	account.CreateDate = time.Now()
+	account.Email = req.Email
+	account.CredentialsExpired = false
+	account.AccountLocked = false
+	account.AccountExpired = false
 
 	err = h.repo.InsertAccount(&account)
 	if err != nil {
+		log.Error(err)
 		return err
 	}
 	converter.CopyFromAccountToPBAccount(&account, resp)
@@ -135,8 +153,8 @@ func (h *accountHandler) ChangePassword(ctx context.Context, req *proto.ChangePa
 		log.Error(err)
 		return PasswordModifyErr
 	}
-	_, err = h.repo.UpdateAccountByUsername(req.GetUsername(), map[string]interface{}{
-		"Password": hashedPassword,
+	err = h.repo.UpdateAccountByUsername(req.GetUsername(), map[string]interface{}{
+		"password": hashedPassword,
 	})
 	if err != nil {
 		log.Error(err)

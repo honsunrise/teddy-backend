@@ -64,16 +64,6 @@
   version = "v1.8.0"
 
 [[projects]]
-  name = "github.com/gogo/protobuf"
-  packages = [
-    "gogoproto",
-    "proto",
-    "protoc-gen-gogo/descriptor"
-  ]
-  revision = "636bf0302bc95575d69441b25a2603156ffdddf1"
-  version = "v1.1.1"
-
-[[projects]]
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
@@ -164,10 +154,7 @@
 
 [[projects]]
   name = "github.com/micro/go-api"
-  packages = [
-    ".",
-    "proto"
-  ]
+  packages = ["proto"]
   revision = "b77313d0bbce97b6a1b37169b58df38e4a78df6a"
   version = "v0.3.1"
 
@@ -357,6 +344,12 @@
   version = "v0.8.0"
 
 [[projects]]
+  name = "github.com/rs/xid"
+  packages = ["."]
+  revision = "15d26544def341f036c5f8dca987a4cbe575032c"
+  version = "v1.2.1"
+
+[[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   revision = "3e01752db0189b9157070a0e1668a620f9a85da2"
@@ -470,6 +463,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "aabad27b51713beea29c4398a8e1a176926b9b8b8c30822256674985c5e5d297"
+  inputs-digest = "439967f1005418ef309e7353f0ac073b973d825ad03ae613c6b75b54cf41b479"
   solver-name = "gps-cdcl"
   solver-version = 1

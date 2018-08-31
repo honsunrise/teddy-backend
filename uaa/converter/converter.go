@@ -1,6 +1,7 @@
 package converter
 
 import (
+	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/zhsyourai/teddy-backend/common/models"
 	"github.com/zhsyourai/teddy-backend/uaa/proto"
 	"time"
@@ -18,14 +19,18 @@ func CopyFromAccountToPBAccount(acc *models.Account, pbacc *proto.Account) {
 	pbacc.AccountLocked = acc.AccountLocked
 	pbacc.CredentialsExpired = acc.CredentialsExpired
 	pbacc.Roles = acc.Roles
+	pbacc.OauthUserIds = make(map[uint32]string, len(acc.OAuthUserIds))
 	for k, v := range acc.OAuthUserIds {
 		pbacc.OauthUserIds[uint32(k)] = v
 	}
-	pbacc.CreateDate.Seconds = acc.CreateDate.Unix()
-	pbacc.CreateDate.Nanos = int32(acc.CreateDate.Nanosecond())
-
-	pbacc.UpdateDate.Seconds = acc.UpdateDate.Unix()
-	pbacc.UpdateDate.Nanos = int32(acc.UpdateDate.Nanosecond())
+	pbacc.CreateDate = &timestamp.Timestamp{
+		Seconds: acc.CreateDate.Unix(),
+		Nanos:   int32(acc.CreateDate.Nanosecond()),
+	}
+	pbacc.UpdateDate = &timestamp.Timestamp{
+		Seconds: acc.UpdateDate.Unix(),
+		Nanos:   int32(acc.UpdateDate.Nanosecond()),
+	}
 }
 
 func CopyFromPBAccountToAccount(pbacc *proto.Account, acc *models.Account) {
