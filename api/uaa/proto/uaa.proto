@@ -11,6 +11,6 @@ service Uaa {
 	rpc Login(go.api.Request) returns (go.api.Response) {}
     rpc Logout(go.api.Request) returns (go.api.Response) {}
     rpc ChangePassword(go.api.Request) returns (go.api.Response) {}
-    rpc SendEmailVerify(go.api.Request) returns (go.api.Response) {}
-    rpc SendEmailResetPassword(go.api.Request) returns (go.api.Response) {}
+    rpc SendEmailCaptcha(go.api.Request) returns (go.api.Response) {}
+    rpc SendPhoneCaptcha(go.api.Request) returns (go.api.Response) {}
 }

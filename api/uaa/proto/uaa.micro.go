@@ -46,8 +46,8 @@ type UaaService interface {
 	Login(ctx context.Context, in *go_api.Request, opts ...client.CallOption) (*go_api.Response, error)
 	Logout(ctx context.Context, in *go_api.Request, opts ...client.CallOption) (*go_api.Response, error)
 	ChangePassword(ctx context.Context, in *go_api.Request, opts ...client.CallOption) (*go_api.Response, error)
-	SendEmailVerify(ctx context.Context, in *go_api.Request, opts ...client.CallOption) (*go_api.Response, error)
-	SendEmailResetPassword(ctx context.Context, in *go_api.Request, opts ...client.CallOption) (*go_api.Response, error)
+	SendEmailCaptcha(ctx context.Context, in *go_api.Request, opts ...client.CallOption) (*go_api.Response, error)
+	SendPhoneCaptcha(ctx context.Context, in *go_api.Request, opts ...client.CallOption) (*go_api.Response, error)
 }
 
 type uaaService struct {
@@ -108,8 +108,8 @@ func (c *uaaService) ChangePassword(ctx context.Context, in *go_api.Request, opt
 	return out, nil
 }
 
-func (c *uaaService) SendEmailVerify(ctx context.Context, in *go_api.Request, opts ...client.CallOption) (*go_api.Response, error) {
-	req := c.c.NewRequest(c.name, "Uaa.SendEmailVerify", in)
+func (c *uaaService) SendEmailCaptcha(ctx context.Context, in *go_api.Request, opts ...client.CallOption) (*go_api.Response, error) {
+	req := c.c.NewRequest(c.name, "Uaa.SendEmailCaptcha", in)
 	out := new(go_api.Response)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -118,8 +118,8 @@ func (c *uaaService) SendEmailVerify(ctx context.Context, in *go_api.Request, op
 	return out, nil
 }
 
-func (c *uaaService) SendEmailResetPassword(ctx context.Context, in *go_api.Request, opts ...client.CallOption) (*go_api.Response, error) {
-	req := c.c.NewRequest(c.name, "Uaa.SendEmailResetPassword", in)
+func (c *uaaService) SendPhoneCaptcha(ctx context.Context, in *go_api.Request, opts ...client.CallOption) (*go_api.Response, error) {
+	req := c.c.NewRequest(c.name, "Uaa.SendPhoneCaptcha", in)
 	out := new(go_api.Response)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -135,8 +135,8 @@ type UaaHandler interface {
 	Login(context.Context, *go_api.Request, *go_api.Response) error
 	Logout(context.Context, *go_api.Request, *go_api.Response) error
 	ChangePassword(context.Context, *go_api.Request, *go_api.Response) error
-	SendEmailVerify(context.Context, *go_api.Request, *go_api.Response) error
-	SendEmailResetPassword(context.Context, *go_api.Request, *go_api.Response) error
+	SendEmailCaptcha(context.Context, *go_api.Request, *go_api.Response) error
+	SendPhoneCaptcha(context.Context, *go_api.Request, *go_api.Response) error
 }
 
 func RegisterUaaHandler(s server.Server, hdlr UaaHandler, opts ...server.HandlerOption) error {
@@ -145,8 +145,8 @@ func RegisterUaaHandler(s server.Server, hdlr UaaHandler, opts ...server.Handler
 		Login(ctx context.Context, in *go_api.Request, out *go_api.Response) error
 		Logout(ctx context.Context, in *go_api.Request, out *go_api.Response) error
 		ChangePassword(ctx context.Context, in *go_api.Request, out *go_api.Response) error
-		SendEmailVerify(ctx context.Context, in *go_api.Request, out *go_api.Response) error
-		SendEmailResetPassword(ctx context.Context, in *go_api.Request, out *go_api.Response) error
+		SendEmailCaptcha(ctx context.Context, in *go_api.Request, out *go_api.Response) error
+		SendPhoneCaptcha(ctx context.Context, in *go_api.Request, out *go_api.Response) error
 	}
 	type Uaa struct {
 		uaa
@@ -175,10 +175,10 @@ func (h *uaaHandler) ChangePassword(ctx context.Context, in *go_api.Request, out
 	return h.UaaHandler.ChangePassword(ctx, in, out)
 }
 
-func (h *uaaHandler) SendEmailVerify(ctx context.Context, in *go_api.Request, out *go_api.Response) error {
-	return h.UaaHandler.SendEmailVerify(ctx, in, out)
+func (h *uaaHandler) SendEmailCaptcha(ctx context.Context, in *go_api.Request, out *go_api.Response) error {
+	return h.UaaHandler.SendEmailCaptcha(ctx, in, out)
 }
 
-func (h *uaaHandler) SendEmailResetPassword(ctx context.Context, in *go_api.Request, out *go_api.Response) error {
-	return h.UaaHandler.SendEmailResetPassword(ctx, in, out)
+func (h *uaaHandler) SendPhoneCaptcha(ctx context.Context, in *go_api.Request, out *go_api.Response) error {
+	return h.UaaHandler.SendPhoneCaptcha(ctx, in, out)
 }
