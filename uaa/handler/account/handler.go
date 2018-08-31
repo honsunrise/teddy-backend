@@ -3,6 +3,7 @@ package account
 import (
 	"context"
 	"errors"
+	"github.com/casbin/casbin"
 	"github.com/golang/protobuf/ptypes/empty"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/models"
@@ -19,16 +20,19 @@ var UserHasBeenRegisteredErr = errors.New("user has been registered")
 var OldPasswordNotCorrectErr = errors.New("old password not correct")
 var PasswordModifyErr = errors.New("password modify error")
 
-func NewAccountHandler(repo repositories.AccountRepository, uidGen components.UidGenerator) (proto.UAAHandler, error) {
+func NewAccountHandler(repo repositories.AccountRepository,
+	uidGen components.UidGenerator, enforcer *casbin.Enforcer) (proto.UAAHandler, error) {
 	return &accountHandler{
-		repo:   repo,
-		uidGen: uidGen,
+		repo:     repo,
+		uidGen:   uidGen,
+		enforcer: enforcer,
 	}, nil
 }
 
 type accountHandler struct {
-	repo   repositories.AccountRepository
-	uidGen components.UidGenerator
+	repo     repositories.AccountRepository
+	uidGen   components.UidGenerator
+	enforcer *casbin.Enforcer
 }
 
 func (h *accountHandler) GetAll(ctx context.Context, req *empty.Empty, resp *proto.GetAllResp) error {

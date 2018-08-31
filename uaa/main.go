@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/casbin/casbin"
+	"github.com/casbin/mongodb-adapter"
 	"github.com/micro/go-micro"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/utils"
@@ -23,9 +25,31 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// New Mongodb client
+	// Load config
 	conf := config.GetConfig()
-	mongodbClient, err := mongo.Connect(context.Background(), utils.BuildMongodbURI(conf.Databases["mongodb"]))
+	mongodbUri := utils.BuildMongodbURI(conf.Databases["mongodb"])
+	model := casbin.NewModel(`
+[request_definition]
+r = sub, obj, act
+
+[policy_definition]
+p = sub, obj, act
+
+[role_definition]
+g = _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
+`)
+
+	enforcer := casbin.NewEnforcer(model, mongodbadapter.NewAdapter(mongodbUri))
+	enforcer.LoadPolicy()
+
+	// New Mongodb client
+	mongodbClient, err := mongo.Connect(context.Background(), mongodbUri)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,7 +74,7 @@ func main() {
 		log.Fatal(err)
 	}
 	// New Handler
-	accountHandler, err := account.NewAccountHandler(accountRepo, uidGenerator)
+	accountHandler, err := account.NewAccountHandler(accountRepo, uidGenerator, enforcer)
 	if err != nil {
 		log.Fatal(err)
 	}
