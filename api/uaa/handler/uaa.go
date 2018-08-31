@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"github.com/casbin/casbin"
 	api "github.com/micro/go-api/proto"
 	"github.com/micro/go-micro/errors"
 	log "github.com/sirupsen/logrus"
@@ -11,7 +12,16 @@ import (
 	"time"
 )
 
-type Uaa struct{}
+type Uaa struct {
+	enforcer *casbin.Enforcer
+}
+
+func NewUaaHandler(enforcer *casbin.Enforcer) (*Uaa, error) {
+	instance := &Uaa{
+		enforcer: enforcer,
+	}
+	return instance, nil
+}
 
 // Uaa.Register is called by the API as /uaa/Register with post body
 func (e *Uaa) Register(ctx context.Context, req *api.Request, rsp *api.Response) error {
@@ -146,7 +156,13 @@ func (e *Uaa) Login(ctx context.Context, req *api.Request, rsp *api.Response) er
 
 // Uaa.Logout is called by the API as /uaa/Logout with post body
 func (e *Uaa) Logout(context.Context, *api.Request, *api.Response) error {
-	panic("implement me")
+	sub := "alice" // the user that wants to access a resource.
+	obj := "data1" // the resource that is going to be accessed.
+	act := "read"  // the operation that the user performs on the resource.
+	if e.enforcer.Enforce(sub, obj, act) != true {
+
+	}
+	return nil
 }
 
 // Uaa.ChangePassword is called by the API as /uaa/ChangePassword with post body
