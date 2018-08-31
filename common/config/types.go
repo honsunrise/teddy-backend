@@ -15,4 +15,5 @@ type Database struct {
 type Config struct {
 	Server    Server                `json:"server"`
 	Databases map[string][]Database `json:"databases"`
+	Casbin    string                `json:"casbin"`
 }

@@ -45,6 +45,7 @@ func CopyFromPBAccountToAccount(pbacc *proto.Account, acc *models.Account) {
 	acc.AccountLocked = pbacc.AccountLocked
 	acc.CredentialsExpired = pbacc.CredentialsExpired
 	acc.Roles = pbacc.Roles
+	acc.OAuthUserIds = make(map[models.OAuthType]string, len(pbacc.OauthUserIds))
 	for k, v := range pbacc.OauthUserIds {
 		acc.OAuthUserIds[models.OAuthType(k)] = v
 	}

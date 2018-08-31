@@ -19,3 +19,5 @@
 
 # go dep
 vendor/
+
+.vendor-new/
