@@ -19,7 +19,7 @@ type InfoRepository interface {
 	FindByTitle(title string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error)
 	FindByTitleAndUser(title string, uid string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error)
 	DeleteInfo(id string) error
-	UpdateInfo(id string, info *models.Info) error
+	UpdateInfo(id string, fields map[string]interface{}) error
 }
 
 func NewInfoRepository(client *mongo.Client) (InfoRepository, error) {
@@ -139,9 +139,29 @@ func (repo *infoRepository) FindByTitleAndUser(title string, uid string, page ui
 }
 
 func (repo *infoRepository) DeleteInfo(id string) error {
-	panic("implement me")
+	filter := bson.NewDocument(bson.EC.String("_id", id))
+	_, err := repo.collections.DeleteOne(repo.ctx, filter)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (repo *infoRepository) UpdateInfo(id string, info *models.Info) error {
-	panic("implement me")
+func (repo *infoRepository) UpdateInfo(id string, fields map[string]interface{}) error {
+	filter := bson.NewDocument(
+		bson.EC.String("_id", id),
+	)
+
+	var bsonFields []*bson.Element
+	for k, v := range fields {
+		bsonFields = append(bsonFields, bson.EC.Interface(k, v))
+	}
+	update := bson.NewDocument(
+		bson.EC.SubDocumentFromElements("$set", bsonFields...),
+	)
+	_, err := repo.collections.UpdateOne(repo.ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
