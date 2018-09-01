@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-type MiddlewareConfig struct {
+type ExtractorConfig struct {
 	Realm string
 
 	SigningAlgorithm string
@@ -18,12 +18,12 @@ type MiddlewareConfig struct {
 }
 
 type Extractor struct {
-	config MiddlewareConfig
+	config ExtractorConfig
 	key    interface{}
 	priKey interface{}
 }
 
-func NewJwtExtractor(config MiddlewareConfig) (*Extractor, error) {
+func NewJwtExtractor(config ExtractorConfig) (*Extractor, error) {
 	if config.Realm == "" {
 		return nil, ErrMissingRealm
 	}
