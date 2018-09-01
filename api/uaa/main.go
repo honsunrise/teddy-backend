@@ -9,6 +9,7 @@ import (
 	"github.com/zhsyourai/teddy-backend/api/uaa/handler"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/common/jwt"
+	"github.com/zhsyourai/teddy-backend/common/jwt-helper"
 	"github.com/zhsyourai/teddy-backend/common/utils"
 	"time"
 
@@ -45,7 +46,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	jwtGen, err := jwt.NewJwtGenerator(jwt.GeneratorConfig{
+	jwtGen, err := jwt_helper.NewJwtGenerator(jwt_helper.GeneratorConfig{
 		Issuer:           "com.teddy.uaa",
 		SigningAlgorithm: SigningAlgorithm,
 		KeyFunc: func() interface{} {
@@ -58,7 +59,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	jwtExt, err := jwt.NewJwtExtractor(jwt.ExtractorConfig{
+	jwtExt, err := jwt_helper.NewJwtExtractor(jwt_helper.ExtractorConfig{
 		Realm:            "com.teddy",
 		SigningAlgorithm: SigningAlgorithm,
 		KeyFunc: func() interface{} {

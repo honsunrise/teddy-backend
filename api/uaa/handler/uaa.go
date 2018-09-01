@@ -8,18 +8,19 @@ import (
 	"github.com/micro/go-micro/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/uaa/client"
-	"github.com/zhsyourai/teddy-backend/common/jwt"
+	"github.com/zhsyourai/teddy-backend/common/jwt-helper"
 	"github.com/zhsyourai/teddy-backend/uaa/proto"
+	"gopkg.in/dgrijalva/jwt-go.v3"
 	"time"
 )
 
 type Uaa struct {
 	enforcer *casbin.Enforcer
-	gen      *jwt.Generator
-	ext      *jwt.Extractor
+	gen      *jwt_helper.Generator
+	ext      *jwt_helper.Extractor
 }
 
-func NewUaaHandler(enforcer *casbin.Enforcer, gen *jwt.Generator, ext *jwt.Extractor) (*Uaa, error) {
+func NewUaaHandler(enforcer *casbin.Enforcer, gen *jwt_helper.Generator, ext *jwt_helper.Extractor) (*Uaa, error) {
 	instance := &Uaa{
 		enforcer: enforcer,
 		gen:      gen,
@@ -145,11 +146,24 @@ func (e *Uaa) Login(ctx context.Context, req *api.Request, rsp *api.Response) er
 		return errors.InternalServerError("com.teddy.api.uaa.login", err.Error())
 	}
 
-	type registerResp struct {
-		Uid string `json:"uid"`
+	token, err := e.gen.GenerateJwt(24*time.Hour, 72*time.Hour, jwt.MapClaims{
+		"uid":      response.Uid,
+		"username": response.Username,
+		"roles":    response.Roles,
+	})
+	if err != nil {
+		log.Error(err)
+		return errors.InternalServerError("com.teddy.api.uaa.login", err.Error())
 	}
-	var jsonResp registerResp
-	jsonResp.Uid = response.Uid
+
+	type registerResp struct {
+		Type        string `json:"type"`
+		AccessToken string `json:"access_token"`
+	}
+	jsonResp := registerResp{
+		AccessToken: token,
+		Type:        "bearer",
+	}
 
 	b, _ := json.Marshal(jsonResp)
 
@@ -159,13 +173,25 @@ func (e *Uaa) Login(ctx context.Context, req *api.Request, rsp *api.Response) er
 	return nil
 }
 
-// Uaa.Logout is called by the API as /uaa/Logout with post body
+// Uaa.Logout is called by the API as /uaa/Logout
 func (e *Uaa) Logout(ctx context.Context, req *api.Request, rsp *api.Response) error {
-	sub := "alice" // the user that wants to access a resource.
-	obj := "data1" // the resource that is going to be accessed.
-	act := "read"  // the operation that the user performs on the resource.
-	if e.enforcer.Enforce(sub, obj, act) != true {
+	log.Info("Received Uaa.Logout request")
 
+	ct, ok := req.Header["Authorization"]
+	if !ok || len(ct.Values) == 0 {
+		return errors.Unauthorized("go.micro.api.uaa", "need Authenticate")
+	}
+	token, err := e.ext.ExtractToken(ct.Values[0])
+	if err != nil {
+		return errors.Unauthorized("go.micro.api.uaa", "need Authenticate")
+	}
+
+	sub := token.Claims.(jwt.MapClaims)["uid"] // the user that wants to access a resource.
+	obj := "uaa.logout"                        // the resource that is going to be accessed.
+	act := "read,write"                        // the operation that the user performs on the resource.
+
+	if e.enforcer.Enforce(sub, obj, act) != true {
+		return errors.Forbidden("go.micro.api.uaa", "need Authorization")
 	}
 	return nil
 }
@@ -174,13 +200,29 @@ func (e *Uaa) Logout(ctx context.Context, req *api.Request, rsp *api.Response) e
 func (e *Uaa) ChangePassword(ctx context.Context, req *api.Request, rsp *api.Response) error {
 	log.Info("Received Uaa.ChangePassword request")
 
+	ct, ok := req.Header["Authorization"]
+	if !ok || len(ct.Values) == 0 {
+		return errors.Unauthorized("go.micro.api.uaa", "need Authenticate")
+	}
+	token, err := e.ext.ExtractToken(ct.Values[0])
+	if err != nil {
+		return errors.Unauthorized("go.micro.api.uaa", "need Authenticate")
+	}
+
+	sub := token.Claims.(jwt.MapClaims)["uid"] // the user that wants to access a resource.
+	obj := "uaa.changePassword"                // the resource that is going to be accessed.
+	act := "read,write"                        // the operation that the user performs on the resource.
+
+	if e.enforcer.Enforce(sub, obj, act) != true {
+		return errors.Forbidden("go.micro.api.uaa", "need Authorization")
+	}
 	// check method
 	if req.Method != "POST" {
 		return errors.BadRequest("com.micro.api.uaa", "require post")
 	}
 
 	// let's make sure we get json
-	ct, ok := req.Header["Content-Type"]
+	ct, ok = req.Header["Content-Type"]
 	if !ok || len(ct.Values) == 0 {
 		return errors.BadRequest("go.micro.api.uaa", "need content-type")
 	}
@@ -208,7 +250,7 @@ func (e *Uaa) ChangePassword(ctx context.Context, req *api.Request, rsp *api.Res
 	}
 
 	// make request
-	_, err := uaaClient.ChangePassword(ctx, &proto.ChangePasswordReq{
+	_, err = uaaClient.ChangePassword(ctx, &proto.ChangePasswordReq{
 		Username:    body.Username,
 		NewPassword: body.NewPassword,
 		OldPassword: body.OldPassword,
