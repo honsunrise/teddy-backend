@@ -1,4 +1,4 @@
-package gin_jwt
+package jwt
 
 import (
 	"crypto/ecdsa"
@@ -18,12 +18,12 @@ type GeneratorConfig struct {
 	NowFunc func() time.Time
 }
 
-type JwtGenerator struct {
+type Generator struct {
 	config GeneratorConfig
 	key    interface{}
 }
 
-func NewGinJwtGenerator(config GeneratorConfig) (*JwtGenerator, error) {
+func NewJwtGenerator(config GeneratorConfig) (*Generator, error) {
 	if config.SigningAlgorithm == "" {
 		return nil, ErrMissingSigningAlgorithm
 	}
@@ -60,13 +60,13 @@ func NewGinJwtGenerator(config GeneratorConfig) (*JwtGenerator, error) {
 		return nil, ErrNotSupportSigningAlgorithm
 	}
 
-	return &JwtGenerator{
+	return &Generator{
 		config: config,
 		key:    realKey,
 	}, nil
 }
 
-func (g *JwtGenerator) GenerateJwt(timeout time.Duration,
+func (g *Generator) GenerateJwt(timeout time.Duration,
 	refresh time.Duration, claims map[string]interface{}) (string, error) {
 	now := g.config.NowFunc()
 	expire := now.Add(timeout)
