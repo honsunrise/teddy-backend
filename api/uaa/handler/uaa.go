@@ -8,17 +8,22 @@ import (
 	"github.com/micro/go-micro/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/uaa/client"
+	"github.com/zhsyourai/teddy-backend/common/jwt"
 	"github.com/zhsyourai/teddy-backend/uaa/proto"
 	"time"
 )
 
 type Uaa struct {
 	enforcer *casbin.Enforcer
+	gen      *jwt.Generator
+	ext      *jwt.Extractor
 }
 
-func NewUaaHandler(enforcer *casbin.Enforcer) (*Uaa, error) {
+func NewUaaHandler(enforcer *casbin.Enforcer, gen *jwt.Generator, ext *jwt.Extractor) (*Uaa, error) {
 	instance := &Uaa{
 		enforcer: enforcer,
+		gen:      gen,
+		ext:      ext,
 	}
 	return instance, nil
 }
@@ -155,7 +160,7 @@ func (e *Uaa) Login(ctx context.Context, req *api.Request, rsp *api.Response) er
 }
 
 // Uaa.Logout is called by the API as /uaa/Logout with post body
-func (e *Uaa) Logout(context.Context, *api.Request, *api.Response) error {
+func (e *Uaa) Logout(ctx context.Context, req *api.Request, rsp *api.Response) error {
 	sub := "alice" // the user that wants to access a resource.
 	obj := "data1" // the resource that is going to be accessed.
 	act := "read"  // the operation that the user performs on the resource.
