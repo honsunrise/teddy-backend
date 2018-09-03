@@ -1,6 +1,6 @@
-# Message Service API
+# Content Service API
 
-This is the Message service API
+This is the Content service API
 
 Generated with
 

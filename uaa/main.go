@@ -50,9 +50,7 @@ func main() {
 	)
 
 	// Initialise service
-	service.Init(
-		// create wrap for the Example srv client
-		micro.WrapHandler(client.NotifyWrapper(service)))
+	service.Init()
 	// New components
 	uidGenerator, err := components.NewUidGenerator(accountRepo)
 	if err != nil {

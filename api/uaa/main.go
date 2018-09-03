@@ -8,7 +8,6 @@ import (
 	"github.com/micro/go-log"
 	"github.com/zhsyourai/teddy-backend/api/uaa/handler"
 	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/common/jwt"
 	"github.com/zhsyourai/teddy-backend/common/jwt-helper"
 	"github.com/zhsyourai/teddy-backend/common/utils"
 	"time"
@@ -37,6 +36,7 @@ func main() {
 	service.Init(
 		// create wrap for the Message srv client
 		micro.WrapHandler(client.UaaWrapper(service)),
+		micro.WrapHandler(client.MessageWrapper(service)),
 	)
 
 	// New jwt generator and extractor

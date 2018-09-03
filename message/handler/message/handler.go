@@ -165,6 +165,7 @@ func (h *notifyService) GetInBox(ctx context.Context, req *proto.GetInBoxReq, re
 				resp.Close()
 				close(ch)
 				inBoxChs.Delete(ch)
+				return
 			}
 		}
 	}()
@@ -190,6 +191,7 @@ func (h *notifyService) GetNotify(ctx context.Context, req *proto.GetNotifyReq, 
 				resp.Close()
 				close(ch)
 				inBoxChs.Delete(ch)
+				return
 			}
 		}
 	}()

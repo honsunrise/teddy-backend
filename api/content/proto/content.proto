@@ -7,6 +7,6 @@ option go_package = "proto";
 import "github.com/micro/go-api/proto/api.proto";
 
 service Content {
-	rpc Inbox(go.api.Request) returns (go.api.Response) {}
-	rpc Notify(go.api.Request) returns (go.api.Response) {}
+	rpc List(go.api.Request) returns (go.api.Response) {}
+	rpc Publish(go.api.Request) returns (go.api.Response) {}
 }
