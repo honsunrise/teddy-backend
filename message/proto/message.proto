@@ -8,22 +8,27 @@ import "github.com/golang/protobuf/ptypes/empty/empty.proto";
 import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
 
 service Message {
-	rpc SendEmail(SendEmailReq) returns (google.protobuf.Empty) {}
-	rpc SendInBox(SendInBoxReq) returns (google.protobuf.Empty) {}
-	rpc SendNotify(SendNotifyReq) returns (google.protobuf.Empty) {}
-    rpc SendSMS(SendSMSReq) returns (google.protobuf.Empty) {}
+    rpc SendEmail (SendEmailReq) returns (google.protobuf.Empty) {}
+    rpc SendInBox (SendInBoxReq) returns (google.protobuf.Empty) {}
+    rpc SendNotify (SendNotifyReq) returns (google.protobuf.Empty) {}
+    rpc SendSMS (SendSMSReq) returns (google.protobuf.Empty) {}
 
-    rpc GetInBox(GetInBoxReq) returns (stream InBoxEntry) {}
-    rpc GetNotify(GetNotifyReq) returns (stream NotifyEntry) {}
+    rpc GetInBox (GetInBoxReq) returns (stream InBoxItem) {}
+    rpc GetNotify (GetNotifyReq) returns (stream NotifyItem) {}
 }
 
-message InBoxEntry {
+message InBoxItem {
     string id = 1;
     string topic = 2;
-    string cotent = 3;
+    string content = 3;
+    string from = 4;
+    uint32 Type = 5;
+    bool unread = 6;
+    google.protobuf.Timestamp sendTime = 7;
+    google.protobuf.Timestamp ReadTime = 8;
 }
 
-message NotifyEntry {
+message NotifyItem {
     string topic = 1;
     string detail = 2;
 }
@@ -36,14 +41,16 @@ message SendEmailReq {
 }
 
 message SendInBoxReq {
-    string username = 1;
+    string uid = 1;
     string topic = 2;
     string content = 3;
-    google.protobuf.Timestamp until = 4;
+    string from = 4;
+    uint32 type = 5;
+    google.protobuf.Timestamp sendTime = 6;
 }
 
 message SendNotifyReq {
-    string username = 1;
+    string uid = 1;
     string topic = 2;
     string detail = 3;
 }
@@ -51,13 +58,15 @@ message SendNotifyReq {
 message SendSMSReq {
     string phoneNumber = 1;
     string content = 2;
-    google.protobuf.Timestamp until = 3;
 }
 
 message GetInBoxReq {
-    string username = 1;
+    uint32 page = 1;
+    uint32 size = 2;
+    uint32 type = 3;
+    string uid = 4;
 }
 
 message GetNotifyReq {
-    string username = 1;
+    string uid = 1;
 }

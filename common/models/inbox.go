@@ -16,7 +16,7 @@ type InBoxItem struct {
 	ID       string
 	From     string
 	Type     InBoxType
-	Subject  string
+	Topic    string
 	Content  string
 	Unread   bool
 	SendTime time.Time
@@ -26,4 +26,10 @@ type InBoxItem struct {
 type InBox struct {
 	Uid   string
 	Items []InBoxItem
+}
+
+type NotifyItem struct {
+	Uid    string
+	Topic  string
+	Detail string
 }

@@ -56,7 +56,6 @@ func (repo *inboxRepository) InsertInBoxItem(uid string, item *models.InBoxItem)
 
 func (repo *inboxRepository) internalFindInBoxItems(uid string, itemType models.InBoxType, ids []string, page uint32,
 	size uint32, sorts []types.Sort) ([]models.InBoxItem, error) {
-	var cur mongo.Cursor
 	var itemsTypeFilter *bson.Element = nil
 	if itemType != models.ALL {
 		itemsTypeFilter = bson.EC.Int64("items.type", int64(itemType))
@@ -97,7 +96,10 @@ func (repo *inboxRepository) internalFindInBoxItems(uid string, itemType models.
 		bson.EC.Int64("$limit", int64(size)),
 		bson.EC.SubDocumentFromElements("$sort", itemsSorts...),
 	)
-	repo.collections.Aggregate(repo.ctx, pipeline)
+	cur, err := repo.collections.Aggregate(repo.ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
 	items := make([]models.InBoxItem, 0, 50)
 	defer cur.Close(repo.ctx)
 	for cur.Next(repo.ctx) {
@@ -108,7 +110,7 @@ func (repo *inboxRepository) internalFindInBoxItems(uid string, itemType models.
 		}
 		items = append(items, item)
 	}
-	err := cur.Err()
+	err = cur.Err()
 	if err != nil {
 		return nil, err
 	}

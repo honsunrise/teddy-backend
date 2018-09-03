@@ -3,9 +3,13 @@ package message
 import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/rs/xid"
+	"github.com/zhsyourai/teddy-backend/common/models"
+	"github.com/zhsyourai/teddy-backend/message/converter"
 	"github.com/zhsyourai/teddy-backend/message/proto"
 	"github.com/zhsyourai/teddy-backend/message/repositories"
 	"gopkg.in/gomail.v2"
+	"sync"
 	"time"
 )
 
@@ -23,6 +27,9 @@ type notifyService struct {
 	repo    repositories.InBoxRepository
 	mailCh  chan *gomail.Message
 	mailErr chan error
+
+	inBoxChMap  sync.Map
+	notifyChMap sync.Map
 }
 
 func (h *notifyService) startMailSender() {
@@ -79,9 +86,37 @@ func (h *notifyService) SendEmail(ctx context.Context, req *proto.SendEmailReq, 
 	}
 }
 
+func (h *notifyService) SendSMS(ctx context.Context, req *proto.SendSMSReq, resp *empty.Empty) error {
+	if err := validateSendSMSReq(req); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (h *notifyService) SendInBox(ctx context.Context, req *proto.SendInBoxReq, resp *empty.Empty) error {
 	if err := validateSendInBoxReq(req); err != nil {
 		return err
+	}
+
+	inboxItem := &models.InBoxItem{
+		Unread:   true,
+		ID:       xid.New().String(),
+		From:     req.From,
+		Type:     models.InBoxType(req.Type),
+		Topic:    req.Topic,
+		Content:  req.Content,
+		SendTime: time.Unix(req.SendTime.Seconds, int64(req.SendTime.Nanos)),
+	}
+	err := h.repo.InsertInBoxItem(req.Uid, inboxItem)
+	if err != nil {
+		return err
+	}
+
+	if inBoxChs, ok := h.inBoxChMap.Load(req.Uid); ok {
+		inBoxChs.(*sync.Map).Range(func(key, value interface{}) bool {
+			key.(chan *models.InBoxItem) <- inboxItem
+			return true
+		})
 	}
 	return nil
 }
@@ -90,12 +125,16 @@ func (h *notifyService) SendNotify(ctx context.Context, req *proto.SendNotifyReq
 	if err := validateSendNotifyReq(req); err != nil {
 		return err
 	}
-	return nil
-}
 
-func (h *notifyService) SendSMS(ctx context.Context, req *proto.SendSMSReq, resp *empty.Empty) error {
-	if err := validateSendSMSReq(req); err != nil {
-		return err
+	if inBoxChs, ok := h.notifyChMap.Load(req.Uid); ok {
+		inBoxChs.(*sync.Map).Range(func(key, value interface{}) bool {
+			key.(chan *models.NotifyItem) <- &models.NotifyItem{
+				Uid:    req.Uid,
+				Topic:  req.Topic,
+				Detail: req.Detail,
+			}
+			return true
+		})
 	}
 	return nil
 }
@@ -104,6 +143,32 @@ func (h *notifyService) GetInBox(ctx context.Context, req *proto.GetInBoxReq, re
 	if err := validateGetInBoxReq(req); err != nil {
 		return err
 	}
+	items, err := h.repo.FindInBoxItems(req.Uid, models.InBoxType(req.Type), req.Page, req.Size, nil)
+	if err != nil {
+		return err
+	}
+	for _, item := range items {
+		var pbItem proto.InBoxItem
+		converter.CopyFromInBoxItemToPBInBoxItem(&item, &pbItem)
+		resp.Send(&pbItem)
+	}
+	tmp, _ := h.inBoxChMap.LoadOrStore(req.Uid, &sync.Map{})
+	inBoxChs := tmp.(*sync.Map)
+	go func() {
+		ch := make(chan *models.InBoxItem)
+		inBoxChs.Store(ch, nil)
+		var pbItem proto.InBoxItem
+		for {
+			item := <-ch
+			converter.CopyFromInBoxItemToPBInBoxItem(item, &pbItem)
+			if err := resp.Send(&pbItem); err != nil {
+				resp.Close()
+				close(ch)
+				inBoxChs.Delete(ch)
+			}
+		}
+	}()
+
 	return nil
 }
 
@@ -111,5 +176,23 @@ func (h *notifyService) GetNotify(ctx context.Context, req *proto.GetNotifyReq, 
 	if err := validateGetNotifyReq(req); err != nil {
 		return err
 	}
+
+	tmp, _ := h.notifyChMap.LoadOrStore(req.Uid, &sync.Map{})
+	inBoxChs := tmp.(*sync.Map)
+	go func() {
+		ch := make(chan *models.NotifyItem)
+		inBoxChs.Store(ch, nil)
+		var pbItem proto.NotifyItem
+		for {
+			item := <-ch
+			converter.CopyFromNotifyItemToPBNotifyItem(item, &pbItem)
+			if err := resp.Send(&pbItem); err != nil {
+				resp.Close()
+				close(ch)
+				inBoxChs.Delete(ch)
+			}
+		}
+	}()
+
 	return nil
 }

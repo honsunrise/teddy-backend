@@ -8,8 +8,8 @@ It is generated from these files:
 	proto/message.proto
 
 It has these top-level messages:
-	InBoxEntry
-	NotifyEntry
+	InBoxItem
+	NotifyItem
 	SendEmailReq
 	SendInBoxReq
 	SendNotifyReq
@@ -133,7 +133,7 @@ type Message_GetInBoxService interface {
 	SendMsg(interface{}) error
 	RecvMsg(interface{}) error
 	Close() error
-	Recv() (*InBoxEntry, error)
+	Recv() (*InBoxItem, error)
 }
 
 type messageServiceGetInBox struct {
@@ -152,8 +152,8 @@ func (x *messageServiceGetInBox) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *messageServiceGetInBox) Recv() (*InBoxEntry, error) {
-	m := new(InBoxEntry)
+func (x *messageServiceGetInBox) Recv() (*InBoxItem, error) {
+	m := new(InBoxItem)
 	err := x.stream.Recv(m)
 	if err != nil {
 		return nil, err
@@ -177,7 +177,7 @@ type Message_GetNotifyService interface {
 	SendMsg(interface{}) error
 	RecvMsg(interface{}) error
 	Close() error
-	Recv() (*NotifyEntry, error)
+	Recv() (*NotifyItem, error)
 }
 
 type messageServiceGetNotify struct {
@@ -196,8 +196,8 @@ func (x *messageServiceGetNotify) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *messageServiceGetNotify) Recv() (*NotifyEntry, error) {
-	m := new(NotifyEntry)
+func (x *messageServiceGetNotify) Recv() (*NotifyItem, error) {
+	m := new(NotifyItem)
 	err := x.stream.Recv(m)
 	if err != nil {
 		return nil, err
@@ -264,7 +264,7 @@ type Message_GetInBoxStream interface {
 	SendMsg(interface{}) error
 	RecvMsg(interface{}) error
 	Close() error
-	Send(*InBoxEntry) error
+	Send(*InBoxItem) error
 }
 
 type messageGetInBoxStream struct {
@@ -283,7 +283,7 @@ func (x *messageGetInBoxStream) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *messageGetInBoxStream) Send(m *InBoxEntry) error {
+func (x *messageGetInBoxStream) Send(m *InBoxItem) error {
 	return x.stream.Send(m)
 }
 
@@ -299,7 +299,7 @@ type Message_GetNotifyStream interface {
 	SendMsg(interface{}) error
 	RecvMsg(interface{}) error
 	Close() error
-	Send(*NotifyEntry) error
+	Send(*NotifyItem) error
 }
 
 type messageGetNotifyStream struct {
@@ -318,6 +318,6 @@ func (x *messageGetNotifyStream) RecvMsg(m interface{}) error {
 	return x.stream.Recv(m)
 }
 
-func (x *messageGetNotifyStream) Send(m *NotifyEntry) error {
+func (x *messageGetNotifyStream) Send(m *NotifyItem) error {
 	return x.stream.Send(m)
 }
