@@ -1,29 +1,24 @@
 package client
 
 import (
-	"context"
+	"github.com/gin-gonic/gin"
+	"github.com/micro/go-micro/client"
 
-	"github.com/micro/go-micro"
-	"github.com/micro/go-micro/server"
-	"github.com/zhsyourai/teddy-backend/message/proto"
+	"github.com/zhsyourai/teddy-backend/content/proto"
 )
 
-type notifyKey struct{}
+var contentKey = "__teddy_content_client_key__"
 
 // FromContext retrieves the client from the Context
-func MessageFromContext(ctx context.Context) (proto.MessageService, bool) {
-	c, ok := ctx.Value(notifyKey{}).(proto.MessageService)
+func ContentFromContext(ctx *gin.Context) (proto.ContentService, bool) {
+	c, ok := ctx.Value(contentKey).(proto.ContentService)
 	return c, ok
 }
 
 // Client returns a wrapper for the UaaClient
-func MessageWrapper(service micro.Service) server.HandlerWrapper {
-	client := proto.NewMessageService("com.teddy.srv.notify", service.Client())
-
-	return func(fn server.HandlerFunc) server.HandlerFunc {
-		return func(ctx context.Context, req server.Request, rsp interface{}) error {
-			ctx = context.WithValue(ctx, notifyKey{}, client)
-			return fn(ctx, req, rsp)
-		}
+func ContentNew() gin.HandlerFunc {
+	c := proto.NewContentService("com.teddy.srv.content", client.DefaultClient)
+	return func(ctx *gin.Context) {
+		ctx.Set(contentKey, c)
 	}
 }
