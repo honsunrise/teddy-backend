@@ -28,7 +28,10 @@ func main() {
 
 	// Load Jwt PublicKey
 	block, _ := pem.Decode([]byte(conf.JWTPkcs8))
-	parseResult, _ := x509.ParsePKCS8PrivateKey(block.Bytes)
+	parseResult, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err != nil {
+		log.Fatal(err)
+	}
 	key := parseResult.(*rsa.PrivateKey)
 
 	// Create service
@@ -47,10 +50,6 @@ func main() {
 			return &key.PublicKey
 		},
 	})
-
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	if err != nil {
 		log.Fatal(err)
