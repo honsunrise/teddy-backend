@@ -1,14 +1,9 @@
 
 GOPATH:=$(shell go env GOPATH)
 
-.PHONY: proto test docker
+.PHONY: test docker
 
-
-proto:
-	protoc --proto_path=${GOPATH}/src:. --micro_out=. --go_out=. proto/message.proto
-
-build: proto
-
+build:
 	go build -o message-api main.go plugin.go
 
 test:

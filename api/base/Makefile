@@ -1,7 +1,7 @@
 
 GOPATH:=$(shell go env GOPATH)
 
-.PHONY: proto test docker
+.PHONY: test docker
 
 build:
 	go build -o base-api main.go plugin.go
