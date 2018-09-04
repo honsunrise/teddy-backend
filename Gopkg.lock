@@ -60,6 +60,24 @@
   version = "v1.0.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/gin-contrib/sse"
+  packages = ["."]
+  revision = "22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae"
+
+[[projects]]
+  name = "github.com/gin-gonic/gin"
+  packages = [
+    ".",
+    "binding",
+    "examples/app-engine",
+    "json",
+    "render"
+  ]
+  revision = "b869fe1415e4b9eb52f247441830d502aece2d4d"
+  version = "v1.3.0"
+
+[[projects]]
   name = "github.com/go-log/log"
   packages = [
     ".",
@@ -95,6 +113,24 @@
   packages = ["."]
   revision = "064e2069ce9c359c118179501254f67d7d37ba24"
   version = "0.2"
+
+[[projects]]
+  name = "github.com/gorilla/context"
+  packages = ["."]
+  revision = "08b5f424b9271eedf6f9f0ce86cb9396ed337a42"
+  version = "v1.1.1"
+
+[[projects]]
+  name = "github.com/gorilla/handlers"
+  packages = ["."]
+  revision = "7e0847f9db758cdebd26c149d0ae9d5d0b9c98ce"
+  version = "v1.4.0"
+
+[[projects]]
+  name = "github.com/gorilla/mux"
+  packages = ["."]
+  revision = "e3702bed27f0d39777b0b37b664b6280e8ef8fbf"
+  version = "v1.6.2"
 
 [[projects]]
   name = "github.com/hashicorp/consul"
@@ -146,6 +182,18 @@
   version = "v0.3.6"
 
 [[projects]]
+  name = "github.com/json-iterator/go"
+  packages = ["."]
+  revision = "1624edc4454b8682399def8740d46db5e4362ba4"
+  version = "v1.1.5"
+
+[[projects]]
+  name = "github.com/mattn/go-isatty"
+  packages = ["."]
+  revision = "6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c"
+  version = "v0.0.4"
+
+[[projects]]
   branch = "master"
   name = "github.com/micro/cli"
   packages = ["."]
@@ -153,7 +201,19 @@
 
 [[projects]]
   name = "github.com/micro/go-api"
-  packages = ["proto"]
+  packages = [
+    ".",
+    "handler",
+    "handler/api",
+    "handler/event",
+    "handler/http",
+    "handler/rpc",
+    "handler/web",
+    "internal/proto",
+    "proto",
+    "router",
+    "server"
+  ]
   revision = "b77313d0bbce97b6a1b37169b58df38e4a78df6a"
   version = "v0.3.1"
 
@@ -222,16 +282,37 @@
   revision = "a581a57b513351792b9f21fc8b95d87b1c5a95da"
 
 [[projects]]
+  name = "github.com/micro/go-web"
+  packages = ["."]
+  revision = "8373ea64a8063743652142796015afdf090d98db"
+  version = "v0.4.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/micro/mdns"
   packages = ["."]
   revision = "cdf30746f9f70dc7a366d3d885792a092fd83102"
 
 [[projects]]
+  name = "github.com/micro/micro"
+  packages = [
+    "api/proto",
+    "internal/handler",
+    "internal/helper",
+    "internal/stats",
+    "plugin",
+    "web"
+  ]
+  revision = "cc8f7f5ff461f462d1ed527bf6267688d4e68785"
+  version = "v0.13.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/micro/util"
   packages = [
     "go/lib/addr",
+    "go/lib/ctx",
+    "go/lib/http",
     "go/lib/net",
     "go/lib/tls"
   ]
@@ -260,6 +341,18 @@
   packages = ["."]
   revision = "fa473d140ef3c6adf42d6b391fe76707f1f243c8"
   version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/modern-go/concurrent"
+  packages = ["."]
+  revision = "bacd9c7ef1dd9b15be4a9909b8ac7a4e313eec94"
+  version = "1.0.3"
+
+[[projects]]
+  name = "github.com/modern-go/reflect2"
+  packages = ["."]
+  revision = "4b7aa43c6742a2c18fdef89dd197aaae7dac7ccd"
+  version = "1.0.1"
 
 [[projects]]
   name = "github.com/mongodb/mongo-go-driver"
@@ -337,10 +430,22 @@
   version = "v1.2.1"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/serenize/snaker"
+  packages = ["."]
+  revision = "a683aaf2d516deecd70cad0c72e3ca773ecfcef0"
+
+[[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   revision = "3e01752db0189b9157070a0e1668a620f9a85da2"
   version = "v1.0.6"
+
+[[projects]]
+  name = "github.com/ugorji/go"
+  packages = ["codec"]
+  revision = "b4c50a2b199d93b13dc15e78929cfb23bfdf21ab"
+  version = "v1.1.1"
 
 [[projects]]
   branch = "master"
@@ -367,6 +472,8 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = [
+    "acme",
+    "acme/autocert",
     "bcrypt",
     "blowfish",
     "ed25519",
@@ -430,6 +537,12 @@
   version = "v3.2.0"
 
 [[projects]]
+  name = "gopkg.in/go-playground/validator.v8"
+  packages = ["."]
+  revision = "5f1438d3fca68893a817e4a66806cea46a9e4ebf"
+  version = "v8.18.2"
+
+[[projects]]
   name = "gopkg.in/gomail.v2"
   packages = ["."]
   revision = "41f3572897373c5538c50a2402db15db079fa4fd"
@@ -456,6 +569,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8ae0c71c4886614348a760138ffebbd6295bfb8bbc1511271ec0e21c28e8289a"
+  inputs-digest = "2e3ea0eb5f1186d42748125fbb5cc2da315d194e1304de81e01bd7956ae9352f"
   solver-name = "gps-cdcl"
   solver-version = 1
