@@ -1,52 +1,38 @@
 package handler
 
 import (
-	"context"
-	"encoding/json"
 	"github.com/casbin/casbin"
-	api "github.com/micro/go-api/proto"
-	"github.com/micro/go-micro/errors"
+	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
+	"github.com/zhsyourai/teddy-backend/api/gin-jwt"
 	"github.com/zhsyourai/teddy-backend/api/uaa/client"
-	"github.com/zhsyourai/teddy-backend/common/jwt-helper"
+	"github.com/zhsyourai/teddy-backend/common/errors"
 	"github.com/zhsyourai/teddy-backend/uaa/proto"
 	"gopkg.in/dgrijalva/jwt-go.v3"
+	"net/http"
 	"time"
 )
 
 type Uaa struct {
-	enforcer *casbin.Enforcer
-	gen      *jwt_helper.Generator
-	ext      *jwt_helper.Extractor
+	enforcer   *casbin.Enforcer
+	middleware *gin_jwt.JwtMiddleware
+	generator  *gin_jwt.JwtGenerator
 }
 
-func NewUaaHandler(enforcer *casbin.Enforcer, gen *jwt_helper.Generator, ext *jwt_helper.Extractor) (*Uaa, error) {
+func NewUaaHandler(enforcer *casbin.Enforcer, middleware *gin_jwt.JwtMiddleware, generator *gin_jwt.JwtGenerator) (*Uaa, error) {
 	instance := &Uaa{
-		enforcer: enforcer,
-		gen:      gen,
-		ext:      ext,
+		enforcer:   enforcer,
+		middleware: middleware,
+		generator:  generator,
 	}
 	return instance, nil
 }
 
+func (h *Uaa) Handler(root gin.IRoutes) {
+}
+
 // Uaa.Register is called by the API as /uaa/Register with post body
-func (e *Uaa) Register(ctx context.Context, req *api.Request, rsp *api.Response) error {
-	log.Info("Received Uaa.Register request")
-
-	// check method
-	if req.Method != "POST" {
-		return errors.BadRequest("com.micro.api.uaa", "require post")
-	}
-
-	// let's make sure we get json
-	ct, ok := req.Header["Content-Type"]
-	if !ok || len(ct.Values) == 0 {
-		return errors.BadRequest("go.micro.api.uaa", "need content-type")
-	}
-
-	if ct.Values[0] != "application/json" {
-		return errors.BadRequest("go.micro.api.uaa", "expect application/json")
-	}
+func (h *Uaa) Register(ctx *gin.Context) {
 
 	// parse body
 	type registerReq struct {
@@ -59,13 +45,14 @@ func (e *Uaa) Register(ctx context.Context, req *api.Request, rsp *api.Response)
 	}
 	var body registerReq
 
-	json.Unmarshal([]byte(req.Body), &body)
+	ctx.Bind(&body)
 
 	// extract the client from the context
 	uaaClient, ok := client.UaaFromContext(ctx)
 	if !ok {
 		log.Error("uaa client not found")
-		return errors.InternalServerError("com.teddy.api.uaa.register", "uaa client not found")
+		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		return
 	}
 
 	// check email or phone
@@ -81,7 +68,8 @@ func (e *Uaa) Register(ctx context.Context, req *api.Request, rsp *api.Response)
 	})
 	if err != nil {
 		log.Error(err)
-		return errors.InternalServerError("com.teddy.api.uaa.register", err.Error())
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
 	type registerResp struct {
@@ -92,32 +80,11 @@ func (e *Uaa) Register(ctx context.Context, req *api.Request, rsp *api.Response)
 	jsonResp.Uid = response.Uid
 	jsonResp.CreateDate = time.Unix(response.CreateDate.Seconds, int64(response.CreateDate.Nanos))
 
-	b, _ := json.Marshal(jsonResp)
-
-	rsp.StatusCode = 200
-	rsp.Body = string(b)
-
-	return nil
+	ctx.JSON(http.StatusOK, &jsonResp)
 }
 
 // Uaa.Login is called by the API as /uaa/Login with post body
-func (e *Uaa) Login(ctx context.Context, req *api.Request, rsp *api.Response) error {
-	log.Info("Received Uaa.Login request")
-
-	// check method
-	if req.Method != "POST" {
-		return errors.BadRequest("com.micro.api.uaa", "require post")
-	}
-
-	// let's make sure we get json
-	ct, ok := req.Header["Content-Type"]
-	if !ok || len(ct.Values) == 0 {
-		return errors.BadRequest("go.micro.api.uaa", "need content-type")
-	}
-
-	if ct.Values[0] != "application/json" {
-		return errors.BadRequest("go.micro.api.uaa", "expect application/json")
-	}
+func (h *Uaa) Login(ctx *gin.Context) {
 
 	// parse body
 	type loginReq struct {
@@ -127,13 +94,14 @@ func (e *Uaa) Login(ctx context.Context, req *api.Request, rsp *api.Response) er
 	}
 	var body loginReq
 
-	json.Unmarshal([]byte(req.Body), &body)
+	ctx.Bind(&body)
 
 	// extract the client from the context
 	uaaClient, ok := client.UaaFromContext(ctx)
 	if !ok {
 		log.Error("uaa client not found")
-		return errors.InternalServerError("com.teddy.api.uaa.login", "uaa client not found")
+		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		return
 	}
 
 	// make request
@@ -143,17 +111,19 @@ func (e *Uaa) Login(ctx context.Context, req *api.Request, rsp *api.Response) er
 	})
 	if err != nil {
 		log.Error(err)
-		return errors.InternalServerError("com.teddy.api.uaa.login", err.Error())
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
-	token, err := e.gen.GenerateJwt(24*time.Hour, 72*time.Hour, jwt.MapClaims{
+	token, err := h.generator.GenerateJwt(24*time.Hour, 72*time.Hour, jwt.MapClaims{
 		"uid":      response.Uid,
 		"username": response.Username,
 		"roles":    response.Roles,
 	})
 	if err != nil {
 		log.Error(err)
-		return errors.InternalServerError("com.teddy.api.uaa.login", err.Error())
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
 	type registerResp struct {
@@ -165,70 +135,40 @@ func (e *Uaa) Login(ctx context.Context, req *api.Request, rsp *api.Response) er
 		Type:        "bearer",
 	}
 
-	b, _ := json.Marshal(jsonResp)
-
-	rsp.StatusCode = 200
-	rsp.Body = string(b)
-
-	return nil
+	ctx.JSON(http.StatusOK, &jsonResp)
 }
 
 // Uaa.Logout is called by the API as /uaa/Logout
-func (e *Uaa) Logout(ctx context.Context, req *api.Request, rsp *api.Response) error {
-	log.Info("Received Uaa.Logout request")
-
-	ct, ok := req.Header["Authorization"]
-	if !ok || len(ct.Values) == 0 {
-		return errors.Unauthorized("go.micro.api.uaa", "need Authenticate")
-	}
-	token, err := e.ext.ExtractToken(ct.Values[0])
+func (h *Uaa) Logout(ctx *gin.Context) {
+	token, err := h.middleware.ExtractToken(ctx)
 	if err != nil {
-		return errors.Unauthorized("go.micro.api.uaa", "need Authenticate")
+		ctx.AbortWithStatus(http.StatusUnauthorized)
 	}
 
 	sub := token.Claims.(jwt.MapClaims)["uid"] // the user that wants to access a resource.
 	obj := "uaa.logout"                        // the resource that is going to be accessed.
 	act := "read,write"                        // the operation that the user performs on the resource.
 
-	if e.enforcer.Enforce(sub, obj, act) != true {
-		return errors.Forbidden("go.micro.api.uaa", "need Authorization")
+	if h.enforcer.Enforce(sub, obj, act) != true {
+		ctx.AbortWithStatus(http.StatusForbidden)
 	}
-	return nil
+	// TODO: may do something
+	ctx.Status(http.StatusOK)
 }
 
 // Uaa.ChangePassword is called by the API as /uaa/ChangePassword with post body
-func (e *Uaa) ChangePassword(ctx context.Context, req *api.Request, rsp *api.Response) error {
-	log.Info("Received Uaa.ChangePassword request")
-
-	ct, ok := req.Header["Authorization"]
-	if !ok || len(ct.Values) == 0 {
-		return errors.Unauthorized("go.micro.api.uaa", "need Authenticate")
-	}
-	token, err := e.ext.ExtractToken(ct.Values[0])
+func (h *Uaa) ChangePassword(ctx *gin.Context) {
+	token, err := h.middleware.ExtractToken(ctx)
 	if err != nil {
-		return errors.Unauthorized("go.micro.api.uaa", "need Authenticate")
+		ctx.AbortWithStatus(http.StatusUnauthorized)
 	}
 
 	sub := token.Claims.(jwt.MapClaims)["uid"] // the user that wants to access a resource.
 	obj := "uaa.changePassword"                // the resource that is going to be accessed.
 	act := "read,write"                        // the operation that the user performs on the resource.
 
-	if e.enforcer.Enforce(sub, obj, act) != true {
-		return errors.Forbidden("go.micro.api.uaa", "need Authorization")
-	}
-	// check method
-	if req.Method != "POST" {
-		return errors.BadRequest("com.micro.api.uaa", "require post")
-	}
-
-	// let's make sure we get json
-	ct, ok = req.Header["Content-Type"]
-	if !ok || len(ct.Values) == 0 {
-		return errors.BadRequest("go.micro.api.uaa", "need content-type")
-	}
-
-	if ct.Values[0] != "application/json" {
-		return errors.BadRequest("go.micro.api.uaa", "expect application/json")
+	if h.enforcer.Enforce(sub, obj, act) != true {
+		ctx.AbortWithStatus(http.StatusForbidden)
 	}
 
 	// parse body
@@ -240,13 +180,13 @@ func (e *Uaa) ChangePassword(ctx context.Context, req *api.Request, rsp *api.Res
 	}
 	var body changePasswordReq
 
-	json.Unmarshal([]byte(req.Body), &body)
+	ctx.Bind(&body)
 
 	// extract the client from the context
 	uaaClient, ok := client.UaaFromContext(ctx)
 	if !ok {
 		log.Error("uaa client not found")
-		return errors.InternalServerError("com.teddy.api.uaa.changePassword", "uaa client not found")
+		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
 	}
 
 	// make request
@@ -257,32 +197,14 @@ func (e *Uaa) ChangePassword(ctx context.Context, req *api.Request, rsp *api.Res
 	})
 	if err != nil {
 		log.Error(err)
-		return errors.InternalServerError("com.teddy.api.uaa.changePassword", err.Error())
+		ctx.AbortWithError(http.StatusInternalServerError, err)
 	}
 
-	rsp.StatusCode = 200
-
-	return nil
+	ctx.Status(http.StatusOK)
 }
 
 // Uaa.SendEmailVerify is called by the API as /uaa/sendEmailCaptcha with post body
-func (e *Uaa) SendEmailCaptcha(ctx context.Context, req *api.Request, rsp *api.Response) error {
-	log.Info("Received Uaa.SendEmailCaptcha request")
-
-	// check method
-	if req.Method != "POST" {
-		return errors.BadRequest("com.micro.api.uaa", "require post")
-	}
-
-	// let's make sure we get json
-	ct, ok := req.Header["Content-Type"]
-	if !ok || len(ct.Values) == 0 {
-		return errors.BadRequest("go.micro.api.uaa", "need content-type")
-	}
-
-	if ct.Values[0] != "application/json" {
-		return errors.BadRequest("go.micro.api.uaa", "expect application/json")
-	}
+func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 
 	// parse body
 	type changePasswordReq struct {
@@ -290,16 +212,14 @@ func (e *Uaa) SendEmailCaptcha(ctx context.Context, req *api.Request, rsp *api.R
 	}
 	var body changePasswordReq
 
-	json.Unmarshal([]byte(req.Body), &body)
+	ctx.Bind(&body)
 
 	// extract the client from the context
 
-	rsp.StatusCode = 200
-
-	return nil
+	ctx.Status(http.StatusOK)
 }
 
 // Uaa.SendEmailVerify is called by the API as /uaa/sendPhoneCaptcha with post body
-func (e *Uaa) SendPhoneCaptcha(ctx context.Context, req *api.Request, rsp *api.Response) error {
-	panic("implement me")
+func (h *Uaa) SendPhoneCaptcha(ctx *gin.Context) {
+	ctx.Status(http.StatusOK)
 }

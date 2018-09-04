@@ -1,27 +1,26 @@
 package main
 
 import (
-	"crypto/rand"
 	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
 	"github.com/casbin/casbin"
 	"github.com/casbin/mongodb-adapter"
+	"github.com/gin-gonic/gin"
 	"github.com/micro/go-log"
+	"github.com/micro/go-web"
+	"github.com/zhsyourai/teddy-backend/api/gin-jwt"
+	"github.com/zhsyourai/teddy-backend/api/uaa/client"
 	"github.com/zhsyourai/teddy-backend/api/uaa/handler"
 	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/common/jwt-helper"
 	"github.com/zhsyourai/teddy-backend/common/utils"
-	"time"
-
-	"github.com/micro/go-micro"
-	"github.com/zhsyourai/teddy-backend/api/uaa/client"
-	"github.com/zhsyourai/teddy-backend/api/uaa/proto"
 )
 
 func main() {
 	// New Service
-	service := micro.NewService(
-		micro.Name("go.micro.api.uaa"),
-		micro.Version("latest"),
+	service := web.NewService(
+		web.Name("go.micro.api.uaa"),
+		web.Version("latest"),
 	)
 
 	// Load config
@@ -33,50 +32,55 @@ func main() {
 	enforcer.LoadPolicy()
 
 	// Initialise service
-	service.Init(
-		// create wrap for the Message srv client
-		micro.WrapHandler(client.UaaWrapper(service)),
-		micro.WrapHandler(client.MessageWrapper(service)),
-	)
+	service.Init()
 
 	// New jwt generator and extractor
 	const SigningAlgorithm = "RS512"
-	key, err := rsa.GenerateKey(rand.Reader, 1024)
+	// Load Jwt PublicKey
+	block, _ := pem.Decode([]byte(conf.JWTPkcs8))
+	parseResult, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
 		log.Fatal(err)
 	}
+	key := parseResult.(*rsa.PrivateKey)
 
-	jwtGen, err := jwt_helper.NewJwtGenerator(jwt_helper.GeneratorConfig{
-		Issuer:           "com.teddy.uaa",
-		SigningAlgorithm: SigningAlgorithm,
-		KeyFunc: func() interface{} {
-			return key
-		},
-		NowFunc: func() time.Time {
-			return time.Now()
-		},
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	jwtExt, err := jwt_helper.NewJwtExtractor(jwt_helper.ExtractorConfig{
+	jwtMiddleware, err := gin_jwt.NewGinJwtMiddleware(gin_jwt.MiddlewareConfig{
 		Realm:            "com.teddy",
 		SigningAlgorithm: SigningAlgorithm,
 		KeyFunc: func() interface{} {
 			return &key.PublicKey
 		},
 	})
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	uaa, err := handler.NewUaaHandler(enforcer, jwtGen, jwtExt)
+	jwtGenerator, err := gin_jwt.NewGinJwtGenerator(gin_jwt.GeneratorConfig{
+		Issuer:           "com.teddy.uaa",
+		SigningAlgorithm: SigningAlgorithm,
+		KeyFunc: func() interface{} {
+			return key
+		},
+	})
+
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	uaa, err := handler.NewUaaHandler(enforcer, jwtMiddleware, jwtGenerator)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Create RESTful handler (using Gin)
+	router := gin.Default()
+	router.Use(client.MessageNew())
+	router.Use(client.UaaNew())
+	uaa.Handler(router)
 
 	// Register Handler
-	proto.RegisterUaaHandler(service.Server(), uaa)
+	service.Handle("/", router)
 
 	// Run service
 	if err := service.Run(); err != nil {
