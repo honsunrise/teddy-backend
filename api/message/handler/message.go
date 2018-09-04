@@ -16,6 +16,7 @@ func NewMessageHandler(middleware *gin_jwt.JwtMiddleware) (*Message, error) {
 }
 
 func (h *Message) Handler(root gin.IRoutes) {
+	root.GET("")
 }
 
 // Message.Register is called by the API as /notify/inbox with post body

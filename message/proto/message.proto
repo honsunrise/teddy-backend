@@ -36,8 +36,8 @@ message NotifyItem {
 message SendEmailReq {
 	string email = 1;
     string topic = 2;
-    string cotent = 3;
-    google.protobuf.Timestamp until = 4;
+    string content = 3;
+    google.protobuf.Timestamp sendTime = 4;
 }
 
 message SendInBoxReq {

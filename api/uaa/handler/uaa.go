@@ -3,11 +3,13 @@ package handler
 import (
 	"github.com/casbin/casbin"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/protobuf/ptypes/timestamp"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/gin-jwt"
 	"github.com/zhsyourai/teddy-backend/api/uaa/client"
 	"github.com/zhsyourai/teddy-backend/common/errors"
-	"github.com/zhsyourai/teddy-backend/uaa/proto"
+	msgProto "github.com/zhsyourai/teddy-backend/message/proto"
+	uaaProto "github.com/zhsyourai/teddy-backend/uaa/proto"
 	"gopkg.in/dgrijalva/jwt-go.v3"
 	"net/http"
 	"time"
@@ -33,6 +35,8 @@ func (h *Uaa) Handler(root gin.IRoutes) {
 
 // Uaa.Register is called by the API as /uaa/Register with post body
 func (h *Uaa) Register(ctx *gin.Context) {
+	// Now time
+	now := time.Now()
 
 	// parse body
 	type registerReq struct {
@@ -59,7 +63,7 @@ func (h *Uaa) Register(ctx *gin.Context) {
 	// TODO: Check email or phone
 
 	// make request
-	response, err := uaaClient.Register(ctx, &proto.RegisterReq{
+	response, err := uaaClient.Register(ctx, &uaaProto.RegisterReq{
 		Username: body.Username,
 		Password: body.Password,
 		Roles:    body.Roles,
@@ -81,6 +85,32 @@ func (h *Uaa) Register(ctx *gin.Context) {
 	jsonResp.CreateDate = time.Unix(response.CreateDate.Seconds, int64(response.CreateDate.Nanos))
 
 	ctx.JSON(http.StatusOK, &jsonResp)
+
+	// This step can happen error and will ignore
+	messageClient, ok := client.MessageFromContext(ctx)
+	if ok {
+		// Send welcome email
+		messageClient.SendEmail(ctx, &msgProto.SendEmailReq{
+			Email:   response.Email,
+			Topic:   "Welcome " + response.Username,
+			Content: "Hi " + response.Username,
+			SendTime: &timestamp.Timestamp{
+				Seconds: now.Unix(),
+				Nanos:   int32(now.Nanosecond()),
+			},
+		})
+
+		// Send welcome inbox
+		messageClient.SendInBox(ctx, &msgProto.SendInBoxReq{
+			Uid:     response.Uid,
+			Topic:   "Welcome " + body.Username,
+			Content: "Hi " + body.Username,
+			SendTime: &timestamp.Timestamp{
+				Seconds: now.Unix(),
+				Nanos:   int32(now.Nanosecond()),
+			},
+		})
+	}
 }
 
 // Uaa.Login is called by the API as /uaa/Login with post body
@@ -105,7 +135,7 @@ func (h *Uaa) Login(ctx *gin.Context) {
 	}
 
 	// make request
-	response, err := uaaClient.VerifyPassword(ctx, &proto.VerifyPasswordReq{
+	response, err := uaaClient.VerifyPassword(ctx, &uaaProto.VerifyPasswordReq{
 		Username: body.Username,
 		Password: body.Password,
 	})
@@ -190,7 +220,7 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 	}
 
 	// make request
-	_, err = uaaClient.ChangePassword(ctx, &proto.ChangePasswordReq{
+	_, err = uaaClient.ChangePassword(ctx, &uaaProto.ChangePasswordReq{
 		Username:    body.Username,
 		NewPassword: body.NewPassword,
 		OldPassword: body.OldPassword,
@@ -207,10 +237,10 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 
 	// parse body
-	type changePasswordReq struct {
+	type sendEmailCaptchaReq struct {
 		Email string `json:"email"`
 	}
-	var body changePasswordReq
+	var body sendEmailCaptchaReq
 
 	ctx.Bind(&body)
 
