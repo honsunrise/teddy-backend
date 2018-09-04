@@ -12,7 +12,6 @@ import (
 	"flag"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/uaa/client"
 	"github.com/zhsyourai/teddy-backend/uaa/handler/account"
 	uaa "github.com/zhsyourai/teddy-backend/uaa/proto"
 	"github.com/zhsyourai/teddy-backend/uaa/repositories"
