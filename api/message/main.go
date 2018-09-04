@@ -44,7 +44,7 @@ func main() {
 	service.Init()
 
 	jwtMiddleware, err := gin_jwt.NewGinJwtMiddleware(gin_jwt.MiddlewareConfig{
-		Realm:            "com.teddy.uaa",
+		Realm:            "com.teddy",
 		SigningAlgorithm: "RS512",
 		KeyFunc: func() interface{} {
 			return &key.PublicKey
@@ -55,10 +55,15 @@ func main() {
 		log.Fatal(err)
 	}
 
+	message, err := handler.NewMessageHandler(jwtMiddleware)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Create RESTful handler (using Gin)
 	router := gin.Default()
 	router.Use(client.MessageNew())
-	handler.NewMessageHandler(jwtMiddleware).Handler(router)
+	message.Handler(router)
 
 	// Register Handler
 	service.Handle("/", router)

@@ -1,18 +1,19 @@
 package handler
 
 import (
-	"context"
-	api "github.com/micro/go-api/proto"
+	"github.com/gin-gonic/gin"
+	"github.com/zhsyourai/teddy-backend/api/gin-jwt"
 )
 
-type Content struct{}
-
-// Content.Register is called by the API as /notify/inbox with post body
-func (e *Content) Inbox(ctx context.Context, req *api.Request, rsp *api.Response) error {
-	panic("implement me")
+type Content struct {
+	middleware *gin_jwt.JwtMiddleware
 }
 
-// Content.Register is called by the API as /notify/inbox with post body
-func (e *Content) Notify(context.Context, *api.Request, *api.Response) error {
-	panic("implement me")
+func NewContentHandler(middleware *gin_jwt.JwtMiddleware) (*Content, error) {
+	return &Content{
+		middleware: middleware,
+	}, nil
+}
+
+func (h *Content) Handler(root gin.IRoutes) {
 }
