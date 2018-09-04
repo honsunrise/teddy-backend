@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/rs/xid"
+	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/common/models"
 	"github.com/zhsyourai/teddy-backend/message/converter"
 	"github.com/zhsyourai/teddy-backend/message/proto"
@@ -14,7 +15,7 @@ import (
 )
 
 func NewMessageHandler(repo repositories.InBoxRepository) (proto.MessageHandler, error) {
-	instance := &notifyService{
+	instance := &notifyHandler{
 		repo:    repo,
 		mailCh:  make(chan *gomail.Message),
 		mailErr: make(chan error),
@@ -23,7 +24,7 @@ func NewMessageHandler(repo repositories.InBoxRepository) (proto.MessageHandler,
 	return instance, nil
 }
 
-type notifyService struct {
+type notifyHandler struct {
 	repo    repositories.InBoxRepository
 	mailCh  chan *gomail.Message
 	mailErr chan error
@@ -32,9 +33,12 @@ type notifyService struct {
 	notifyChMap sync.Map
 }
 
-func (h *notifyService) startMailSender() {
+func (h *notifyHandler) startMailSender() {
+	// Load config
+	mailConf := config.GetConfig().Mail
+
 	go func() {
-		d := gomail.NewPlainDialer("smtp.example.com", 587, "user", "123456")
+		d := gomail.NewPlainDialer(mailConf.Host, mailConf.Port, mailConf.Username, mailConf.Password)
 
 		var s gomail.SendCloser
 		var err error
@@ -67,7 +71,7 @@ func (h *notifyService) startMailSender() {
 	}()
 }
 
-func (h *notifyService) SendEmail(ctx context.Context, req *proto.SendEmailReq, resp *empty.Empty) error {
+func (h *notifyHandler) SendEmail(ctx context.Context, req *proto.SendEmailReq, resp *empty.Empty) error {
 	if err := validateSendEmailReq(req); err != nil {
 		return err
 	}
@@ -86,14 +90,14 @@ func (h *notifyService) SendEmail(ctx context.Context, req *proto.SendEmailReq, 
 	}
 }
 
-func (h *notifyService) SendSMS(ctx context.Context, req *proto.SendSMSReq, resp *empty.Empty) error {
+func (h *notifyHandler) SendSMS(ctx context.Context, req *proto.SendSMSReq, resp *empty.Empty) error {
 	if err := validateSendSMSReq(req); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (h *notifyService) SendInBox(ctx context.Context, req *proto.SendInBoxReq, resp *empty.Empty) error {
+func (h *notifyHandler) SendInBox(ctx context.Context, req *proto.SendInBoxReq, resp *empty.Empty) error {
 	if err := validateSendInBoxReq(req); err != nil {
 		return err
 	}
@@ -121,7 +125,7 @@ func (h *notifyService) SendInBox(ctx context.Context, req *proto.SendInBoxReq, 
 	return nil
 }
 
-func (h *notifyService) SendNotify(ctx context.Context, req *proto.SendNotifyReq, resp *empty.Empty) error {
+func (h *notifyHandler) SendNotify(ctx context.Context, req *proto.SendNotifyReq, resp *empty.Empty) error {
 	if err := validateSendNotifyReq(req); err != nil {
 		return err
 	}
@@ -139,7 +143,7 @@ func (h *notifyService) SendNotify(ctx context.Context, req *proto.SendNotifyReq
 	return nil
 }
 
-func (h *notifyService) GetInBox(ctx context.Context, req *proto.GetInBoxReq, resp proto.Message_GetInBoxStream) error {
+func (h *notifyHandler) GetInBox(ctx context.Context, req *proto.GetInBoxReq, resp proto.Message_GetInBoxStream) error {
 	if err := validateGetInBoxReq(req); err != nil {
 		return err
 	}
@@ -173,7 +177,7 @@ func (h *notifyService) GetInBox(ctx context.Context, req *proto.GetInBoxReq, re
 	return nil
 }
 
-func (h *notifyService) GetNotify(ctx context.Context, req *proto.GetNotifyReq, resp proto.Message_GetNotifyStream) error {
+func (h *notifyHandler) GetNotify(ctx context.Context, req *proto.GetNotifyReq, resp proto.Message_GetNotifyStream) error {
 	if err := validateGetNotifyReq(req); err != nil {
 		return err
 	}
