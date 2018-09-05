@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
@@ -10,13 +9,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-log"
 	"github.com/micro/go-web"
-	"github.com/micro/micro/web"
-	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/zhsyourai/teddy-backend/api/gin-jwt"
 	"github.com/zhsyourai/teddy-backend/api/uaa/client"
-	"github.com/zhsyourai/teddy-backend/api/uaa/components"
 	"github.com/zhsyourai/teddy-backend/api/uaa/handler"
-	"github.com/zhsyourai/teddy-backend/api/uaa/repositories"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/common/utils"
 )
@@ -30,20 +25,6 @@ func main() {
 	enforcer := casbin.NewEnforcer(model, mongodbadapter.NewAdapter(mongodbUri))
 	enforcer.LoadPolicy()
 
-	// New Mongodb client
-	mongodbClient, err := mongo.Connect(context.Background(), mongodbUri)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// New Repository
-	keyValuePairRepo, err := repositories.NewKeyValuePairRepository(mongodbClient)
-	if err != nil {
-		log.Fatal(err)
-	}
-	simpleCaptch, err := components.NewCaptchaVerifier(keyValuePairRepo)
-	if err != nil {
-		log.Fatal(err)
-	}
 	// New Service
 	service := web.NewService(
 		web.Name("go.micro.api.uaa"),
@@ -86,7 +67,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	uaa, err := handler.NewUaaHandler(enforcer, simpleCaptch, jwtMiddleware, jwtGenerator)
+	uaa, err := handler.NewUaaHandler(enforcer, jwtMiddleware, jwtGenerator)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -95,6 +76,7 @@ func main() {
 	router := gin.Default()
 	router.Use(client.MessageNew())
 	router.Use(client.UaaNew())
+	router.Use(client.CaptchaNew())
 	uaa.Handler(router)
 
 	// Register Handler

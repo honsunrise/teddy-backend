@@ -7,7 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/gin-jwt"
 	"github.com/zhsyourai/teddy-backend/api/uaa/client"
-	"github.com/zhsyourai/teddy-backend/api/uaa/components"
+	capProto "github.com/zhsyourai/teddy-backend/captcha/proto"
 	"github.com/zhsyourai/teddy-backend/common/errors"
 	msgProto "github.com/zhsyourai/teddy-backend/message/proto"
 	uaaProto "github.com/zhsyourai/teddy-backend/uaa/proto"
@@ -20,14 +20,11 @@ type Uaa struct {
 	enforcer   *casbin.Enforcer
 	middleware *gin_jwt.JwtMiddleware
 	generator  *gin_jwt.JwtGenerator
-	captcha    components.CaptchaVerifier
 }
 
-func NewUaaHandler(enforcer *casbin.Enforcer,
-	captcha components.CaptchaVerifier, middleware *gin_jwt.JwtMiddleware,
+func NewUaaHandler(enforcer *casbin.Enforcer, middleware *gin_jwt.JwtMiddleware,
 	generator *gin_jwt.JwtGenerator) (*Uaa, error) {
 	instance := &Uaa{
-		captcha:    captcha,
 		enforcer:   enforcer,
 		middleware: middleware,
 		generator:  generator,
@@ -64,17 +61,33 @@ func (h *Uaa) Register(ctx *gin.Context) {
 		return
 	}
 
+	// extract the client from the context
+	captchaClient, ok := client.CaptchaKeyFromContext(ctx)
+	if !ok {
+		log.Error(errors.ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		return
+	}
+
 	// check email or phone
 	if body.Email != "" && body.Captcha != "" {
-		err := h.captcha.Exist(body.Email, body.Captcha)
-		if err != nil {
+		rsp, err := captchaClient.Verify(ctx, &capProto.VerifyReq{
+			Type: capProto.CaptchaType_RANDOM_BY_ID,
+			Id:   body.Email,
+			Code: body.Captcha,
+		})
+		if err != nil || !rsp.Correct {
 			log.Error(errors.ErrCaptchaNotCorrect)
 			ctx.AbortWithError(http.StatusInternalServerError, errors.ErrCaptchaNotCorrect)
 			return
 		}
 	} else if body.Phone != "" && body.Captcha != "" {
-		err := h.captcha.Exist(body.Phone, body.Captcha)
-		if err != nil {
+		rsp, err := captchaClient.Verify(ctx, &capProto.VerifyReq{
+			Type: capProto.CaptchaType_RANDOM_BY_ID,
+			Id:   body.Phone,
+			Code: body.Captcha,
+		})
+		if err != nil || !rsp.Correct {
 			log.Error(errors.ErrCaptchaNotCorrect)
 			ctx.AbortWithError(http.StatusInternalServerError, errors.ErrCaptchaNotCorrect)
 			return
@@ -275,7 +288,18 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 		return
 	}
 
-	captcha, err := h.captcha.NextNumberCaptcha(body.Email, now.Add(time.Minute*10))
+	// extract the client from the context
+	captchaClient, ok := client.CaptchaKeyFromContext(ctx)
+	if !ok {
+		log.Error(errors.ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		return
+	}
+
+	captcha, err := captchaClient.GetRandomById(ctx, &capProto.GetRandomReq{
+		Len: 6,
+		Id:  body.Email,
+	})
 	if err != nil {
 		log.Error(err)
 		ctx.AbortWithError(http.StatusInternalServerError, err)
@@ -285,7 +309,7 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	_, err = messageClient.SendEmail(ctx, &msgProto.SendEmailReq{
 		Email:   body.Email,
 		Topic:   "Verify captcha",
-		Content: "Your captcha:" + captcha,
+		Content: "Your captcha:" + captcha.Code,
 		SendTime: &timestamp.Timestamp{
 			Seconds: now.Unix(),
 			Nanos:   int32(now.Nanosecond()),
