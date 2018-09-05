@@ -35,8 +35,8 @@ func NewUaaHandler(enforcer *casbin.Enforcer, middleware *gin_jwt.JwtMiddleware,
 func (h *Uaa) Handler(root gin.IRoutes) {
 	root.POST("/uaa/register", h.Register)
 	root.POST("/uaa/login", h.Login)
-	root.Any("/uaa/logout", h.Logout)
-	root.POST("/uaa/changePassword", h.ChangePassword)
+	root.Any("/uaa/logout", h.middleware.Handler, h.Logout)
+	root.POST("/uaa/changePassword", h.middleware.Handler, h.ChangePassword)
 	root.POST("/uaa/sendEmailCaptcha", h.SendEmailCaptcha)
 }
 
