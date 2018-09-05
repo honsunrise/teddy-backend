@@ -4,6 +4,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"flag"
 	"github.com/casbin/casbin"
 	"github.com/casbin/mongodb-adapter"
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,12 @@ import (
 )
 
 func main() {
+	flag.Parse()
+
+	err := config.Init()
+	if err != nil {
+		log.Fatal(err)
+	}
 	// Load config
 	conf := config.GetConfig()
 	mongodbUri := utils.BuildMongodbURI(conf.Databases["mongodb"])

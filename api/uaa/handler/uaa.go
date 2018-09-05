@@ -33,6 +33,11 @@ func NewUaaHandler(enforcer *casbin.Enforcer, middleware *gin_jwt.JwtMiddleware,
 }
 
 func (h *Uaa) Handler(root gin.IRoutes) {
+	root.POST("/uaa/register", h.Register)
+	root.POST("/uaa/login", h.Login)
+	root.Any("/uaa/logout", h.Logout)
+	root.POST("/uaa/changePassword", h.ChangePassword)
+	root.POST("/uaa/sendEmailCaptcha", h.SendEmailCaptcha)
 }
 
 // Uaa.Register is called by the API as /uaa/Register with post body

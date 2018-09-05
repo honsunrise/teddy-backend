@@ -80,7 +80,7 @@ func (h *notifyHandler) SendEmail(ctx context.Context, req *proto.SendEmailReq, 
 	m.SetHeader("From", "alex@example.com")
 	m.SetHeader("To", req.Email)
 	m.SetHeader("Subject", req.Topic)
-	m.SetBody("text/html", req.Cotent)
+	m.SetBody("text/html", req.Content)
 
 	select {
 	case err := <-h.mailErr:
