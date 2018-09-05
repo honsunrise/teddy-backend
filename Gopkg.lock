@@ -48,6 +48,12 @@
   revision = "94a6b8a052e6727dfe20d7bfc4d6e8fa8a76a71f"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/dchest/captcha"
+  packages = ["."]
+  revision = "6a29415a8364ec2971fdc62d9e415ed53fc20410"
+
+[[projects]]
   name = "github.com/dgrijalva/jwt-go"
   packages = ["."]
   revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
@@ -70,7 +76,6 @@
   packages = [
     ".",
     "binding",
-    "examples/app-engine",
     "json",
     "render"
   ]
@@ -282,10 +287,10 @@
   revision = "a581a57b513351792b9f21fc8b95d87b1c5a95da"
 
 [[projects]]
+  branch = "master"
   name = "github.com/micro/go-web"
   packages = ["."]
-  revision = "8373ea64a8063743652142796015afdf090d98db"
-  version = "v0.4.0"
+  revision = "5abd554f3cf7b9f4649e047ecaabd78675da272d"
 
 [[projects]]
   branch = "master"
@@ -569,6 +574,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2e3ea0eb5f1186d42748125fbb5cc2da315d194e1304de81e01bd7956ae9352f"
+  inputs-digest = "ec9be2a35fdf80e78214dfdbd3a3ead8591300fad47780de04cbf73c41fc7734"
   solver-name = "gps-cdcl"
   solver-version = 1

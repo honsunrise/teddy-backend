@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package com.teddy.srv.content;
+
+option go_package = "proto";
+
+import "github.com/golang/protobuf/ptypes/empty/empty.proto";
+import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
+
+service Captcha {
+    rpc GetImage (GetImageReq) returns (GetImageResp) {}
+    rpc GetVoice (GetVoiceReq) returns (GetVoiceResp) {}
+    rpc GetRandomById (GetRandomReq) returns (GetRandomResp) {}
+    rpc Verify(VerifyReq) returns (VerifyResp) {}
+}
+
+message GetImageReq {
+    uint32 len = 1;
+    uint32 width = 2;
+    uint32 height = 3;
+}
+
+message GetImageResp {
+    string id = 1;
+    bytes image = 2;
+}
+
+message GetVoiceReq {
+    uint32 len = 1;
+    string lang = 2;
+}
+
+message GetVoiceResp {
+    string id = 1;
+    bytes voice_wav = 2;
+}
+
+message GetRandomReq {
+    uint32 len = 1;
+    string id = 2;
+}
+
+message GetRandomResp {
+    string code = 1;
+}
+
+enum CaptchaType {
+    IMAGE = 0;
+    RANDOM_BY_ID = 1;
+    VOICE = 2;
+}
+
+message VerifyReq {
+    CaptchaType type = 1;
+    string id = 2;
+    string code = 3;
+}
+
+message VerifyResp {
+    bool correct = 1;
+}
