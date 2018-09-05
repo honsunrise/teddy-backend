@@ -5,8 +5,9 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"flag"
-	"github.com/zhsyourai/teddy-backend/api/content/client"
-	"github.com/zhsyourai/teddy-backend/api/content/handler"
+	"github.com/zhsyourai/teddy-backend/.vendor-new/github.com/micro/go-web"
+	"github.com/zhsyourai/teddy-backend/api/base/client"
+	"github.com/zhsyourai/teddy-backend/api/base/handler"
 	"github.com/zhsyourai/teddy-backend/api/gin-jwt"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"log"
@@ -55,14 +56,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	content, err := handler.NewContentHandler(jwtMiddleware)
+	content, err := handler.NewBaseHandler(jwtMiddleware)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Create RESTful handler (using Gin)
 	router := gin.Default()
-	router.Use(client.ContentNew())
+	router.Use(client.CaptchaNew())
 	content.Handler(router)
 
 	// Register Handler

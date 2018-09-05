@@ -38,6 +38,7 @@ func (h *Uaa) Handler(root gin.IRoutes) {
 	root.Any("/uaa/logout", h.middleware.Handler, h.Logout)
 	root.POST("/uaa/changePassword", h.middleware.Handler, h.ChangePassword)
 	root.POST("/uaa/sendEmailCaptcha", h.SendEmailCaptcha)
+	root.POST("/uaa/resetPassword", h.ResetPassword)
 }
 
 // Uaa.Register is called by the API as /uaa/Register with post body
@@ -328,7 +329,10 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-// Uaa.SendEmailVerify is called by the API as /uaa/sendPhoneCaptcha with post body
 func (h *Uaa) SendPhoneCaptcha(ctx *gin.Context) {
+	ctx.Status(http.StatusOK)
+}
+
+func (h *Uaa) ResetPassword(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
