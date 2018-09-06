@@ -15,6 +15,7 @@ It has these top-level messages:
 	SendNotifyReq
 	SendSMSReq
 	GetInBoxReq
+	GetInboxResp
 	GetNotifyReq
 */
 package proto
@@ -55,7 +56,7 @@ type MessageService interface {
 	SendInBox(ctx context.Context, in *SendInBoxReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
 	SendNotify(ctx context.Context, in *SendNotifyReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
 	SendSMS(ctx context.Context, in *SendSMSReq, opts ...client.CallOption) (*google_protobuf.Empty, error)
-	GetInBox(ctx context.Context, in *GetInBoxReq, opts ...client.CallOption) (Message_GetInBoxService, error)
+	GetInBox(ctx context.Context, in *GetInBoxReq, opts ...client.CallOption) (*GetInboxResp, error)
 	GetNotify(ctx context.Context, in *GetNotifyReq, opts ...client.CallOption) (Message_GetNotifyService, error)
 }
 
@@ -117,48 +118,14 @@ func (c *messageService) SendSMS(ctx context.Context, in *SendSMSReq, opts ...cl
 	return out, nil
 }
 
-func (c *messageService) GetInBox(ctx context.Context, in *GetInBoxReq, opts ...client.CallOption) (Message_GetInBoxService, error) {
-	req := c.c.NewRequest(c.name, "Message.GetInBox", &GetInBoxReq{})
-	stream, err := c.c.Stream(ctx, req, opts...)
+func (c *messageService) GetInBox(ctx context.Context, in *GetInBoxReq, opts ...client.CallOption) (*GetInboxResp, error) {
+	req := c.c.NewRequest(c.name, "Message.GetInBox", in)
+	out := new(GetInboxResp)
+	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	if err := stream.Send(in); err != nil {
-		return nil, err
-	}
-	return &messageServiceGetInBox{stream}, nil
-}
-
-type Message_GetInBoxService interface {
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*InBoxItem, error)
-}
-
-type messageServiceGetInBox struct {
-	stream client.Stream
-}
-
-func (x *messageServiceGetInBox) Close() error {
-	return x.stream.Close()
-}
-
-func (x *messageServiceGetInBox) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *messageServiceGetInBox) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *messageServiceGetInBox) Recv() (*InBoxItem, error) {
-	m := new(InBoxItem)
-	err := x.stream.Recv(m)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
+	return out, nil
 }
 
 func (c *messageService) GetNotify(ctx context.Context, in *GetNotifyReq, opts ...client.CallOption) (Message_GetNotifyService, error) {
@@ -212,7 +179,7 @@ type MessageHandler interface {
 	SendInBox(context.Context, *SendInBoxReq, *google_protobuf.Empty) error
 	SendNotify(context.Context, *SendNotifyReq, *google_protobuf.Empty) error
 	SendSMS(context.Context, *SendSMSReq, *google_protobuf.Empty) error
-	GetInBox(context.Context, *GetInBoxReq, Message_GetInBoxStream) error
+	GetInBox(context.Context, *GetInBoxReq, *GetInboxResp) error
 	GetNotify(context.Context, *GetNotifyReq, Message_GetNotifyStream) error
 }
 
@@ -222,7 +189,7 @@ func RegisterMessageHandler(s server.Server, hdlr MessageHandler, opts ...server
 		SendInBox(ctx context.Context, in *SendInBoxReq, out *google_protobuf.Empty) error
 		SendNotify(ctx context.Context, in *SendNotifyReq, out *google_protobuf.Empty) error
 		SendSMS(ctx context.Context, in *SendSMSReq, out *google_protobuf.Empty) error
-		GetInBox(ctx context.Context, stream server.Stream) error
+		GetInBox(ctx context.Context, in *GetInBoxReq, out *GetInboxResp) error
 		GetNotify(ctx context.Context, stream server.Stream) error
 	}
 	type Message struct {
@@ -252,39 +219,8 @@ func (h *messageHandler) SendSMS(ctx context.Context, in *SendSMSReq, out *googl
 	return h.MessageHandler.SendSMS(ctx, in, out)
 }
 
-func (h *messageHandler) GetInBox(ctx context.Context, stream server.Stream) error {
-	m := new(GetInBoxReq)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.MessageHandler.GetInBox(ctx, m, &messageGetInBoxStream{stream})
-}
-
-type Message_GetInBoxStream interface {
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*InBoxItem) error
-}
-
-type messageGetInBoxStream struct {
-	stream server.Stream
-}
-
-func (x *messageGetInBoxStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *messageGetInBoxStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *messageGetInBoxStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *messageGetInBoxStream) Send(m *InBoxItem) error {
-	return x.stream.Send(m)
+func (h *messageHandler) GetInBox(ctx context.Context, in *GetInBoxReq, out *GetInboxResp) error {
+	return h.MessageHandler.GetInBox(ctx, in, out)
 }
 
 func (h *messageHandler) GetNotify(ctx context.Context, stream server.Stream) error {

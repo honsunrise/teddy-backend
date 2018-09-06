@@ -29,7 +29,6 @@ type notifyHandler struct {
 	mailCh  chan *gomail.Message
 	mailErr chan error
 
-	inBoxChMap  sync.Map
 	notifyChMap sync.Map
 }
 
@@ -115,13 +114,7 @@ func (h *notifyHandler) SendInBox(ctx context.Context, req *proto.SendInBoxReq, 
 	if err != nil {
 		return err
 	}
-
-	if inBoxChs, ok := h.inBoxChMap.Load(req.Uid); ok {
-		inBoxChs.(*sync.Map).Range(func(key, value interface{}) bool {
-			key.(chan *models.InBoxItem) <- inboxItem
-			return true
-		})
-	}
+	// TODO: Send notify
 	return nil
 }
 
@@ -143,7 +136,7 @@ func (h *notifyHandler) SendNotify(ctx context.Context, req *proto.SendNotifyReq
 	return nil
 }
 
-func (h *notifyHandler) GetInBox(ctx context.Context, req *proto.GetInBoxReq, resp proto.Message_GetInBoxStream) error {
+func (h *notifyHandler) GetInBox(ctx context.Context, req *proto.GetInBoxReq, resp *proto.GetInboxResp) error {
 	if err := validateGetInBoxReq(req); err != nil {
 		return err
 	}
@@ -151,28 +144,12 @@ func (h *notifyHandler) GetInBox(ctx context.Context, req *proto.GetInBoxReq, re
 	if err != nil {
 		return err
 	}
-	for _, item := range items {
+	resp.Items = make([]*proto.InBoxItem, len(items))
+	for i, item := range items {
 		var pbItem proto.InBoxItem
 		converter.CopyFromInBoxItemToPBInBoxItem(&item, &pbItem)
-		resp.Send(&pbItem)
+		resp.Items[i] = &pbItem
 	}
-	tmp, _ := h.inBoxChMap.LoadOrStore(req.Uid, &sync.Map{})
-	inBoxChs := tmp.(*sync.Map)
-	go func() {
-		ch := make(chan *models.InBoxItem)
-		inBoxChs.Store(ch, nil)
-		var pbItem proto.InBoxItem
-		for {
-			item := <-ch
-			converter.CopyFromInBoxItemToPBInBoxItem(item, &pbItem)
-			if err := resp.Send(&pbItem); err != nil {
-				resp.Close()
-				close(ch)
-				inBoxChs.Delete(ch)
-				return
-			}
-		}
-	}()
 
 	return nil
 }
