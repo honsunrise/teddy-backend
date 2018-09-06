@@ -34,34 +34,41 @@ func (h *captchaHandler) cleanTack() {
 	}
 }
 
-func (h *captchaHandler) GetImage(ctx context.Context, req *proto.GetImageReq, rsp *proto.GetImageResp) error {
-	if err := validateGetImageReq(req); err != nil {
+func (h *captchaHandler) GetCaptchaId(ctx context.Context, req *proto.GetCaptchaIdReq, rsp *proto.GetCaptchaIdResp) error {
+	if err := validateGetCaptchaIdReq(req); err != nil {
 		return err
 	}
-
-	id := captcha.New()
+	id := captcha.NewLen(int(req.Len))
 	rsp.Id = id
-	imgBuf := bytes.NewBuffer(rsp.Image)
+	return nil
+}
 
-	if err := captcha.WriteImage(imgBuf, id, int(req.Width), int(req.Height)); err != nil {
+func (h *captchaHandler) GetImageData(ctx context.Context, req *proto.GetImageDataReq, rsp *proto.GetImageDataResp) error {
+	if err := validateGetImageDataReq(req); err != nil {
 		return err
 	}
+
+	imgBuf := &bytes.Buffer{}
+
+	if err := captcha.WriteImage(imgBuf, req.Id, int(req.Width), int(req.Height)); err != nil {
+		return err
+	}
+	rsp.Image = imgBuf.Bytes()
 
 	return nil
 }
 
-func (h *captchaHandler) GetVoice(ctx context.Context, req *proto.GetVoiceReq, rsp *proto.GetVoiceResp) error {
-	if err := validateGetVoiceReq(req); err != nil {
+func (h *captchaHandler) GetVoiceData(ctx context.Context, req *proto.GetVoiceDataReq, rsp *proto.GetVoiceDataResp) error {
+	if err := validateGetVoiceDataReq(req); err != nil {
 		return err
 	}
 
-	id := captcha.New()
-	rsp.Id = id
-	voiceBuf := bytes.NewBuffer(rsp.VoiceWav)
+	voiceBuf := &bytes.Buffer{}
 
-	if err := captcha.WriteAudio(voiceBuf, id, req.Lang); err != nil {
+	if err := captcha.WriteAudio(voiceBuf, req.Id, req.Lang); err != nil {
 		return err
 	}
+	rsp.VoiceWav = voiceBuf.Bytes()
 
 	return nil
 }

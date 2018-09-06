@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"flag"
-	"github.com/zhsyourai/teddy-backend/.vendor-new/github.com/micro/go-web"
 	"github.com/zhsyourai/teddy-backend/api/base/client"
 	"github.com/zhsyourai/teddy-backend/api/base/handler"
 	"github.com/zhsyourai/teddy-backend/api/gin-jwt"

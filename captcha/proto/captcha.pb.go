@@ -43,195 +43,271 @@ func (x CaptchaType) String() string {
 	return proto.EnumName(CaptchaType_name, int32(x))
 }
 func (CaptchaType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_captcha_69853c87995740c5, []int{0}
+	return fileDescriptor_captcha_f0113d98600adf9f, []int{0}
 }
 
-type GetImageReq struct {
+type GetCaptchaIdReq struct {
 	Len                  uint32   `protobuf:"varint,1,opt,name=len,proto3" json:"len,omitempty"`
-	Width                uint32   `protobuf:"varint,2,opt,name=width,proto3" json:"width,omitempty"`
-	Height               uint32   `protobuf:"varint,3,opt,name=height,proto3" json:"height,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *GetImageReq) Reset()         { *m = GetImageReq{} }
-func (m *GetImageReq) String() string { return proto.CompactTextString(m) }
-func (*GetImageReq) ProtoMessage()    {}
-func (*GetImageReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_captcha_69853c87995740c5, []int{0}
+func (m *GetCaptchaIdReq) Reset()         { *m = GetCaptchaIdReq{} }
+func (m *GetCaptchaIdReq) String() string { return proto.CompactTextString(m) }
+func (*GetCaptchaIdReq) ProtoMessage()    {}
+func (*GetCaptchaIdReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_captcha_f0113d98600adf9f, []int{0}
 }
-func (m *GetImageReq) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetImageReq.Unmarshal(m, b)
+func (m *GetCaptchaIdReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetCaptchaIdReq.Unmarshal(m, b)
 }
-func (m *GetImageReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetImageReq.Marshal(b, m, deterministic)
+func (m *GetCaptchaIdReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetCaptchaIdReq.Marshal(b, m, deterministic)
 }
-func (dst *GetImageReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetImageReq.Merge(dst, src)
+func (dst *GetCaptchaIdReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetCaptchaIdReq.Merge(dst, src)
 }
-func (m *GetImageReq) XXX_Size() int {
-	return xxx_messageInfo_GetImageReq.Size(m)
+func (m *GetCaptchaIdReq) XXX_Size() int {
+	return xxx_messageInfo_GetCaptchaIdReq.Size(m)
 }
-func (m *GetImageReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetImageReq.DiscardUnknown(m)
+func (m *GetCaptchaIdReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetCaptchaIdReq.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_GetImageReq proto.InternalMessageInfo
+var xxx_messageInfo_GetCaptchaIdReq proto.InternalMessageInfo
 
-func (m *GetImageReq) GetLen() uint32 {
+func (m *GetCaptchaIdReq) GetLen() uint32 {
 	if m != nil {
 		return m.Len
 	}
 	return 0
 }
 
-func (m *GetImageReq) GetWidth() uint32 {
+type GetCaptchaIdResp struct {
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetCaptchaIdResp) Reset()         { *m = GetCaptchaIdResp{} }
+func (m *GetCaptchaIdResp) String() string { return proto.CompactTextString(m) }
+func (*GetCaptchaIdResp) ProtoMessage()    {}
+func (*GetCaptchaIdResp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_captcha_f0113d98600adf9f, []int{1}
+}
+func (m *GetCaptchaIdResp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetCaptchaIdResp.Unmarshal(m, b)
+}
+func (m *GetCaptchaIdResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetCaptchaIdResp.Marshal(b, m, deterministic)
+}
+func (dst *GetCaptchaIdResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetCaptchaIdResp.Merge(dst, src)
+}
+func (m *GetCaptchaIdResp) XXX_Size() int {
+	return xxx_messageInfo_GetCaptchaIdResp.Size(m)
+}
+func (m *GetCaptchaIdResp) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetCaptchaIdResp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetCaptchaIdResp proto.InternalMessageInfo
+
+func (m *GetCaptchaIdResp) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+type GetImageDataReq struct {
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Width                uint32   `protobuf:"varint,2,opt,name=width,proto3" json:"width,omitempty"`
+	Height               uint32   `protobuf:"varint,3,opt,name=height,proto3" json:"height,omitempty"`
+	Reload               bool     `protobuf:"varint,4,opt,name=reload,proto3" json:"reload,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetImageDataReq) Reset()         { *m = GetImageDataReq{} }
+func (m *GetImageDataReq) String() string { return proto.CompactTextString(m) }
+func (*GetImageDataReq) ProtoMessage()    {}
+func (*GetImageDataReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_captcha_f0113d98600adf9f, []int{2}
+}
+func (m *GetImageDataReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetImageDataReq.Unmarshal(m, b)
+}
+func (m *GetImageDataReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetImageDataReq.Marshal(b, m, deterministic)
+}
+func (dst *GetImageDataReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetImageDataReq.Merge(dst, src)
+}
+func (m *GetImageDataReq) XXX_Size() int {
+	return xxx_messageInfo_GetImageDataReq.Size(m)
+}
+func (m *GetImageDataReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetImageDataReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetImageDataReq proto.InternalMessageInfo
+
+func (m *GetImageDataReq) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *GetImageDataReq) GetWidth() uint32 {
 	if m != nil {
 		return m.Width
 	}
 	return 0
 }
 
-func (m *GetImageReq) GetHeight() uint32 {
+func (m *GetImageDataReq) GetHeight() uint32 {
 	if m != nil {
 		return m.Height
 	}
 	return 0
 }
 
-type GetImageResp struct {
-	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Image                []byte   `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
+func (m *GetImageDataReq) GetReload() bool {
+	if m != nil {
+		return m.Reload
+	}
+	return false
+}
+
+type GetImageDataResp struct {
+	Image                []byte   `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *GetImageResp) Reset()         { *m = GetImageResp{} }
-func (m *GetImageResp) String() string { return proto.CompactTextString(m) }
-func (*GetImageResp) ProtoMessage()    {}
-func (*GetImageResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_captcha_69853c87995740c5, []int{1}
+func (m *GetImageDataResp) Reset()         { *m = GetImageDataResp{} }
+func (m *GetImageDataResp) String() string { return proto.CompactTextString(m) }
+func (*GetImageDataResp) ProtoMessage()    {}
+func (*GetImageDataResp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_captcha_f0113d98600adf9f, []int{3}
 }
-func (m *GetImageResp) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetImageResp.Unmarshal(m, b)
+func (m *GetImageDataResp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetImageDataResp.Unmarshal(m, b)
 }
-func (m *GetImageResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetImageResp.Marshal(b, m, deterministic)
+func (m *GetImageDataResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetImageDataResp.Marshal(b, m, deterministic)
 }
-func (dst *GetImageResp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetImageResp.Merge(dst, src)
+func (dst *GetImageDataResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetImageDataResp.Merge(dst, src)
 }
-func (m *GetImageResp) XXX_Size() int {
-	return xxx_messageInfo_GetImageResp.Size(m)
+func (m *GetImageDataResp) XXX_Size() int {
+	return xxx_messageInfo_GetImageDataResp.Size(m)
 }
-func (m *GetImageResp) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetImageResp.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetImageResp proto.InternalMessageInfo
-
-func (m *GetImageResp) GetId() string {
-	if m != nil {
-		return m.Id
-	}
-	return ""
+func (m *GetImageDataResp) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetImageDataResp.DiscardUnknown(m)
 }
 
-func (m *GetImageResp) GetImage() []byte {
+var xxx_messageInfo_GetImageDataResp proto.InternalMessageInfo
+
+func (m *GetImageDataResp) GetImage() []byte {
 	if m != nil {
 		return m.Image
 	}
 	return nil
 }
 
-type GetVoiceReq struct {
-	Len                  uint32   `protobuf:"varint,1,opt,name=len,proto3" json:"len,omitempty"`
-	Lang                 string   `protobuf:"bytes,2,opt,name=lang,proto3" json:"lang,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *GetVoiceReq) Reset()         { *m = GetVoiceReq{} }
-func (m *GetVoiceReq) String() string { return proto.CompactTextString(m) }
-func (*GetVoiceReq) ProtoMessage()    {}
-func (*GetVoiceReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_captcha_69853c87995740c5, []int{2}
-}
-func (m *GetVoiceReq) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetVoiceReq.Unmarshal(m, b)
-}
-func (m *GetVoiceReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetVoiceReq.Marshal(b, m, deterministic)
-}
-func (dst *GetVoiceReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetVoiceReq.Merge(dst, src)
-}
-func (m *GetVoiceReq) XXX_Size() int {
-	return xxx_messageInfo_GetVoiceReq.Size(m)
-}
-func (m *GetVoiceReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetVoiceReq.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetVoiceReq proto.InternalMessageInfo
-
-func (m *GetVoiceReq) GetLen() uint32 {
-	if m != nil {
-		return m.Len
-	}
-	return 0
-}
-
-func (m *GetVoiceReq) GetLang() string {
-	if m != nil {
-		return m.Lang
-	}
-	return ""
-}
-
-type GetVoiceResp struct {
+type GetVoiceDataReq struct {
 	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	VoiceWav             []byte   `protobuf:"bytes,2,opt,name=voice_wav,json=voiceWav,proto3" json:"voice_wav,omitempty"`
+	Lang                 string   `protobuf:"bytes,2,opt,name=lang,proto3" json:"lang,omitempty"`
+	Reload               bool     `protobuf:"varint,3,opt,name=reload,proto3" json:"reload,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *GetVoiceResp) Reset()         { *m = GetVoiceResp{} }
-func (m *GetVoiceResp) String() string { return proto.CompactTextString(m) }
-func (*GetVoiceResp) ProtoMessage()    {}
-func (*GetVoiceResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_captcha_69853c87995740c5, []int{3}
+func (m *GetVoiceDataReq) Reset()         { *m = GetVoiceDataReq{} }
+func (m *GetVoiceDataReq) String() string { return proto.CompactTextString(m) }
+func (*GetVoiceDataReq) ProtoMessage()    {}
+func (*GetVoiceDataReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_captcha_f0113d98600adf9f, []int{4}
 }
-func (m *GetVoiceResp) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetVoiceResp.Unmarshal(m, b)
+func (m *GetVoiceDataReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetVoiceDataReq.Unmarshal(m, b)
 }
-func (m *GetVoiceResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetVoiceResp.Marshal(b, m, deterministic)
+func (m *GetVoiceDataReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetVoiceDataReq.Marshal(b, m, deterministic)
 }
-func (dst *GetVoiceResp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetVoiceResp.Merge(dst, src)
+func (dst *GetVoiceDataReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetVoiceDataReq.Merge(dst, src)
 }
-func (m *GetVoiceResp) XXX_Size() int {
-	return xxx_messageInfo_GetVoiceResp.Size(m)
+func (m *GetVoiceDataReq) XXX_Size() int {
+	return xxx_messageInfo_GetVoiceDataReq.Size(m)
 }
-func (m *GetVoiceResp) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetVoiceResp.DiscardUnknown(m)
+func (m *GetVoiceDataReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetVoiceDataReq.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_GetVoiceResp proto.InternalMessageInfo
+var xxx_messageInfo_GetVoiceDataReq proto.InternalMessageInfo
 
-func (m *GetVoiceResp) GetId() string {
+func (m *GetVoiceDataReq) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-func (m *GetVoiceResp) GetVoiceWav() []byte {
+func (m *GetVoiceDataReq) GetLang() string {
+	if m != nil {
+		return m.Lang
+	}
+	return ""
+}
+
+func (m *GetVoiceDataReq) GetReload() bool {
+	if m != nil {
+		return m.Reload
+	}
+	return false
+}
+
+type GetVoiceDataResp struct {
+	VoiceWav             []byte   `protobuf:"bytes,1,opt,name=voice_wav,json=voiceWav,proto3" json:"voice_wav,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetVoiceDataResp) Reset()         { *m = GetVoiceDataResp{} }
+func (m *GetVoiceDataResp) String() string { return proto.CompactTextString(m) }
+func (*GetVoiceDataResp) ProtoMessage()    {}
+func (*GetVoiceDataResp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_captcha_f0113d98600adf9f, []int{5}
+}
+func (m *GetVoiceDataResp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetVoiceDataResp.Unmarshal(m, b)
+}
+func (m *GetVoiceDataResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetVoiceDataResp.Marshal(b, m, deterministic)
+}
+func (dst *GetVoiceDataResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetVoiceDataResp.Merge(dst, src)
+}
+func (m *GetVoiceDataResp) XXX_Size() int {
+	return xxx_messageInfo_GetVoiceDataResp.Size(m)
+}
+func (m *GetVoiceDataResp) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetVoiceDataResp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetVoiceDataResp proto.InternalMessageInfo
+
+func (m *GetVoiceDataResp) GetVoiceWav() []byte {
 	if m != nil {
 		return m.VoiceWav
 	}
@@ -250,7 +326,7 @@ func (m *GetRandomReq) Reset()         { *m = GetRandomReq{} }
 func (m *GetRandomReq) String() string { return proto.CompactTextString(m) }
 func (*GetRandomReq) ProtoMessage()    {}
 func (*GetRandomReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_captcha_69853c87995740c5, []int{4}
+	return fileDescriptor_captcha_f0113d98600adf9f, []int{6}
 }
 func (m *GetRandomReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetRandomReq.Unmarshal(m, b)
@@ -295,7 +371,7 @@ func (m *GetRandomResp) Reset()         { *m = GetRandomResp{} }
 func (m *GetRandomResp) String() string { return proto.CompactTextString(m) }
 func (*GetRandomResp) ProtoMessage()    {}
 func (*GetRandomResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_captcha_69853c87995740c5, []int{5}
+	return fileDescriptor_captcha_f0113d98600adf9f, []int{7}
 }
 func (m *GetRandomResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetRandomResp.Unmarshal(m, b)
@@ -335,7 +411,7 @@ func (m *VerifyReq) Reset()         { *m = VerifyReq{} }
 func (m *VerifyReq) String() string { return proto.CompactTextString(m) }
 func (*VerifyReq) ProtoMessage()    {}
 func (*VerifyReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_captcha_69853c87995740c5, []int{6}
+	return fileDescriptor_captcha_f0113d98600adf9f, []int{8}
 }
 func (m *VerifyReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_VerifyReq.Unmarshal(m, b)
@@ -387,7 +463,7 @@ func (m *VerifyResp) Reset()         { *m = VerifyResp{} }
 func (m *VerifyResp) String() string { return proto.CompactTextString(m) }
 func (*VerifyResp) ProtoMessage()    {}
 func (*VerifyResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_captcha_69853c87995740c5, []int{7}
+	return fileDescriptor_captcha_f0113d98600adf9f, []int{9}
 }
 func (m *VerifyResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_VerifyResp.Unmarshal(m, b)
@@ -415,10 +491,12 @@ func (m *VerifyResp) GetCorrect() bool {
 }
 
 func init() {
-	proto.RegisterType((*GetImageReq)(nil), "com.teddy.srv.content.GetImageReq")
-	proto.RegisterType((*GetImageResp)(nil), "com.teddy.srv.content.GetImageResp")
-	proto.RegisterType((*GetVoiceReq)(nil), "com.teddy.srv.content.GetVoiceReq")
-	proto.RegisterType((*GetVoiceResp)(nil), "com.teddy.srv.content.GetVoiceResp")
+	proto.RegisterType((*GetCaptchaIdReq)(nil), "com.teddy.srv.content.GetCaptchaIdReq")
+	proto.RegisterType((*GetCaptchaIdResp)(nil), "com.teddy.srv.content.GetCaptchaIdResp")
+	proto.RegisterType((*GetImageDataReq)(nil), "com.teddy.srv.content.GetImageDataReq")
+	proto.RegisterType((*GetImageDataResp)(nil), "com.teddy.srv.content.GetImageDataResp")
+	proto.RegisterType((*GetVoiceDataReq)(nil), "com.teddy.srv.content.GetVoiceDataReq")
+	proto.RegisterType((*GetVoiceDataResp)(nil), "com.teddy.srv.content.GetVoiceDataResp")
 	proto.RegisterType((*GetRandomReq)(nil), "com.teddy.srv.content.GetRandomReq")
 	proto.RegisterType((*GetRandomResp)(nil), "com.teddy.srv.content.GetRandomResp")
 	proto.RegisterType((*VerifyReq)(nil), "com.teddy.srv.content.VerifyReq")
@@ -426,38 +504,42 @@ func init() {
 	proto.RegisterEnum("com.teddy.srv.content.CaptchaType", CaptchaType_name, CaptchaType_value)
 }
 
-func init() { proto.RegisterFile("proto/captcha.proto", fileDescriptor_captcha_69853c87995740c5) }
+func init() { proto.RegisterFile("proto/captcha.proto", fileDescriptor_captcha_f0113d98600adf9f) }
 
-var fileDescriptor_captcha_69853c87995740c5 = []byte{
-	// 479 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x84, 0x93, 0x5d, 0x6f, 0xd3, 0x3c,
-	0x14, 0xc7, 0xd7, 0x74, 0x7d, 0xc9, 0x59, 0x37, 0x55, 0x7e, 0x1e, 0x50, 0x15, 0x6e, 0x46, 0x86,
-	0x10, 0xe2, 0x22, 0x41, 0x2b, 0x70, 0xb3, 0xab, 0x75, 0x9b, 0xa6, 0x5c, 0x94, 0x4a, 0x16, 0x14,
-	0x81, 0x90, 0xaa, 0x2c, 0xf1, 0x92, 0x48, 0x4b, 0x1c, 0x12, 0xaf, 0x53, 0xbf, 0x30, 0x9f, 0x03,
-	0xfb, 0x38, 0xe9, 0x22, 0xd4, 0x97, 0x9b, 0xf6, 0x1c, 0xfb, 0xfc, 0x7f, 0x7f, 0xdb, 0xe7, 0x04,
-	0xfe, 0xcb, 0x0b, 0x2e, 0xb8, 0x1b, 0xf8, 0xb9, 0x08, 0x62, 0xdf, 0xc1, 0x8c, 0xbc, 0x08, 0x78,
-	0xea, 0x08, 0x16, 0x86, 0x2b, 0xa7, 0x2c, 0x96, 0x4e, 0xc0, 0x33, 0xc1, 0x32, 0x61, 0x8d, 0xa3,
-	0x44, 0xc4, 0x8f, 0x77, 0x32, 0x4f, 0xdd, 0x88, 0x3f, 0xf8, 0x59, 0xe4, 0x62, 0xfd, 0xdd, 0xe3,
-	0xbd, 0x9b, 0x8b, 0x55, 0xce, 0x4a, 0x97, 0xa5, 0x32, 0xd0, 0xbf, 0x9a, 0x65, 0x5d, 0xec, 0x17,
-	0x89, 0x24, 0x65, 0xa5, 0xf0, 0xd3, 0xfc, 0x39, 0xd2, 0x62, 0x7b, 0x0a, 0x47, 0xb7, 0x4c, 0x78,
-	0xa9, 0x1f, 0x31, 0xca, 0x7e, 0x93, 0x21, 0xb4, 0x1f, 0x58, 0x36, 0x6a, 0x9d, 0xb6, 0xde, 0x1d,
-	0x53, 0x15, 0x92, 0xff, 0xa1, 0xf3, 0x94, 0x84, 0x22, 0x1e, 0x19, 0xb8, 0xa6, 0x13, 0xf2, 0x12,
-	0xba, 0x31, 0x4b, 0xa2, 0x58, 0x8c, 0xda, 0xb8, 0x5c, 0x65, 0xf6, 0x47, 0x18, 0x3c, 0xe3, 0xca,
-	0x9c, 0x9c, 0x80, 0x91, 0x84, 0x88, 0x33, 0xa9, 0x8c, 0x14, 0x2d, 0x51, 0x9b, 0x48, 0x1b, 0x50,
-	0x9d, 0xd8, 0x63, 0x3c, 0xc4, 0x9c, 0x27, 0xc1, 0x96, 0x43, 0x10, 0x38, 0x54, 0xf7, 0x42, 0x95,
-	0x49, 0x31, 0xb6, 0x2f, 0xd0, 0xaa, 0x12, 0x6d, 0xb0, 0x7a, 0x05, 0xe6, 0x52, 0x6d, 0x2e, 0x9e,
-	0xfc, 0x65, 0x65, 0xd7, 0xc7, 0x85, 0xef, 0xfe, 0xd2, 0xfe, 0x80, 0x62, 0xea, 0x67, 0x21, 0x4f,
-	0x37, 0x5b, 0x6a, 0x9c, 0x51, 0xe3, 0xec, 0x33, 0x38, 0x6e, 0x28, 0xa4, 0x9f, 0x3c, 0x53, 0xc0,
-	0x43, 0x56, 0x39, 0x62, 0x6c, 0x47, 0x60, 0xce, 0x59, 0x91, 0xdc, 0xaf, 0x14, 0xf3, 0x33, 0x1c,
-	0xaa, 0xd7, 0xc7, 0x82, 0x93, 0x73, 0xdb, 0xd9, 0xd8, 0x72, 0xe7, 0x4a, 0xcf, 0xc5, 0x57, 0x59,
-	0x49, 0xb1, 0xfe, 0x5f, 0xe7, 0xb5, 0x51, 0xbb, 0x61, 0xf4, 0x16, 0xa0, 0x36, 0x92, 0x47, 0x19,
-	0x41, 0x2f, 0xe0, 0x45, 0xc1, 0x02, 0x81, 0x66, 0x7d, 0x5a, 0xa7, 0xef, 0x3f, 0xc1, 0x51, 0xc3,
-	0x80, 0x98, 0xd0, 0xf1, 0xa6, 0x97, 0xb7, 0x37, 0xc3, 0x03, 0x79, 0xe3, 0x01, 0xbd, 0xfc, 0x72,
-	0x3d, 0x9b, 0x2e, 0x26, 0x3f, 0x16, 0xde, 0xf5, 0xb0, 0xa5, 0x36, 0xe7, 0x33, 0xef, 0xea, 0x66,
-	0x68, 0x9c, 0xff, 0x31, 0xa0, 0x57, 0xe9, 0xc8, 0x37, 0xe8, 0xd7, 0x2d, 0x25, 0xdb, 0x2e, 0xd1,
-	0x18, 0x21, 0xeb, 0x6c, 0x6f, 0x4d, 0x99, 0xdb, 0x07, 0x15, 0x16, 0xdb, 0xb7, 0x0b, 0x5b, 0x0f,
-	0xc5, 0x2e, 0xec, 0x7a, 0x06, 0x24, 0xf6, 0x57, 0xa3, 0x4d, 0x93, 0x95, 0x17, 0x92, 0x1d, 0xba,
-	0x75, 0xfb, 0xad, 0x37, 0xfb, 0x8b, 0x90, 0x3e, 0x83, 0xae, 0x7e, 0x76, 0x72, 0xba, 0x45, 0xb1,
-	0x6e, 0xbf, 0xf5, 0x7a, 0x4f, 0x85, 0x02, 0x4e, 0x7a, 0x3f, 0x3b, 0xfa, 0x5b, 0xed, 0xe2, 0xdf,
-	0xf8, 0x6f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xf1, 0x3c, 0xf8, 0xe6, 0x2e, 0x04, 0x00, 0x00,
+var fileDescriptor_captcha_f0113d98600adf9f = []byte{
+	// 531 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x8c, 0x94, 0x4d, 0x6f, 0x9b, 0x40,
+	0x10, 0x86, 0x13, 0xe3, 0x2f, 0xb6, 0x4e, 0x8a, 0xb6, 0x1f, 0x42, 0xf4, 0x92, 0xe2, 0x2a, 0x8d,
+	0x7a, 0x80, 0x2a, 0x51, 0x7b, 0xe9, 0x29, 0x8e, 0xa3, 0x88, 0x83, 0x6b, 0x69, 0x55, 0xb9, 0x6a,
+	0x55, 0xc9, 0xda, 0xc0, 0x06, 0x90, 0x0c, 0x4b, 0x61, 0xe3, 0xc8, 0x3f, 0xb7, 0xff, 0xa4, 0xbb,
+	0x03, 0xa1, 0xd8, 0x8a, 0xed, 0x5e, 0xec, 0x99, 0xf1, 0xcc, 0x3c, 0x2f, 0xc3, 0x2b, 0xa3, 0x17,
+	0x59, 0xce, 0x05, 0x77, 0x7d, 0x9a, 0x09, 0x3f, 0xa2, 0x0e, 0x64, 0xf8, 0x95, 0xcf, 0x13, 0x47,
+	0xb0, 0x20, 0x58, 0x39, 0x45, 0xbe, 0x74, 0x7c, 0x9e, 0x0a, 0x96, 0x0a, 0xeb, 0x22, 0x8c, 0x45,
+	0x74, 0x7f, 0x2b, 0xf3, 0xc4, 0x0d, 0xf9, 0x82, 0xa6, 0xa1, 0x0b, 0xfd, 0xb7, 0xf7, 0x77, 0x6e,
+	0x26, 0x56, 0x19, 0x2b, 0x5c, 0x96, 0xc8, 0xa0, 0xfc, 0x2c, 0x77, 0x59, 0x5f, 0xf6, 0x0f, 0x89,
+	0x38, 0x61, 0x85, 0xa0, 0x49, 0xf6, 0x2f, 0x2a, 0x87, 0xed, 0x21, 0x7a, 0x7e, 0xc3, 0xc4, 0x55,
+	0x29, 0xce, 0x0b, 0x08, 0xfb, 0x8d, 0x0d, 0xa4, 0x2d, 0x58, 0x6a, 0x1e, 0x9e, 0x1c, 0x9e, 0x1d,
+	0x11, 0x15, 0xda, 0x36, 0x32, 0xd6, 0x9b, 0x8a, 0x0c, 0x1f, 0xa3, 0x56, 0x1c, 0x40, 0x93, 0x4e,
+	0x64, 0x64, 0x87, 0xb0, 0xc8, 0x4b, 0x68, 0xc8, 0xc6, 0x54, 0x50, 0xb5, 0x68, 0xa3, 0x05, 0xbf,
+	0x44, 0x9d, 0x87, 0x38, 0x10, 0x91, 0xd9, 0x82, 0xd5, 0x65, 0x82, 0x5f, 0xa3, 0x6e, 0xc4, 0xe2,
+	0x30, 0x12, 0xa6, 0x06, 0xe5, 0x2a, 0x53, 0xf5, 0x9c, 0x2d, 0x38, 0x0d, 0xcc, 0xb6, 0xac, 0xf7,
+	0x49, 0x95, 0xd9, 0x67, 0x20, 0xa6, 0x01, 0x92, 0x62, 0xe4, 0xe6, 0x58, 0x15, 0x00, 0x36, 0x20,
+	0x65, 0x62, 0x4f, 0x40, 0xd2, 0x8c, 0xc7, 0xfe, 0x56, 0x49, 0x18, 0xb5, 0xd5, 0xc1, 0x40, 0x91,
+	0x4e, 0x20, 0x6e, 0x80, 0xb5, 0x35, 0xb0, 0x0b, 0xe0, 0xc6, 0x3a, 0x09, 0x7e, 0x83, 0xf4, 0xa5,
+	0x2a, 0xcc, 0x1f, 0xe8, 0xb2, 0x82, 0xf7, 0xa1, 0xf0, 0x9d, 0x2e, 0xed, 0x8f, 0x68, 0x20, 0x07,
+	0x08, 0x4d, 0x03, 0x9e, 0x3c, 0x79, 0xd8, 0x4a, 0x4e, 0xab, 0x3e, 0xe2, 0x10, 0x1d, 0x35, 0x26,
+	0xe4, 0x7e, 0xa9, 0xcf, 0xe7, 0x01, 0xab, 0x14, 0x43, 0x2c, 0x2f, 0xad, 0xcf, 0x58, 0x1e, 0xdf,
+	0xad, 0xd4, 0xce, 0xcf, 0xa8, 0xad, 0x5e, 0x31, 0x34, 0x1c, 0x9f, 0xdb, 0xce, 0x93, 0xbe, 0x72,
+	0xaa, 0x57, 0xf7, 0x4d, 0x76, 0x12, 0xe8, 0xdf, 0x24, 0xd7, 0x20, 0xad, 0x01, 0x3a, 0x45, 0xe8,
+	0x11, 0x24, 0xa5, 0x98, 0xa8, 0xe7, 0xf3, 0x3c, 0x67, 0xbe, 0x00, 0x58, 0x9f, 0x3c, 0xa6, 0x1f,
+	0x3e, 0xa1, 0x67, 0x0d, 0x00, 0xd6, 0x51, 0xc7, 0x9b, 0x5c, 0xde, 0x5c, 0x1b, 0x07, 0xf2, 0x89,
+	0x07, 0xe4, 0xf2, 0xeb, 0x78, 0x3a, 0x99, 0x8f, 0x7e, 0xcc, 0xbd, 0xb1, 0x71, 0xa8, 0x7e, 0x9c,
+	0x4d, 0xbd, 0xab, 0x6b, 0xa3, 0x75, 0xfe, 0x47, 0x43, 0xbd, 0x6a, 0x0e, 0x53, 0x38, 0x55, 0xed,
+	0x30, 0x7c, 0xba, 0xe5, 0x41, 0x36, 0xbc, 0x6a, 0xbd, 0xff, 0xaf, 0xbe, 0x22, 0xb3, 0x0f, 0x2a,
+	0x44, 0xed, 0x9b, 0x5d, 0x88, 0xa6, 0x8b, 0x77, 0x21, 0xd6, 0x4c, 0x58, 0x23, 0x6a, 0x87, 0xec,
+	0x42, 0x34, 0x5d, 0xb9, 0x0b, 0xb1, 0x66, 0x37, 0x89, 0xf8, 0xd5, 0x70, 0xc8, 0x68, 0x25, 0x2f,
+	0x35, 0xdc, 0x3e, 0x5b, 0x3b, 0xcf, 0x7a, 0xb7, 0xbf, 0x09, 0xb6, 0x4f, 0x51, 0xb7, 0x7c, 0xe3,
+	0xf8, 0x64, 0xcb, 0x44, 0xed, 0x3c, 0xeb, 0xed, 0x9e, 0x0e, 0xb5, 0x70, 0xd4, 0xfb, 0xd9, 0x29,
+	0xff, 0x8b, 0xba, 0xf0, 0x75, 0xf1, 0x37, 0x00, 0x00, 0xff, 0xff, 0x62, 0x35, 0x0b, 0xbb, 0x0e,
+	0x05, 0x00, 0x00,
 }

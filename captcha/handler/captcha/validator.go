@@ -2,7 +2,11 @@ package captcha
 
 import "github.com/zhsyourai/teddy-backend/captcha/proto"
 
-func validateGetImageReq(req *proto.GetImageReq) error {
+func validateGetCaptchaIdReq(req *proto.GetCaptchaIdReq) error {
+	return nil
+}
+
+func validateGetImageDataReq(req *proto.GetImageDataReq) error {
 	return nil
 }
 
@@ -10,7 +14,7 @@ func validateGetRandomReq(req *proto.GetRandomReq) error {
 	return nil
 }
 
-func validateGetVoiceReq(req *proto.GetVoiceReq) error {
+func validateGetVoiceDataReq(req *proto.GetVoiceDataReq) error {
 	return nil
 }
 

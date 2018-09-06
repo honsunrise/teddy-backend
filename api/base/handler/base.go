@@ -23,14 +23,41 @@ func NewBaseHandler(middleware *gin_jwt.JwtMiddleware) (*Base, error) {
 }
 
 func (h *Base) Handler(root gin.IRoutes) {
-	root.GET("/base/captcha/:id", h.GetCaptchaImage)
+	root.GET("/base/captcha", h.GetCaptchaId)
+	root.GET("/base/captcha/:id", h.GetCaptchaData)
 
 	root.PUT("/base/profile/:id")
 	root.GET("/base/profile/:id")
 	root.POST("/base/profile/:id/avatar")
 }
 
-func (h *Base) GetCaptchaImage(ctx *gin.Context) {
+func (h *Base) GetCaptchaId(ctx *gin.Context) {
+	// extract the client from the context
+	captchaClient, ok := client.CaptchaFromContext(ctx)
+	if !ok {
+		log.Error(errors.ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		return
+	}
+
+	idResp, err := captchaClient.GetCaptchaId(ctx, &proto.GetCaptchaIdReq{
+		Len: 6,
+	})
+	if err != nil {
+		log.Error(err)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	type captchaIdResp struct {
+		Id string `json:"id"`
+	}
+	var jsonResp captchaIdResp
+	jsonResp.Id = idResp.Id
+	ctx.JSON(http.StatusOK, &jsonResp)
+}
+
+func (h *Base) GetCaptchaData(ctx *gin.Context) {
 	// extract the client from the context
 	captchaClient, ok := client.CaptchaFromContext(ctx)
 	if !ok {
@@ -49,17 +76,16 @@ func (h *Base) GetCaptchaImage(ctx *gin.Context) {
 
 	lang := strings.ToLower(ctx.Param("lang"))
 	// Fill header
-	if ctx.Param("download") != "true" {
-		ctx.Header("Content-Type", "application/octet-stream")
-	}
 	ctx.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	ctx.Header("Pragma", "no-cache")
 	ctx.Header("Expires", "0")
 
+	contentType := "application/octet-stream"
+
 	switch ext {
 	case ".png":
-		resp, err := captchaClient.GetImage(ctx, &proto.GetImageReq{
-			Len:    6,
+		resp, err := captchaClient.GetImageData(ctx, &proto.GetImageDataReq{
+			Id:     id,
 			Width:  240,
 			Height: 80,
 			Reload: ctx.Param("reload") != "",
@@ -69,10 +95,13 @@ func (h *Base) GetCaptchaImage(ctx *gin.Context) {
 			ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		ctx.Data(http.StatusOK, "image/png", resp.Image)
+		if ctx.Param("download") != "true" {
+			contentType = "image/png"
+		}
+		ctx.Data(http.StatusOK, contentType, resp.Image)
 	case ".wav":
-		resp, err := captchaClient.GetVoice(ctx, &proto.GetVoiceReq{
-			Len:    6,
+		resp, err := captchaClient.GetVoiceData(ctx, &proto.GetVoiceDataReq{
+			Id:     id,
 			Lang:   lang,
 			Reload: ctx.Param("reload") != "",
 		})
@@ -81,7 +110,10 @@ func (h *Base) GetCaptchaImage(ctx *gin.Context) {
 			ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		ctx.Data(http.StatusOK, "audio/x-wav", resp.VoiceWav)
+		if ctx.Param("download") != "true" {
+			contentType = "audio/x-wav"
+		}
+		ctx.Data(http.StatusOK, contentType, resp.VoiceWav)
 	default:
 		ctx.Status(http.StatusNotFound)
 		return

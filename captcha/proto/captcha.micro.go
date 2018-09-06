@@ -8,10 +8,12 @@ It is generated from these files:
 	proto/captcha.proto
 
 It has these top-level messages:
-	GetImageReq
-	GetImageResp
-	GetVoiceReq
-	GetVoiceResp
+	GetCaptchaIdReq
+	GetCaptchaIdResp
+	GetImageDataReq
+	GetImageDataResp
+	GetVoiceDataReq
+	GetVoiceDataResp
 	GetRandomReq
 	GetRandomResp
 	VerifyReq
@@ -50,8 +52,9 @@ var _ server.Option
 // Client API for Captcha service
 
 type CaptchaService interface {
-	GetImage(ctx context.Context, in *GetImageReq, opts ...client.CallOption) (*GetImageResp, error)
-	GetVoice(ctx context.Context, in *GetVoiceReq, opts ...client.CallOption) (*GetVoiceResp, error)
+	GetCaptchaId(ctx context.Context, in *GetCaptchaIdReq, opts ...client.CallOption) (*GetCaptchaIdResp, error)
+	GetImageData(ctx context.Context, in *GetImageDataReq, opts ...client.CallOption) (*GetImageDataResp, error)
+	GetVoiceData(ctx context.Context, in *GetVoiceDataReq, opts ...client.CallOption) (*GetVoiceDataResp, error)
 	GetRandomById(ctx context.Context, in *GetRandomReq, opts ...client.CallOption) (*GetRandomResp, error)
 	Verify(ctx context.Context, in *VerifyReq, opts ...client.CallOption) (*VerifyResp, error)
 }
@@ -74,9 +77,9 @@ func NewCaptchaService(name string, c client.Client) CaptchaService {
 	}
 }
 
-func (c *captchaService) GetImage(ctx context.Context, in *GetImageReq, opts ...client.CallOption) (*GetImageResp, error) {
-	req := c.c.NewRequest(c.name, "Captcha.GetImage", in)
-	out := new(GetImageResp)
+func (c *captchaService) GetCaptchaId(ctx context.Context, in *GetCaptchaIdReq, opts ...client.CallOption) (*GetCaptchaIdResp, error) {
+	req := c.c.NewRequest(c.name, "Captcha.GetCaptchaId", in)
+	out := new(GetCaptchaIdResp)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -84,9 +87,19 @@ func (c *captchaService) GetImage(ctx context.Context, in *GetImageReq, opts ...
 	return out, nil
 }
 
-func (c *captchaService) GetVoice(ctx context.Context, in *GetVoiceReq, opts ...client.CallOption) (*GetVoiceResp, error) {
-	req := c.c.NewRequest(c.name, "Captcha.GetVoice", in)
-	out := new(GetVoiceResp)
+func (c *captchaService) GetImageData(ctx context.Context, in *GetImageDataReq, opts ...client.CallOption) (*GetImageDataResp, error) {
+	req := c.c.NewRequest(c.name, "Captcha.GetImageData", in)
+	out := new(GetImageDataResp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *captchaService) GetVoiceData(ctx context.Context, in *GetVoiceDataReq, opts ...client.CallOption) (*GetVoiceDataResp, error) {
+	req := c.c.NewRequest(c.name, "Captcha.GetVoiceData", in)
+	out := new(GetVoiceDataResp)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -117,16 +130,18 @@ func (c *captchaService) Verify(ctx context.Context, in *VerifyReq, opts ...clie
 // Server API for Captcha service
 
 type CaptchaHandler interface {
-	GetImage(context.Context, *GetImageReq, *GetImageResp) error
-	GetVoice(context.Context, *GetVoiceReq, *GetVoiceResp) error
+	GetCaptchaId(context.Context, *GetCaptchaIdReq, *GetCaptchaIdResp) error
+	GetImageData(context.Context, *GetImageDataReq, *GetImageDataResp) error
+	GetVoiceData(context.Context, *GetVoiceDataReq, *GetVoiceDataResp) error
 	GetRandomById(context.Context, *GetRandomReq, *GetRandomResp) error
 	Verify(context.Context, *VerifyReq, *VerifyResp) error
 }
 
 func RegisterCaptchaHandler(s server.Server, hdlr CaptchaHandler, opts ...server.HandlerOption) error {
 	type captcha interface {
-		GetImage(ctx context.Context, in *GetImageReq, out *GetImageResp) error
-		GetVoice(ctx context.Context, in *GetVoiceReq, out *GetVoiceResp) error
+		GetCaptchaId(ctx context.Context, in *GetCaptchaIdReq, out *GetCaptchaIdResp) error
+		GetImageData(ctx context.Context, in *GetImageDataReq, out *GetImageDataResp) error
+		GetVoiceData(ctx context.Context, in *GetVoiceDataReq, out *GetVoiceDataResp) error
 		GetRandomById(ctx context.Context, in *GetRandomReq, out *GetRandomResp) error
 		Verify(ctx context.Context, in *VerifyReq, out *VerifyResp) error
 	}
@@ -141,12 +156,16 @@ type captchaHandler struct {
 	CaptchaHandler
 }
 
-func (h *captchaHandler) GetImage(ctx context.Context, in *GetImageReq, out *GetImageResp) error {
-	return h.CaptchaHandler.GetImage(ctx, in, out)
+func (h *captchaHandler) GetCaptchaId(ctx context.Context, in *GetCaptchaIdReq, out *GetCaptchaIdResp) error {
+	return h.CaptchaHandler.GetCaptchaId(ctx, in, out)
 }
 
-func (h *captchaHandler) GetVoice(ctx context.Context, in *GetVoiceReq, out *GetVoiceResp) error {
-	return h.CaptchaHandler.GetVoice(ctx, in, out)
+func (h *captchaHandler) GetImageData(ctx context.Context, in *GetImageDataReq, out *GetImageDataResp) error {
+	return h.CaptchaHandler.GetImageData(ctx, in, out)
+}
+
+func (h *captchaHandler) GetVoiceData(ctx context.Context, in *GetVoiceDataReq, out *GetVoiceDataResp) error {
+	return h.CaptchaHandler.GetVoiceData(ctx, in, out)
 }
 
 func (h *captchaHandler) GetRandomById(ctx context.Context, in *GetRandomReq, out *GetRandomResp) error {

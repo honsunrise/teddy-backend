@@ -8,31 +8,40 @@ import "github.com/golang/protobuf/ptypes/empty/empty.proto";
 import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
 
 service Captcha {
-    rpc GetImage (GetImageReq) returns (GetImageResp) {}
-    rpc GetVoice (GetVoiceReq) returns (GetVoiceResp) {}
+    rpc GetCaptchaId (GetCaptchaIdReq) returns (GetCaptchaIdResp) {}
+    rpc GetImageData (GetImageDataReq) returns (GetImageDataResp) {}
+    rpc GetVoiceData (GetVoiceDataReq) returns (GetVoiceDataResp) {}
     rpc GetRandomById (GetRandomReq) returns (GetRandomResp) {}
     rpc Verify(VerifyReq) returns (VerifyResp) {}
 }
 
-message GetImageReq {
+message GetCaptchaIdReq {
     uint32 len = 1;
+}
+
+message GetCaptchaIdResp {
+    string id = 1;
+}
+
+message GetImageDataReq {
+    string id = 1;
     uint32 width = 2;
     uint32 height = 3;
+    bool reload = 4;
 }
 
-message GetImageResp {
+message GetImageDataResp {
+    bytes image = 1;
+}
+
+message GetVoiceDataReq {
     string id = 1;
-    bytes image = 2;
-}
-
-message GetVoiceReq {
-    uint32 len = 1;
     string lang = 2;
+    bool reload = 3;
 }
 
-message GetVoiceResp {
-    string id = 1;
-    bytes voice_wav = 2;
+message GetVoiceDataResp {
+    bytes voice_wav = 1;
 }
 
 message GetRandomReq {

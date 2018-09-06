@@ -241,18 +241,40 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 
 	if h.enforcer.Enforce(sub, obj, act) != true {
 		ctx.AbortWithStatus(http.StatusForbidden)
+		return
 	}
 
 	// parse body
 	type changePasswordReq struct {
-		Username    string `json:"username"`
-		OldPassword string `json:"old_password"`
-		NewPassword string `json:"new_password"`
-		Captcha     string `json:"captcha"`
+		Username        string `json:"username"`
+		OldPassword     string `json:"old_password"`
+		NewPassword     string `json:"new_password"`
+		CaptchaId       string `json:"captcha_id"`
+		CaptchaSolution string `json:"captcha_solution"`
 	}
 	var body changePasswordReq
 
 	ctx.Bind(&body)
+
+	// extract the client from the context
+	captchaClient, ok := client.CaptchaKeyFromContext(ctx)
+	if !ok {
+		log.Error(errors.ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		return
+	}
+
+	rsp, err := captchaClient.Verify(ctx, &capProto.VerifyReq{
+		Type: capProto.CaptchaType_RANDOM_BY_ID,
+		Id:   body.CaptchaId,
+		Code: body.CaptchaSolution,
+	})
+
+	if err != nil || !rsp.Correct {
+		log.Error(errors.ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrCaptchaNotCorrect)
+		return
+	}
 
 	// extract the client from the context
 	uaaClient, ok := client.UaaFromContext(ctx)
@@ -280,24 +302,38 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	now := time.Now()
 	// parse body
 	type sendEmailCaptchaReq struct {
-		Email string `json:"email"`
+		Email           string `json:"email"`
+		CaptchaId       string `json:"captcha_id"`
+		CaptchaSolution string `json:"captcha_solution"`
 	}
 	var body sendEmailCaptchaReq
 
 	ctx.Bind(&body)
 
 	// extract the client from the context
-	messageClient, ok := client.MessageFromContext(ctx)
+	captchaClient, ok := client.CaptchaKeyFromContext(ctx)
 	if !ok {
-		log.Error("message client not found")
+		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
 		return
 	}
 
-	// extract the client from the context
-	captchaClient, ok := client.CaptchaKeyFromContext(ctx)
-	if !ok {
+	rsp, err := captchaClient.Verify(ctx, &capProto.VerifyReq{
+		Type: capProto.CaptchaType_RANDOM_BY_ID,
+		Id:   body.CaptchaId,
+		Code: body.CaptchaSolution,
+	})
+
+	if err != nil || !rsp.Correct {
 		log.Error(errors.ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrCaptchaNotCorrect)
+		return
+	}
+
+	// extract the client from the context
+	messageClient, ok := client.MessageFromContext(ctx)
+	if !ok {
+		log.Error("message client not found")
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
 		return
 	}

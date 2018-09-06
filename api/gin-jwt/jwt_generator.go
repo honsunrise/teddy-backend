@@ -3,8 +3,8 @@ package gin_jwt
 import (
 	"crypto/ecdsa"
 	"crypto/rsa"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
+	"gopkg.in/dgrijalva/jwt-go.v3"
 	"time"
 )
 
