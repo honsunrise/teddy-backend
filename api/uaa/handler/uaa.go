@@ -319,7 +319,7 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	}
 
 	rsp, err := captchaClient.Verify(ctx, &capProto.VerifyReq{
-		Type: capProto.CaptchaType_RANDOM_BY_ID,
+		Type: capProto.CaptchaType_IMAGE,
 		Id:   body.CaptchaId,
 		Code: body.CaptchaSolution,
 	})
@@ -345,6 +345,7 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	if err != nil {
 		log.Error(err)
 		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
 	// Send captcha email

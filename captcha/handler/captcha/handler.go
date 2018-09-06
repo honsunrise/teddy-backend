@@ -108,7 +108,7 @@ func (h *captchaHandler) Verify(ctx context.Context, req *proto.VerifyReq, rsp *
 		}
 		rsp.Correct = true
 	} else if req.Type == proto.CaptchaType_IMAGE || req.Type == proto.CaptchaType_VOICE {
-		if captcha.Verify(req.Id, []byte(req.Code)) {
+		if captcha.VerifyString(req.Id, req.Code) {
 			rsp.Correct = true
 		}
 	}
