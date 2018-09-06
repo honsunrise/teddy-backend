@@ -22,7 +22,7 @@ message InBoxItem {
     string topic = 2;
     string content = 3;
     string from = 4;
-    uint32 Type = 5;
+    uint32 type = 5;
     bool unread = 6;
     google.protobuf.Timestamp sendTime = 7;
     google.protobuf.Timestamp ReadTime = 8;

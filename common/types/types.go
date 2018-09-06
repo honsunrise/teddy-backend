@@ -8,10 +8,8 @@ import (
 var ErrOrderNotSupport = errors.New("order not support")
 
 type Paging struct {
-	Page  uint32 `json:"page"`
-	Size  uint32 `json:"size"`
-	Sort  string `json:"sort"`
-	Order string `json:"order"`
+	Page uint32 `json:"page"`
+	Size uint32 `json:"size"`
 }
 
 type Order uint8

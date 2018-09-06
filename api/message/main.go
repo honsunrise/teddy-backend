@@ -5,10 +5,13 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"flag"
+	"github.com/casbin/casbin"
+	"github.com/casbin/mongodb-adapter"
 	"github.com/zhsyourai/teddy-backend/api/gin-jwt"
 	"github.com/zhsyourai/teddy-backend/api/message/client"
 	"github.com/zhsyourai/teddy-backend/api/message/handler"
 	"github.com/zhsyourai/teddy-backend/common/config"
+	"github.com/zhsyourai/teddy-backend/common/utils"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -25,6 +28,11 @@ func main() {
 	}
 	// Load config
 	conf := config.GetConfig()
+	mongodbUri := utils.BuildMongodbURI(conf.Databases["mongodb"])
+	model := casbin.NewModel(conf.Casbin)
+
+	enforcer := casbin.NewEnforcer(model, mongodbadapter.NewAdapter(mongodbUri))
+	enforcer.LoadPolicy()
 
 	// Load Jwt PublicKey
 	block, _ := pem.Decode([]byte(conf.JWTPkcs8))
@@ -55,7 +63,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	message, err := handler.NewMessageHandler(jwtMiddleware)
+	message, err := handler.NewMessageHandler(enforcer, jwtMiddleware)
 	if err != nil {
 		log.Fatal(err)
 	}
