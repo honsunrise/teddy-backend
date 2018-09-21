@@ -6,40 +6,67 @@ consul:
   - "8400:8400"
   - "8500:8500"
   - "8600:53/udp"
+
 micro:
-  command: --registry_address=consul:8500 api --handler=rpc
+  command: --registry_address=consul:8500 api --handler=web
   image: microhq/micro:latest
   links:
   - consul
   - api
   ports:
   - "8080:8080"
-api:
-  build: ./api/hotel
+
+api-base:
+  build: ./api/base
   command: --registry_address=consul:8500
   links:
   - consul
-  - auth
-  - geo
-  - profile
-  - rate
-auth:
-  build: ./srv/auth
+  - captcha
+
+api-content:
+  build: ./api/content
   command: --registry_address=consul:8500
   links:
   - consul
-geo:
-  build: ./srv/geo
+  - message
+  - captcha
+
+api-message:
+  build: ./api/message
   command: --registry_address=consul:8500
   links:
   - consul
-profile:
-  build: ./srv/profile
+  - message
+  - captcha
+
+api-uaa:
+  build: ./api/uaa
+    command: --registry_address=consul:8500
+    links:
+    - consul
+    - uaa
+    - message
+    - captcha
+message:
+  build: ./message
   command: --registry_address=consul:8500
   links:
   - consul
-rate:
-  build: ./srv/rate
+
+uaa:
+  build: ./uaa
+  command: --registry_address=consul:8500
+  links:
+  - consul
+
+content:
+  build: ./content
+  command: --registry_address=consul:8500
+  links:
+  - consul
+
+captcha:
+  build: ./captcha
   command: --registry_address=consul:8500
   links:
   - consul
