@@ -4,7 +4,7 @@ GOPATH:=$(shell go env GOPATH)
 .PHONY: test docker
 
 build:
-	go build -o uaa-api main.go plugin.go
+	go build -o uaa-api main.go
 
 test:
 	go test -v ./... -cover

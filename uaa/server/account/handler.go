@@ -3,7 +3,6 @@ package account
 import (
 	"context"
 	"errors"
-	"github.com/casbin/casbin"
 	"github.com/golang/protobuf/ptypes/empty"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/models"
@@ -20,81 +19,81 @@ var UserHasBeenRegisteredErr = errors.New("user has been registered")
 var OldPasswordNotCorrectErr = errors.New("old password not correct")
 var PasswordModifyErr = errors.New("password modify error")
 
-func NewAccountHandler(repo repositories.AccountRepository,
-	uidGen components.UidGenerator, enforcer *casbin.Enforcer) (proto.UAAHandler, error) {
+func NewAccountServer(repo repositories.AccountRepository, uidGen components.UidGenerator) (proto.UAAServer, error) {
 	return &accountHandler{
-		repo:     repo,
-		uidGen:   uidGen,
-		enforcer: enforcer,
+		repo:   repo,
+		uidGen: uidGen,
 	}, nil
 }
 
 type accountHandler struct {
-	repo     repositories.AccountRepository
-	uidGen   components.UidGenerator
-	enforcer *casbin.Enforcer
+	repo   repositories.AccountRepository
+	uidGen components.UidGenerator
 }
 
-func (h *accountHandler) GetAll(ctx context.Context, req *empty.Empty, resp *proto.GetAllResp) error {
+func (h *accountHandler) GetAll(context.Context, *empty.Empty) (*proto.GetAllResp, error) {
 	accs, err := h.repo.FindAll()
 	if err != nil {
 		log.Error(err)
-		return err
+		return nil, err
 	}
 
+	var resp proto.GetAllResp
 	for _, v := range accs {
 		var pbacc proto.Account
 		converter.CopyFromAccountToPBAccount(&v, &pbacc)
 		resp.Accounts = append(resp.Accounts, &pbacc)
 	}
 
-	return nil
+	return &resp, nil
 }
 
-func (h *accountHandler) GetByUsername(ctx context.Context, req *proto.GetByUsernameReq, resp *proto.Account) error {
+func (h *accountHandler) GetByUsername(ctx context.Context, req *proto.GetByUsernameReq) (*proto.Account, error) {
 	if err := validateGetByUsernameReq(req); err != nil {
-		return err
+		return nil, err
 	}
 
 	acc, err := h.repo.FindAccountByUsername(req.GetUsername())
 	if err != nil {
 		log.Error(err)
-		return UserNotFoundErr
+		return nil, err
 	}
-	converter.CopyFromAccountToPBAccount(&acc, resp)
-	return nil
+	var resp proto.Account
+	converter.CopyFromAccountToPBAccount(&acc, &resp)
+	return &resp, nil
 }
 
-func (h *accountHandler) DeleteByUsername(ctx context.Context, req *proto.DeleteByUsernameReq, resp *empty.Empty) error {
+func (h *accountHandler) DeleteByUsername(ctx context.Context, req *proto.DeleteByUsernameReq) (*empty.Empty, error) {
 	if err := validateDeleteByUsernameReq(req); err != nil {
-		return err
+		return nil, err
 	}
 
 	err := h.repo.DeleteAccountByUsername(req.GetUsername())
 	if err != nil {
 		log.Error(err)
-		return UserNotFoundErr
+		return nil, err
 	}
-	return nil
+	var resp empty.Empty
+	return &resp, nil
 }
 
-func (h *accountHandler) Register(ctx context.Context, req *proto.RegisterReq, resp *proto.Account) error {
+func (h *accountHandler) Register(ctx context.Context, req *proto.RegisterReq) (*proto.Account, error) {
 	if err := validateRegisterReq(req); err != nil {
-		return err
+		return nil, err
 	}
 
 	_, err := h.repo.FindAccountByUsername(req.GetUsername())
 	if err == nil {
-		return UserHasBeenRegisteredErr
+		return nil, err
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.GetPassword()), bcrypt.DefaultCost)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	uid, err := h.uidGen.NexID()
 	if err != nil {
 		log.Error(err)
-		return err
+		return nil, err
 	}
 
 	var account models.Account
@@ -112,57 +111,60 @@ func (h *accountHandler) Register(ctx context.Context, req *proto.RegisterReq, r
 	err = h.repo.InsertAccount(&account)
 	if err != nil {
 		log.Error(err)
-		return err
+		return nil, err
 	}
-	converter.CopyFromAccountToPBAccount(&account, resp)
-	return nil
+	var resp proto.Account
+	converter.CopyFromAccountToPBAccount(&account, &resp)
+	return &resp, nil
 }
 
-func (h *accountHandler) VerifyPassword(ctx context.Context, req *proto.VerifyPasswordReq, resp *proto.Account) error {
+func (h *accountHandler) VerifyPassword(ctx context.Context, req *proto.VerifyPasswordReq) (*proto.Account, error) {
 	if err := validateVerifyPasswordReq(req); err != nil {
-		return err
+		return nil, err
 	}
 
 	acc, err := h.repo.FindAccountByUsername(req.GetUsername())
 	if err != nil {
 		log.Error(err)
-		return UserNotFoundErr
+		return nil, UserNotFoundErr
 	}
 	err = bcrypt.CompareHashAndPassword(acc.Password, []byte(req.GetPassword()))
 	if err != nil {
 		log.Error(err)
-		return UserNotFoundErr
+		return nil, UserNotFoundErr
 	}
-	converter.CopyFromAccountToPBAccount(&acc, resp)
-	return nil
+	var resp proto.Account
+	converter.CopyFromAccountToPBAccount(&acc, &resp)
+	return &resp, nil
 }
 
-func (h *accountHandler) ChangePassword(ctx context.Context, req *proto.ChangePasswordReq, resp *empty.Empty) error {
+func (h *accountHandler) ChangePassword(ctx context.Context, req *proto.ChangePasswordReq) (*empty.Empty, error) {
 	if err := validateChangePasswordReq(req); err != nil {
-		return err
+		return nil, err
 	}
 
 	acc, err := h.repo.FindAccountByUsername(req.GetUsername())
 	if err != nil {
 		log.Error(err)
-		return UserNotFoundErr
+		return nil, UserNotFoundErr
 	}
 	err = bcrypt.CompareHashAndPassword(acc.Password, []byte(req.GetOldPassword()))
 	if err != nil {
 		log.Error(err)
-		return OldPasswordNotCorrectErr
+		return nil, OldPasswordNotCorrectErr
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.GetNewPassword()), bcrypt.DefaultCost)
 	if err != nil {
 		log.Error(err)
-		return PasswordModifyErr
+		return nil, PasswordModifyErr
 	}
 	err = h.repo.UpdateAccountByUsername(req.GetUsername(), map[string]interface{}{
 		"password": hashedPassword,
 	})
 	if err != nil {
 		log.Error(err)
-		return PasswordModifyErr
+		return nil, PasswordModifyErr
 	}
-	return nil
+	var resp empty.Empty
+	return &resp, nil
 }

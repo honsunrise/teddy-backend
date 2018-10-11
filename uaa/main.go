@@ -1,21 +1,24 @@
 package main
 
 import (
-	"github.com/casbin/casbin"
-	"github.com/casbin/mongodb-adapter"
+	"fmt"
 	"github.com/micro/go-micro"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/utils"
 	"github.com/zhsyourai/teddy-backend/uaa/components"
+	"google.golang.org/grpc"
+	"net"
 
 	"context"
 	"flag"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/uaa/handler/account"
 	uaa "github.com/zhsyourai/teddy-backend/uaa/proto"
 	"github.com/zhsyourai/teddy-backend/uaa/repositories"
+	"github.com/zhsyourai/teddy-backend/uaa/server/account"
 )
+
+const PORT = 9999
 
 func main() {
 	flag.Parse()
@@ -27,10 +30,6 @@ func main() {
 	// Load config
 	conf := config.GetConfig()
 	mongodbUri := utils.BuildMongodbURI(conf.Databases["mongodb"])
-	model := casbin.NewModel(conf.Casbin)
-
-	enforcer := casbin.NewEnforcer(model, mongodbadapter.NewAdapter(mongodbUri))
-	enforcer.LoadPolicy()
 
 	// New Mongodb client
 	mongodbClient, err := mongo.Connect(context.Background(), mongodbUri)
@@ -56,15 +55,21 @@ func main() {
 		log.Fatal(err)
 	}
 	// New Handler
-	accountHandler, err := account.NewAccountHandler(accountRepo, uidGenerator, enforcer)
+	accountHandler, err := account.NewAccountServer(accountRepo, uidGenerator)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Register Handler
-	uaa.RegisterUAAHandler(service.Server(), accountHandler)
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", PORT))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	uaa.RegisterUAAServer(grpcServer, accountHandler)
 
 	// Run service
-	if err := service.Run(); err != nil {
+	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatal(err)
 	}
 }
