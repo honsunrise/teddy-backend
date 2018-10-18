@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package com.teddy.srv.content;
+package com.teddy.srv.captcha;
 
 option go_package = "proto";
 

@@ -1,4 +1,3 @@
----
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: RbacConfig
 metadata:
@@ -11,13 +10,205 @@ spec:
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRole
 metadata:
-  name: tester
-  namespace: default
+  name: admin
 spec:
   rules:
-  - services: ["test-*"]
+  - services: ["*"]
     methods: ["*"]
-  - services: ["bookstore.default.svc.cluster.local"]
-    paths: ["*/reviews"]
-    methods: ["GET"]
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRoleBinding
+metadata:
+  name: binding-all-authenticated-admins
+spec:
+  subjects:
+  - properties:
+      source.principal: "*"
+      request.auth.claims[roles]: "ADMIN"
+  roleRef:
+    kind: ServiceRole
+    name: "admin"
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRole
+metadata:
+  name: user
+spec:
+  rules:
+  - services: ["teddy-api-*"]
+    methods: ["*"]
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRoleBinding
+metadata:
+  name: binding-all-teddy-api-authenticated-users
+spec:
+  subjects:
+  - properties:
+      source.principal: "*"
+      request.auth.claims[roles]: "USER"
+  roleRef:
+    kind: ServiceRole
+    name: "user"
+---
+##################################################################################################
+# Uaa service role
+##################################################################################################
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRole
+metadata:
+  name: uaa-viewer
+spec:
+  rules:
+  - services: ["uaa.default.svc.cluster.local"]
+    methods: ["POST"]
+    paths: ["com.teddy.srv.uaa.UAA/Get*", "com.teddy.srv.uaa.UAA/VerifyPassword"]
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRole
+metadata:
+  name: uaa-modifier
+spec:
+  rules:
+  - services: ["uaa.default.svc.cluster.local"]
+    methods: ["POST"]
+    paths: ["com.teddy.srv.uaa.UAA/DeleteByUsername", "com.teddy.srv.uaa.UAA/ChangePassword", "com.teddy.srv.uaa.UAA/Register"]
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRoleBinding
+metadata:
+  name: binding-uaa-viewer
+spec:
+  subjects:
+  - user: "teddy-api-uaa"
+  roleRef:
+    kind: ServiceRole
+    name: "uaa-viewer"
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRoleBinding
+metadata:
+  name: binding-uaa-modifier
+spec:
+  subjects:
+  - user: "teddy-api-uaa"
+  roleRef:
+    kind: ServiceRole
+    name: "uaa-modifier"
+---
+##################################################################################################
+# content service role
+##################################################################################################
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRole
+metadata:
+  name: content-viewer
+spec:
+  rules:
+  - services: ["content.default.svc.cluster.local"]
+    methods: ["POST"]
+    paths: ["com.teddy.srv.content.Content/Get*"]
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRole
+metadata:
+  name: content-modifier
+spec:
+  rules:
+  - services: ["content.default.svc.cluster.local"]
+    methods: ["POST"]
+    paths: ["com.teddy.srv.content.Content/PublishInfo", "com.teddy.srv.content.Content/EditInfo", "com.teddy.srv.content.Content/DeleteInfo", "com.teddy.srv.content.Content/WatchInfo", "com.teddy.srv.content.Content/LikeInfo", "com.teddy.srv.content.Content/UnLikeInfo", "com.teddy.srv.content.Content/FavoriteInfo"]
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRoleBinding
+metadata:
+  name: binding-content-viewer
+spec:
+  subjects:
+  - user: "teddy-api-content"
+  roleRef:
+    kind: ServiceRole
+    name: "content-viewer"
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRoleBinding
+metadata:
+  name: binding-content-modifier
+spec:
+  subjects:
+  - user: "teddy-api-content"
+  roleRef:
+    kind: ServiceRole
+    name: "content-modifier"
+---
+##################################################################################################
+# message service role
+##################################################################################################
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRole
+metadata:
+  name: message-viewer
+spec:
+  rules:
+  - services: ["message.default.svc.cluster.local"]
+    methods: ["POST"]
+    paths: ["com.teddy.srv.message.Message/Get*"]
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRole
+metadata:
+  name: message-sender
+spec:
+  rules:
+  - services: ["message.default.svc.cluster.local"]
+    methods: ["POST"]
+    paths: ["com.teddy.srv.message.Message/Send*"]
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRoleBinding
+metadata:
+  name: binding-message-viewer
+spec:
+  subjects:
+  - user: "teddy-api-message"
+  roleRef:
+    kind: ServiceRole
+    name: "message-viewer"
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRoleBinding
+metadata:
+  name: binding-message-modifier
+spec:
+  subjects:
+  - user: "teddy-api-message"
+  - user: "teddy-api-uaa"
+  roleRef:
+    kind: ServiceRole
+    name: "message-modifier"
+---
+##################################################################################################
+# captcha service role
+##################################################################################################
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRole
+metadata:
+  name: captcha-viewer
+spec:
+  rules:
+  - services: ["captcha.default.svc.cluster.local"]
+    methods: ["POST"]
+    paths: ["com.teddy.srv.captcha.Captcha/Get*", "com.teddy.srv.captcha.Captcha/Verify", ]
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRoleBinding
+metadata:
+  name: binding-captcha-viewer
+spec:
+  subjects:
+  - user: "teddy-api-uaa"
+  - user: "teddy-api-base"
+  roleRef:
+    kind: ServiceRole
+    name: "captcha-viewer"
 ---

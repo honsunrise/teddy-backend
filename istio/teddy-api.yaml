@@ -1,0 +1,172 @@
+##################################################################################################
+# Base API service
+##################################################################################################
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: teddy-api-base
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-base
+  labels:
+    app: api-base
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: api-bases
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-bases
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-bases
+  template:
+    metadata:
+      labels:
+        app: api-bases
+    spec:
+      serviceAccountName: teddy-api-base
+      containers:
+      - name: api-base
+        image: com.teddy.srv/api-base:0.0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+---
+##################################################################################################
+# Content API service
+##################################################################################################
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: teddy-api-content
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-content
+  labels:
+    app: api-content
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: api-contents
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-contents
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-contents
+  template:
+    metadata:
+      labels:
+        app: api-contents
+    spec:
+      serviceAccountName: teddy-api-content
+      containers:
+      - name: api-content
+        image: com.teddy.srv/api-content:0.0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+---
+##################################################################################################
+# Message API service
+##################################################################################################
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: teddy-api-message
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-message
+  labels:
+    app: api-message
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: api-messages
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-messages
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-messages
+  template:
+    metadata:
+      labels:
+        app: api-messages
+    spec:
+      serviceAccountName: teddy-api-message
+      containers:
+      - name: api-message
+        image: com.teddy.srv/api-message:0.0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+---
+##################################################################################################
+# Uaa API service
+##################################################################################################
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: teddy-api-uaa
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-uaa
+  labels:
+    app: api-uaa
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: api-uaas
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-uaas
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-uaas
+  template:
+    metadata:
+      labels:
+        app: api-uaas
+    spec:
+      serviceAccountName: teddy-api-uaa
+      containers:
+      - name: api-uaa
+        image: com.teddy.srv/api-uaa:0.0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+---

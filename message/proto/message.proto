@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package com.teddy.srv.notify;
+package com.teddy.srv.message;
 
 option go_package = "proto";
 

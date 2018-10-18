@@ -1,0 +1,172 @@
+##################################################################################################
+# uaa service
+##################################################################################################
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: teddy-uaa
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uaa
+  labels:
+    app: uaa
+spec:
+  ports:
+  - port: 9999
+    name: grpc
+  selector:
+    app: uaas
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uaas
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uaas
+  template:
+    metadata:
+      labels:
+        app: uaas
+    spec:
+      serviceAccountName: teddy-uaa
+      containers:
+      - name: uaa
+        image: com.teddy.srv/uaa:0.0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9999
+---
+##################################################################################################
+# message service
+##################################################################################################
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: teddy-message
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: message
+  labels:
+    app: message
+spec:
+  ports:
+  - port: 9999
+    name: grpc
+  selector:
+    app: messages
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: messages
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: messages
+  template:
+    metadata:
+      labels:
+        app: messages
+    spec:
+      serviceAccountName: teddy-message
+      containers:
+      - name: message
+        image: com.teddy.srv/message:0.0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9999
+---
+##################################################################################################
+# content service
+##################################################################################################
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: teddy-content
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: content
+  labels:
+    app: content
+spec:
+  ports:
+  - port: 9999
+    name: grpc
+  selector:
+    app: contents
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: contents
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: contents
+  template:
+    metadata:
+      labels:
+        app: contents
+    spec:
+      serviceAccountName: teddy-content
+      containers:
+      - name: content
+        image: com.teddy.srv/content:0.0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9999
+---
+##################################################################################################
+# captcha services
+##################################################################################################
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: teddy-captcha
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: captcha
+  labels:
+    app: captcha
+spec:
+  ports:
+  - port: 9999
+    name: grpc
+  selector:
+    app: captchas
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: captchas
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: captchas
+  template:
+    metadata:
+      labels:
+        app: captchas
+    spec:
+      serviceAccountName: teddy-captcha
+      containers:
+      - name: captcha
+        image: com.teddy.srv/captcha:0.0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9999
+---

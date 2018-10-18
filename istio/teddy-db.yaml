@@ -9,23 +9,25 @@ spec:
   - port: 27017
     name: mongo
   selector:
-    app: mongodb
+    app: mongodbs
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongodb-v1
+  name: mongodb
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: mongodbs
   template:
     metadata:
       labels:
-        app: mongodb
-        version: v1
+        app: mongodbs
     spec:
       containers:
       - name: mongodb
-        image: istio/examples-bookinfo-mongodb:1.9.0
+        image: com.teddy.db/mongo:0.0.1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 27017
