@@ -1,0 +1,123 @@
+##################################################################################################
+# uaa service traffic
+##################################################################################################
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: uaa
+spec:
+  host: uaa
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+  subsets:
+  - name: uaa-v0.0.1
+    labels:
+      version: v0.0.1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: uaa
+spec:
+  hosts:
+  - uaa
+  http:
+  - route:
+    - destination:
+        host: uaa
+        subset: uaa-v0.0.1
+    timeout: 0.5s
+---
+##################################################################################################
+# message service traffic
+##################################################################################################
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: message
+spec:
+  host: message
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+  subsets:
+  - name: message-v0.0.1
+    labels:
+      version: v0.0.1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: message
+spec:
+  hosts:
+  - message
+  http:
+  - route:
+    - destination:
+        host: message
+        subset: message-v0.0.1
+    timeout: 0.5s
+---
+##################################################################################################
+# content service traffic
+##################################################################################################
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: content
+spec:
+  host: content
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+  subsets:
+  - name: content-v0.0.1
+    labels:
+      version: v0.0.1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: content
+spec:
+  hosts:
+  - content
+  http:
+  - route:
+    - destination:
+        host: content
+        subset: uaa-v0.0.1
+    timeout: 0.5s
+---
+##################################################################################################
+# captcha service traffic
+##################################################################################################
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: captcha
+spec:
+  host: captcha
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+  subsets:
+  - name: captcha-v0.0.1
+    labels:
+      version: v0.0.1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: captcha
+spec:
+  hosts:
+  - captcha
+  http:
+  - route:
+    - destination:
+        host: captcha
+        subset: captcha-v0.0.1
+    timeout: 0.5s
