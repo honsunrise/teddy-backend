@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: default-gateway
+  name: default-http-gateway
 spec:
   selector:
     istio: ingressgateway # use Istio default gateway implementation
@@ -21,7 +21,7 @@ spec:
   hosts:
   - "todo.todo"
   gateways:
-  - default-gateway
+  - default-http-gateway
   http:
   - match:
     - uri:
