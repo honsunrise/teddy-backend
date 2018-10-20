@@ -1,0 +1,57 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: default-gateway
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "todo.todo"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: default
+spec:
+  hosts:
+  - "todo.todo"
+  gateways:
+  - default-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /uaa
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: api-uaa
+  - match:
+    - uri:
+        prefix: /base
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: api-base
+  - match:
+    - uri:
+        prefix: /content
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: api-content
+  - match:
+    - uri:
+        prefix: /message
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: api-message
