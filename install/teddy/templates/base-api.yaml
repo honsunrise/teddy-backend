@@ -1,0 +1,90 @@
+{{- define "teddy.api.base.name" -}}
+  {{- printf "%s-%s" (include "teddy.name" .) "api-base" -}}
+{{- end -}}
+
+{{- define "teddy.api.base.fullname" -}}
+  {{- printf "%s-%s" (include "teddy.fullname" .) "api-base" -}}
+{{- end -}}
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "teddy.api.base.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "teddy.api.base.name" . }}
+    helm.sh/chart: {{ include "teddy.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "teddy.api.base.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "teddy.api.base.name" . }}
+    helm.sh/chart: {{ include "teddy.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: {{ default .Values.api.base.type "ClusterIP" }}
+    ports:
+    - port: {{ default .Values.api.base.port 8080 }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    selector:
+      app.kubernetes.io/name: {{ include "teddy.api.base.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "teddy.api.base.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "teddy.api.base.name" . }}
+    helm.sh/chart: {{ include "teddy.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ default .Values.api.base.replicas 1 }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "teddy.api.base.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "teddy.api.base.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      serviceAccountName: {{ include "teddy.api.base.fullname" . }}
+      containers:
+        - name: {{ include "teddy.api.base.name" . }}
+          image: "{{ .Values.api.base.image.repository }}:{{ .Values.api.base.image.tag }}"
+          imagePullPolicy: {{ .Values.api.base.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+{{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+{{- end }}
+{{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+{{- end }}
+{{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+{{- end }}
