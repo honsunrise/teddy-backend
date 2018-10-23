@@ -1,17 +1,17 @@
-{{- define "teddy.apis.content.name" -}}
-  {{- printf "%s-%s" (include "teddy.name" .) "api-content" -}}
+{{- define "teddy.services.content.name" -}}
+  {{- printf "%s-%s" (include "teddy.name" .) "service-content" -}}
 {{- end -}}
 
-{{- define "teddy.apis.content.fullname" -}}
-  {{- printf "%s-%s" (include "teddy.fullname" .) "api-content" -}}
+{{- define "teddy.services.content.fullname" -}}
+  {{- printf "%s-%s" (include "teddy.fullname" .) "service-content" -}}
 {{- end -}}
 
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ include "teddy.apis.content.fullname" . }}
+  name: {{ include "teddy.services.content.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "teddy.apis.content.name" . }}
+    app.kubernetes.io/name: {{ include "teddy.services.content.name" . }}
     helm.sh/chart: {{ include "teddy.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
@@ -19,49 +19,49 @@ metadata:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "teddy.apis.content.fullname" . }}
+  name: {{ include "teddy.services.content.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "teddy.apis.content.name" . }}
+    app.kubernetes.io/name: {{ include "teddy.services.content.name" . }}
     helm.sh/chart: {{ include "teddy.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
-  type: {{ default "ClusterIP" .Values.apis.content.type }}
+  type: {{ default "ClusterIP" .Values.services.content.type }}
     ports:
-    - port: {{ default 8080 .Values.apis.content.port }}
+    - port: {{ default 8080 .Values.services.content.port }}
       targetPort: http
       protocol: TCP
       name: http
     selector:
-      app.kubernetes.io/name: {{ include "teddy.apis.content.name" . }}
+      app.kubernetes.io/name: {{ include "teddy.services.content.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "teddy.apis.content.fullname" . }}
+  name: {{ include "teddy.services.content.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "teddy.apis.content.name" . }}
+    app.kubernetes.io/name: {{ include "teddy.services.content.name" . }}
     helm.sh/chart: {{ include "teddy.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
-  replicas: {{ default 1 .Values.apis.content.replicas }}
+  replicas: {{ default 1 .Values.services.content.replicas }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "teddy.apis.content.name" . }}
+      app.kubernetes.io/name: {{ include "teddy.services.content.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "teddy.apis.content.name" . }}
+        app.kubernetes.io/name: {{ include "teddy.services.content.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
-      serviceAccountName: {{ include "teddy.apis.content.fullname" . }}
+      serviceAccountName: {{ include "teddy.services.content.fullname" . }}
       containers:
-        - name: {{ include "teddy.apis.content.name" . }}
-          image: "{{ .Values.apis.content.image.repository }}:{{ .Values.apis.content.image.tag }}"
-          imagePullPolicy: {{ .Values.apis.content.image.pullPolicy }}
+        - name: {{ include "teddy.services.content.name" . }}
+          image: "{{ .Values.services.content.image.repository }}:{{ .Values.services.content.image.tag }}"
+          imagePullPolicy: {{ .Values.services.content.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 8080

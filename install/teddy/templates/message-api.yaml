@@ -1,17 +1,17 @@
-{{- define "teddy.api.message.name" -}}
+{{- define "teddy.apis.message.name" -}}
   {{- printf "%s-%s" (include "teddy.name" .) "api-message" -}}
 {{- end -}}
 
-{{- define "teddy.api.message.fullname" -}}
+{{- define "teddy.apis.message.fullname" -}}
   {{- printf "%s-%s" (include "teddy.fullname" .) "api-message" -}}
 {{- end -}}
 
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ include "teddy.api.message.fullname" . }}
+  name: {{ include "teddy.apis.message.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "teddy.api.message.name" . }}
+    app.kubernetes.io/name: {{ include "teddy.apis.message.name" . }}
     helm.sh/chart: {{ include "teddy.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
@@ -19,49 +19,49 @@ metadata:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "teddy.api.message.fullname" . }}
+  name: {{ include "teddy.apis.message.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "teddy.api.message.name" . }}
+    app.kubernetes.io/name: {{ include "teddy.apis.message.name" . }}
     helm.sh/chart: {{ include "teddy.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
-  type: {{ default .Values.api.message.type "ClusterIP" }}
+  type: {{ default "ClusterIP" .Values.apis.message.type }}
     ports:
-    - port: {{ default .Values.api.message.port 8080 }}
+    - port: {{ default 8080 .Values.apis.message.port }}
       targetPort: http
       protocol: TCP
       name: http
     selector:
-      app.kubernetes.io/name: {{ include "teddy.api.message.name" . }}
+      app.kubernetes.io/name: {{ include "teddy.apis.message.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "teddy.api.message.fullname" . }}
+  name: {{ include "teddy.apis.message.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "teddy.api.message.name" . }}
+    app.kubernetes.io/name: {{ include "teddy.apis.message.name" . }}
     helm.sh/chart: {{ include "teddy.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
-  replicas: {{ default .Values.api.message.replicas 1 }}
+  replicas: {{ default 1 .Values.apis.message.replicas }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "teddy.api.message.name" . }}
+      app.kubernetes.io/name: {{ include "teddy.apis.message.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "teddy.api.message.name" . }}
+        app.kubernetes.io/name: {{ include "teddy.apis.message.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
-      serviceAccountName: {{ include "teddy.api.message.fullname" . }}
+      serviceAccountName: {{ include "teddy.apis.message.fullname" . }}
       containers:
-        - name: {{ include "teddy.api.message.name" . }}
-          image: "{{ .Values.api.message.image.repository }}:{{ .Values.api.message.image.tag }}"
-          imagePullPolicy: {{ .Values.api.message.image.pullPolicy }}
+        - name: {{ include "teddy.apis.message.name" . }}
+          image: "{{ .Values.apis.message.image.repository }}:{{ .Values.apis.message.image.tag }}"
+          imagePullPolicy: {{ .Values.apis.message.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 8080
