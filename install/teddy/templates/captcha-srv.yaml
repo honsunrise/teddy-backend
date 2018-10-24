@@ -22,6 +22,7 @@ metadata:
   name: {{ include "teddy.services.captcha.fullname" . }}
   labels:
     app.kubernetes.io/name: {{ include "teddy.services.captcha.name" . }}
+    app.kubernetes.io/version: {{ .Values.services.captcha.version }}
     helm.sh/chart: {{ include "teddy.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
@@ -42,6 +43,7 @@ metadata:
   name: {{ include "teddy.services.captcha.fullname" . }}
   labels:
     app.kubernetes.io/name: {{ include "teddy.services.captcha.name" . }}
+    app.kubernetes.io/version: {{ .Values.services.captcha.version }}
     helm.sh/chart: {{ include "teddy.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
@@ -75,16 +77,16 @@ spec:
               path: /
               port: http
           resources:
-{{ toYaml .Values.resources | indent 12 }}
-{{- with .Values.nodeSelector }}
+{{ toYaml .Values.services.captcha.resources | indent 12 }}
+{{- with .Values.services.captcha.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
 {{- end }}
-{{- with .Values.affinity }}
+{{- with .Values.services.captcha.affinity }}
       affinity:
 {{ toYaml . | indent 8 }}
 {{- end }}
-{{- with .Values.tolerations }}
+{{- with .Values.services.captcha.tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}
 {{- end }}

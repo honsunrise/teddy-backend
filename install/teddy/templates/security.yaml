@@ -1,3 +1,26 @@
+apiVersion: "authentication.istio.io/v1alpha1"
+kind: "Policy"
+metadata:
+  name: {{ .Release.Name | quote }}
+spec:
+  peers:
+    - mtls: {}
+---
+apiVersion: "authentication.istio.io/v1alpha1"
+kind: "Policy"
+metadata:
+  name: {{ .Release.Name | quote }}
+spec:
+  targets:
+    - name: "api-*"
+      ports:
+        - number: {{ default 8080 .Values.apis.content.port }}
+  origins:
+    - jwt:
+        issuer: {{ .Value.services.uaa.issuer }}
+        jwksUri: {{ .Value.services.uaa.jwksUri }}
+  principalBinding: USE_ORIGIN
+---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: RbacConfig
 metadata:

@@ -28,10 +28,10 @@ metadata:
 spec:
   type: {{ default "ClusterIP" .Values.apis.base.type }}
     ports:
-    - port: {{ default 8080 .Values.apis.base.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
+      - port: {{ default 8080 .Values.apis.base.port }}
+        targetPort: http
+        protocol: TCP
+        name: http
     selector:
       app.kubernetes.io/name: {{ include "teddy.apis.base.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}

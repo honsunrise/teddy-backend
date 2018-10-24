@@ -1,0 +1,161 @@
+
+{{- $fullName := include "teddy.fullname" . -}}
+{{- $ingressPath := .Values.ingress.path -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    app.kubernetes.io/name: {{ include "teddy.name" . }}
+    helm.sh/chart: {{ include "teddy.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- with .Values.ingress.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+{{- if .Values.ingress.tls }}
+  tls:
+  {{- range .Values.ingress.tls }}
+    - hosts:
+      {{- range .hosts }}
+        - {{ . | quote }}
+      {{- end }}
+      secretName: {{ .secretName }}
+  {{- end }}
+{{- end }}
+  rules:
+  {{- range .Values.ingress.hosts }}
+    - host: {{ . | quote }}
+      http:
+        paths:
+          - path: {{ $ingressPath }}
+            backend:
+              serviceName: {{ $fullName }}
+              servicePort: http
+  {{- end }}
+
+##################################################################################################
+# uaa service traffic
+##################################################################################################
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: uaa
+spec:
+  host: uaa
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+  subsets:
+    - name: uaa-v0.0.1
+      labels:
+        version: v0.0.1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: uaa
+spec:
+  hosts:
+  - uaa
+  http:
+  - route:
+    - destination:
+        host: uaa
+        subset: uaa-v0.0.1
+    timeout: 0.5s
+---
+##################################################################################################
+# message service traffic
+##################################################################################################
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: message
+spec:
+  host: message
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+  subsets:
+  - name: message-v0.0.1
+    labels:
+      version: v0.0.1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: message
+spec:
+  hosts:
+  - message
+  http:
+  - route:
+    - destination:
+        host: message
+        subset: message-v0.0.1
+    timeout: 0.5s
+---
+##################################################################################################
+# content service traffic
+##################################################################################################
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: content
+spec:
+  host: content
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+  subsets:
+  - name: content-v0.0.1
+    labels:
+      version: v0.0.1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: content
+spec:
+  hosts:
+  - content
+  http:
+  - route:
+    - destination:
+        host: content
+        subset: uaa-v0.0.1
+    timeout: 0.5s
+---
+##################################################################################################
+# captcha service traffic
+##################################################################################################
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: captcha
+spec:
+  host: captcha
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+  subsets:
+    - name: captcha-v0.0.1
+      labels:
+        app.kubernetes.io/version: v0.0.1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: captcha
+spec:
+  hosts:
+    - captcha
+  http:
+    - route:
+      - destination:
+          host: captcha
+          subset: captcha-v0.0.1
+        timeout: 0.5s
