@@ -6,12 +6,12 @@ apis:
   base:
     type: ClusterIP
     port: 8080
+    timeout: 0.5s
     deploys:
       - replicas: 1
         traffic:
           headers:
             user-agent: "reg"
-          weight: 50
         image:
           repository: nginx
           tag: stable
@@ -26,26 +26,106 @@ apis:
         nodeSelector: {}
         tolerations: []
         affinity: {}
+      - replicas: 1
+        traffic: {}
+        image:
+          repository: nginx
+          tag: v1
+          pullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        nodeSelector: {}
+        tolerations: []
+        affinity: {}
   uaa:
+    type: ClusterIP
+    port: 8080
+    timeout: 0.5s
     image:
       repository: nginx
       tag: stable
       pullPolicy: IfNotPresent
+    deploys:
+      - replicas: 1
+        traffic:
+          weight: 50
+        image:
+          repository: nginx
+          tag: v1
+          pullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        nodeSelector: {}
+        tolerations: []
+        affinity: {}
   content:
+    type: ClusterIP
+    port: 8080
+    timeout: 0.5s
     image:
       repository: nginx
       tag: stable
       pullPolicy: IfNotPresent
+    deploys:
+      - replicas: 1
+        traffic:
+          weight: 50
+        image:
+          repository: nginx
+          tag: v1
+          pullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        nodeSelector: {}
+        tolerations: []
+        affinity: {}
   message:
+    type: ClusterIP
+    port: 8080
+    timeout: 0.5s
     image:
       repository: nginx
       tag: stable
       pullPolicy: IfNotPresent
+    deploys:
+      - replicas: 1
+        traffic:
+          weight: 50
+        image:
+          repository: nginx
+          tag: v1
+          pullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        nodeSelector: {}
+        tolerations: []
+        affinity: {}
 
 services:
   captcha:
     type: ClusterIP
     port: 8080
+    timeout: 0.5s
     deploys:
       - replicas: 1
         traffic:
@@ -65,6 +145,9 @@ services:
         tolerations: []
         affinity: {}
   uaa:
+    type: ClusterIP
+    port: 8080
+    timeout: 0.5s
     issuer: "uaa.teddy.com"
     jwksUriEndpoint: "https://raw.githubusercontent.com/istio/istio/release-1.0/security/tools/jwt/samples/jwks.json"
     deploys:
@@ -86,15 +169,49 @@ services:
         tolerations: []
         affinity: {}
   content:
-    image:
-      repository: nginx
-      tag: stable
-      pullPolicy: IfNotPresent
+    type: ClusterIP
+    port: 8080
+    timeout: 0.5s
+    deploys:
+      - replicas: 1
+        traffic:
+          weight: 50
+        image:
+          repository: nginx
+          tag: stable
+          pullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        nodeSelector: {}
+        tolerations: []
+        affinity: {}
   message:
-    image:
-      repository: nginx
-      tag: stable
-      pullPolicy: IfNotPresent
+    type: ClusterIP
+    port: 8080
+    timeout: 0.5s
+    deploys:
+      - replicas: 1
+        traffic:
+          weight: 50
+        image:
+          repository: nginx
+          tag: stable
+          pullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        nodeSelector: {}
+        tolerations: []
+        affinity: {}
 
 gateway:
   use-let: "true"

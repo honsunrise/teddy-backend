@@ -1,71 +1,273 @@
-
-{{- $fullName := include "teddy.fullname" . -}}
-{{- $ingressPath := .Values.ingress.path -}}
-apiVersion: extensions/v1beta1
-kind: Ingress
+{{- $root := . -}}
+##################################################################################################
+# base api traffic
+##################################################################################################
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
 metadata:
-  name: {{ $fullName }}
-  labels:
-    app.kubernetes.io/name: {{ include "teddy.name" . }}
-    helm.sh/chart: {{ include "teddy.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- with .Values.ingress.annotations }}
-  annotations:
-{{ toYaml . | indent 4 }}
-{{- end }}
+  name: {{ include "teddy.apis.base.name" . }}
 spec:
-{{- if .Values.ingress.tls }}
-  tls:
-  {{- range .Values.ingress.tls }}
-    - hosts:
-      {{- range .hosts }}
-        - {{ . | quote }}
-      {{- end }}
-      secretName: {{ .secretName }}
-  {{- end }}
+  host: {{ include "teddy.apis.base.name" . }}
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+  subsets:
+{{- range .Values.apis.base.deploys }}
+    - name: {{ .image.tag }}
+      labels:
+        app.kubernetes.io/version: {{ .image.tag }}
 {{- end }}
-  rules:
-  {{- range .Values.ingress.hosts }}
-    - host: {{ . | quote }}
-      http:
-        paths:
-          - path: {{ $ingressPath }}
-            backend:
-              serviceName: {{ $fullName }}
-              servicePort: http
-  {{- end }}
-
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ include "teddy.apis.base.name" . }}
+spec:
+  hosts:
+    - {{ include "teddy.apis.base.name" . }}
+  http:
+{{- range .Values.apis.base.deploys }}
+    {{- if and .traffic.headers (not .traffic.weight) }}
+    - match:
+        - headers:
+          {{ toYaml .traffic.headers | indent 5 -}}
+      route:
+        - destination:
+          host: {{ include "teddy.apis.base.name" $root }}
+    {{- end }}
+{{- end }}
+{{- range .Values.apis.base.deploys }}
+    {{- if and (not .traffic.headers) .traffic.weight }}
+    - route:
+      - destination:
+          host: {{ include "teddy.apis.base.name" $root }}
+          subset: {{ .image.tag }}
+        weight: {{ .traffic.weight }}
+    {{- end }}
+{{- end }}
+{{- range .Values.apis.base.deploys }}
+    {{- if and (not .traffic.headers) (not .traffic.weight) }}
+    - route:
+      - destination:
+          host: {{ include "teddy.apis.base.name" $root }}
+          subset: {{ .image.tag }}
+    {{- end }}
+{{- end }}
+    timeout: {{ .Values.apis.base.timeout }}
+---
+##################################################################################################
+# uaa api traffic
+##################################################################################################
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: {{ include "teddy.apis.uaa.name" . }}
+spec:
+  host: {{ include "teddy.apis.uaa.name" . }}
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+  subsets:
+{{- range .Values.apis.uaa.deploys }}
+    - name: {{ .image.tag }}
+      labels:
+        app.kubernetes.io/version: {{ .image.tag }}
+{{- end }}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ include "teddy.apis.uaa.name" . }}
+spec:
+  hosts:
+    - {{ include "teddy.apis.uaa.name" . }}
+  http:
+{{- range .Values.apis.uaa.deploys }}
+    {{- if and .traffic.headers (not .traffic.weight) }}
+    - match:
+        - headers:
+          {{ toYaml .traffic.headers | indent 5 -}}
+      route:
+        - destination:
+          host: {{ include "teddy.apis.uaa.name" $root }}
+    {{- end }}
+{{- end }}
+{{- range .Values.apis.uaa.deploys }}
+    {{- if and (not .traffic.headers) .traffic.weight }}
+    - route:
+      - destination:
+          host: {{ include "teddy.apis.uaa.name" $root }}
+          subset: {{ .image.tag }}
+        weight: {{ .traffic.weight }}
+    {{- end }}
+{{- end }}
+{{- range .Values.apis.uaa.deploys }}
+    {{- if and (not .traffic.headers) (not .traffic.weight) }}
+    - route:
+      - destination:
+          host: {{ include "teddy.apis.uaa.name" $root }}
+          subset: {{ .image.tag }}
+    {{- end }}
+{{- end }}
+    timeout: {{ .Values.apis.uaa.timeout }}
+---
+##################################################################################################
+# content api traffic
+##################################################################################################
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: {{ include "teddy.apis.content.name" . }}
+spec:
+  host: {{ include "teddy.apis.content.name" . }}
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+  subsets:
+{{- range .Values.apis.content.deploys }}
+    - name: {{ .image.tag }}
+      labels:
+        app.kubernetes.io/version: {{ .image.tag }}
+{{- end }}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ include "teddy.apis.content.name" . }}
+spec:
+  hosts:
+    - {{ include "teddy.apis.content.name" . }}
+  http:
+{{- range .Values.apis.content.deploys }}
+    {{- if and .traffic.headers (not .traffic.weight) }}
+    - match:
+        - headers:
+          {{ toYaml .traffic.headers | indent 5 -}}
+      route:
+        - destination:
+          host: {{ include "teddy.apis.content.name" $root }}
+    {{- end }}
+{{- end }}
+{{- range .Values.apis.content.deploys }}
+    {{- if and (not .traffic.headers) .traffic.weight }}
+    - route:
+      - destination:
+          host: {{ include "teddy.apis.content.name" $root }}
+          subset: {{ .image.tag }}
+        weight: {{ .traffic.weight }}
+    {{- end }}
+{{- end }}
+{{- range .Values.apis.content.deploys }}
+    {{- if and (not .traffic.headers) (not .traffic.weight) }}
+    - route:
+      - destination:
+          host: {{ include "teddy.apis.content.name" $root }}
+          subset: {{ .image.tag }}
+    {{- end }}
+{{- end }}
+    timeout: {{ .Values.apis.content.timeout }}
+---
+##################################################################################################
+# message api traffic
+##################################################################################################
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: {{ include "teddy.apis.message.name" . }}
+spec:
+  host: {{ include "teddy.apis.message.name" . }}
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+  subsets:
+{{- range .Values.apis.message.deploys }}
+    - name: {{ .image.tag }}
+      labels:
+        app.kubernetes.io/version: {{ .image.tag }}
+{{- end }}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ include "teddy.apis.message.name" . }}
+spec:
+  hosts:
+    - {{ include "teddy.apis.message.name" . }}
+  http:
+{{- range .Values.apis.message.deploys }}
+    {{- if and .traffic.headers (not .traffic.weight) }}
+    - match:
+        - headers:
+          {{ toYaml .traffic.headers | indent 5 -}}
+      route:
+        - destination:
+          host: {{ include "teddy.apis.message.name" $root }}
+    {{- end }}
+{{- end }}
+{{- range .Values.apis.message.deploys }}
+    {{- if and (not .traffic.headers) .traffic.weight }}
+    - route:
+      - destination:
+          host: {{ include "teddy.apis.message.name" $root }}
+          subset: {{ .image.tag }}
+        weight: {{ .traffic.weight }}
+    {{- end }}
+{{- end }}
+{{- range .Values.apis.message.deploys }}
+    {{- if and (not .traffic.headers) (not .traffic.weight) }}
+    - route:
+      - destination:
+          host: {{ include "teddy.apis.message.name" $root }}
+          subset: {{ .image.tag }}
+    {{- end }}
+{{- end }}
+    timeout: {{ .Values.apis.message.timeout }}
+---
 ##################################################################################################
 # uaa service traffic
 ##################################################################################################
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
-  name: uaa
+  name: {{ include "teddy.services.uaa.name" . }}
 spec:
-  host: uaa
+  host: {{ include "teddy.services.uaa.name" . }}
   trafficPolicy:
     loadBalancer:
       simple: ROUND_ROBIN
   subsets:
-    - name: uaa-v0.0.1
+{{- range .Values.services.uaa.deploys }}
+    - name: {{ .image.tag }}
       labels:
-        version: v0.0.1
+        app.kubernetes.io/version: {{ .image.tag }}
+{{- end }}
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: uaa
+  name: {{ include "teddy.services.uaa.name" . }}
 spec:
   hosts:
-  - uaa
+    - {{ include "teddy.services.uaa.name" . }}
   http:
-  - route:
-    - destination:
-        host: uaa
-        subset: uaa-v0.0.1
-    timeout: 0.5s
+{{- range .Values.services.uaa.deploys }}
+    {{- if .traffic.weight }}
+    - route:
+      - destination:
+          host: {{ include "teddy.services.uaa.name" $root }}
+          subset: {{ .image.tag }}
+        weight: {{ .traffic.weight }}
+    {{- end }}
+{{- end }}
+{{- range .Values.services.uaa.deploys }}
+    {{- if not .traffic.weight }}
+    - route:
+      - destination:
+          host: {{ include "teddy.services.uaa.name" $root }}
+          subset: {{ .image.tag }}
+    {{- end }}
+{{- end }}
+    timeout: {{ .Values.services.uaa.timeout }}
 ---
 ##################################################################################################
 # message service traffic
@@ -73,30 +275,45 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
-  name: message
+  name: {{ include "teddy.services.message.name" . }}
 spec:
-  host: message
+  host: {{ include "teddy.services.message.name" . }}
   trafficPolicy:
     loadBalancer:
       simple: ROUND_ROBIN
   subsets:
-  - name: message-v0.0.1
-    labels:
-      version: v0.0.1
+{{- range .Values.services.message.deploys }}
+    - name: {{ .image.tag }}
+      labels:
+        app.kubernetes.io/version: {{ .image.tag }}
+{{- end }}
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: message
+  name: {{ include "teddy.services.message.name" . }}
 spec:
   hosts:
-  - message
+    - {{ include "teddy.services.message.name" . }}
   http:
-  - route:
-    - destination:
-        host: message
-        subset: message-v0.0.1
-    timeout: 0.5s
+{{- range .Values.services.message.deploys }}
+    {{- if .traffic.weight }}
+    - route:
+      - destination:
+          host: {{ include "teddy.services.message.name" $root }}
+          subset: {{ .image.tag }}
+        weight: {{ .traffic.weight }}
+    {{- end }}
+{{- end }}
+{{- range .Values.services.message.deploys }}
+    {{- if not .traffic.weight }}
+    - route:
+      - destination:
+          host: {{ include "teddy.services.message.name" $root }}
+          subset: {{ .image.tag }}
+    {{- end }}
+{{- end }}
+    timeout: {{ .Values.services.message.timeout }}
 ---
 ##################################################################################################
 # content service traffic
@@ -104,30 +321,45 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
-  name: content
+  name: {{ include "teddy.services.content.name" . }}
 spec:
-  host: content
+  host: {{ include "teddy.services.content.name" . }}
   trafficPolicy:
     loadBalancer:
       simple: ROUND_ROBIN
   subsets:
-  - name: content-v0.0.1
-    labels:
-      version: v0.0.1
+{{- range .Values.services.content.deploys }}
+    - name: {{ .image.tag }}
+      labels:
+        app.kubernetes.io/version: {{ .image.tag }}
+{{- end }}
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: content
+  name: {{ include "teddy.services.content.name" . }}
 spec:
   hosts:
-  - content
+    - {{ include "teddy.services.content.name" . }}
   http:
-  - route:
-    - destination:
-        host: content
-        subset: uaa-v0.0.1
-    timeout: 0.5s
+{{- range .Values.services.content.deploys }}
+    {{- if .traffic.weight }}
+    - route:
+      - destination:
+          host: {{ include "teddy.services.content.name" $root }}
+          subset: {{ .image.tag }}
+        weight: {{ .traffic.weight }}
+    {{- end }}
+{{- end }}
+{{- range .Values.services.content.deploys }}
+    {{- if not .traffic.weight }}
+    - route:
+      - destination:
+          host: {{ include "teddy.services.content.name" $root }}
+          subset: {{ .image.tag }}
+    {{- end }}
+{{- end }}
+    timeout: {{ .Values.services.content.timeout }}
 ---
 ##################################################################################################
 # captcha service traffic
@@ -135,27 +367,43 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
-  name: captcha
+  name: {{ include "teddy.services.captcha.name" . }}
 spec:
-  host: captcha
+  host: {{ include "teddy.services.captcha.name" . }}
   trafficPolicy:
     loadBalancer:
       simple: ROUND_ROBIN
   subsets:
-    - name: captcha-v0.0.1
+{{- range .Values.services.captcha.deploys }}
+    - name: {{ .image.tag }}
       labels:
-        app.kubernetes.io/version: v0.0.1
+        app.kubernetes.io/version: {{ .image.tag }}
+{{- end }}
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: captcha
+  name: {{ include "teddy.services.captcha.name" . }}
 spec:
   hosts:
-    - captcha
+    - {{ include "teddy.services.captcha.name" . }}
   http:
+{{- range .Values.services.captcha.deploys }}
+    {{- if .traffic.weight }}
     - route:
       - destination:
-          host: captcha
-          subset: captcha-v0.0.1
-        timeout: 0.5s
+          host: {{ include "teddy.services.captcha.name" $root }}
+          subset: {{ .image.tag }}
+        weight: {{ .traffic.weight }}
+    {{- end }}
+{{- end }}
+{{- range .Values.services.captcha.deploys }}
+    {{- if not .traffic.weight }}
+    - route:
+      - destination:
+          host: {{ include "teddy.services.captcha.name" $root }}
+          subset: {{ .image.tag }}
+    {{- end }}
+{{- end }}
+    timeout: {{ .Values.services.captcha.timeout }}
+---
