@@ -18,7 +18,7 @@ spec:
   origins:
     - jwt:
         issuer: {{ .Values.services.uaa.issuer }}
-        jwksUri: {{ .Values.services.uaa.jwksUriEndpoint }}
+        jwksUri: {{ print "http://%s%s" (include "teddy.apis.uaa.name" .) .Values.services.uaa.jwksUriEndpoint }}
   principalBinding: USE_ORIGIN
 ---
 apiVersion: "rbac.istio.io/v1alpha1"

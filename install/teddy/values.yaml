@@ -149,7 +149,7 @@ services:
     port: 8080
     timeout: 0.5s
     issuer: "uaa.teddy.com"
-    jwksUriEndpoint: "https://raw.githubusercontent.com/istio/istio/release-1.0/security/tools/jwt/samples/jwks.json"
+    jwksUriEndpoint: "/istio/istio/release-1.0/security/tools/jwt/samples/jwks.json"
     deploys:
       - replicas: 1
         traffic:
