@@ -1,3 +1,38 @@
+{{- define "router" -}}
+- match:
+    - uri:
+      prefix: /uaa
+  route:
+    - destination:
+        port:
+          number: {{ .Values.apis.uaa.port }}
+        host: {{ include "teddy.apis.uaa.name" .}}
+- match:
+    - uri:
+      prefix: /base
+  route:
+    - destination:
+        port:
+          number: {{ .Values.apis.base.port }}
+        host: {{ include "teddy.apis.base.name" .}}
+- match:
+    - uri:
+      prefix: /content
+  route:
+    - destination:
+        port:
+          number: {{ .Values.apis.content.port }}
+        host: {{ include "teddy.apis.content.name" .}}
+- match:
+    - uri:
+      prefix: /message
+  route:
+    - destination:
+        port:
+          number: {{ .Values.apis.message.port }}
+        host: {{ include "teddy.apis.message.name" .}}
+{{- end -}}
+
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
@@ -6,12 +41,24 @@ spec:
   selector:
     istio: ingressgateway # use Istio default gateway implementation
   servers:
-  - port:
-      number: 80
-      name: http
-      protocol: HTTP
-    hosts:
-    - "todo.todo"
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - {{ .Values.gateway.host }}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: default
+spec:
+  hosts:
+  - {{ .Values.gateway.host }}
+  gateways:
+  - default-http-gateway
+  http:
+{{ include "router" . | indent 4 }}
 ---
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: ClusterIssuer
@@ -42,13 +89,13 @@ spec:
     kind: ClusterIssuer
   commonName: bookinfo.example.com
   dnsNames:
-  - bookinfo.example.com
+    - bookinfo.example.com
   acme:
     config:
-    - http01:
-        ingressClass: none
-      domains:
-      - bookinfo.example.com
+      - http01:
+          ingressClass: none
+        domains:
+          - bookinfo.example.com
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
@@ -58,16 +105,16 @@ spec:
   selector:
     istio: ingressgateway # use istio default ingress gateway
   servers:
-  - port:
-      number: 443
-      name: https
-      protocol: HTTPS
-    tls:
-      mode: SIMPLE
-      serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
-      privateKey: /etc/istio/ingressgateway-certs/tls.key
-    hosts:
-    - "todo.todo"
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      tls:
+        mode: SIMPLE
+        serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+        privateKey: /etc/istio/ingressgateway-certs/tls.key
+      hosts:
+        - {{ .Values.gateway.host }}
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -75,39 +122,8 @@ metadata:
   name: default
 spec:
   hosts:
-  - "todo.todo"
+    - {{ .Values.gateway.host }}
   gateways:
-  - default-https-gateway
+    - default-https-gateway
   http:
-  - match:
-    - uri:
-        prefix: /uaa
-    route:
-    - destination:
-        port:
-          number: 8080
-        host: api-uaa
-  - match:
-    - uri:
-        prefix: /base
-    route:
-    - destination:
-        port:
-          number: 8080
-        host: api-base
-  - match:
-    - uri:
-        prefix: /content
-    route:
-    - destination:
-        port:
-          number: 8080
-        host: api-content
-  - match:
-    - uri:
-        prefix: /message
-    route:
-    - destination:
-        port:
-          number: 8080
-        host: api-message
+{{ include "router" . | indent 4 }}
