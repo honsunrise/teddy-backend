@@ -16,10 +16,8 @@ type Base struct {
 	middleware *gin_jwt.JwtMiddleware
 }
 
-func NewBaseHandler(middleware *gin_jwt.JwtMiddleware) (*Base, error) {
-	return &Base{
-		middleware: middleware,
-	}, nil
+func NewBaseHandler() (*Base, error) {
+	return &Base{}, nil
 }
 
 func (h *Base) Handler(root gin.IRoutes) {

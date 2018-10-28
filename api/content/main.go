@@ -10,6 +10,8 @@ import (
 	"github.com/zhsyourai/teddy-backend/api/gin-jwt"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"log"
+	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -23,39 +25,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Load config
-	conf := config.GetConfig()
 
-	// Load Jwt PublicKey
-	block, _ := pem.Decode([]byte(conf.JWTPkcs8))
-	parseResult, err := x509.ParsePKCS8PrivateKey(block.Bytes)
-	if err != nil {
-		log.Fatal(err)
-	}
-	key := parseResult.(*rsa.PrivateKey)
-
-	// Create service
-	service := web.NewService(
-		web.Name("go.micro.api.content"),
-		web.Version("latest"),
-	)
-
-	// Initialise service
-	service.Init()
-
-	jwtMiddleware, err := gin_jwt.NewGinJwtMiddleware(gin_jwt.MiddlewareConfig{
-		Realm:            "com.teddy",
-		SigningAlgorithm: "RS512",
-		KeyFunc: func() interface{} {
-			return &key.PublicKey
-		},
-	})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	content, err := handler.NewContentHandler(jwtMiddleware)
+	content, err := handler.NewContentHandler()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -65,11 +36,16 @@ func main() {
 	router.Use(client.ContentNew())
 	content.Handler(router)
 
-	// Register Handler
-	service.Handle("/", router)
+	srv := http.Server{
+		Addr:           ":8080",
+		Handler:        router,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
 
-	// Run server
-	if err := service.Run(); err != nil {
+	srv.ListenAndServe()
+	if err != nil {
 		log.Fatal(err)
 	}
 }

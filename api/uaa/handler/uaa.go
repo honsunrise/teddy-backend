@@ -1,42 +1,32 @@
 package handler
 
 import (
-	"github.com/casbin/casbin"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/api/gin-jwt"
 	"github.com/zhsyourai/teddy-backend/api/uaa/client"
 	capProto "github.com/zhsyourai/teddy-backend/captcha/proto"
 	"github.com/zhsyourai/teddy-backend/common/errors"
 	msgProto "github.com/zhsyourai/teddy-backend/message/proto"
 	uaaProto "github.com/zhsyourai/teddy-backend/uaa/proto"
-	"gopkg.in/dgrijalva/jwt-go.v3"
 	"net/http"
 	"time"
 )
 
 type Uaa struct {
-	enforcer   *casbin.Enforcer
-	middleware *gin_jwt.JwtMiddleware
-	generator  *gin_jwt.JwtGenerator
 }
 
-func NewUaaHandler(enforcer *casbin.Enforcer, middleware *gin_jwt.JwtMiddleware,
-	generator *gin_jwt.JwtGenerator) (*Uaa, error) {
-	instance := &Uaa{
-		enforcer:   enforcer,
-		middleware: middleware,
-		generator:  generator,
-	}
+func NewUaaHandler() (*Uaa, error) {
+	instance := &Uaa{}
 	return instance, nil
 }
 
 func (h *Uaa) Handler(root gin.IRoutes) {
 	root.POST("/uaa/register", h.Register)
 	root.POST("/uaa/login", h.Login)
-	root.Any("/uaa/logout", h.middleware.Handler, h.Logout)
-	root.POST("/uaa/changePassword", h.middleware.Handler, h.ChangePassword)
+	root.Any("/uaa/logout", h.Logout)
+	root.POST("/uaa/changePassword", h.ChangePassword)
 	root.POST("/uaa/sendEmailCaptcha", h.SendEmailCaptcha)
 	root.POST("/uaa/resetPassword", h.ResetPassword)
 }
