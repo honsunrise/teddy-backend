@@ -1,4 +1,4 @@
-package content
+package server
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-func NewContentHandler(repo repositories.InfoRepository) (proto.ContentHandler, error) {
+func NewContentServer(repo repositories.InfoRepository) (proto.ContentServer, error) {
 	instance := &contentHandler{
 		repo:    repo,
 		mailCh:  make(chan *gomail.Message),

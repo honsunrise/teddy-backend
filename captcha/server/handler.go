@@ -1,4 +1,4 @@
-package captcha
+package server
 
 import (
 	"bytes"
@@ -15,7 +15,7 @@ const (
 	Expiration = 10 * time.Minute
 )
 
-func NewCaptchaHandler(repo repositories.KeyValuePairRepository) (proto.CaptchaHandler, error) {
+func NewCaptchaServer(repo repositories.KeyValuePairRepository) (proto.CaptchaServer, error) {
 	instance := &captchaHandler{
 		repo: repo,
 	}

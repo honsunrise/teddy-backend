@@ -1,4 +1,4 @@
-package message
+package server
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-func NewMessageHandler(repo repositories.InBoxRepository) (proto.MessageHandler, error) {
+func NewMessageServer(repo repositories.InBoxRepository) (proto.MessageServer, error) {
 	instance := &notifyHandler{
 		repo:    repo,
 		mailCh:  make(chan *gomail.Message),

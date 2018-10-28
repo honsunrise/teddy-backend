@@ -1,17 +1,22 @@
 package main
 
 import (
+	"fmt"
+	log "github.com/sirupsen/logrus"
+	"github.com/zhsyourai/teddy-backend/common/utils"
+	"google.golang.org/grpc"
+	"net"
+
 	"context"
 	"flag"
-	"github.com/micro/go-micro"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/captcha/handler/captcha"
 	"github.com/zhsyourai/teddy-backend/captcha/proto"
 	"github.com/zhsyourai/teddy-backend/captcha/repositories"
+	"github.com/zhsyourai/teddy-backend/captcha/server"
 	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/common/utils"
 )
+
+const PORT = 9999
 
 func main() {
 	flag.Parse()
@@ -20,36 +25,37 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// New Mongodb client
+	// Load config
 	conf := config.GetConfig()
-	mongodbClient, err := mongo.Connect(context.Background(), utils.BuildMongodbURI(conf.Databases["mongodb"]))
+	mongodbUri := utils.BuildMongodbURI(conf.Databases["mongodb"])
+
+	// New Mongodb client
+	mongodbClient, err := mongo.Connect(context.Background(), mongodbUri)
 	if err != nil {
 		log.Fatal(err)
 	}
 	// New Repository
-	contentRepo, err := repositories.NewKeyValuePairRepository(mongodbClient)
+	kvRepo, err := repositories.NewKeyValuePairRepository(mongodbClient)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// New Service
-	service := micro.NewService(
-		micro.Name("com.teddy.srv.captcha"),
-		micro.Version("latest"),
-	)
-
-	// Initialise service
-	service.Init()
 	// New Handler
-	contentHandler, err := captcha.NewCaptchaHandler(contentRepo)
+	captchaSrv, err := server.NewCaptchaServer(kvRepo)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Register Handler
-	proto.RegisterCaptchaHandler(service.Server(), contentHandler)
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", PORT))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	proto.RegisterCaptchaServer(grpcServer, captchaSrv)
 
 	// Run service
-	if err := service.Run(); err != nil {
+	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatal(err)
 	}
 }

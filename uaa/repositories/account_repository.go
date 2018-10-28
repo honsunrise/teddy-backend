@@ -8,7 +8,7 @@ import (
 	"github.com/zhsyourai/teddy-backend/common/models"
 )
 
-var ErrUpdateAccount = errors.New("account update error")
+var ErrUpdateAccount = errors.New("uaa update error")
 
 type AccountRepository interface {
 	InsertAccount(account *models.Account) error

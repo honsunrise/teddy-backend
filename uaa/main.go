@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/micro/go-micro"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/utils"
 	"github.com/zhsyourai/teddy-backend/uaa/components"
@@ -13,9 +12,9 @@ import (
 	"flag"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/zhsyourai/teddy-backend/common/config"
-	uaa "github.com/zhsyourai/teddy-backend/uaa/proto"
+	"github.com/zhsyourai/teddy-backend/uaa/proto"
 	"github.com/zhsyourai/teddy-backend/uaa/repositories"
-	"github.com/zhsyourai/teddy-backend/uaa/server/account"
+	"github.com/zhsyourai/teddy-backend/uaa/server"
 )
 
 const PORT = 9999
@@ -41,21 +40,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// New Service
-	service := micro.NewService(
-		micro.Name("com.teddy.srv.uaa"),
-		micro.Version("latest"),
-	)
 
-	// Initialise service
-	service.Init()
 	// New components
 	uidGenerator, err := components.NewUidGenerator(accountRepo)
 	if err != nil {
 		log.Fatal(err)
 	}
 	// New Handler
-	accountHandler, err := account.NewAccountServer(accountRepo, uidGenerator)
+	accountSrv, err := server.NewAccountServer(accountRepo, uidGenerator)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,7 +58,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	uaa.RegisterUAAServer(grpcServer, accountHandler)
+	proto.RegisterUAAServer(grpcServer, accountSrv)
 
 	// Run service
 	if err := grpcServer.Serve(lis); err != nil {

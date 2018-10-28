@@ -1,4 +1,4 @@
-package message
+package server
 
 import "github.com/zhsyourai/teddy-backend/message/proto"
 

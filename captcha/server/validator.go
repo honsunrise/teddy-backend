@@ -1,4 +1,4 @@
-package captcha
+package server
 
 import "github.com/zhsyourai/teddy-backend/captcha/proto"
 

@@ -1,17 +1,24 @@
 package main
 
 import (
+	"fmt"
+	"github.com/micro/go-micro"
+	log "github.com/sirupsen/logrus"
+	"github.com/zhsyourai/teddy-backend/common/utils"
+	"github.com/zhsyourai/teddy-backend/content/components"
+	"github.com/zhsyourai/teddy-backend/content/server"
+	"google.golang.org/grpc"
+	"net"
+
 	"context"
 	"flag"
-	"github.com/micro/go-micro"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/common/utils"
-	"github.com/zhsyourai/teddy-backend/content/handler/content"
 	"github.com/zhsyourai/teddy-backend/content/proto"
 	"github.com/zhsyourai/teddy-backend/content/repositories"
 )
+
+const PORT = 9999
 
 func main() {
 	flag.Parse()
@@ -20,36 +27,44 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// New Mongodb client
+	// Load config
 	conf := config.GetConfig()
-	mongodbClient, err := mongo.Connect(context.Background(), utils.BuildMongodbURI(conf.Databases["mongodb"]))
+	mongodbUri := utils.BuildMongodbURI(conf.Databases["mongodb"])
+
+	// New Mongodb client
+	mongodbClient, err := mongo.Connect(context.Background(), mongodbUri)
 	if err != nil {
 		log.Fatal(err)
 	}
 	// New Repository
-	contentRepo, err := repositories.NewInfoRepository(mongodbClient)
+	accountRepo, err := repositories.NewInfoRepository(mongodbClient)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	// New Service
 	service := micro.NewService(
-		micro.Name("com.teddy.srv.content"),
+		micro.Name("com.teddy.srv.uaa"),
 		micro.Version("latest"),
 	)
 
 	// Initialise service
 	service.Init()
 	// New Handler
-	contentHandler, err := content.NewContentHandler(contentRepo)
+	accountHandler, err := server.NewContentServer(accountRepo)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Register Handler
-	proto.RegisterContentHandler(service.Server(), contentHandler)
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", PORT))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	proto.RegisterContentServer(grpcServer, accountHandler)
 
 	// Run service
-	if err := service.Run(); err != nil {
+	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -1,17 +1,22 @@
 package main
 
 import (
+	"fmt"
+	log "github.com/sirupsen/logrus"
+	"github.com/zhsyourai/teddy-backend/common/utils"
+	"google.golang.org/grpc"
+	"net"
+
 	"context"
 	"flag"
-	"github.com/micro/go-micro"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/common/utils"
-	"github.com/zhsyourai/teddy-backend/message/handler/message"
 	"github.com/zhsyourai/teddy-backend/message/proto"
 	"github.com/zhsyourai/teddy-backend/message/repositories"
+	"github.com/zhsyourai/teddy-backend/message/server"
 )
+
+const PORT = 9999
 
 func main() {
 	flag.Parse()
@@ -20,9 +25,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// New Mongodb client
+	// Load config
 	conf := config.GetConfig()
-	mongodbClient, err := mongo.Connect(context.Background(), utils.BuildMongodbURI(conf.Databases["mongodb"]))
+	mongodbUri := utils.BuildMongodbURI(conf.Databases["mongodb"])
+
+	// New Mongodb client
+	mongodbClient, err := mongo.Connect(context.Background(), mongodbUri)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,24 +40,22 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// New Service
-	service := micro.NewService(
-		micro.Name("com.teddy.srv.notify"),
-		micro.Version("latest"),
-	)
-
-	// Initialise service
-	service.Init()
 	// New Handler
-	messageHandler, err := message.NewMessageHandler(inboxRepo)
+	messageSrv, err := server.NewMessageServer(inboxRepo)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Register Handler
-	proto.RegisterMessageHandler(service.Server(), messageHandler)
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", PORT))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	proto.RegisterMessageServer(grpcServer, messageSrv)
 
 	// Run service
-	if err := service.Run(); err != nil {
+	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatal(err)
 	}
 }

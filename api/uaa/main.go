@@ -79,7 +79,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Create RESTful handler (using Gin)
+	// Create RESTful server (using Gin)
 	router := gin.Default()
 	router.Use(client.MessageNew())
 	router.Use(client.UaaNew())
