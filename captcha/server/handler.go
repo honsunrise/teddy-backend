@@ -34,48 +34,52 @@ func (h *captchaHandler) cleanTack() {
 	}
 }
 
-func (h *captchaHandler) GetCaptchaId(ctx context.Context, req *proto.GetCaptchaIdReq, rsp *proto.GetCaptchaIdResp) error {
+func (h *captchaHandler) GetCaptchaId(ctx context.Context, req *proto.GetCaptchaIdReq) (*proto.GetCaptchaIdResp, error) {
+	var resp proto.GetCaptchaIdResp
 	if err := validateGetCaptchaIdReq(req); err != nil {
-		return err
+		return nil, err
 	}
 	id := captcha.NewLen(int(req.Len))
-	rsp.Id = id
-	return nil
+	resp.Id = id
+	return &resp, nil
 }
 
-func (h *captchaHandler) GetImageData(ctx context.Context, req *proto.GetImageDataReq, rsp *proto.GetImageDataResp) error {
+func (h *captchaHandler) GetImageData(ctx context.Context, req *proto.GetImageDataReq) (*proto.GetImageDataResp, error) {
+	var resp proto.GetImageDataResp
 	if err := validateGetImageDataReq(req); err != nil {
-		return err
+		return nil, err
 	}
 
 	imgBuf := &bytes.Buffer{}
 
 	if err := captcha.WriteImage(imgBuf, req.Id, int(req.Width), int(req.Height)); err != nil {
-		return err
+		return nil, err
 	}
-	rsp.Image = imgBuf.Bytes()
+	resp.Image = imgBuf.Bytes()
 
-	return nil
+	return &resp, nil
 }
 
-func (h *captchaHandler) GetVoiceData(ctx context.Context, req *proto.GetVoiceDataReq, rsp *proto.GetVoiceDataResp) error {
+func (h *captchaHandler) GetVoiceData(ctx context.Context, req *proto.GetVoiceDataReq) (*proto.GetVoiceDataResp, error) {
+	var resp proto.GetVoiceDataResp
 	if err := validateGetVoiceDataReq(req); err != nil {
-		return err
+		return nil, err
 	}
 
 	voiceBuf := &bytes.Buffer{}
 
 	if err := captcha.WriteAudio(voiceBuf, req.Id, req.Lang); err != nil {
-		return err
+		return nil, err
 	}
-	rsp.VoiceWav = voiceBuf.Bytes()
+	resp.VoiceWav = voiceBuf.Bytes()
 
-	return nil
+	return &resp, nil
 }
 
-func (h *captchaHandler) GetRandomById(ctx context.Context, req *proto.GetRandomReq, rsp *proto.GetRandomResp) error {
+func (h *captchaHandler) GetRandomById(ctx context.Context, req *proto.GetRandomReq) (*proto.GetRandomResp, error) {
+	var resp proto.GetRandomResp
 	if err := validateGetRandomReq(req); err != nil {
-		return err
+		return nil, err
 	}
 
 	s := ""
@@ -89,29 +93,32 @@ func (h *captchaHandler) GetRandomById(ctx context.Context, req *proto.GetRandom
 		ExpireTime: time.Now().Add(Expiration),
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	resp.Code = s
+
+	return &resp, nil
 }
 
-func (h *captchaHandler) Verify(ctx context.Context, req *proto.VerifyReq, rsp *proto.VerifyResp) error {
+func (h *captchaHandler) Verify(ctx context.Context, req *proto.VerifyReq) (*proto.VerifyResp, error) {
+	var resp proto.VerifyResp
 	if err := validateVerifyReq(req); err != nil {
-		return err
+		return nil, err
 	}
-	rsp.Correct = false
+	resp.Correct = false
 
 	if req.Type == proto.CaptchaType_RANDOM_BY_ID {
 		now := time.Now()
 		_, err := h.repo.FindKeyValuePairByKeyAndValueAndExpire(req.Id, req.Code, now)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		rsp.Correct = true
+		resp.Correct = true
 	} else if req.Type == proto.CaptchaType_IMAGE || req.Type == proto.CaptchaType_VOICE {
 		if captcha.VerifyString(req.Id, req.Code) {
-			rsp.Correct = true
+			resp.Correct = true
 		}
 	}
 
-	return nil
+	return &resp, nil
 }

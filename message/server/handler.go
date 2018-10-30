@@ -70,9 +70,11 @@ func (h *notifyHandler) startMailSender() {
 	}()
 }
 
-func (h *notifyHandler) SendEmail(ctx context.Context, req *proto.SendEmailReq, resp *empty.Empty) error {
+func (h *notifyHandler) SendEmail(ctx context.Context, req *proto.SendEmailReq) (*empty.Empty, error) {
+	var resp empty.Empty
+
 	if err := validateSendEmailReq(req); err != nil {
-		return err
+		return nil, err
 	}
 
 	m := gomail.NewMessage()
@@ -83,22 +85,26 @@ func (h *notifyHandler) SendEmail(ctx context.Context, req *proto.SendEmailReq, 
 
 	select {
 	case err := <-h.mailErr:
-		return err
+		return nil, err
 	case h.mailCh <- m:
-		return nil
+		return &resp, nil
 	}
 }
 
-func (h *notifyHandler) SendSMS(ctx context.Context, req *proto.SendSMSReq, resp *empty.Empty) error {
+func (h *notifyHandler) SendSMS(ctx context.Context, req *proto.SendSMSReq) (*empty.Empty, error) {
+	var resp empty.Empty
+
 	if err := validateSendSMSReq(req); err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &resp, nil
 }
 
-func (h *notifyHandler) SendInBox(ctx context.Context, req *proto.SendInBoxReq, resp *empty.Empty) error {
+func (h *notifyHandler) SendInBox(ctx context.Context, req *proto.SendInBoxReq) (*empty.Empty, error) {
+	var resp empty.Empty
+
 	if err := validateSendInBoxReq(req); err != nil {
-		return err
+		return nil, err
 	}
 
 	inboxItem := &models.InBoxItem{
@@ -112,15 +118,16 @@ func (h *notifyHandler) SendInBox(ctx context.Context, req *proto.SendInBoxReq, 
 	}
 	err := h.repo.InsertInBoxItem(req.Uid, inboxItem)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	// TODO: Send notify
-	return nil
+	return &resp, nil
 }
 
-func (h *notifyHandler) SendNotify(ctx context.Context, req *proto.SendNotifyReq, resp *empty.Empty) error {
+func (h *notifyHandler) SendNotify(ctx context.Context, req *proto.SendNotifyReq) (*empty.Empty, error) {
+	var resp empty.Empty
+
 	if err := validateSendNotifyReq(req); err != nil {
-		return err
+		return nil, err
 	}
 
 	if inBoxChs, ok := h.notifyChMap.Load(req.Uid); ok {
@@ -133,16 +140,17 @@ func (h *notifyHandler) SendNotify(ctx context.Context, req *proto.SendNotifyReq
 			return true
 		})
 	}
-	return nil
+	return &resp, nil
 }
 
-func (h *notifyHandler) GetInBox(ctx context.Context, req *proto.GetInBoxReq, resp *proto.GetInboxResp) error {
+func (h *notifyHandler) GetInBox(ctx context.Context, req *proto.GetInBoxReq) (*proto.GetInboxResp, error) {
+	var resp proto.GetInboxResp
 	if err := validateGetInBoxReq(req); err != nil {
-		return err
+		return nil, err
 	}
 	items, err := h.repo.FindInBoxItems(req.Uid, models.InBoxType(req.Type), req.Page, req.Size, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	resp.Items = make([]*proto.InBoxItem, len(items))
 	for i, item := range items {
@@ -151,10 +159,10 @@ func (h *notifyHandler) GetInBox(ctx context.Context, req *proto.GetInBoxReq, re
 		resp.Items[i] = &pbItem
 	}
 
-	return nil
+	return &resp, nil
 }
 
-func (h *notifyHandler) GetNotify(ctx context.Context, req *proto.GetNotifyReq, resp proto.Message_GetNotifyStream) error {
+func (h *notifyHandler) GetNotify(req *proto.GetNotifyReq, resp proto.Message_GetNotifyServer) error {
 	if err := validateGetNotifyReq(req); err != nil {
 		return err
 	}
@@ -169,7 +177,6 @@ func (h *notifyHandler) GetNotify(ctx context.Context, req *proto.GetNotifyReq, 
 			item := <-ch
 			converter.CopyFromNotifyItemToPBNotifyItem(item, &pbItem)
 			if err := resp.Send(&pbItem); err != nil {
-				resp.Close()
 				close(ch)
 				inBoxChs.Delete(ch)
 				return

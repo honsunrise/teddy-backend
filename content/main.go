@@ -5,7 +5,6 @@ import (
 	"github.com/micro/go-micro"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/utils"
-	"github.com/zhsyourai/teddy-backend/content/components"
 	"github.com/zhsyourai/teddy-backend/content/server"
 	"google.golang.org/grpc"
 	"net"
