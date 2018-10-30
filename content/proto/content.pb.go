@@ -3,11 +3,15 @@
 
 package proto
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import _ "github.com/golang/protobuf/ptypes/empty"
-import timestamp "github.com/golang/protobuf/ptypes/timestamp"
+import (
+	fmt "fmt"
+	proto "github.com/golang/protobuf/proto"
+	empty "github.com/golang/protobuf/ptypes/empty"
+	timestamp "github.com/golang/protobuf/ptypes/timestamp"
+	context "golang.org/x/net/context"
+	grpc "google.golang.org/grpc"
+	math "math"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -35,16 +39,17 @@ func (m *Tag) Reset()         { *m = Tag{} }
 func (m *Tag) String() string { return proto.CompactTextString(m) }
 func (*Tag) ProtoMessage()    {}
 func (*Tag) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_85356c321e0b0cd2, []int{0}
+	return fileDescriptor_048f54ad8861f783, []int{0}
 }
+
 func (m *Tag) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Tag.Unmarshal(m, b)
 }
 func (m *Tag) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Tag.Marshal(b, m, deterministic)
 }
-func (dst *Tag) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Tag.Merge(dst, src)
+func (m *Tag) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Tag.Merge(m, src)
 }
 func (m *Tag) XXX_Size() int {
 	return xxx_messageInfo_Tag.Size(m)
@@ -123,16 +128,17 @@ func (m *Info) Reset()         { *m = Info{} }
 func (m *Info) String() string { return proto.CompactTextString(m) }
 func (*Info) ProtoMessage()    {}
 func (*Info) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_85356c321e0b0cd2, []int{1}
+	return fileDescriptor_048f54ad8861f783, []int{1}
 }
+
 func (m *Info) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Info.Unmarshal(m, b)
 }
 func (m *Info) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Info.Marshal(b, m, deterministic)
 }
-func (dst *Info) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Info.Merge(dst, src)
+func (m *Info) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Info.Merge(m, src)
 }
 func (m *Info) XXX_Size() int {
 	return xxx_messageInfo_Info.Size(m)
@@ -317,16 +323,17 @@ func (m *GetTagReq) Reset()         { *m = GetTagReq{} }
 func (m *GetTagReq) String() string { return proto.CompactTextString(m) }
 func (*GetTagReq) ProtoMessage()    {}
 func (*GetTagReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_85356c321e0b0cd2, []int{2}
+	return fileDescriptor_048f54ad8861f783, []int{2}
 }
+
 func (m *GetTagReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetTagReq.Unmarshal(m, b)
 }
 func (m *GetTagReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_GetTagReq.Marshal(b, m, deterministic)
 }
-func (dst *GetTagReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetTagReq.Merge(dst, src)
+func (m *GetTagReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetTagReq.Merge(m, src)
 }
 func (m *GetTagReq) XXX_Size() int {
 	return xxx_messageInfo_GetTagReq.Size(m)
@@ -371,16 +378,17 @@ func (m *UidPageReq) Reset()         { *m = UidPageReq{} }
 func (m *UidPageReq) String() string { return proto.CompactTextString(m) }
 func (*UidPageReq) ProtoMessage()    {}
 func (*UidPageReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_85356c321e0b0cd2, []int{3}
+	return fileDescriptor_048f54ad8861f783, []int{3}
 }
+
 func (m *UidPageReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UidPageReq.Unmarshal(m, b)
 }
 func (m *UidPageReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_UidPageReq.Marshal(b, m, deterministic)
 }
-func (dst *UidPageReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UidPageReq.Merge(dst, src)
+func (m *UidPageReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UidPageReq.Merge(m, src)
 }
 func (m *UidPageReq) XXX_Size() int {
 	return xxx_messageInfo_UidPageReq.Size(m)
@@ -423,16 +431,17 @@ func (m *GetTagsResp) Reset()         { *m = GetTagsResp{} }
 func (m *GetTagsResp) String() string { return proto.CompactTextString(m) }
 func (*GetTagsResp) ProtoMessage()    {}
 func (*GetTagsResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_85356c321e0b0cd2, []int{4}
+	return fileDescriptor_048f54ad8861f783, []int{4}
 }
+
 func (m *GetTagsResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetTagsResp.Unmarshal(m, b)
 }
 func (m *GetTagsResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_GetTagsResp.Marshal(b, m, deterministic)
 }
-func (dst *GetTagsResp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetTagsResp.Merge(dst, src)
+func (m *GetTagsResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetTagsResp.Merge(m, src)
 }
 func (m *GetTagsResp) XXX_Size() int {
 	return xxx_messageInfo_GetTagsResp.Size(m)
@@ -468,16 +477,17 @@ func (m *PublishInfoReq) Reset()         { *m = PublishInfoReq{} }
 func (m *PublishInfoReq) String() string { return proto.CompactTextString(m) }
 func (*PublishInfoReq) ProtoMessage()    {}
 func (*PublishInfoReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_85356c321e0b0cd2, []int{5}
+	return fileDescriptor_048f54ad8861f783, []int{5}
 }
+
 func (m *PublishInfoReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PublishInfoReq.Unmarshal(m, b)
 }
 func (m *PublishInfoReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_PublishInfoReq.Marshal(b, m, deterministic)
 }
-func (dst *PublishInfoReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PublishInfoReq.Merge(dst, src)
+func (m *PublishInfoReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PublishInfoReq.Merge(m, src)
 }
 func (m *PublishInfoReq) XXX_Size() int {
 	return xxx_messageInfo_PublishInfoReq.Size(m)
@@ -563,16 +573,17 @@ func (m *EditInfoReq) Reset()         { *m = EditInfoReq{} }
 func (m *EditInfoReq) String() string { return proto.CompactTextString(m) }
 func (*EditInfoReq) ProtoMessage()    {}
 func (*EditInfoReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_85356c321e0b0cd2, []int{6}
+	return fileDescriptor_048f54ad8861f783, []int{6}
 }
+
 func (m *EditInfoReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EditInfoReq.Unmarshal(m, b)
 }
 func (m *EditInfoReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_EditInfoReq.Marshal(b, m, deterministic)
 }
-func (dst *EditInfoReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EditInfoReq.Merge(dst, src)
+func (m *EditInfoReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EditInfoReq.Merge(m, src)
 }
 func (m *EditInfoReq) XXX_Size() int {
 	return xxx_messageInfo_EditInfoReq.Size(m)
@@ -659,16 +670,17 @@ func (m *GetInfosReq) Reset()         { *m = GetInfosReq{} }
 func (m *GetInfosReq) String() string { return proto.CompactTextString(m) }
 func (*GetInfosReq) ProtoMessage()    {}
 func (*GetInfosReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_85356c321e0b0cd2, []int{7}
+	return fileDescriptor_048f54ad8861f783, []int{7}
 }
+
 func (m *GetInfosReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetInfosReq.Unmarshal(m, b)
 }
 func (m *GetInfosReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_GetInfosReq.Marshal(b, m, deterministic)
 }
-func (dst *GetInfosReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetInfosReq.Merge(dst, src)
+func (m *GetInfosReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetInfosReq.Merge(m, src)
 }
 func (m *GetInfosReq) XXX_Size() int {
 	return xxx_messageInfo_GetInfosReq.Size(m)
@@ -711,16 +723,17 @@ func (m *GetInfosResp) Reset()         { *m = GetInfosResp{} }
 func (m *GetInfosResp) String() string { return proto.CompactTextString(m) }
 func (*GetInfosResp) ProtoMessage()    {}
 func (*GetInfosResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_85356c321e0b0cd2, []int{8}
+	return fileDescriptor_048f54ad8861f783, []int{8}
 }
+
 func (m *GetInfosResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetInfosResp.Unmarshal(m, b)
 }
 func (m *GetInfosResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_GetInfosResp.Marshal(b, m, deterministic)
 }
-func (dst *GetInfosResp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetInfosResp.Merge(dst, src)
+func (m *GetInfosResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetInfosResp.Merge(m, src)
 }
 func (m *GetInfosResp) XXX_Size() int {
 	return xxx_messageInfo_GetInfosResp.Size(m)
@@ -749,16 +762,17 @@ func (m *InfoIdReq) Reset()         { *m = InfoIdReq{} }
 func (m *InfoIdReq) String() string { return proto.CompactTextString(m) }
 func (*InfoIdReq) ProtoMessage()    {}
 func (*InfoIdReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_85356c321e0b0cd2, []int{9}
+	return fileDescriptor_048f54ad8861f783, []int{9}
 }
+
 func (m *InfoIdReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_InfoIdReq.Unmarshal(m, b)
 }
 func (m *InfoIdReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_InfoIdReq.Marshal(b, m, deterministic)
 }
-func (dst *InfoIdReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_InfoIdReq.Merge(dst, src)
+func (m *InfoIdReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InfoIdReq.Merge(m, src)
 }
 func (m *InfoIdReq) XXX_Size() int {
 	return xxx_messageInfo_InfoIdReq.Size(m)
@@ -789,16 +803,17 @@ func (m *InfoIdPageReq) Reset()         { *m = InfoIdPageReq{} }
 func (m *InfoIdPageReq) String() string { return proto.CompactTextString(m) }
 func (*InfoIdPageReq) ProtoMessage()    {}
 func (*InfoIdPageReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_85356c321e0b0cd2, []int{10}
+	return fileDescriptor_048f54ad8861f783, []int{10}
 }
+
 func (m *InfoIdPageReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_InfoIdPageReq.Unmarshal(m, b)
 }
 func (m *InfoIdPageReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_InfoIdPageReq.Marshal(b, m, deterministic)
 }
-func (dst *InfoIdPageReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_InfoIdPageReq.Merge(dst, src)
+func (m *InfoIdPageReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InfoIdPageReq.Merge(m, src)
 }
 func (m *InfoIdPageReq) XXX_Size() int {
 	return xxx_messageInfo_InfoIdPageReq.Size(m)
@@ -841,16 +856,17 @@ func (m *UserIdsResp) Reset()         { *m = UserIdsResp{} }
 func (m *UserIdsResp) String() string { return proto.CompactTextString(m) }
 func (*UserIdsResp) ProtoMessage()    {}
 func (*UserIdsResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_85356c321e0b0cd2, []int{11}
+	return fileDescriptor_048f54ad8861f783, []int{11}
 }
+
 func (m *UserIdsResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UserIdsResp.Unmarshal(m, b)
 }
 func (m *UserIdsResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_UserIdsResp.Marshal(b, m, deterministic)
 }
-func (dst *UserIdsResp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UserIdsResp.Merge(dst, src)
+func (m *UserIdsResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UserIdsResp.Merge(m, src)
 }
 func (m *UserIdsResp) XXX_Size() int {
 	return xxx_messageInfo_UserIdsResp.Size(m)
@@ -879,16 +895,17 @@ func (m *InfoIdsResp) Reset()         { *m = InfoIdsResp{} }
 func (m *InfoIdsResp) String() string { return proto.CompactTextString(m) }
 func (*InfoIdsResp) ProtoMessage()    {}
 func (*InfoIdsResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_85356c321e0b0cd2, []int{12}
+	return fileDescriptor_048f54ad8861f783, []int{12}
 }
+
 func (m *InfoIdsResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_InfoIdsResp.Unmarshal(m, b)
 }
 func (m *InfoIdsResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_InfoIdsResp.Marshal(b, m, deterministic)
 }
-func (dst *InfoIdsResp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_InfoIdsResp.Merge(dst, src)
+func (m *InfoIdsResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InfoIdsResp.Merge(m, src)
 }
 func (m *InfoIdsResp) XXX_Size() int {
 	return xxx_messageInfo_InfoIdsResp.Size(m)
@@ -926,75 +943,610 @@ func init() {
 	proto.RegisterType((*InfoIdsResp)(nil), "com.teddy.srv.content.InfoIdsResp")
 }
 
-func init() { proto.RegisterFile("proto/content.proto", fileDescriptor_content_85356c321e0b0cd2) }
+func init() { proto.RegisterFile("proto/content.proto", fileDescriptor_048f54ad8861f783) }
 
-var fileDescriptor_content_85356c321e0b0cd2 = []byte{
-	// 1072 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xcc, 0x56, 0x5f, 0x73, 0xdb, 0x44,
-	0x10, 0xc7, 0x96, 0x5d, 0x5b, 0xeb, 0xc4, 0x0d, 0xd7, 0x36, 0x68, 0x5c, 0x06, 0x52, 0x01, 0x33,
-	0x3c, 0xc9, 0xd3, 0xb4, 0x0f, 0x9d, 0x52, 0x1e, 0x48, 0x49, 0xd2, 0x30, 0x01, 0x8a, 0x68, 0xda,
-	0x21, 0xc3, 0x30, 0xa3, 0x44, 0x67, 0xf9, 0xa6, 0xb6, 0x65, 0xac, 0xb3, 0x83, 0xf9, 0x62, 0xbc,
-	0xf0, 0xc6, 0x97, 0xe0, 0x23, 0xf0, 0x31, 0xb8, 0xdd, 0xd3, 0x49, 0x72, 0x1a, 0xff, 0x61, 0xec,
-	0x07, 0x5e, 0x92, 0xdd, 0xd5, 0xee, 0xef, 0x7e, 0xb7, 0xff, 0x7c, 0x70, 0x67, 0x38, 0x8a, 0x65,
-	0xdc, 0xbe, 0x8c, 0x07, 0x92, 0x0f, 0xa4, 0x47, 0x1a, 0xbb, 0x77, 0x19, 0xf7, 0x3d, 0xc9, 0xc3,
-	0x70, 0xea, 0x25, 0xa3, 0x89, 0x97, 0x7e, 0x6c, 0x3d, 0x8a, 0x84, 0xec, 0x8e, 0x2f, 0x94, 0xde,
-	0x6f, 0x47, 0x71, 0x2f, 0x18, 0x44, 0x6d, 0xf2, 0xbf, 0x18, 0x77, 0xda, 0x43, 0x39, 0x1d, 0xf2,
-	0xa4, 0xcd, 0xfb, 0x4a, 0xd0, 0x7f, 0x35, 0x56, 0xeb, 0x8b, 0xe5, 0x41, 0x52, 0xf4, 0x79, 0x22,
-	0x83, 0xfe, 0x30, 0x97, 0x74, 0xb0, 0xfb, 0x47, 0x09, 0xac, 0x57, 0x41, 0xc4, 0x76, 0xc0, 0x92,
-	0x41, 0xe4, 0x94, 0xf6, 0x4a, 0x9f, 0xdb, 0x3e, 0x8a, 0x68, 0xe9, 0xc6, 0xd2, 0x29, 0x2b, 0x4b,
-	0xc5, 0x47, 0x91, 0x3d, 0x01, 0xbb, 0x23, 0x46, 0x89, 0xfc, 0xb1, 0x1b, 0x5f, 0x39, 0x96, 0xb2,
-	0x37, 0xf6, 0x5b, 0x5e, 0x14, 0xc7, 0x51, 0x8f, 0x7b, 0xe6, 0x44, 0xef, 0x95, 0x39, 0xc0, 0xcf,
-	0x9d, 0xd9, 0x63, 0xa8, 0xf5, 0x82, 0x44, 0x9e, 0x25, 0xdc, 0xa9, 0x2c, 0x8d, 0x33, 0xae, 0xec,
-	0x43, 0xb0, 0x53, 0xf1, 0x60, 0xea, 0x54, 0x89, 0x59, 0x6e, 0x70, 0xff, 0xae, 0x42, 0xe5, 0x64,
-	0xd0, 0x89, 0x91, 0xe8, 0x58, 0x84, 0x86, 0xba, 0x12, 0x59, 0x13, 0xca, 0xca, 0x50, 0x26, 0x83,
-	0x92, 0xd8, 0x5d, 0xa8, 0x4a, 0x21, 0x7b, 0x9c, 0x48, 0xdb, 0xbe, 0x56, 0x18, 0x83, 0x0a, 0x66,
-	0x87, 0x18, 0x6d, 0xfb, 0x24, 0x33, 0x07, 0x6a, 0x69, 0x2d, 0xd2, 0x03, 0x8d, 0x8a, 0x64, 0x2e,
-	0xe3, 0x09, 0x1f, 0x9d, 0x8a, 0x44, 0x3a, 0xb7, 0xf6, 0x2c, 0x24, 0x93, 0x19, 0xd8, 0x47, 0x00,
-	0xa4, 0xbc, 0x16, 0x21, 0x8f, 0x9d, 0x1a, 0x85, 0x16, 0x2c, 0xec, 0x19, 0x34, 0x86, 0xe3, 0x8b,
-	0x9e, 0x48, 0xba, 0x78, 0x4f, 0xa7, 0xbe, 0x34, 0x09, 0x45, 0x77, 0x76, 0x00, 0x4d, 0xbc, 0xb7,
-	0xcf, 0x27, 0x82, 0x5f, 0x11, 0x80, 0xbd, 0x14, 0xe0, 0x5a, 0x04, 0xe6, 0x60, 0x12, 0xf4, 0x54,
-	0x5a, 0x40, 0x85, 0xd6, 0x7d, 0xad, 0x20, 0xef, 0xab, 0x40, 0x5e, 0x76, 0x9f, 0xc7, 0x63, 0x75,
-	0xe5, 0x86, 0xfa, 0x64, 0xf9, 0x05, 0x0b, 0xe5, 0x28, 0x88, 0x12, 0x67, 0x8b, 0x2e, 0x4c, 0x32,
-	0x22, 0xf5, 0xc4, 0x5b, 0x9e, 0x38, 0xdb, 0xe4, 0xae, 0x15, 0xb6, 0x0b, 0xb7, 0x44, 0x72, 0xaa,
-	0x44, 0xa7, 0x49, 0x07, 0xa4, 0x1a, 0x6b, 0x41, 0x1d, 0x1d, 0x28, 0x6d, 0xb7, 0x09, 0x25, 0xd3,
-	0x31, 0x66, 0x3c, 0x40, 0xcd, 0xd9, 0x21, 0xa8, 0x54, 0xc3, 0x18, 0x91, 0x9c, 0xe9, 0x2f, 0xef,
-	0x13, 0x5a, 0xa6, 0x23, 0x63, 0xed, 0x45, 0x88, 0x8c, 0x10, 0x0b, 0x16, 0xac, 0x53, 0x27, 0x98,
-	0xc4, 0x23, 0x21, 0x15, 0xc3, 0x3b, 0x04, 0x9b, 0x1b, 0x30, 0x5a, 0x24, 0x47, 0xa9, 0xea, 0xdc,
-	0x25, 0xec, 0x82, 0x85, 0xb9, 0xb0, 0x65, 0x9c, 0x09, 0xff, 0x1e, 0xe1, 0xcf, 0xd8, 0x4c, 0x35,
-	0xbe, 0x8d, 0x43, 0xd1, 0x99, 0x52, 0x35, 0x76, 0x57, 0xab, 0x46, 0x1e, 0x41, 0xdd, 0x14, 0x0c,
-	0x74, 0x79, 0x9c, 0x0f, 0x88, 0x46, 0x6e, 0x70, 0x0f, 0xc1, 0x3e, 0xe6, 0x52, 0x8d, 0xa5, 0xcf,
-	0x7f, 0xc5, 0x12, 0x0c, 0x83, 0x88, 0x53, 0x7f, 0xab, 0x36, 0x45, 0x19, 0x6d, 0x89, 0xf8, 0x9d,
-	0x53, 0x8b, 0x2b, 0x1b, 0xca, 0x66, 0x0c, 0xac, 0x6c, 0x0c, 0xdc, 0x23, 0x80, 0x33, 0x11, 0xbe,
-	0x54, 0x01, 0xeb, 0xe1, 0x7c, 0x09, 0x0d, 0x4d, 0x27, 0xf1, 0x79, 0x32, 0x64, 0x5e, 0xda, 0x13,
-	0x25, 0x95, 0x1b, 0xbc, 0xf5, 0x8d, 0xab, 0xcc, 0x43, 0xf6, 0xe4, 0xe7, 0xfe, 0x69, 0x41, 0xf3,
-	0xa5, 0xee, 0x66, 0x9c, 0x57, 0xe4, 0xf2, 0xee, 0xc8, 0x66, 0x23, 0x5a, 0x2e, 0x8e, 0x68, 0x61,
-	0x1c, 0xad, 0xd9, 0x71, 0x34, 0x8d, 0x59, 0x29, 0x34, 0xe6, 0x29, 0xd4, 0x44, 0x3f, 0xa2, 0xba,
-	0x55, 0x89, 0xdb, 0xfe, 0x1c, 0x6e, 0xb3, 0x6c, 0xbc, 0x13, 0x1d, 0x74, 0x38, 0x90, 0xa3, 0xa9,
-	0x6f, 0x20, 0x98, 0x0f, 0xf6, 0x04, 0x67, 0x37, 0x1b, 0xf8, 0xc6, 0xfe, 0xe3, 0xd5, 0xf0, 0x5e,
-	0x9b, 0x30, 0x8d, 0x98, 0xc3, 0x60, 0x63, 0xf3, 0xdf, 0x24, 0x1f, 0x0d, 0x82, 0x1e, 0x2d, 0x09,
-	0xd5, 0xd8, 0x46, 0x9f, 0x6d, 0x89, 0xfa, 0xb5, 0x96, 0x68, 0x3d, 0x85, 0xad, 0x22, 0x4d, 0xcc,
-	0xe0, 0x5b, 0x3e, 0x35, 0x19, 0x54, 0x62, 0x3a, 0xe0, 0xe3, 0x2c, 0x83, 0xa4, 0x3c, 0x2d, 0x3f,
-	0x29, 0xb5, 0x9e, 0x41, 0x73, 0x96, 0xd2, 0x7f, 0x89, 0x76, 0xff, 0xb2, 0xa0, 0x71, 0x18, 0x0a,
-	0x69, 0x6a, 0xa7, 0x97, 0x6b, 0x29, 0x5b, 0xae, 0x69, 0x2d, 0xcb, 0x37, 0xd4, 0xd2, 0x9a, 0x53,
-	0xcb, 0xca, 0xcd, 0xb5, 0xac, 0x16, 0x6a, 0x79, 0x92, 0xd7, 0x52, 0xe7, 0xbe, 0x3d, 0x27, 0xf7,
-	0x05, 0x6a, 0x73, 0x0a, 0xf9, 0x7d, 0xb1, 0x90, 0x35, 0x02, 0x7b, 0xb8, 0x02, 0xd8, 0x6a, 0x55,
-	0xac, 0x2f, 0xaa, 0xa2, 0xfd, 0xff, 0xa9, 0xe2, 0x31, 0xcd, 0x30, 0xde, 0x2d, 0x59, 0x6f, 0x19,
-	0x7c, 0x05, 0x5b, 0x39, 0x90, 0xda, 0x06, 0x0f, 0xa1, 0x2a, 0x50, 0x49, 0xd7, 0xc1, 0xfd, 0x39,
-	0x99, 0xa5, 0xac, 0x6a, 0x4f, 0xf7, 0x3e, 0xd8, 0xa8, 0x9e, 0x84, 0x37, 0xb4, 0x93, 0xda, 0x7d,
-	0xdb, 0xfa, 0xa3, 0xd9, 0x5b, 0xd7, 0xfb, 0x6d, 0x35, 0x9a, 0x0f, 0xa0, 0xa1, 0x9e, 0x09, 0xa3,
-	0x93, 0x50, 0xb3, 0x54, 0x41, 0xca, 0xaa, 0x49, 0xaa, 0x16, 0x43, 0xd9, 0xfd, 0x18, 0x1a, 0xfa,
-	0x24, 0xed, 0xa2, 0x30, 0x72, 0x0f, 0x14, 0xf7, 0xff, 0xb1, 0xa1, 0xf6, 0x3c, 0xed, 0xd1, 0x1f,
-	0xa0, 0x96, 0xee, 0x40, 0xb6, 0x37, 0xe7, 0x8a, 0xd9, 0xca, 0x6e, 0xb9, 0x0b, 0x3d, 0xe8, 0x38,
-	0xf7, 0x3d, 0xf6, 0x1d, 0x34, 0x0a, 0x8b, 0x83, 0x7d, 0xb6, 0xd2, 0x72, 0x69, 0xed, 0xbe, 0xf3,
-	0x2b, 0x73, 0x88, 0x6f, 0x41, 0x85, 0xf7, 0x02, 0xea, 0xa6, 0x7f, 0x99, 0xbb, 0xbc, 0xc1, 0x17,
-	0x20, 0x9d, 0x41, 0xdd, 0xd4, 0x98, 0x2d, 0xb8, 0x8b, 0xe9, 0xa6, 0xd6, 0x27, 0x4b, 0x7d, 0xe8,
-	0xc2, 0x2f, 0x00, 0xbe, 0xe6, 0x3d, 0x2e, 0x39, 0x51, 0xdc, 0x5b, 0xd0, 0x29, 0xd4, 0x1a, 0x0b,
-	0x08, 0x1e, 0x83, 0xfd, 0x06, 0x1f, 0x29, 0x6b, 0x03, 0x1d, 0x41, 0x1d, 0x5f, 0x29, 0x6b, 0xe3,
-	0xa8, 0xab, 0x9d, 0x0d, 0x36, 0x82, 0xf4, 0x86, 0xe6, 0x0b, 0x7b, 0xf7, 0x94, 0xde, 0x55, 0x0f,
-	0xe6, 0x60, 0xe5, 0xbf, 0xec, 0x73, 0xdb, 0xad, 0xd0, 0xdd, 0x0a, 0xf8, 0x27, 0x68, 0xa6, 0xc0,
-	0xfa, 0x25, 0xb5, 0x41, 0xe8, 0xf3, 0x6c, 0x27, 0x20, 0xe7, 0x90, 0x7d, 0xba, 0x30, 0x6a, 0x19,
-	0x76, 0x61, 0x6e, 0x15, 0xf6, 0xcf, 0x44, 0x1b, 0x23, 0x35, 0xed, 0xcd, 0xa2, 0x7f, 0x03, 0x5b,
-	0xe6, 0xed, 0xb7, 0x76, 0xe5, 0xce, 0xe1, 0x76, 0x9a, 0xe0, 0xec, 0x39, 0xb9, 0xb1, 0x0c, 0xff,
-	0x02, 0x3b, 0x69, 0x16, 0x0c, 0xf6, 0x46, 0xf3, 0x70, 0x50, 0x3b, 0xaf, 0xea, 0xfb, 0xdc, 0xa2,
-	0x7f, 0x8f, 0xfe, 0x0d, 0x00, 0x00, 0xff, 0xff, 0x4d, 0x53, 0xb2, 0xc7, 0xb6, 0x0e, 0x00, 0x00,
+var fileDescriptor_048f54ad8861f783 = []byte{
+	// 1083 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x56, 0xcd, 0x72, 0x1b, 0x45,
+	0x10, 0xf6, 0x6a, 0x25, 0x4b, 0xdb, 0xfa, 0x89, 0x99, 0x24, 0x66, 0x4b, 0xa1, 0x40, 0x59, 0xa0,
+	0x4a, 0xa7, 0x55, 0xc5, 0xc9, 0x21, 0x15, 0xc2, 0x01, 0x07, 0xd9, 0x16, 0x65, 0x20, 0x2c, 0x56,
+	0x52, 0xb8, 0x28, 0xaa, 0xd6, 0xda, 0xd1, 0x6a, 0xca, 0xd2, 0xae, 0xd0, 0x8c, 0x64, 0xc4, 0x8b,
+	0x71, 0xe1, 0xc6, 0x4b, 0xf0, 0x08, 0x3c, 0x06, 0x35, 0x3d, 0xfb, 0x27, 0xdb, 0xfa, 0xa1, 0xa4,
+	0x03, 0x17, 0x7b, 0x7a, 0xb6, 0xfb, 0x9b, 0x6f, 0xfa, 0xeb, 0x6e, 0x0d, 0x3c, 0x1c, 0x4f, 0x42,
+	0x11, 0xb6, 0x7a, 0x61, 0x20, 0x68, 0x20, 0x6c, 0xb4, 0xc8, 0xe3, 0x5e, 0x38, 0xb2, 0x05, 0xf5,
+	0xbc, 0xb9, 0xcd, 0x27, 0x33, 0x3b, 0xfa, 0x58, 0x7f, 0xee, 0x33, 0x31, 0x98, 0x5e, 0xd9, 0xbd,
+	0x70, 0xd4, 0xf2, 0xc3, 0xa1, 0x1b, 0xf8, 0x2d, 0xf4, 0xbf, 0x9a, 0xf6, 0x5b, 0x63, 0x31, 0x1f,
+	0x53, 0xde, 0xa2, 0xa3, 0xb1, 0x98, 0xab, 0xbf, 0x0a, 0xab, 0xfe, 0xc5, 0xfa, 0x20, 0xc1, 0x46,
+	0x94, 0x0b, 0x77, 0x34, 0x4e, 0x57, 0x2a, 0xd8, 0xfa, 0x43, 0x03, 0xfd, 0xc2, 0xf5, 0xc9, 0x01,
+	0xe8, 0xc2, 0xf5, 0x4d, 0xad, 0xa1, 0x35, 0x0d, 0x47, 0x2e, 0xe5, 0xce, 0x20, 0x14, 0x66, 0xae,
+	0xa1, 0x35, 0xf3, 0x8e, 0x5c, 0x92, 0x97, 0x60, 0xf4, 0xd9, 0x84, 0x8b, 0x1f, 0x07, 0xe1, 0x8d,
+	0xa9, 0x37, 0xb4, 0x66, 0xf9, 0xa8, 0x6e, 0xfb, 0x61, 0xe8, 0x0f, 0xa9, 0x1d, 0x9f, 0x68, 0x5f,
+	0xc4, 0x07, 0x38, 0xa9, 0x33, 0x79, 0x01, 0xc5, 0xa1, 0xcb, 0x45, 0x97, 0x53, 0x33, 0xbf, 0x36,
+	0x2e, 0x76, 0x25, 0x1f, 0x81, 0x11, 0x2d, 0x8f, 0xe7, 0x66, 0x01, 0x99, 0xa5, 0x1b, 0xd6, 0xdf,
+	0x05, 0xc8, 0x77, 0x82, 0x7e, 0x28, 0x89, 0x4e, 0x99, 0x17, 0x53, 0x9f, 0x32, 0x8f, 0xd4, 0x20,
+	0xc7, 0x3c, 0x64, 0x6e, 0x38, 0x39, 0xe6, 0x91, 0x47, 0x50, 0x10, 0x4c, 0x0c, 0x29, 0x92, 0x36,
+	0x1c, 0x65, 0x10, 0x02, 0x79, 0x99, 0x1d, 0x64, 0x54, 0x75, 0x70, 0x4d, 0x4c, 0x28, 0x46, 0x5a,
+	0x44, 0x07, 0xc6, 0xa6, 0x24, 0xd3, 0x0b, 0x67, 0x74, 0x72, 0xce, 0xb8, 0x30, 0xf7, 0x1b, 0xba,
+	0x24, 0x93, 0x6c, 0x90, 0x8f, 0x01, 0xd0, 0x78, 0xc7, 0x3c, 0x1a, 0x9a, 0x45, 0x0c, 0xcd, 0xec,
+	0x90, 0xd7, 0x50, 0x1e, 0x4f, 0xaf, 0x86, 0x8c, 0x0f, 0xe4, 0x3d, 0xcd, 0xd2, 0xda, 0x24, 0x64,
+	0xdd, 0xc9, 0x31, 0xd4, 0xe4, 0xbd, 0x1d, 0x3a, 0x63, 0xf4, 0x06, 0x01, 0x8c, 0xb5, 0x00, 0xb7,
+	0x22, 0x64, 0x0e, 0x66, 0xee, 0x90, 0x79, 0x26, 0x34, 0xb4, 0x66, 0xc9, 0x51, 0x86, 0xe4, 0x7d,
+	0xe3, 0x8a, 0xde, 0xe0, 0x4d, 0x38, 0x0d, 0x84, 0x59, 0x6e, 0x68, 0x4d, 0xdd, 0xc9, 0xec, 0x60,
+	0x8e, 0x5c, 0x9f, 0x9b, 0x15, 0xbc, 0x30, 0xae, 0x25, 0xd2, 0x90, 0x5d, 0x53, 0x6e, 0x56, 0xd1,
+	0x5d, 0x19, 0xe4, 0x10, 0xf6, 0x19, 0x3f, 0x67, 0xd7, 0xd4, 0xac, 0xe1, 0x01, 0x91, 0x45, 0xea,
+	0x50, 0x92, 0x0e, 0x98, 0xb6, 0x07, 0x88, 0x92, 0xd8, 0x32, 0x66, 0x1a, 0x48, 0xcb, 0x3c, 0x40,
+	0xa8, 0xc8, 0x92, 0x31, 0x8c, 0x77, 0xd5, 0x97, 0x0f, 0x10, 0x2d, 0xb1, 0x25, 0x63, 0xe5, 0x85,
+	0x88, 0x04, 0x11, 0x33, 0x3b, 0x52, 0xa7, 0xbe, 0x3b, 0x0b, 0x27, 0x4c, 0x50, 0x6e, 0x3e, 0x44,
+	0xd8, 0x74, 0x43, 0x46, 0x33, 0x7e, 0x12, 0x99, 0xe6, 0x23, 0xc4, 0xce, 0xec, 0x10, 0x0b, 0x2a,
+	0xb1, 0x33, 0xe2, 0x3f, 0x46, 0xfc, 0x85, 0xbd, 0x58, 0x8d, 0x6f, 0x43, 0x8f, 0xf5, 0xe7, 0xa8,
+	0xc6, 0xe1, 0x66, 0x6a, 0xa4, 0x11, 0x58, 0x4d, 0x6e, 0xa0, 0xe4, 0x31, 0x3f, 0x44, 0x1a, 0xe9,
+	0x86, 0xd5, 0x06, 0xe3, 0x94, 0x8a, 0x0b, 0xd7, 0x77, 0xe8, 0xaf, 0x52, 0x82, 0xb1, 0xeb, 0x53,
+	0xac, 0xef, 0xaa, 0x83, 0x6b, 0xb9, 0xc7, 0xd9, 0xef, 0x14, 0x4b, 0xbc, 0xea, 0xe0, 0x3a, 0x6e,
+	0x03, 0x3d, 0x69, 0x03, 0xeb, 0x04, 0xa0, 0xcb, 0xbc, 0xb7, 0xae, 0x4f, 0xb7, 0xc3, 0xf9, 0x12,
+	0xca, 0x8a, 0x0e, 0x77, 0x28, 0x1f, 0x13, 0x3b, 0xaa, 0x09, 0xad, 0xa1, 0xe3, 0xad, 0xef, 0x1d,
+	0x65, 0xb6, 0x64, 0x8f, 0x7e, 0xd6, 0x9f, 0x3a, 0xd4, 0xde, 0xaa, 0x6a, 0x96, 0xfd, 0x2a, 0xb9,
+	0xdc, 0x6d, 0xd9, 0xa4, 0x45, 0x73, 0xd9, 0x16, 0xcd, 0xb4, 0xa3, 0xbe, 0xd8, 0x8e, 0x71, 0x61,
+	0xe6, 0x33, 0x85, 0x79, 0x0e, 0x45, 0x36, 0xf2, 0x51, 0xb7, 0x02, 0x72, 0x3b, 0x5a, 0xc2, 0x6d,
+	0x91, 0x8d, 0xdd, 0x51, 0x41, 0xed, 0x40, 0x4c, 0xe6, 0x4e, 0x0c, 0x41, 0x1c, 0x30, 0x66, 0xb2,
+	0x77, 0x93, 0x86, 0x2f, 0x1f, 0xbd, 0xd8, 0x0c, 0xef, 0x5d, 0x1c, 0xa6, 0x10, 0x53, 0x18, 0x59,
+	0xd8, 0xf4, 0x37, 0x41, 0x27, 0x81, 0x3b, 0xc4, 0x21, 0x51, 0x72, 0x12, 0x7b, 0xb1, 0x24, 0x4a,
+	0xb7, 0x4a, 0xa2, 0xfe, 0x0a, 0x2a, 0x59, 0x9a, 0x32, 0x83, 0xd7, 0x74, 0x1e, 0x67, 0xf0, 0x9a,
+	0xce, 0xa3, 0x06, 0x9f, 0x26, 0x19, 0x44, 0xe3, 0x55, 0xee, 0xa5, 0x56, 0x7f, 0x0d, 0xb5, 0x45,
+	0x4a, 0xff, 0x25, 0xda, 0xfa, 0x4b, 0x87, 0x72, 0xdb, 0x63, 0x22, 0xd6, 0x4e, 0x0d, 0x57, 0x2d,
+	0x19, 0xae, 0x91, 0x96, 0xb9, 0x7b, 0xb4, 0xd4, 0x97, 0x68, 0x99, 0xbf, 0x5f, 0xcb, 0x42, 0x46,
+	0xcb, 0x4e, 0xaa, 0xa5, 0xca, 0x7d, 0x6b, 0x49, 0xee, 0x33, 0xd4, 0x96, 0x08, 0xf9, 0x7d, 0x56,
+	0xc8, 0x22, 0x82, 0x3d, 0xdb, 0x00, 0x6c, 0x33, 0x15, 0x4b, 0xab, 0x54, 0x34, 0xfe, 0x3f, 0x2a,
+	0x9e, 0x62, 0x0f, 0xcb, 0xbb, 0xf1, 0xed, 0x86, 0xc1, 0x57, 0x50, 0x49, 0x81, 0xf8, 0x98, 0x3c,
+	0x83, 0x02, 0x93, 0x46, 0x34, 0x0e, 0x9e, 0x2c, 0xc9, 0x2c, 0x66, 0x55, 0x79, 0x5a, 0x4f, 0xc0,
+	0x90, 0x66, 0xc7, 0xbb, 0xa7, 0x9c, 0xac, 0x36, 0x54, 0xd5, 0xc7, 0x78, 0x6e, 0xdd, 0xae, 0xb7,
+	0xcd, 0x68, 0x3e, 0x85, 0x72, 0x97, 0xd3, 0x49, 0xc7, 0x53, 0x2c, 0x09, 0xe4, 0xa7, 0xcc, 0x53,
+	0x24, 0x0d, 0x07, 0xd7, 0xd6, 0x27, 0x50, 0x56, 0x27, 0x29, 0x97, 0x03, 0xd0, 0x53, 0x0f, 0xb9,
+	0x3c, 0xfa, 0xc7, 0x80, 0xe2, 0x9b, 0xa8, 0x46, 0x7f, 0x80, 0x62, 0x34, 0x03, 0x49, 0x63, 0xc9,
+	0x15, 0x93, 0x91, 0x5d, 0xb7, 0x56, 0x7a, 0xe0, 0x71, 0xd6, 0x1e, 0xf9, 0x0e, 0xca, 0x99, 0xc1,
+	0x41, 0x3e, 0xdf, 0x68, 0xb8, 0xd4, 0x0f, 0xef, 0xfc, 0xca, 0xb4, 0xe5, 0x5b, 0xd0, 0xda, 0x23,
+	0x67, 0x50, 0x8a, 0xeb, 0x97, 0x58, 0xeb, 0x0b, 0x7c, 0x05, 0x52, 0x17, 0x4a, 0xb1, 0xc6, 0x64,
+	0xc5, 0x5d, 0xe2, 0x6a, 0xaa, 0x7f, 0xba, 0xd6, 0x07, 0x2f, 0x7c, 0x06, 0xf0, 0x35, 0x1d, 0x52,
+	0x41, 0x91, 0x62, 0x63, 0x45, 0xa5, 0x60, 0x69, 0xac, 0x20, 0x78, 0x0a, 0xc6, 0x7b, 0xf9, 0x48,
+	0xd9, 0x1a, 0xe8, 0x04, 0x4a, 0xf2, 0x95, 0xb2, 0x35, 0xce, 0x19, 0x40, 0x37, 0xd8, 0x09, 0xd2,
+	0x7b, 0xec, 0x2f, 0x59, 0xbb, 0xe7, 0xf8, 0xae, 0x7a, 0xba, 0x04, 0x2b, 0xfd, 0x65, 0x5f, 0x5a,
+	0x6e, 0x99, 0xea, 0xb6, 0xf6, 0xc8, 0x4f, 0x50, 0x8b, 0x80, 0xd5, 0x4b, 0x6a, 0x87, 0xd0, 0x97,
+	0xc9, 0x4c, 0x90, 0x9c, 0x3d, 0xf2, 0xd9, 0xca, 0xa8, 0x75, 0xd8, 0x99, 0xbe, 0xb5, 0xf6, 0xc8,
+	0xcf, 0x48, 0x5b, 0x46, 0x2a, 0xda, 0xbb, 0x45, 0xff, 0x06, 0x2a, 0xf1, 0xdb, 0x6f, 0x6b, 0xe5,
+	0x2e, 0xe1, 0x41, 0x94, 0xe0, 0xe4, 0x39, 0xb9, 0xb3, 0x0c, 0xff, 0x02, 0x07, 0x51, 0x16, 0x62,
+	0xec, 0x9d, 0xe6, 0xe1, 0xb8, 0x78, 0x59, 0x50, 0xf7, 0xd9, 0xc7, 0x7f, 0xcf, 0xff, 0x0d, 0x00,
+	0x00, 0xff, 0xff, 0x4d, 0x53, 0xb2, 0xc7, 0xb6, 0x0e, 0x00, 0x00,
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConn
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion4
+
+// ContentClient is the client API for Content service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type ContentClient interface {
+	GetTags(ctx context.Context, in *GetTagReq, opts ...grpc.CallOption) (*GetTagsResp, error)
+	PublishInfo(ctx context.Context, in *PublishInfoReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	EditInfo(ctx context.Context, in *EditInfoReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	GetInfos(ctx context.Context, in *GetInfosReq, opts ...grpc.CallOption) (*GetInfosResp, error)
+	DeleteInfo(ctx context.Context, in *InfoIdReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	WatchInfo(ctx context.Context, in *InfoIdReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	LikeInfo(ctx context.Context, in *InfoIdReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	UnLikeInfo(ctx context.Context, in *InfoIdReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	GetUserLikes(ctx context.Context, in *UidPageReq, opts ...grpc.CallOption) (*InfoIdsResp, error)
+	GetUserUnlikes(ctx context.Context, in *UidPageReq, opts ...grpc.CallOption) (*InfoIdsResp, error)
+	GetInfoLiked(ctx context.Context, in *InfoIdPageReq, opts ...grpc.CallOption) (*UserIdsResp, error)
+	GetInfoUnliked(ctx context.Context, in *InfoIdPageReq, opts ...grpc.CallOption) (*UserIdsResp, error)
+	FavoriteInfo(ctx context.Context, in *InfoIdReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	GetUserFavorite(ctx context.Context, in *UidPageReq, opts ...grpc.CallOption) (*InfoIdsResp, error)
+	GetInfoFavorited(ctx context.Context, in *InfoIdPageReq, opts ...grpc.CallOption) (*UserIdsResp, error)
+}
+
+type contentClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewContentClient(cc *grpc.ClientConn) ContentClient {
+	return &contentClient{cc}
+}
+
+func (c *contentClient) GetTags(ctx context.Context, in *GetTagReq, opts ...grpc.CallOption) (*GetTagsResp, error) {
+	out := new(GetTagsResp)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/GetTags", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) PublishInfo(ctx context.Context, in *PublishInfoReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/PublishInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) EditInfo(ctx context.Context, in *EditInfoReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/EditInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) GetInfos(ctx context.Context, in *GetInfosReq, opts ...grpc.CallOption) (*GetInfosResp, error) {
+	out := new(GetInfosResp)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/GetInfos", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) DeleteInfo(ctx context.Context, in *InfoIdReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/DeleteInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) WatchInfo(ctx context.Context, in *InfoIdReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/WatchInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) LikeInfo(ctx context.Context, in *InfoIdReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/LikeInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) UnLikeInfo(ctx context.Context, in *InfoIdReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/UnLikeInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) GetUserLikes(ctx context.Context, in *UidPageReq, opts ...grpc.CallOption) (*InfoIdsResp, error) {
+	out := new(InfoIdsResp)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/GetUserLikes", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) GetUserUnlikes(ctx context.Context, in *UidPageReq, opts ...grpc.CallOption) (*InfoIdsResp, error) {
+	out := new(InfoIdsResp)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/GetUserUnlikes", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) GetInfoLiked(ctx context.Context, in *InfoIdPageReq, opts ...grpc.CallOption) (*UserIdsResp, error) {
+	out := new(UserIdsResp)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/GetInfoLiked", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) GetInfoUnliked(ctx context.Context, in *InfoIdPageReq, opts ...grpc.CallOption) (*UserIdsResp, error) {
+	out := new(UserIdsResp)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/GetInfoUnliked", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) FavoriteInfo(ctx context.Context, in *InfoIdReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/FavoriteInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) GetUserFavorite(ctx context.Context, in *UidPageReq, opts ...grpc.CallOption) (*InfoIdsResp, error) {
+	out := new(InfoIdsResp)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/GetUserFavorite", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) GetInfoFavorited(ctx context.Context, in *InfoIdPageReq, opts ...grpc.CallOption) (*UserIdsResp, error) {
+	out := new(UserIdsResp)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/GetInfoFavorited", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ContentServer is the server API for Content service.
+type ContentServer interface {
+	GetTags(context.Context, *GetTagReq) (*GetTagsResp, error)
+	PublishInfo(context.Context, *PublishInfoReq) (*empty.Empty, error)
+	EditInfo(context.Context, *EditInfoReq) (*empty.Empty, error)
+	GetInfos(context.Context, *GetInfosReq) (*GetInfosResp, error)
+	DeleteInfo(context.Context, *InfoIdReq) (*empty.Empty, error)
+	WatchInfo(context.Context, *InfoIdReq) (*empty.Empty, error)
+	LikeInfo(context.Context, *InfoIdReq) (*empty.Empty, error)
+	UnLikeInfo(context.Context, *InfoIdReq) (*empty.Empty, error)
+	GetUserLikes(context.Context, *UidPageReq) (*InfoIdsResp, error)
+	GetUserUnlikes(context.Context, *UidPageReq) (*InfoIdsResp, error)
+	GetInfoLiked(context.Context, *InfoIdPageReq) (*UserIdsResp, error)
+	GetInfoUnliked(context.Context, *InfoIdPageReq) (*UserIdsResp, error)
+	FavoriteInfo(context.Context, *InfoIdReq) (*empty.Empty, error)
+	GetUserFavorite(context.Context, *UidPageReq) (*InfoIdsResp, error)
+	GetInfoFavorited(context.Context, *InfoIdPageReq) (*UserIdsResp, error)
+}
+
+func RegisterContentServer(s *grpc.Server, srv ContentServer) {
+	s.RegisterService(&_Content_serviceDesc, srv)
+}
+
+func _Content_GetTags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTagReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).GetTags(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.content.Content/GetTags",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).GetTags(ctx, req.(*GetTagReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_PublishInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PublishInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).PublishInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.content.Content/PublishInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).PublishInfo(ctx, req.(*PublishInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_EditInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EditInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).EditInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.content.Content/EditInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).EditInfo(ctx, req.(*EditInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_GetInfos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetInfosReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).GetInfos(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.content.Content/GetInfos",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).GetInfos(ctx, req.(*GetInfosReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_DeleteInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InfoIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).DeleteInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.content.Content/DeleteInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).DeleteInfo(ctx, req.(*InfoIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_WatchInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InfoIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).WatchInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.content.Content/WatchInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).WatchInfo(ctx, req.(*InfoIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_LikeInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InfoIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).LikeInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.content.Content/LikeInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).LikeInfo(ctx, req.(*InfoIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_UnLikeInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InfoIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).UnLikeInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.content.Content/UnLikeInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).UnLikeInfo(ctx, req.(*InfoIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_GetUserLikes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UidPageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).GetUserLikes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.content.Content/GetUserLikes",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).GetUserLikes(ctx, req.(*UidPageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_GetUserUnlikes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UidPageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).GetUserUnlikes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.content.Content/GetUserUnlikes",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).GetUserUnlikes(ctx, req.(*UidPageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_GetInfoLiked_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InfoIdPageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).GetInfoLiked(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.content.Content/GetInfoLiked",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).GetInfoLiked(ctx, req.(*InfoIdPageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_GetInfoUnliked_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InfoIdPageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).GetInfoUnliked(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.content.Content/GetInfoUnliked",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).GetInfoUnliked(ctx, req.(*InfoIdPageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_FavoriteInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InfoIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).FavoriteInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.content.Content/FavoriteInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).FavoriteInfo(ctx, req.(*InfoIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_GetUserFavorite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UidPageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).GetUserFavorite(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.content.Content/GetUserFavorite",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).GetUserFavorite(ctx, req.(*UidPageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_GetInfoFavorited_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InfoIdPageReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).GetInfoFavorited(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.content.Content/GetInfoFavorited",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).GetInfoFavorited(ctx, req.(*InfoIdPageReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _Content_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "com.teddy.srv.content.Content",
+	HandlerType: (*ContentServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetTags",
+			Handler:    _Content_GetTags_Handler,
+		},
+		{
+			MethodName: "PublishInfo",
+			Handler:    _Content_PublishInfo_Handler,
+		},
+		{
+			MethodName: "EditInfo",
+			Handler:    _Content_EditInfo_Handler,
+		},
+		{
+			MethodName: "GetInfos",
+			Handler:    _Content_GetInfos_Handler,
+		},
+		{
+			MethodName: "DeleteInfo",
+			Handler:    _Content_DeleteInfo_Handler,
+		},
+		{
+			MethodName: "WatchInfo",
+			Handler:    _Content_WatchInfo_Handler,
+		},
+		{
+			MethodName: "LikeInfo",
+			Handler:    _Content_LikeInfo_Handler,
+		},
+		{
+			MethodName: "UnLikeInfo",
+			Handler:    _Content_UnLikeInfo_Handler,
+		},
+		{
+			MethodName: "GetUserLikes",
+			Handler:    _Content_GetUserLikes_Handler,
+		},
+		{
+			MethodName: "GetUserUnlikes",
+			Handler:    _Content_GetUserUnlikes_Handler,
+		},
+		{
+			MethodName: "GetInfoLiked",
+			Handler:    _Content_GetInfoLiked_Handler,
+		},
+		{
+			MethodName: "GetInfoUnliked",
+			Handler:    _Content_GetInfoUnliked_Handler,
+		},
+		{
+			MethodName: "FavoriteInfo",
+			Handler:    _Content_FavoriteInfo_Handler,
+		},
+		{
+			MethodName: "GetUserFavorite",
+			Handler:    _Content_GetUserFavorite_Handler,
+		},
+		{
+			MethodName: "GetInfoFavorited",
+			Handler:    _Content_GetInfoFavorited_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/content.proto",
 }

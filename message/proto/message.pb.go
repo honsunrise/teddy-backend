@@ -3,11 +3,15 @@
 
 package proto
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import _ "github.com/golang/protobuf/ptypes/empty"
-import timestamp "github.com/golang/protobuf/ptypes/timestamp"
+import (
+	fmt "fmt"
+	proto "github.com/golang/protobuf/proto"
+	empty "github.com/golang/protobuf/ptypes/empty"
+	timestamp "github.com/golang/protobuf/ptypes/timestamp"
+	context "golang.org/x/net/context"
+	grpc "google.golang.org/grpc"
+	math "math"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -38,16 +42,17 @@ func (m *InBoxItem) Reset()         { *m = InBoxItem{} }
 func (m *InBoxItem) String() string { return proto.CompactTextString(m) }
 func (*InBoxItem) ProtoMessage()    {}
 func (*InBoxItem) Descriptor() ([]byte, []int) {
-	return fileDescriptor_message_83c091215cd4fde9, []int{0}
+	return fileDescriptor_33f3a5e1293a7bcd, []int{0}
 }
+
 func (m *InBoxItem) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_InBoxItem.Unmarshal(m, b)
 }
 func (m *InBoxItem) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_InBoxItem.Marshal(b, m, deterministic)
 }
-func (dst *InBoxItem) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_InBoxItem.Merge(dst, src)
+func (m *InBoxItem) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InBoxItem.Merge(m, src)
 }
 func (m *InBoxItem) XXX_Size() int {
 	return xxx_messageInfo_InBoxItem.Size(m)
@@ -126,16 +131,17 @@ func (m *NotifyItem) Reset()         { *m = NotifyItem{} }
 func (m *NotifyItem) String() string { return proto.CompactTextString(m) }
 func (*NotifyItem) ProtoMessage()    {}
 func (*NotifyItem) Descriptor() ([]byte, []int) {
-	return fileDescriptor_message_83c091215cd4fde9, []int{1}
+	return fileDescriptor_33f3a5e1293a7bcd, []int{1}
 }
+
 func (m *NotifyItem) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_NotifyItem.Unmarshal(m, b)
 }
 func (m *NotifyItem) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_NotifyItem.Marshal(b, m, deterministic)
 }
-func (dst *NotifyItem) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_NotifyItem.Merge(dst, src)
+func (m *NotifyItem) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_NotifyItem.Merge(m, src)
 }
 func (m *NotifyItem) XXX_Size() int {
 	return xxx_messageInfo_NotifyItem.Size(m)
@@ -174,16 +180,17 @@ func (m *SendEmailReq) Reset()         { *m = SendEmailReq{} }
 func (m *SendEmailReq) String() string { return proto.CompactTextString(m) }
 func (*SendEmailReq) ProtoMessage()    {}
 func (*SendEmailReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_message_83c091215cd4fde9, []int{2}
+	return fileDescriptor_33f3a5e1293a7bcd, []int{2}
 }
+
 func (m *SendEmailReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SendEmailReq.Unmarshal(m, b)
 }
 func (m *SendEmailReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_SendEmailReq.Marshal(b, m, deterministic)
 }
-func (dst *SendEmailReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SendEmailReq.Merge(dst, src)
+func (m *SendEmailReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SendEmailReq.Merge(m, src)
 }
 func (m *SendEmailReq) XXX_Size() int {
 	return xxx_messageInfo_SendEmailReq.Size(m)
@@ -238,16 +245,17 @@ func (m *SendInBoxReq) Reset()         { *m = SendInBoxReq{} }
 func (m *SendInBoxReq) String() string { return proto.CompactTextString(m) }
 func (*SendInBoxReq) ProtoMessage()    {}
 func (*SendInBoxReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_message_83c091215cd4fde9, []int{3}
+	return fileDescriptor_33f3a5e1293a7bcd, []int{3}
 }
+
 func (m *SendInBoxReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SendInBoxReq.Unmarshal(m, b)
 }
 func (m *SendInBoxReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_SendInBoxReq.Marshal(b, m, deterministic)
 }
-func (dst *SendInBoxReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SendInBoxReq.Merge(dst, src)
+func (m *SendInBoxReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SendInBoxReq.Merge(m, src)
 }
 func (m *SendInBoxReq) XXX_Size() int {
 	return xxx_messageInfo_SendInBoxReq.Size(m)
@@ -313,16 +321,17 @@ func (m *SendNotifyReq) Reset()         { *m = SendNotifyReq{} }
 func (m *SendNotifyReq) String() string { return proto.CompactTextString(m) }
 func (*SendNotifyReq) ProtoMessage()    {}
 func (*SendNotifyReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_message_83c091215cd4fde9, []int{4}
+	return fileDescriptor_33f3a5e1293a7bcd, []int{4}
 }
+
 func (m *SendNotifyReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SendNotifyReq.Unmarshal(m, b)
 }
 func (m *SendNotifyReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_SendNotifyReq.Marshal(b, m, deterministic)
 }
-func (dst *SendNotifyReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SendNotifyReq.Merge(dst, src)
+func (m *SendNotifyReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SendNotifyReq.Merge(m, src)
 }
 func (m *SendNotifyReq) XXX_Size() int {
 	return xxx_messageInfo_SendNotifyReq.Size(m)
@@ -366,16 +375,17 @@ func (m *SendSMSReq) Reset()         { *m = SendSMSReq{} }
 func (m *SendSMSReq) String() string { return proto.CompactTextString(m) }
 func (*SendSMSReq) ProtoMessage()    {}
 func (*SendSMSReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_message_83c091215cd4fde9, []int{5}
+	return fileDescriptor_33f3a5e1293a7bcd, []int{5}
 }
+
 func (m *SendSMSReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SendSMSReq.Unmarshal(m, b)
 }
 func (m *SendSMSReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_SendSMSReq.Marshal(b, m, deterministic)
 }
-func (dst *SendSMSReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SendSMSReq.Merge(dst, src)
+func (m *SendSMSReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SendSMSReq.Merge(m, src)
 }
 func (m *SendSMSReq) XXX_Size() int {
 	return xxx_messageInfo_SendSMSReq.Size(m)
@@ -414,16 +424,17 @@ func (m *GetInBoxReq) Reset()         { *m = GetInBoxReq{} }
 func (m *GetInBoxReq) String() string { return proto.CompactTextString(m) }
 func (*GetInBoxReq) ProtoMessage()    {}
 func (*GetInBoxReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_message_83c091215cd4fde9, []int{6}
+	return fileDescriptor_33f3a5e1293a7bcd, []int{6}
 }
+
 func (m *GetInBoxReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetInBoxReq.Unmarshal(m, b)
 }
 func (m *GetInBoxReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_GetInBoxReq.Marshal(b, m, deterministic)
 }
-func (dst *GetInBoxReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetInBoxReq.Merge(dst, src)
+func (m *GetInBoxReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetInBoxReq.Merge(m, src)
 }
 func (m *GetInBoxReq) XXX_Size() int {
 	return xxx_messageInfo_GetInBoxReq.Size(m)
@@ -473,16 +484,17 @@ func (m *GetInboxResp) Reset()         { *m = GetInboxResp{} }
 func (m *GetInboxResp) String() string { return proto.CompactTextString(m) }
 func (*GetInboxResp) ProtoMessage()    {}
 func (*GetInboxResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_message_83c091215cd4fde9, []int{7}
+	return fileDescriptor_33f3a5e1293a7bcd, []int{7}
 }
+
 func (m *GetInboxResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetInboxResp.Unmarshal(m, b)
 }
 func (m *GetInboxResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_GetInboxResp.Marshal(b, m, deterministic)
 }
-func (dst *GetInboxResp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetInboxResp.Merge(dst, src)
+func (m *GetInboxResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetInboxResp.Merge(m, src)
 }
 func (m *GetInboxResp) XXX_Size() int {
 	return xxx_messageInfo_GetInboxResp.Size(m)
@@ -511,16 +523,17 @@ func (m *GetNotifyReq) Reset()         { *m = GetNotifyReq{} }
 func (m *GetNotifyReq) String() string { return proto.CompactTextString(m) }
 func (*GetNotifyReq) ProtoMessage()    {}
 func (*GetNotifyReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_message_83c091215cd4fde9, []int{8}
+	return fileDescriptor_33f3a5e1293a7bcd, []int{8}
 }
+
 func (m *GetNotifyReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetNotifyReq.Unmarshal(m, b)
 }
 func (m *GetNotifyReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_GetNotifyReq.Marshal(b, m, deterministic)
 }
-func (dst *GetNotifyReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetNotifyReq.Merge(dst, src)
+func (m *GetNotifyReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetNotifyReq.Merge(m, src)
 }
 func (m *GetNotifyReq) XXX_Size() int {
 	return xxx_messageInfo_GetNotifyReq.Size(m)
@@ -539,55 +552,321 @@ func (m *GetNotifyReq) GetUid() string {
 }
 
 func init() {
-	proto.RegisterType((*InBoxItem)(nil), "com.teddy.srv.notify.InBoxItem")
-	proto.RegisterType((*NotifyItem)(nil), "com.teddy.srv.notify.NotifyItem")
-	proto.RegisterType((*SendEmailReq)(nil), "com.teddy.srv.notify.SendEmailReq")
-	proto.RegisterType((*SendInBoxReq)(nil), "com.teddy.srv.notify.SendInBoxReq")
-	proto.RegisterType((*SendNotifyReq)(nil), "com.teddy.srv.notify.SendNotifyReq")
-	proto.RegisterType((*SendSMSReq)(nil), "com.teddy.srv.notify.SendSMSReq")
-	proto.RegisterType((*GetInBoxReq)(nil), "com.teddy.srv.notify.GetInBoxReq")
-	proto.RegisterType((*GetInboxResp)(nil), "com.teddy.srv.notify.GetInboxResp")
-	proto.RegisterType((*GetNotifyReq)(nil), "com.teddy.srv.notify.GetNotifyReq")
+	proto.RegisterType((*InBoxItem)(nil), "com.teddy.srv.message.InBoxItem")
+	proto.RegisterType((*NotifyItem)(nil), "com.teddy.srv.message.NotifyItem")
+	proto.RegisterType((*SendEmailReq)(nil), "com.teddy.srv.message.SendEmailReq")
+	proto.RegisterType((*SendInBoxReq)(nil), "com.teddy.srv.message.SendInBoxReq")
+	proto.RegisterType((*SendNotifyReq)(nil), "com.teddy.srv.message.SendNotifyReq")
+	proto.RegisterType((*SendSMSReq)(nil), "com.teddy.srv.message.SendSMSReq")
+	proto.RegisterType((*GetInBoxReq)(nil), "com.teddy.srv.message.GetInBoxReq")
+	proto.RegisterType((*GetInboxResp)(nil), "com.teddy.srv.message.GetInboxResp")
+	proto.RegisterType((*GetNotifyReq)(nil), "com.teddy.srv.message.GetNotifyReq")
 }
 
-func init() { proto.RegisterFile("proto/message.proto", fileDescriptor_message_83c091215cd4fde9) }
+func init() { proto.RegisterFile("proto/message.proto", fileDescriptor_33f3a5e1293a7bcd) }
 
-var fileDescriptor_message_83c091215cd4fde9 = []byte{
-	// 576 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xb4, 0x54, 0x4f, 0x6f, 0xd3, 0x30,
-	0x14, 0x5f, 0x9a, 0xfe, 0x7d, 0xdd, 0x10, 0x32, 0xd3, 0x14, 0xf5, 0x42, 0x31, 0x17, 0x4e, 0x29,
-	0xda, 0x04, 0x07, 0xb8, 0x4d, 0xaa, 0xa0, 0x42, 0x1b, 0x52, 0x3a, 0x2e, 0x70, 0x4a, 0x1b, 0x37,
-	0x8b, 0xd4, 0xc4, 0x21, 0x71, 0x10, 0xe5, 0x33, 0xf0, 0x61, 0xf8, 0x46, 0x7c, 0x10, 0x2e, 0x3c,
-	0xdb, 0x89, 0x9b, 0x89, 0x36, 0xa3, 0x87, 0x5d, 0xda, 0xe7, 0x17, 0xbf, 0x5f, 0x7e, 0x7f, 0x1c,
-	0xc3, 0x93, 0x34, 0xe3, 0x82, 0x4f, 0x62, 0x96, 0xe7, 0x7e, 0xc8, 0x5c, 0xb5, 0x22, 0xa7, 0x4b,
-	0x1e, 0xbb, 0x82, 0x05, 0xc1, 0xc6, 0xcd, 0xb3, 0x6f, 0x6e, 0xc2, 0x45, 0xb4, 0xda, 0x8c, 0x2e,
-	0xc2, 0x48, 0xdc, 0x16, 0x0b, 0x17, 0x1f, 0x4e, 0x42, 0xbe, 0xf6, 0x93, 0x70, 0xa2, 0xb6, 0x2f,
-	0x8a, 0xd5, 0x24, 0x15, 0x9b, 0x94, 0xe5, 0x13, 0x16, 0x63, 0xa1, 0x7f, 0x35, 0xd4, 0xe8, 0xed,
-	0xfd, 0x43, 0x22, 0xc2, 0xb7, 0x0b, 0x3f, 0x4e, 0xb7, 0x95, 0x1e, 0xa6, 0x7f, 0x2c, 0x18, 0xcc,
-	0x92, 0x4b, 0xfe, 0x7d, 0x26, 0x58, 0x4c, 0x1e, 0x41, 0x2b, 0x0a, 0x1c, 0x6b, 0x6c, 0xbd, 0x18,
-	0x78, 0x58, 0x91, 0x53, 0xe8, 0x08, 0x9e, 0x46, 0x4b, 0xa7, 0xa5, 0x5a, 0x7a, 0x41, 0x1c, 0xe8,
-	0x2d, 0x79, 0x22, 0x58, 0x22, 0x1c, 0x5b, 0xf5, 0xab, 0x25, 0x21, 0xd0, 0x5e, 0x65, 0x3c, 0x76,
-	0xda, 0xaa, 0xad, 0x6a, 0xd9, 0x93, 0x24, 0x9c, 0x0e, 0xf6, 0x4e, 0x3c, 0x55, 0x93, 0x33, 0xe8,
-	0x16, 0x49, 0xc6, 0xfc, 0xc0, 0xe9, 0x62, 0xb7, 0xef, 0x95, 0x2b, 0xf2, 0x1a, 0xfa, 0x39, 0x4b,
-	0x82, 0x1b, 0x24, 0xe9, 0xf4, 0xf0, 0xc9, 0xf0, 0x7c, 0xe4, 0x86, 0x9c, 0x87, 0xeb, 0xd2, 0x36,
-	0x94, 0xe4, 0xde, 0x54, 0x0a, 0x3c, 0xb3, 0x57, 0xce, 0x79, 0x38, 0xaf, 0xe6, 0xfa, 0xf7, 0xcf,
-	0x55, 0x7b, 0xe9, 0x1b, 0x80, 0x6b, 0xe5, 0xbc, 0x52, 0x6f, 0xd4, 0x5a, 0x75, 0xb5, 0xc8, 0x35,
-	0x60, 0xc2, 0x8f, 0xd6, 0xa5, 0x09, 0xe5, 0x8a, 0xfe, 0xb4, 0xe0, 0x78, 0x8e, 0x04, 0xa6, 0x31,
-	0xae, 0x3c, 0xf6, 0x55, 0x8e, 0x33, 0x59, 0x57, 0xe3, 0x6a, 0x71, 0xb0, 0x85, 0x75, 0x0b, 0xda,
-	0xff, 0x6f, 0x01, 0xfd, 0x55, 0xd2, 0x51, 0x61, 0x4a, 0x3a, 0x8f, 0xc1, 0x2e, 0x4c, 0x98, 0xb2,
-	0x7c, 0xb0, 0x34, 0xeb, 0x94, 0xbb, 0x07, 0x50, 0xfe, 0x08, 0x27, 0x92, 0xb1, 0x4e, 0xe0, 0x10,
-	0xca, 0xdb, 0x48, 0xec, 0x3b, 0x91, 0xbc, 0x07, 0x90, 0x80, 0xf3, 0xab, 0xb9, 0x44, 0x1b, 0xc3,
-	0x30, 0xbd, 0xe5, 0x09, 0xbb, 0x2e, 0xe2, 0x05, 0xcb, 0x4a, 0xd4, 0x7a, 0xab, 0x2e, 0xbd, 0x75,
-	0x47, 0x3a, 0xfd, 0x02, 0xc3, 0x77, 0x4c, 0x18, 0x2f, 0x51, 0x75, 0x8a, 0xdf, 0xae, 0xc2, 0x40,
-	0xd5, 0xb2, 0x96, 0xbd, 0x3c, 0xfa, 0xc1, 0xd4, 0x24, 0xf6, 0x64, 0x6d, 0xdc, 0xb1, 0x6b, 0xee,
-	0x94, 0xa2, 0xda, 0x46, 0x14, 0x9d, 0xc2, 0xb1, 0x02, 0x5f, 0x48, 0xf0, 0x3c, 0x25, 0xaf, 0xa0,
-	0x13, 0xe1, 0xf9, 0xcb, 0x11, 0xde, 0x46, 0xf3, 0x9e, 0xba, 0xbb, 0xee, 0x06, 0xd7, 0x7c, 0xa5,
-	0x9e, 0xde, 0x4d, 0xc7, 0x0a, 0xa6, 0xc1, 0xbd, 0xf3, 0xdf, 0x36, 0xf4, 0xae, 0xf4, 0xb5, 0x43,
-	0x66, 0x30, 0x30, 0xa7, 0x95, 0xd0, 0xdd, 0xaf, 0xa8, 0x1f, 0xe7, 0xd1, 0xd9, 0x3f, 0x19, 0x4e,
-	0xe5, 0xa5, 0x43, 0x8f, 0x2a, 0x28, 0x45, 0xa8, 0x09, 0xaa, 0xb2, 0xaf, 0x01, 0xea, 0x83, 0x4e,
-	0x4c, 0x8b, 0x20, 0xcf, 0xf7, 0x63, 0x19, 0x99, 0x0d, 0x60, 0x53, 0xe8, 0x95, 0xf1, 0x93, 0xf1,
-	0x7e, 0x24, 0x7d, 0x3a, 0x1a, 0x60, 0xe6, 0xd0, 0xaf, 0xb2, 0x27, 0xcf, 0x76, 0xe3, 0xd4, 0xce,
-	0xc6, 0x88, 0x36, 0x6c, 0x29, 0x13, 0x46, 0xd0, 0x4f, 0x30, 0x30, 0x61, 0x91, 0xfd, 0x23, 0x5b,
-	0x99, 0x7b, 0x14, 0x6c, 0xaf, 0x2b, 0x7a, 0xf4, 0xd2, 0xba, 0xec, 0x7d, 0xee, 0x68, 0xfe, 0x5d,
-	0xf5, 0x77, 0xf1, 0x37, 0x00, 0x00, 0xff, 0xff, 0x8c, 0xc4, 0x88, 0x62, 0x6d, 0x06, 0x00, 0x00,
+var fileDescriptor_33f3a5e1293a7bcd = []byte{
+	// 584 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x54, 0xcd, 0x6e, 0xd3, 0x40,
+	0x10, 0x8e, 0xe3, 0xfc, 0x4e, 0x1a, 0x84, 0x16, 0x88, 0xac, 0x9c, 0xcc, 0x96, 0x43, 0x4e, 0x0e,
+	0x4a, 0xa5, 0x1e, 0xe0, 0x56, 0xa9, 0x85, 0x22, 0x5a, 0x24, 0xa7, 0x08, 0x09, 0x4e, 0x4e, 0x3c,
+	0x71, 0x57, 0xca, 0x7a, 0x4d, 0xbc, 0x46, 0x84, 0x67, 0xe0, 0x61, 0x78, 0x2b, 0x1e, 0x82, 0x0b,
+	0xda, 0x5d, 0xdb, 0x71, 0x05, 0x71, 0xc9, 0x81, 0x4b, 0x3b, 0x33, 0x99, 0xf9, 0x32, 0xdf, 0xf7,
+	0x4d, 0x16, 0x1e, 0x25, 0x1b, 0x21, 0xc5, 0x94, 0x63, 0x9a, 0x06, 0x11, 0x7a, 0x3a, 0x23, 0x4f,
+	0x96, 0x82, 0x7b, 0x12, 0xc3, 0x70, 0xeb, 0xa5, 0x9b, 0x2f, 0x5e, 0xfe, 0xe1, 0xf8, 0x24, 0x62,
+	0xf2, 0x36, 0x5b, 0x78, 0x4b, 0xc1, 0xa7, 0x91, 0x58, 0x07, 0x71, 0x34, 0xd5, 0xfd, 0x8b, 0x6c,
+	0x35, 0x4d, 0xe4, 0x36, 0xc1, 0x74, 0x8a, 0x3c, 0x91, 0x5b, 0xf3, 0xd7, 0x60, 0x8d, 0x5f, 0xde,
+	0x3f, 0x24, 0x19, 0xc7, 0x54, 0x06, 0x3c, 0xd9, 0x45, 0x66, 0x98, 0xfe, 0xb2, 0xa0, 0x7f, 0x19,
+	0x9f, 0x89, 0xaf, 0x97, 0x12, 0x39, 0x79, 0x00, 0x4d, 0x16, 0x3a, 0x96, 0x6b, 0x4d, 0xfa, 0x7e,
+	0x93, 0x85, 0xe4, 0x31, 0xb4, 0xa5, 0x48, 0xd8, 0xd2, 0x69, 0xea, 0x92, 0x49, 0x88, 0x03, 0xdd,
+	0xa5, 0x88, 0x25, 0xc6, 0xd2, 0xb1, 0x75, 0xbd, 0x48, 0x09, 0x81, 0xd6, 0x6a, 0x23, 0xb8, 0xd3,
+	0xd2, 0x65, 0x1d, 0xab, 0x9a, 0x5a, 0xc2, 0x69, 0xbb, 0xd6, 0x64, 0xe8, 0xeb, 0x98, 0x8c, 0xa0,
+	0x93, 0xc5, 0x1b, 0x0c, 0x42, 0xa7, 0xe3, 0x5a, 0x93, 0x9e, 0x9f, 0x67, 0xe4, 0x14, 0x7a, 0x29,
+	0xc6, 0xe1, 0x0d, 0xe3, 0xe8, 0x74, 0x5d, 0x6b, 0x32, 0x98, 0x8d, 0xbd, 0x48, 0x88, 0x68, 0x9d,
+	0xeb, 0xb6, 0xc8, 0x56, 0xde, 0x4d, 0xc1, 0xc0, 0x2f, 0x7b, 0xd5, 0x9c, 0x8f, 0x81, 0x99, 0xeb,
+	0xdd, 0x3f, 0x57, 0xf4, 0xd2, 0x17, 0x00, 0xd7, 0x42, 0xb2, 0xd5, 0x56, 0xb3, 0x2f, 0xd9, 0x5a,
+	0x55, 0xb6, 0x23, 0xe8, 0x84, 0x28, 0x03, 0xb6, 0xce, 0x45, 0xc8, 0x33, 0xfa, 0xdd, 0x82, 0xa3,
+	0x39, 0xc6, 0xe1, 0x39, 0x0f, 0xd8, 0xda, 0xc7, 0xcf, 0x6a, 0x1c, 0x55, 0x5c, 0x8c, 0xeb, 0xe4,
+	0x60, 0x09, 0xab, 0x12, 0xb4, 0xfe, 0x5d, 0x02, 0xfa, 0x23, 0x5f, 0x47, 0x9b, 0xa9, 0xd6, 0x79,
+	0x08, 0x76, 0x56, 0x9a, 0xa9, 0xc2, 0xff, 0xe6, 0x66, 0x75, 0xe5, 0xce, 0x01, 0x2b, 0xbf, 0x83,
+	0xa1, 0xda, 0xd8, 0x38, 0x70, 0xc8, 0xca, 0x3b, 0x4b, 0xec, 0x3b, 0x96, 0xbc, 0x06, 0x50, 0x80,
+	0xf3, 0xab, 0xb9, 0x42, 0x73, 0x61, 0x90, 0xdc, 0x8a, 0x18, 0xaf, 0x33, 0xbe, 0xc0, 0x4d, 0x8e,
+	0x5a, 0x2d, 0x55, 0xa9, 0x37, 0xef, 0x50, 0xa7, 0x9f, 0x60, 0xf0, 0x0a, 0x65, 0xa9, 0x25, 0x81,
+	0x56, 0x12, 0x44, 0xa8, 0x31, 0x86, 0xbe, 0x8e, 0x55, 0x2d, 0x65, 0xdf, 0x50, 0x4f, 0x0e, 0x7d,
+	0x1d, 0x97, 0xea, 0xd8, 0x15, 0x75, 0x72, 0x52, 0xad, 0x92, 0x14, 0xbd, 0x80, 0x23, 0x0d, 0xbe,
+	0x50, 0xe0, 0x69, 0x42, 0x4e, 0xa1, 0xcd, 0x24, 0xf2, 0xd4, 0xb1, 0x5c, 0x7b, 0x32, 0x98, 0xb9,
+	0xde, 0x5f, 0x1f, 0x07, 0xaf, 0xfc, 0x99, 0xfa, 0xa6, 0x9d, 0xba, 0x1a, 0xa7, 0x46, 0xbe, 0xd9,
+	0x4f, 0x1b, 0xba, 0x57, 0x66, 0x9c, 0xbc, 0x81, 0x7e, 0x79, 0xae, 0xe4, 0x78, 0xcf, 0x77, 0x54,
+	0x0f, 0x7a, 0x3c, 0xfa, 0xc3, 0xc5, 0x73, 0xf5, 0xec, 0xd0, 0x46, 0x81, 0xa5, 0x37, 0xaa, 0xc5,
+	0x2a, 0x14, 0xac, 0xc1, 0x7a, 0x6b, 0x4c, 0x33, 0x34, 0xc8, 0xb3, 0x1a, 0xb0, 0x92, 0x69, 0x0d,
+	0xda, 0x05, 0x74, 0xf3, 0x13, 0x20, 0x4f, 0x6b, 0xa0, 0xcc, 0x89, 0xd4, 0xe0, 0xbc, 0x87, 0x5e,
+	0x71, 0x00, 0x84, 0xee, 0x01, 0xaa, 0x5c, 0xc8, 0xf8, 0xb8, 0xae, 0x27, 0x37, 0x9a, 0x36, 0xc8,
+	0x07, 0xe8, 0x97, 0x96, 0x91, 0x9a, 0x99, 0x1d, 0xd5, 0x7d, 0x2c, 0x76, 0xef, 0x16, 0x6d, 0x3c,
+	0xb7, 0xce, 0xba, 0x1f, 0xdb, 0x86, 0x43, 0x47, 0xff, 0x3b, 0xf9, 0x1d, 0x00, 0x00, 0xff, 0xff,
+	0x8e, 0xa9, 0xfd, 0x5c, 0x77, 0x06, 0x00, 0x00,
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConn
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion4
+
+// MessageClient is the client API for Message service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type MessageClient interface {
+	SendEmail(ctx context.Context, in *SendEmailReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	SendInBox(ctx context.Context, in *SendInBoxReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	SendNotify(ctx context.Context, in *SendNotifyReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	SendSMS(ctx context.Context, in *SendSMSReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	GetInBox(ctx context.Context, in *GetInBoxReq, opts ...grpc.CallOption) (*GetInboxResp, error)
+	GetNotify(ctx context.Context, in *GetNotifyReq, opts ...grpc.CallOption) (Message_GetNotifyClient, error)
+}
+
+type messageClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewMessageClient(cc *grpc.ClientConn) MessageClient {
+	return &messageClient{cc}
+}
+
+func (c *messageClient) SendEmail(ctx context.Context, in *SendEmailReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.message.Message/SendEmail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *messageClient) SendInBox(ctx context.Context, in *SendInBoxReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.message.Message/SendInBox", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *messageClient) SendNotify(ctx context.Context, in *SendNotifyReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.message.Message/SendNotify", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *messageClient) SendSMS(ctx context.Context, in *SendSMSReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.message.Message/SendSMS", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *messageClient) GetInBox(ctx context.Context, in *GetInBoxReq, opts ...grpc.CallOption) (*GetInboxResp, error) {
+	out := new(GetInboxResp)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.message.Message/GetInBox", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *messageClient) GetNotify(ctx context.Context, in *GetNotifyReq, opts ...grpc.CallOption) (Message_GetNotifyClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Message_serviceDesc.Streams[0], "/com.teddy.srv.message.Message/GetNotify", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &messageGetNotifyClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Message_GetNotifyClient interface {
+	Recv() (*NotifyItem, error)
+	grpc.ClientStream
+}
+
+type messageGetNotifyClient struct {
+	grpc.ClientStream
+}
+
+func (x *messageGetNotifyClient) Recv() (*NotifyItem, error) {
+	m := new(NotifyItem)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// MessageServer is the server API for Message service.
+type MessageServer interface {
+	SendEmail(context.Context, *SendEmailReq) (*empty.Empty, error)
+	SendInBox(context.Context, *SendInBoxReq) (*empty.Empty, error)
+	SendNotify(context.Context, *SendNotifyReq) (*empty.Empty, error)
+	SendSMS(context.Context, *SendSMSReq) (*empty.Empty, error)
+	GetInBox(context.Context, *GetInBoxReq) (*GetInboxResp, error)
+	GetNotify(*GetNotifyReq, Message_GetNotifyServer) error
+}
+
+func RegisterMessageServer(s *grpc.Server, srv MessageServer) {
+	s.RegisterService(&_Message_serviceDesc, srv)
+}
+
+func _Message_SendEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendEmailReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageServer).SendEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.message.Message/SendEmail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageServer).SendEmail(ctx, req.(*SendEmailReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Message_SendInBox_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendInBoxReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageServer).SendInBox(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.message.Message/SendInBox",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageServer).SendInBox(ctx, req.(*SendInBoxReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Message_SendNotify_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendNotifyReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageServer).SendNotify(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.message.Message/SendNotify",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageServer).SendNotify(ctx, req.(*SendNotifyReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Message_SendSMS_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendSMSReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageServer).SendSMS(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.message.Message/SendSMS",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageServer).SendSMS(ctx, req.(*SendSMSReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Message_GetInBox_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetInBoxReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageServer).GetInBox(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.message.Message/GetInBox",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageServer).GetInBox(ctx, req.(*GetInBoxReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Message_GetNotify_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetNotifyReq)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(MessageServer).GetNotify(m, &messageGetNotifyServer{stream})
+}
+
+type Message_GetNotifyServer interface {
+	Send(*NotifyItem) error
+	grpc.ServerStream
+}
+
+type messageGetNotifyServer struct {
+	grpc.ServerStream
+}
+
+func (x *messageGetNotifyServer) Send(m *NotifyItem) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+var _Message_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "com.teddy.srv.message.Message",
+	HandlerType: (*MessageServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SendEmail",
+			Handler:    _Message_SendEmail_Handler,
+		},
+		{
+			MethodName: "SendInBox",
+			Handler:    _Message_SendInBox_Handler,
+		},
+		{
+			MethodName: "SendNotify",
+			Handler:    _Message_SendNotify_Handler,
+		},
+		{
+			MethodName: "SendSMS",
+			Handler:    _Message_SendSMS_Handler,
+		},
+		{
+			MethodName: "GetInBox",
+			Handler:    _Message_GetInBox_Handler,
+		},
+	},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetNotify",
+			Handler:       _Message_GetNotify_Handler,
+			ServerStreams: true,
+		},
+	},
+	Metadata: "proto/message.proto",
 }
