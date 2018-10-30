@@ -1,9 +1,13 @@
 package main
 
 import (
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
 	"flag"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
+	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
 	"github.com/zhsyourai/teddy-backend/api/uaa/client"
 	"github.com/zhsyourai/teddy-backend/api/uaa/handler"
 	"github.com/zhsyourai/teddy-backend/common/config"
@@ -18,8 +22,29 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	conf := config.GetConfig()
 
-	uaa, err := handler.NewUaaHandler()
+	// New jwt generator and extractor
+	const SigningAlgorithm = "RS512"
+	// Load Jwt PublicKey
+	block, _ := pem.Decode([]byte(conf.JWTPkcs8))
+	if block == nil {
+		log.Fatal("Jwt private key decode error")
+	}
+	parseResult, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err != nil {
+		log.Fatal(err)
+	}
+	key := parseResult.(*rsa.PrivateKey)
+
+	jwtGenerator, err := gin_jwt.NewGinJwtGenerator(gin_jwt.GeneratorConfig{
+		Issuer:           "com.teddy.uaa",
+		SigningAlgorithm: SigningAlgorithm,
+		KeyFunc: func() interface{} {
+			return key
+		},
+	})
+	uaa, err := handler.NewUaaHandler(jwtGenerator)
 	if err != nil {
 		log.Fatal(err)
 	}

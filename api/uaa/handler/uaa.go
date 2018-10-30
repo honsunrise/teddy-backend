@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	log "github.com/sirupsen/logrus"
+	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
 	"github.com/zhsyourai/teddy-backend/api/uaa/client"
 	capProto "github.com/zhsyourai/teddy-backend/captcha/proto"
 	"github.com/zhsyourai/teddy-backend/common/errors"
@@ -15,10 +16,13 @@ import (
 )
 
 type Uaa struct {
+	generator *gin_jwt.JwtGenerator
 }
 
-func NewUaaHandler() (*Uaa, error) {
-	instance := &Uaa{}
+func NewUaaHandler(generator *gin_jwt.JwtGenerator) (*Uaa, error) {
+	instance := &Uaa{
+		generator: generator,
+	}
 	return instance, nil
 }
 
