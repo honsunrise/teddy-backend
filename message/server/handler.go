@@ -130,15 +130,12 @@ func (h *notifyHandler) SendNotify(ctx context.Context, req *proto.SendNotifyReq
 		return nil, err
 	}
 
-	if inBoxChs, ok := h.notifyChMap.Load(req.Uid); ok {
-		inBoxChs.(*sync.Map).Range(func(key, value interface{}) bool {
-			key.(chan *models.NotifyItem) <- &models.NotifyItem{
-				Uid:    req.Uid,
-				Topic:  req.Topic,
-				Detail: req.Detail,
-			}
-			return true
-		})
+	if inBoxCh, ok := h.notifyChMap.Load(req.Uid); ok {
+		inBoxCh.(chan *models.NotifyItem) <- &models.NotifyItem{
+			Uid:    req.Uid,
+			Topic:  req.Topic,
+			Detail: req.Detail,
+		}
 	}
 	return &resp, nil
 }
@@ -167,22 +164,17 @@ func (h *notifyHandler) GetNotify(req *proto.GetNotifyReq, resp proto.Message_Ge
 		return err
 	}
 
-	tmp, _ := h.notifyChMap.LoadOrStore(req.Uid, &sync.Map{})
-	inBoxChs := tmp.(*sync.Map)
-	go func() {
-		ch := make(chan *models.NotifyItem)
-		inBoxChs.Store(ch, nil)
-		var pbItem proto.NotifyItem
-		for {
-			item := <-ch
-			converter.CopyFromNotifyItemToPBNotifyItem(item, &pbItem)
-			if err := resp.Send(&pbItem); err != nil {
-				close(ch)
-				inBoxChs.Delete(ch)
-				return
-			}
+	tmp, _ := h.notifyChMap.LoadOrStore(req.Uid, make(chan *models.NotifyItem))
+	inBoxCh := tmp.(chan *models.NotifyItem)
+	var pbItem proto.NotifyItem
+	for {
+		item := <-inBoxCh
+		converter.CopyFromNotifyItemToPBNotifyItem(item, &pbItem)
+		if err := resp.Send(&pbItem); err != nil {
+			close(inBoxCh)
+			h.notifyChMap.Delete(req.Uid)
+			return err
 		}
-	}()
-
+	}
 	return nil
 }

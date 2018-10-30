@@ -1,8 +1,11 @@
 package client
 
 import (
+	log "github.com/sirupsen/logrus"
+
 	"github.com/gin-gonic/gin"
 	"github.com/zhsyourai/teddy-backend/content/proto"
+	"google.golang.org/grpc"
 )
 
 var contentKey = "__teddy_content_client_key__"
@@ -15,8 +18,15 @@ func ContentFromContext(ctx *gin.Context) (proto.ContentClient, bool) {
 
 // Client returns a wrapper for the UaaClient
 func ContentNew() gin.HandlerFunc {
-	c := proto.NewContentClient()
+	conn, err := grpc.Dial("")
+	if err != nil {
+		log.Errorf("Dial to captcha server error %v", err)
+		return nil
+	}
+	client := proto.NewContentClient(conn)
+
 	return func(ctx *gin.Context) {
-		ctx.Set(contentKey, c)
+		ctx.Set(contentKey, client)
+		ctx.Next()
 	}
 }

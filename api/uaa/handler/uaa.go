@@ -58,7 +58,7 @@ func (h *Uaa) Register(ctx *gin.Context) {
 	}
 
 	// extract the client from the context
-	captchaClient, ok := client.CaptchaKeyFromContext(ctx)
+	captchaClient, ok := client.CaptchaFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
@@ -202,38 +202,12 @@ func (h *Uaa) Login(ctx *gin.Context) {
 
 // Uaa.Logout is called by the API as /uaa/Logout
 func (h *Uaa) Logout(ctx *gin.Context) {
-	token, err := h.middleware.ExtractToken(ctx)
-	if err != nil {
-		ctx.AbortWithStatus(http.StatusUnauthorized)
-	}
-
-	sub := token.Claims.(jwt.MapClaims)["uid"] // the user that wants to access a resource.
-	obj := "uaa.logout"                        // the resource that is going to be accessed.
-	act := "read,write"                        // the operation that the user performs on the resource.
-
-	if h.enforcer.Enforce(sub, obj, act) != true {
-		ctx.AbortWithStatus(http.StatusForbidden)
-	}
 	// TODO: may do something
 	ctx.Status(http.StatusOK)
 }
 
 // Uaa.ChangePassword is called by the API as /uaa/ChangePassword with post body
 func (h *Uaa) ChangePassword(ctx *gin.Context) {
-	token, err := h.middleware.ExtractToken(ctx)
-	if err != nil {
-		ctx.AbortWithStatus(http.StatusUnauthorized)
-	}
-
-	sub := token.Claims.(jwt.MapClaims)["uid"] // the user that wants to access a resource.
-	obj := "uaa.changePassword"                // the resource that is going to be accessed.
-	act := "read,write"                        // the operation that the user performs on the resource.
-
-	if h.enforcer.Enforce(sub, obj, act) != true {
-		ctx.AbortWithStatus(http.StatusForbidden)
-		return
-	}
-
 	// parse body
 	type changePasswordReq struct {
 		Username        string `json:"username"`
@@ -247,7 +221,7 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 	ctx.Bind(&body)
 
 	// extract the client from the context
-	captchaClient, ok := client.CaptchaKeyFromContext(ctx)
+	captchaClient, ok := client.CaptchaFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
@@ -301,7 +275,7 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	ctx.Bind(&body)
 
 	// extract the client from the context
-	captchaClient, ok := client.CaptchaKeyFromContext(ctx)
+	captchaClient, ok := client.CaptchaFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)

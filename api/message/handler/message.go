@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/prometheus/common/log"
@@ -46,20 +45,6 @@ func (h *Message) PostInbox(ctx *gin.Context) {
 }
 
 func (h *Message) Inbox(ctx *gin.Context) {
-	token, err := h.middleware.ExtractToken(ctx)
-	if err != nil {
-		ctx.AbortWithStatus(http.StatusUnauthorized)
-	}
-
-	sub := token.Claims.(jwt.MapClaims)["uid"] // the user that wants to access a resource.
-	obj := "uaa.changePassword"                // the resource that is going to be accessed.
-	act := "read,write"                        // the operation that the user performs on the resource.
-
-	if h.enforcer.Enforce(sub, obj, act) != true {
-		ctx.AbortWithStatus(http.StatusForbidden)
-		return
-	}
-
 	// extract the client from the context
 	paging := &types.Paging{}
 	if err := ctx.BindQuery(paging); err != nil {
@@ -162,13 +147,11 @@ func (h *Message) Notify(ctx *gin.Context) {
 		notifyItem, err := notifyStream.Recv()
 		if err != nil {
 			log.Error(err)
-			notifyStream.Close()
 			return
 		}
 		notifyJson, err := json.Marshal(notifyItem)
 		if err != nil {
 			log.Error(err)
-			notifyStream.Close()
 			return
 		}
 		conn.WriteMessage(websocket.TextMessage, notifyJson)
