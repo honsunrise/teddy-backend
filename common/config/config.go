@@ -2,12 +2,6 @@ package config
 
 import (
 	"flag"
-	mconfig "github.com/micro/go-config"
-	"github.com/micro/go-config/encoder/yaml"
-	"github.com/micro/go-config/source"
-	"github.com/micro/go-config/source/consul"
-	"github.com/micro/go-config/source/env"
-	mflag "github.com/micro/go-config/source/flag"
 )
 
 var config Config
@@ -21,26 +15,6 @@ func init() {
 }
 
 func Init() error {
-	err := mconfig.Load(
-		env.NewSource(
-			env.WithStrippedPrefix("TEDDY"),
-		),
-		mflag.NewSource(),
-		consul.NewSource(
-			consul.WithAddress(consulAddress),
-			consul.WithPrefix(consulPrefix),
-			consul.StripPrefix(true),
-			source.WithEncoder(yaml.NewEncoder()),
-		),
-	)
-	if err != nil {
-		return err
-	}
-
-	err = mconfig.Scan(&config)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 
