@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/common/log"
 	"github.com/zhsyourai/teddy-backend/api/base/client"
-	"github.com/zhsyourai/teddy-backend/api/gin-jwt"
 	"github.com/zhsyourai/teddy-backend/captcha/proto"
 	"github.com/zhsyourai/teddy-backend/common/errors"
 	"net/http"
@@ -13,7 +12,6 @@ import (
 )
 
 type Base struct {
-	middleware *gin_jwt.JwtMiddleware
 }
 
 func NewBaseHandler() (*Base, error) {
