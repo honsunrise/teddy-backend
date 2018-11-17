@@ -1,6 +1,7 @@
 package gin_jwt
 
 import (
+	"crypto"
 	"crypto/ecdsa"
 	"crypto/rsa"
 	"github.com/google/uuid"
@@ -90,5 +91,16 @@ func (g *JwtGenerator) GenerateJwt(timeout time.Duration,
 		return "", err
 	} else {
 		return tokenString, nil
+	}
+}
+
+func (g *JwtGenerator) GetJwtPublishKey() (crypto.PublicKey, error) {
+	switch g.key.(type) {
+	case *rsa.PrivateKey:
+		return g.key.(*rsa.PrivateKey).Public(), nil
+	case *ecdsa.PrivateKey:
+		return g.key.(*ecdsa.PrivateKey).Public(), nil
+	default:
+		return nil, ErrInvalidKey
 	}
 }

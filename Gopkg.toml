@@ -56,3 +56,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/dchest/captcha"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/lestrrat-go/jwx"

@@ -21,6 +21,14 @@
   revision = "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a"
 
 [[projects]]
+  digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  pruneopts = "UT"
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
+
+[[projects]]
   branch = "master"
   digest = "1:3e38fc80f8fb9482345b1a596b21dfa2f86d696061cbd76a6620a5658e038132"
   name = "github.com/dchest/captcha"
@@ -165,6 +173,26 @@
   pruneopts = "UT"
   revision = "5c8c8bd35d3832f5d134ae1e1e375b69a4d25242"
   version = "v1.0.1"
+
+[[projects]]
+  branch = "master"
+  digest = "1:cb2cab2aae49bf008ba60556f4af9ba87b190e265be57d78b37f10eb0768491a"
+  name = "github.com/lestrrat-go/jwx"
+  packages = [
+    "internal/base64",
+    "jwa",
+    "jwk",
+  ]
+  pruneopts = "UT"
+  revision = "0d477e6a1f0ec69634840308e3873fe71d928dd0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:992a4e430ab23874d31778dc2a17ba41e7733a9cfd151d1ee8476b46a828e7f5"
+  name = "github.com/lestrrat-go/pdebug"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "39f9a71bcabe9432cbdfe4d3d33f41988acd2ce6"
 
 [[projects]]
   digest = "1:0981502f9816113c9c8c4ac301583841855c8cf4da8c72f696b3ebedf6d0e4e5"
@@ -594,6 +622,7 @@
     "github.com/golang/protobuf/ptypes/timestamp",
     "github.com/google/uuid",
     "github.com/gorilla/websocket",
+    "github.com/lestrrat-go/jwx/jwk",
     "github.com/micro/go-micro",
     "github.com/mongodb/mongo-go-driver/bson",
     "github.com/mongodb/mongo-go-driver/mongo",

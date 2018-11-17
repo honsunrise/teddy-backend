@@ -4,6 +4,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/lestrrat-go/jwx/jwk"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
 	"github.com/zhsyourai/teddy-backend/api/uaa/client"
@@ -33,6 +34,7 @@ func (h *Uaa) Handler(root gin.IRoutes) {
 	root.POST("/uaa/changePassword", h.ChangePassword)
 	root.POST("/uaa/sendEmailCaptcha", h.SendEmailCaptcha)
 	root.POST("/uaa/resetPassword", h.ResetPassword)
+	root.GET("/uaa/jwks.json", h.JWKsJSON)
 }
 
 // Uaa.Register is called by the API as /uaa/Register with post body
@@ -329,6 +331,7 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	if err != nil {
 		log.Error(err)
 		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
 	}
 
 	ctx.Status(http.StatusOK)
@@ -340,4 +343,20 @@ func (h *Uaa) SendPhoneCaptcha(ctx *gin.Context) {
 
 func (h *Uaa) ResetPassword(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
+}
+
+func (h *Uaa) JWKsJSON(ctx *gin.Context) {
+	privKey, err := h.generator.GetJwtPublishKey()
+	if err != nil {
+		log.Error(err)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	key, err := jwk.New(privKey)
+	if err != nil {
+		log.Error(err)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, key)
 }
