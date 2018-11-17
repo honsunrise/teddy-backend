@@ -2,15 +2,12 @@ package commands
 
 import (
 	"fmt"
-	"github.com/zhsyourai/URCF-engine/commands/account"
-	"github.com/zhsyourai/URCF-engine/commands/kill"
-	"github.com/zhsyourai/URCF-engine/commands/serve"
-	"github.com/zhsyourai/URCF-engine/commands/version"
+	"github.com/zhsyourai/teddy-backend/cli/version"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"os"
 )
 
-var app = kingpin.New("urcf", "Universal Remote Config Framework Engine")
+var app = kingpin.New("teddy-cli", "Teddy backend command line tools")
 
 var registry = make(map[string]func() error)
 
@@ -25,9 +22,6 @@ func register(processors map[string]func() error) {
 
 func init() {
 	register(version.Prepare(app))
-	register(serve.Prepare(app))
-	register(kill.Prepare(app))
-	register(account.Prepare(app))
 }
 
 func Run() int {
