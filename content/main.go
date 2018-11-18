@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/micro/go-micro"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/utils"
 	"github.com/zhsyourai/teddy-backend/content/server"
@@ -40,14 +39,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// New Service
-	service := micro.NewService(
-		micro.Name("com.teddy.srv.uaa"),
-		micro.Version("latest"),
-	)
-
-	// Initialise service
-	service.Init()
 	// New Handler
 	accountHandler, err := server.NewContentServer(accountRepo)
 	if err != nil {
