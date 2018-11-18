@@ -48,17 +48,17 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{- define "teddy.services.captcha.name" -}}
-  {{- printf "%s" "api-base" -}}
+  {{- printf "%s" "srv-captcha" -}}
 {{- end -}}
 
 {{- define "teddy.services.content.name" -}}
-  {{- printf "%s" "api-content" -}}
+  {{- printf "%s" "srv-content" -}}
 {{- end -}}
 
 {{- define "teddy.services.message.name" -}}
-  {{- printf "%s" "api-message" -}}
+  {{- printf "%s" "srv-message" -}}
 {{- end -}}
 
 {{- define "teddy.services.uaa.name" -}}
-  {{- printf "%s" "api-uaa" -}}
+  {{- printf "%s" "srv-uaa" -}}
 {{- end -}}
