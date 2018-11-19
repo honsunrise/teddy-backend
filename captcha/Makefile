@@ -13,5 +13,11 @@ build: proto
 test:
 	go test -v ./... -cover
 
-docker:
+docker: build
 	docker build . -t captcha-srv:latest
+
+docker-tag: docker
+	docker tag captcha-srv:latest ${DOCKER_ID_USER}/captcha-srv:latest
+
+docker-push: docker-tag
+	docker push ${DOCKER_ID_USER}/captcha-srv:latest

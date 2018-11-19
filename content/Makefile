@@ -13,5 +13,11 @@ build: proto
 test:
 	go test -v ./... -cover
 
-docker:
+docker: build
 	docker build . -t content-srv:latest
+
+docker-tag: docker
+	docker tag content-srv:latest ${DOCKER_ID_USER}/content-srv:latest
+
+docker-push: docker-tag
+	docker push ${DOCKER_ID_USER}/content-srv:latest

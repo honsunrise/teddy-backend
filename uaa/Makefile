@@ -13,5 +13,11 @@ build: proto
 test:
 	go test -v ./... -cover
 
-docker:
+docker: build
 	docker build . -t uaa-srv:latest
+
+docker-tag: docker
+	docker tag uaa-srv:latest ${DOCKER_ID_USER}/uaa-srv:latest
+
+docker-push: docker-tag
+	docker push ${DOCKER_ID_USER}/uaa-srv:latest
