@@ -34,10 +34,8 @@ type inboxRepository struct {
 }
 
 func (repo *inboxRepository) InsertInBoxItem(uid string, item *models.InBoxItem) error {
-	filter := bson.NewDocument(bson.EC.String("uid", uid))
-	update := bson.NewDocument(
-		bson.EC.SubDocumentFromElements("$addToSet", bson.EC.Interface("items", item)),
-	)
+	filter := bson.D{{"uid", uid}}
+	update := bson.D{{"$addToSet", bson.D{{"items", item}}}}
 	result := repo.collections.FindOneAndUpdate(repo.ctx, filter, update)
 	if result.Decode(nil) == mongo.ErrNoDocuments {
 		inbox := models.InBox{
@@ -56,46 +54,33 @@ func (repo *inboxRepository) InsertInBoxItem(uid string, item *models.InBoxItem)
 
 func (repo *inboxRepository) internalFindInBoxItems(uid string, itemType models.InBoxType, ids []string, page uint32,
 	size uint32, sorts []types.Sort) ([]models.InBoxItem, error) {
-	var itemsTypeFilter *bson.Element = nil
+	var dynFilter = make(bson.D, 0)
 	if itemType != models.ALL {
-		itemsTypeFilter = bson.EC.Int64("items.type", int64(itemType))
+		dynFilter = append(dynFilter, bson.E{Key: "items.type", Value: int64(itemType)})
 	}
-	var itemsIdsFilter *bson.Element = nil
 	if len(ids) != 0 {
-		var bsonIds = make([]*bson.Value, 0, len(ids))
-		for _, id := range ids {
-			bsonIds = append(bsonIds, bson.VC.String(id))
-		}
-		itemsIdsFilter = bson.EC.SubDocumentFromElements("items.id",
-			bson.EC.ArrayFromElements("$in", bsonIds...),
-		)
+		dynFilter = append(dynFilter, bson.E{Key: "items.id", Value: bson.D{{"$in", bson.A{ids}}}})
 	}
-	var dynFilter = make([]*bson.Element, 0, 2)
-	if itemsTypeFilter != nil {
-		dynFilter = append(dynFilter, itemsTypeFilter)
-	}
-	if itemsIdsFilter != nil {
-		dynFilter = append(dynFilter, itemsIdsFilter)
-	}
-	var itemsSorts []*bson.Element
+
+	var itemsSorts = make(bson.D, 0, len(sorts))
 	if len(sorts) != 0 {
-		itemsSorts = make([]*bson.Element, 0, len(sorts))
 		for _, sort := range sorts {
 			if sort.Order == types.ASC {
-				itemsSorts = append(itemsSorts, bson.EC.Int32(sort.Name, 1))
+				itemsSorts = append(itemsSorts, bson.E{Key: sort.Name, Value: 1})
 			} else {
-				itemsSorts = append(itemsSorts, bson.EC.Int32(sort.Name, -1))
+				itemsSorts = append(itemsSorts, bson.E{Key: sort.Name, Value: -1})
 			}
 		}
 	}
-	pipeline := bson.NewDocument(
-		bson.EC.SubDocumentFromElements("$match", bson.EC.String("uid", uid)),
-		bson.EC.String("$unwind", "$items"),
-		bson.EC.SubDocumentFromElements("$match", dynFilter...),
-		bson.EC.Int64("$skip", int64(size*page)),
-		bson.EC.Int64("$limit", int64(size)),
-		bson.EC.SubDocumentFromElements("$sort", itemsSorts...),
-	)
+	pipeline := bson.D{
+		{"$match", bson.D{{"uid", uid}}},
+		{"$unwind", "$items"},
+		{"$match", dynFilter},
+		{"$skip", int64(size * page)},
+		{"$limit", int64(size)},
+		{"$sort", itemsSorts},
+	}
+
 	cur, err := repo.collections.Aggregate(repo.ctx, pipeline)
 	if err != nil {
 		return nil, err
@@ -132,12 +117,13 @@ func (repo *inboxRepository) FindInBoxItem(uid string, id string) (models.InBoxI
 
 func (repo *inboxRepository) FindInBoxUnreadCount(uid string) (int64, error) {
 	var cur mongo.Cursor
-	pipeline := bson.NewDocument(
-		bson.EC.SubDocumentFromElements("$match", bson.EC.String("uid", uid)),
-		bson.EC.String("$unwind", "$items"),
-		bson.EC.SubDocumentFromElements("$match", bson.EC.Boolean("items.unread", true)),
-		bson.EC.String("$count", "count"),
-	)
+	pipeline := bson.D{
+		{"$match", bson.D{{"uid", uid}}},
+		{"$unwind", "$items"},
+		{"$match", bson.D{{"items.unread", true}}},
+		{"$count", "count"},
+	}
+
 	repo.collections.Aggregate(repo.ctx, pipeline)
 	elem := make(map[string]interface{})
 	defer cur.Close(repo.ctx)
@@ -156,10 +142,8 @@ func (repo *inboxRepository) FindInBoxUnreadCount(uid string) (int64, error) {
 }
 
 func (repo *inboxRepository) DeleteAllInBoxItem(uid string) error {
-	filter := bson.NewDocument(bson.EC.String("uid", uid))
-	update := bson.NewDocument(
-		bson.EC.SubDocumentFromElements("$unset", bson.EC.String("items", "")),
-	)
+	filter := bson.D{{"uid", uid}}
+	update := bson.D{{"$unset", bson.D{{"items", ""}}}}
 	_, err := repo.collections.UpdateOne(repo.ctx, filter, update)
 	if err != nil {
 		return err
@@ -168,18 +152,16 @@ func (repo *inboxRepository) DeleteAllInBoxItem(uid string) error {
 }
 
 func (repo *inboxRepository) DeleteInBoxItems(uid string, ids []string) error {
-	filter := bson.NewDocument(bson.EC.String("uid", uid))
-	var bsonIds = make([]*bson.Value, 0, len(ids))
-	for _, id := range ids {
-		bsonIds = append(bsonIds, bson.VC.String(id))
-	}
-	update := bson.NewDocument(
-		bson.EC.SubDocumentFromElements("$pull",
-			bson.EC.SubDocumentFromElements("items",
-				bson.EC.SubDocumentFromElements("id", bson.EC.ArrayFromElements("$in", bsonIds...)),
-			),
-		),
-	)
+	filter := bson.D{{"uid", uid}}
+	update := bson.D{{
+		"$pull", bson.D{{
+			"items", bson.D{{
+				"id", bson.D{{
+					"$in", bson.A{ids},
+				}},
+			}},
+		}},
+	}}
 	_, err := repo.collections.UpdateOne(repo.ctx, filter, update)
 	if err != nil {
 		return err
@@ -188,26 +170,22 @@ func (repo *inboxRepository) DeleteInBoxItems(uid string, ids []string) error {
 }
 
 func (repo *inboxRepository) UpdateInBoxItems(uid string, ids []string, fields map[string]interface{}) error {
-	var bsonIds []*bson.Value
-	for _, id := range ids {
-		bsonIds = append(bsonIds, bson.VC.String(id))
+	filter := bson.D{
+		{"uid", uid},
+		{"items", bson.D{{
+			"$elemMatch", bson.D{{
+				"id", bson.A{ids},
+			}},
+		}}},
 	}
-	filter := bson.NewDocument(
-		bson.EC.String("uid", uid),
-		bson.EC.SubDocumentFromElements("items",
-			bson.EC.SubDocumentFromElements("$elemMatch",
-				bson.EC.SubDocumentFromElements("id", bson.EC.ArrayFromElements("$in", bsonIds...)),
-			),
-		),
-	)
 
-	var bsonFields []*bson.Element
+	var bsonFields = make(bson.D, len(fields))
 	for k, v := range fields {
-		bsonFields = append(bsonFields, bson.EC.Interface(fmt.Sprintf("items.%s", k), v))
+		bsonFields = append(bsonFields, bson.E{Key: fmt.Sprintf("items.%s", k), Value: v})
 	}
-	update := bson.NewDocument(
-		bson.EC.SubDocumentFromElements("$set", bsonFields...),
-	)
+
+	update := bson.D{{"$set", bsonFields}}
+
 	_, err := repo.collections.UpdateOne(repo.ctx, filter, update)
 	if err != nil {
 		return err

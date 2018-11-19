@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/rs/xid"
-	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/common/models"
+	"github.com/zhsyourai/teddy-backend/common/types"
 	"github.com/zhsyourai/teddy-backend/message/converter"
 	"github.com/zhsyourai/teddy-backend/message/proto"
 	"github.com/zhsyourai/teddy-backend/message/repositories"
@@ -14,27 +14,29 @@ import (
 	"time"
 )
 
-func NewMessageServer(repo repositories.InBoxRepository) (proto.MessageServer, error) {
+func NewMessageServer(repo repositories.InBoxRepository, confType types.Config) (proto.MessageServer, error) {
 	instance := &notifyHandler{
-		repo:    repo,
-		mailCh:  make(chan *gomail.Message),
-		mailErr: make(chan error),
+		repo:     repo,
+		mailCh:   make(chan *gomail.Message),
+		mailErr:  make(chan error),
+		confType: confType,
 	}
 	instance.startMailSender()
 	return instance, nil
 }
 
 type notifyHandler struct {
-	repo    repositories.InBoxRepository
-	mailCh  chan *gomail.Message
-	mailErr chan error
+	repo     repositories.InBoxRepository
+	mailCh   chan *gomail.Message
+	mailErr  chan error
+	confType types.Config
 
 	notifyChMap sync.Map
 }
 
 func (h *notifyHandler) startMailSender() {
 	// Load config
-	mailConf := config.GetConfig().Mail
+	mailConf := h.confType.Mail
 
 	go func() {
 		d := gomail.NewPlainDialer(mailConf.Host, mailConf.Port, mailConf.Username, mailConf.Password)
