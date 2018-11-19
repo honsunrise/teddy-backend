@@ -17,7 +17,7 @@ func CaptchaFromContext(ctx *gin.Context) (proto.CaptchaClient, bool) {
 
 // Client returns a wrapper for the UaaClient
 func CaptchaNew() gin.HandlerFunc {
-	conn, err := grpc.Dial("")
+	conn, err := grpc.Dial("srv-captcha")
 	if err != nil {
 		log.Errorf("Dial to captcha server error %v", err)
 		return nil
