@@ -9,5 +9,11 @@ build:
 test:
 	go test -v ./... -cover
 
-docker:
+docker: build
 	docker build . -t base-api:latest
+
+docker-tag: docker
+	docker tag base-api:latest ${DOCKER_ID_USER}/base-api:latest
+
+docker-push: docker-tag
+	docker push ${DOCKER_ID_USER}/base-api:latest
