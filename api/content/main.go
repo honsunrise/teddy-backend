@@ -1,10 +1,11 @@
 package main
 
 import (
-	"flag"
 	"github.com/zhsyourai/teddy-backend/api/content/client"
 	"github.com/zhsyourai/teddy-backend/api/content/handler"
 	"github.com/zhsyourai/teddy-backend/common/config"
+	"github.com/zhsyourai/teddy-backend/common/config/source/file"
+	"github.com/zhsyourai/teddy-backend/common/types"
 	"log"
 	"net/http"
 	"time"
@@ -13,9 +14,12 @@ import (
 )
 
 func main() {
-	flag.Parse()
-
-	err := config.Init()
+	conf, err := config.NewConfig(file.NewSource(file.WithFormat(config.Yaml), file.WithPath("config.yaml")))
+	if err != nil {
+		log.Fatal(err)
+	}
+	var confType types.Config
+	err = conf.Scan(&confType)
 	if err != nil {
 		log.Fatal(err)
 	}

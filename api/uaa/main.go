@@ -4,30 +4,33 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"flag"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
 	"github.com/zhsyourai/teddy-backend/api/uaa/client"
 	"github.com/zhsyourai/teddy-backend/api/uaa/handler"
 	"github.com/zhsyourai/teddy-backend/common/config"
+	"github.com/zhsyourai/teddy-backend/common/config/source/file"
+	"github.com/zhsyourai/teddy-backend/common/types"
 	"net/http"
 	"time"
 )
 
 func main() {
-	flag.Parse()
-
-	err := config.Init()
+	conf, err := config.NewConfig(file.NewSource(file.WithFormat(config.Yaml), file.WithPath("config.yaml")))
 	if err != nil {
 		log.Fatal(err)
 	}
-	conf := config.GetConfig()
+	var confType types.Config
+	err = conf.Scan(&confType)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// New jwt generator and extractor
 	const SigningAlgorithm = "RS512"
 	// Load Jwt PublicKey
-	block, _ := pem.Decode([]byte(conf.JWTPkcs8))
+	block, _ := pem.Decode([]byte(confType.JWTPkcs8))
 	if block == nil {
 		log.Fatal("Jwt private key decode error")
 	}
