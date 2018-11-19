@@ -41,7 +41,7 @@ func (repo *accountRepository) InsertAccount(account *models.Account) error {
 }
 
 func (repo *accountRepository) FindAccountByUsername(username string) (account models.Account, err error) {
-	filter := bson.NewDocument(bson.EC.String("username", username))
+	filter := bson.D{{"username", username}}
 	err = repo.collections.FindOne(repo.ctx, filter).Decode(&account)
 	if err != nil {
 		return
@@ -69,7 +69,7 @@ func (repo *accountRepository) FindAll() (accounts []models.Account, err error) 
 }
 
 func (repo *accountRepository) DeleteAccountByUsername(username string) (err error) {
-	filter := bson.NewDocument(bson.EC.String("username", username))
+	filter := bson.D{{"username", username}}
 	_, err = repo.collections.DeleteOne(repo.ctx, filter)
 	if err != nil {
 		return
@@ -79,17 +79,12 @@ func (repo *accountRepository) DeleteAccountByUsername(username string) (err err
 
 func (repo *accountRepository) UpdateAccountByUsername(username string,
 	fields map[string]interface{}) error {
-	filter := bson.NewDocument(
-		bson.EC.String("username", username),
-	)
-
-	var bsonFields []*bson.Element
+	filter := bson.D{{"username", username}}
+	var bsonFields []bson.E
 	for k, v := range fields {
-		bsonFields = append(bsonFields, bson.EC.Interface(k, v))
+		bsonFields = append(bsonFields, bson.E{Key: k, Value: v})
 	}
-	update := bson.NewDocument(
-		bson.EC.SubDocumentFromElements("$set", bsonFields...),
-	)
+	update := bson.D{{"$set", bson.A{bsonFields}}}
 	ur, err := repo.collections.UpdateOne(repo.ctx, filter, update)
 	if err != nil {
 		return err

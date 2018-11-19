@@ -22,8 +22,6 @@ func NewConfig(sources ...Source) (*Config, error) {
 		modTimeMap: make(map[interface{}]time.Time),
 		sources:    sources,
 	}
-	config.rwmutex.Lock()
-	defer config.rwmutex.Unlock()
 
 	if err := config.Fetch(); err != nil {
 		return nil, err

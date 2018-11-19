@@ -2,11 +2,11 @@ package utils
 
 import (
 	"fmt"
-	"github.com/zhsyourai/teddy-backend/common/config"
+	"github.com/zhsyourai/teddy-backend/common/types"
 	"strings"
 )
 
-func BuildMongodbURI(databases []config.Database) string {
+func BuildMongodbURI(databases []types.Database) string {
 	parts := make([]string, len(databases))
 	for i, database := range databases {
 		authPart := fmt.Sprintf("%s:%s@", database.Username, database.Password)
