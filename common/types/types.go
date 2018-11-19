@@ -45,3 +45,31 @@ type Sort struct {
 	Name  string
 	Order Order
 }
+
+// For config
+
+type Server struct {
+	Address string `json:"address"`
+	Port    int    `json:"port"`
+}
+
+type Database struct {
+	Address  string `json:"address"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	AuthDB   string `json:"auth_db"`
+}
+
+type Mail struct {
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type Config struct {
+	Server    Server                `json:"server"`
+	Databases map[string][]Database `json:"databases"`
+	JWTPkcs8  string                `json:"jwt_pkcs8"`
+	Mail      Mail                  `json:"mail"`
+}

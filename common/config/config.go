@@ -1,27 +1,94 @@
 package config
 
 import (
-	"flag"
+	"github.com/imdario/mergo"
+	"github.com/mitchellh/mapstructure"
+	"sync"
+	"time"
 )
 
-var config Config
-
-var consulAddress string
-var consulPrefix string
-
-func init() {
-	flag.StringVar(&consulAddress, "consul_addr", "127.0.0.1:8500", "the consul address default 127.0.0.1:8500")
-	flag.StringVar(&consulPrefix, "consul_prefix", "teddy/config", "the consul config prefix default /teddy/config")
+type Config struct {
+	exit       chan bool
+	sources    []Source
+	resultMap  map[string]interface{}
+	modTimeMap map[interface{}]time.Time
+	rwmutex    sync.RWMutex
 }
 
-func Init() error {
+func NewConfig(sources ...Source) (*Config, error) {
+	config := &Config{
+		exit:       make(chan bool),
+		resultMap:  make(map[string]interface{}),
+		modTimeMap: make(map[interface{}]time.Time),
+		sources:    sources,
+	}
+	config.rwmutex.Lock()
+	defer config.rwmutex.Unlock()
+
+	if err := config.Fetch(); err != nil {
+		return nil, err
+	}
+
+	return config, nil
+}
+
+func (c *Config) Fetch() error {
+	c.rwmutex.Lock()
+	defer c.rwmutex.Unlock()
+
+	for _, s := range c.sources {
+		if modTime, ok := c.modTimeMap[s]; ok {
+			tmpModTime, err := s.LastModifyTime()
+			if err != nil {
+				return err
+			}
+			tmpMap, err := s.Read()
+			if err != nil {
+				return err
+			}
+			if modTime.Before(tmpModTime) {
+				if err := mergo.Map(&c.resultMap, tmpMap, mergo.WithOverride); err != nil {
+					return err
+				}
+			}
+		} else {
+			tmpModTime, err := s.LastModifyTime()
+			if err != nil {
+				return err
+			}
+			tmpMap, err := s.Read()
+			if err != nil {
+				return err
+			}
+			c.modTimeMap[s] = tmpModTime
+			if err := mergo.Map(&c.resultMap, tmpMap, mergo.WithOverride); err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 
-func GetConfig() *Config {
-	return &config
+func (c *Config) Scan(v interface{}) error {
+	c.rwmutex.RLock()
+	defer c.rwmutex.RUnlock()
+
+	return mapstructure.Decode(c.resultMap, v)
 }
 
-func Watch() <-chan *Config {
+func (c *Config) Watch() (*WatchResult, error) {
+	return nil, nil
+}
+
+func (c *Config) Close() error {
+	c.rwmutex.Lock()
+	defer c.rwmutex.Unlock()
+
+	select {
+	case <-c.exit:
+		return nil
+	default:
+		close(c.exit)
+	}
 	return nil
 }
