@@ -3,13 +3,14 @@ package main
 import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
+	"github.com/zhsyourai/teddy-backend/common/config/source/file"
+	"github.com/zhsyourai/teddy-backend/common/types"
 	"github.com/zhsyourai/teddy-backend/common/utils"
 	"github.com/zhsyourai/teddy-backend/content/server"
 	"google.golang.org/grpc"
 	"net"
 
 	"context"
-	"flag"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/content/proto"
@@ -19,15 +20,17 @@ import (
 const PORT = 9999
 
 func main() {
-	flag.Parse()
-
-	err := config.Init()
+	conf, err := config.NewConfig(file.NewSource(file.WithFormat(config.Yaml), file.WithPath("config.yaml")))
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Load config
-	conf := config.GetConfig()
-	mongodbUri := utils.BuildMongodbURI(conf.Databases["mongodb"])
+	var confType types.Config
+	err = conf.Scan(&confType)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	mongodbUri := utils.BuildMongodbURI(confType.Databases["mongodb"])
 
 	// New Mongodb client
 	mongodbClient, err := mongo.Connect(context.Background(), mongodbUri)
@@ -45,7 +48,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", PORT))
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", confType.Server.Address, confType.Server.Port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

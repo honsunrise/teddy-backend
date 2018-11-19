@@ -54,7 +54,7 @@ func (repo *inboxRepository) InsertInBoxItem(uid string, item *models.InBoxItem)
 
 func (repo *inboxRepository) internalFindInBoxItems(uid string, itemType models.InBoxType, ids []string, page uint32,
 	size uint32, sorts []types.Sort) ([]models.InBoxItem, error) {
-	var dynFilter = make(bson.D, 0)
+	var dynFilter = make(bson.D, 0, 2)
 	if itemType != models.ALL {
 		dynFilter = append(dynFilter, bson.E{Key: "items.type", Value: int64(itemType)})
 	}
@@ -172,11 +172,9 @@ func (repo *inboxRepository) DeleteInBoxItems(uid string, ids []string) error {
 func (repo *inboxRepository) UpdateInBoxItems(uid string, ids []string, fields map[string]interface{}) error {
 	filter := bson.D{
 		{"uid", uid},
-		{"items", bson.D{{
-			"$elemMatch", bson.D{{
-				"id", bson.A{ids},
-			}},
-		}}},
+		{"items", bson.D{
+			{"$elemMatch", bson.D{{"id", bson.A{ids}}}},
+		}},
 	}
 
 	var bsonFields = make(bson.D, len(fields))

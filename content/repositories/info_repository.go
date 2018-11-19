@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/zhsyourai/teddy-backend/common/models"
@@ -38,7 +39,7 @@ type infoRepository struct {
 }
 
 func (repo *infoRepository) InsertInfo(info *models.Info) error {
-	filter := bson.NewDocument(bson.EC.String("title", info.Title))
+	filter := bson.D{{"title", info.Title}}
 	result := repo.collections.FindOne(repo.ctx, filter)
 	if result.Decode(nil) == mongo.ErrNoDocuments {
 		_, err := repo.collections.InsertOne(repo.ctx, info)
@@ -54,53 +55,33 @@ func (repo *infoRepository) InsertInfo(info *models.Info) error {
 func (repo *infoRepository) internalFindInfo(uid string, title string, tags []string, page uint32,
 	size uint32, sorts []types.Sort) ([]models.Info, error) {
 	var cur mongo.Cursor
-	var uidFilter *bson.Element = nil
+	var dynFilter = make(bson.D, 0, 3)
 	if uid != "" {
-		uidFilter = bson.EC.String("uid", uid)
+		dynFilter = append(dynFilter, bson.E{Key: "uid", Value: uid})
 	}
-	var tagsFilter *bson.Element = nil
 	if len(tags) != 0 {
-		var bsonTags = make([]*bson.Value, 0, len(tags))
-		for _, id := range tags {
-			bsonTags = append(bsonTags, bson.VC.String(id))
-		}
-		tagsFilter = bson.EC.SubDocumentFromElements("tags",
-			bson.EC.ArrayFromElements("$in", bsonTags...),
-		)
+		dynFilter = append(dynFilter, bson.E{Key: "tags", Value: bson.D{{"$in", bson.A{tags}}}})
 	}
-	var titleFilter *bson.Element = nil
 	if title != "" {
-		titleFilter = bson.EC.SubDocumentFromElements("$text",
-			bson.EC.String("$search", title))
+		dynFilter = append(dynFilter, bson.E{Key: "$text", Value: bson.D{{"$search", title}}})
 	}
 
-	var dynFilter = make([]*bson.Element, 0, 3)
-	if uidFilter != nil {
-		dynFilter = append(dynFilter, uidFilter)
-	}
-	if tagsFilter != nil {
-		dynFilter = append(dynFilter, tagsFilter)
-	}
-	if titleFilter != nil {
-		dynFilter = append(dynFilter, titleFilter)
-	}
-	var itemsSorts []*bson.Element
+	var itemsSorts = make(bson.D, 0, len(sorts))
 	if len(sorts) != 0 {
-		itemsSorts = make([]*bson.Element, 0, len(sorts))
 		for _, sort := range sorts {
 			if sort.Order == types.ASC {
-				itemsSorts = append(itemsSorts, bson.EC.Int32(sort.Name, 1))
+				itemsSorts = append(itemsSorts, bson.E{Key: sort.Name, Value: 1})
 			} else {
-				itemsSorts = append(itemsSorts, bson.EC.Int32(sort.Name, -1))
+				itemsSorts = append(itemsSorts, bson.E{Key: sort.Name, Value: -1})
 			}
 		}
 	}
-	pipeline := bson.NewDocument(
-		bson.EC.SubDocumentFromElements("$match", dynFilter...),
-		bson.EC.Int64("$skip", int64(size*page)),
-		bson.EC.Int64("$limit", int64(size)),
-		bson.EC.SubDocumentFromElements("$sort", itemsSorts...),
-	)
+	pipeline := bson.D{
+		{"$match", dynFilter},
+		{"$skip", int64(size * page)},
+		{"$limit", int64(size)},
+		{"$sort", itemsSorts},
+	}
 	repo.collections.Aggregate(repo.ctx, pipeline)
 	items := make([]models.Info, 0, 50)
 	defer cur.Close(repo.ctx)
@@ -140,7 +121,7 @@ func (repo *infoRepository) FindByTitleAndUser(title string, uid string, page ui
 }
 
 func (repo *infoRepository) DeleteInfo(id string) error {
-	filter := bson.NewDocument(bson.EC.String("_id", id))
+	filter := bson.D{{"_id", id}}
 	_, err := repo.collections.DeleteOne(repo.ctx, filter)
 	if err != nil {
 		return err
@@ -149,17 +130,12 @@ func (repo *infoRepository) DeleteInfo(id string) error {
 }
 
 func (repo *infoRepository) UpdateInfo(id string, fields map[string]interface{}) error {
-	filter := bson.NewDocument(
-		bson.EC.String("_id", id),
-	)
-
-	var bsonFields []*bson.Element
+	filter := bson.D{{"_id", id}}
+	var bsonFields = make(bson.D, len(fields))
 	for k, v := range fields {
-		bsonFields = append(bsonFields, bson.EC.Interface(k, v))
+		bsonFields = append(bsonFields, bson.E{Key: fmt.Sprintf("items.%s", k), Value: v})
 	}
-	update := bson.NewDocument(
-		bson.EC.SubDocumentFromElements("$set", bsonFields...),
-	)
+	update := bson.D{{"$set", bsonFields}}
 	ur, err := repo.collections.UpdateOne(repo.ctx, filter, update)
 	if err != nil {
 		return err

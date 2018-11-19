@@ -33,13 +33,14 @@ type keyValuePairRepository struct {
 func (repo *keyValuePairRepository) FindKeyValuePairByKeyAndValueAndExpire(key string,
 	value string, time time.Time) (models.KeyValuePair, error) {
 	var kvp models.KeyValuePair
-	filter := bson.NewDocument(
-		bson.EC.String("key", key),
-		bson.EC.String("value", value),
-		bson.EC.SubDocumentFromElements("expire_time",
-			bson.EC.Int64("$lt", time.UnixNano()),
-		),
-	)
+	filter := bson.D{
+		{"key", key},
+		{"value", value},
+		{"expire_time", bson.D{
+			{"$lt", time.UnixNano()},
+		}},
+	}
+
 	err := repo.collections.FindOne(repo.ctx, filter).Decode(&kvp)
 	if err != nil {
 		return models.KeyValuePair{}, err
@@ -48,11 +49,9 @@ func (repo *keyValuePairRepository) FindKeyValuePairByKeyAndValueAndExpire(key s
 }
 
 func (repo *keyValuePairRepository) DeleteKeyValuePairLT(time time.Time) error {
-	filter := bson.NewDocument(
-		bson.EC.SubDocumentFromElements("expire_time",
-			bson.EC.Int64("$lt", time.UnixNano()),
-		),
-	)
+	filter := bson.D{
+		{"expire_time", bson.D{{"$lt", time.UnixNano()}}},
+	}
 	_, err := repo.collections.DeleteMany(repo.ctx, filter)
 	if err != nil {
 		return err
@@ -70,7 +69,7 @@ func (repo *keyValuePairRepository) InsertKeyValuePair(kv *models.KeyValuePair) 
 
 func (repo *keyValuePairRepository) FindKeyValuePairByKey(key string) (models.KeyValuePair, error) {
 	var kvp models.KeyValuePair
-	filter := bson.NewDocument(bson.EC.String("key", key))
+	filter := bson.D{{"key", key}}
 	err := repo.collections.FindOne(repo.ctx, filter).Decode(&kvp)
 	if err != nil {
 		return models.KeyValuePair{}, err
@@ -79,7 +78,7 @@ func (repo *keyValuePairRepository) FindKeyValuePairByKey(key string) (models.Ke
 }
 
 func (repo *keyValuePairRepository) DeleteKeyValuePairByKey(key string) error {
-	filter := bson.NewDocument(bson.EC.String("key", key))
+	filter := bson.D{{"key", key}}
 	_, err := repo.collections.DeleteOne(repo.ctx, filter)
 	if err != nil {
 		return err
