@@ -1,7 +1,7 @@
 {{- define "router" -}}
 - match:
     - uri:
-      prefix: /uaa
+        prefix: /uaa
   route:
     - destination:
         port:
@@ -9,7 +9,7 @@
         host: {{ include "teddy.apis.uaa.name" .}}
 - match:
     - uri:
-      prefix: /base
+        prefix: /base
   route:
     - destination:
         port:
@@ -17,7 +17,7 @@
         host: {{ include "teddy.apis.base.name" .}}
 - match:
     - uri:
-      prefix: /content
+        prefix: /content
   route:
     - destination:
         port:
@@ -25,7 +25,7 @@
         host: {{ include "teddy.apis.content.name" .}}
 - match:
     - uri:
-      prefix: /message
+        prefix: /message
   route:
     - destination:
         port:
@@ -46,7 +46,7 @@ spec:
         name: http
         protocol: HTTP
       hosts:
-        - {{ .Values.gateway.host }}
+        - {{ .Values.gateway.host | quote }}
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -54,11 +54,13 @@ metadata:
   name: default
 spec:
   hosts:
-  - {{ .Values.gateway.host }}
+    - {{ .Values.gateway.host | quote }}
   gateways:
-  - default-http-gateway
+    - default-http-gateway
   http:
 {{ include "router" . | indent 4 }}
+
+{{- if .Values.gateway.tls }}
 ---
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: ClusterIssuer
@@ -127,3 +129,4 @@ spec:
     - default-https-gateway
   http:
 {{ include "router" . | indent 4 }}
+{{- end }}

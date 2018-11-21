@@ -19,14 +19,14 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   type: {{ default "ClusterIP" .Values.services.message.type }}
-    ports:
-      - port: {{ default 8080 .Values.services.message.port }}
-        targetPort: http
-        protocol: TCP
-        name: http
-    selector:
-      app.kubernetes.io/name: {{ include "teddy.services.message.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+    - port: {{ default 8080 .Values.services.message.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "teddy.services.message.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{- $root := . -}}
 {{- range .Values.services.message.deploys -}}

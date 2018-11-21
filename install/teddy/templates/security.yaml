@@ -1,7 +1,7 @@
 apiVersion: "authentication.istio.io/v1alpha1"
 kind: "Policy"
 metadata:
-  name: {{ .Release.Name | quote }}
+  name: default
 spec:
   peers:
     - mtls: {}
@@ -12,13 +12,22 @@ metadata:
   name: {{ .Release.Name | quote }}
 spec:
   targets:
-    - name: "api-*"
+    - name: "api-base"
+      ports:
+        - number: {{ default 8080 .Values.apis.base.port }}
+    - name: "api-content"
       ports:
         - number: {{ default 8080 .Values.apis.content.port }}
+    - name: "api-message"
+      ports:
+        - number: {{ default 8080 .Values.apis.message.port }}
+    - name: "api-uaa"
+      ports:
+        - number: {{ default 8080 .Values.apis.uaa.port }}
   origins:
     - jwt:
         issuer: {{ .Values.services.uaa.issuer }}
-        jwksUri: {{ print "http://%s%s" (include "teddy.apis.uaa.name" .) .Values.services.uaa.jwksUriEndpoint }}
+        jwksUri: {{ printf "http://%s%s" (include "teddy.apis.uaa.name" .) .Values.services.uaa.jwksUriEndpoint }}
   principalBinding: USE_ORIGIN
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
@@ -241,7 +250,7 @@ spec:
   rules:
     - services: [{{- printf "%s.%s.svc.cluster.local" (include "teddy.services.captcha.name" .) .Release.Namespace -}}]
       methods: ["POST"]
-      paths: ["com.teddy.srv.captcha.Captcha/Get*", "com.teddy.srv.captcha.Captcha/Verify", ]
+      paths: ["com.teddy.srv.captcha.Captcha/Get*", "com.teddy.srv.captcha.Captcha/Verify"]
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRoleBinding

@@ -28,32 +28,34 @@ spec:
   http:
 {{- range .Values.apis.base.deploys }}
     {{- if and .traffic.headers (not .traffic.weight) }}
-    - match:
+    - timeout: {{ .traffic.timeout }}
+      match:
         - headers:
           {{ toYaml .traffic.headers | indent 5 -}}
       route:
         - destination:
-          host: {{ include "teddy.apis.base.name" $root }}
+            host: {{ include "teddy.apis.base.name" $root }}
     {{- end }}
 {{- end }}
 {{- range .Values.apis.base.deploys }}
     {{- if and (not .traffic.headers) .traffic.weight }}
-    - route:
-      - destination:
-          host: {{ include "teddy.apis.base.name" $root }}
-          subset: {{ .image.tag }}
-        weight: {{ .traffic.weight }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.apis.base.name" $root }}
+            subset: {{ .image.tag }}
+          weight: {{ .traffic.weight }}
     {{- end }}
 {{- end }}
 {{- range .Values.apis.base.deploys }}
     {{- if and (not .traffic.headers) (not .traffic.weight) }}
-    - route:
-      - destination:
-          host: {{ include "teddy.apis.base.name" $root }}
-          subset: {{ .image.tag }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.apis.base.name" $root }}
+            subset: {{ .image.tag }}
     {{- end }}
 {{- end }}
-    timeout: {{ .Values.apis.base.timeout }}
 ---
 ##################################################################################################
 # uaa api traffic
@@ -84,32 +86,34 @@ spec:
   http:
 {{- range .Values.apis.uaa.deploys }}
     {{- if and .traffic.headers (not .traffic.weight) }}
-    - match:
+    - timeout: {{ .traffic.timeout }}
+      match:
         - headers:
           {{ toYaml .traffic.headers | indent 5 -}}
       route:
         - destination:
-          host: {{ include "teddy.apis.uaa.name" $root }}
+            host: {{ include "teddy.apis.uaa.name" $root }}
     {{- end }}
 {{- end }}
 {{- range .Values.apis.uaa.deploys }}
     {{- if and (not .traffic.headers) .traffic.weight }}
-    - route:
-      - destination:
-          host: {{ include "teddy.apis.uaa.name" $root }}
-          subset: {{ .image.tag }}
-        weight: {{ .traffic.weight }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.apis.uaa.name" $root }}
+            subset: {{ .image.tag }}
+          weight: {{ .traffic.weight }}
     {{- end }}
 {{- end }}
 {{- range .Values.apis.uaa.deploys }}
     {{- if and (not .traffic.headers) (not .traffic.weight) }}
-    - route:
-      - destination:
-          host: {{ include "teddy.apis.uaa.name" $root }}
-          subset: {{ .image.tag }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.apis.uaa.name" $root }}
+            subset: {{ .image.tag }}
     {{- end }}
 {{- end }}
-    timeout: {{ .Values.apis.uaa.timeout }}
 ---
 ##################################################################################################
 # content api traffic
@@ -140,32 +144,34 @@ spec:
   http:
 {{- range .Values.apis.content.deploys }}
     {{- if and .traffic.headers (not .traffic.weight) }}
-    - match:
+    - timeout: {{ .traffic.timeout }}
+      match:
         - headers:
           {{ toYaml .traffic.headers | indent 5 -}}
       route:
         - destination:
-          host: {{ include "teddy.apis.content.name" $root }}
+            host: {{ include "teddy.apis.content.name" $root }}
     {{- end }}
 {{- end }}
 {{- range .Values.apis.content.deploys }}
     {{- if and (not .traffic.headers) .traffic.weight }}
-    - route:
-      - destination:
-          host: {{ include "teddy.apis.content.name" $root }}
-          subset: {{ .image.tag }}
-        weight: {{ .traffic.weight }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.apis.content.name" $root }}
+            subset: {{ .image.tag }}
+          weight: {{ .traffic.weight }}
     {{- end }}
 {{- end }}
 {{- range .Values.apis.content.deploys }}
     {{- if and (not .traffic.headers) (not .traffic.weight) }}
-    - route:
-      - destination:
-          host: {{ include "teddy.apis.content.name" $root }}
-          subset: {{ .image.tag }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.apis.content.name" $root }}
+            subset: {{ .image.tag }}
     {{- end }}
 {{- end }}
-    timeout: {{ .Values.apis.content.timeout }}
 ---
 ##################################################################################################
 # message api traffic
@@ -196,32 +202,34 @@ spec:
   http:
 {{- range .Values.apis.message.deploys }}
     {{- if and .traffic.headers (not .traffic.weight) }}
-    - match:
+    - timeout: {{ .traffic.timeout }}
+      match:
         - headers:
           {{ toYaml .traffic.headers | indent 5 -}}
       route:
         - destination:
-          host: {{ include "teddy.apis.message.name" $root }}
+            host: {{ include "teddy.apis.message.name" $root }}
     {{- end }}
 {{- end }}
 {{- range .Values.apis.message.deploys }}
     {{- if and (not .traffic.headers) .traffic.weight }}
-    - route:
-      - destination:
-          host: {{ include "teddy.apis.message.name" $root }}
-          subset: {{ .image.tag }}
-        weight: {{ .traffic.weight }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.apis.message.name" $root }}
+            subset: {{ .image.tag }}
+          weight: {{ .traffic.weight }}
     {{- end }}
 {{- end }}
 {{- range .Values.apis.message.deploys }}
     {{- if and (not .traffic.headers) (not .traffic.weight) }}
-    - route:
-      - destination:
-          host: {{ include "teddy.apis.message.name" $root }}
-          subset: {{ .image.tag }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.apis.message.name" $root }}
+            subset: {{ .image.tag }}
     {{- end }}
 {{- end }}
-    timeout: {{ .Values.apis.message.timeout }}
 ---
 ##################################################################################################
 # uaa service traffic
@@ -252,22 +260,23 @@ spec:
   http:
 {{- range .Values.services.uaa.deploys }}
     {{- if .traffic.weight }}
-    - route:
-      - destination:
-          host: {{ include "teddy.services.uaa.name" $root }}
-          subset: {{ .image.tag }}
-        weight: {{ .traffic.weight }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.services.uaa.name" $root }}
+            subset: {{ .image.tag }}
+          weight: {{ .traffic.weight }}
     {{- end }}
 {{- end }}
 {{- range .Values.services.uaa.deploys }}
     {{- if not .traffic.weight }}
-    - route:
-      - destination:
-          host: {{ include "teddy.services.uaa.name" $root }}
-          subset: {{ .image.tag }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.services.uaa.name" $root }}
+            subset: {{ .image.tag }}
     {{- end }}
 {{- end }}
-    timeout: {{ .Values.services.uaa.timeout }}
 ---
 ##################################################################################################
 # message service traffic
@@ -298,22 +307,23 @@ spec:
   http:
 {{- range .Values.services.message.deploys }}
     {{- if .traffic.weight }}
-    - route:
-      - destination:
-          host: {{ include "teddy.services.message.name" $root }}
-          subset: {{ .image.tag }}
-        weight: {{ .traffic.weight }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.services.message.name" $root }}
+            subset: {{ .image.tag }}
+          weight: {{ .traffic.weight }}
     {{- end }}
 {{- end }}
 {{- range .Values.services.message.deploys }}
     {{- if not .traffic.weight }}
-    - route:
-      - destination:
-          host: {{ include "teddy.services.message.name" $root }}
-          subset: {{ .image.tag }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.services.message.name" $root }}
+            subset: {{ .image.tag }}
     {{- end }}
 {{- end }}
-    timeout: {{ .Values.services.message.timeout }}
 ---
 ##################################################################################################
 # content service traffic
@@ -344,22 +354,23 @@ spec:
   http:
 {{- range .Values.services.content.deploys }}
     {{- if .traffic.weight }}
-    - route:
-      - destination:
-          host: {{ include "teddy.services.content.name" $root }}
-          subset: {{ .image.tag }}
-        weight: {{ .traffic.weight }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.services.content.name" $root }}
+            subset: {{ .image.tag }}
+          weight: {{ .traffic.weight }}
     {{- end }}
 {{- end }}
 {{- range .Values.services.content.deploys }}
     {{- if not .traffic.weight }}
-    - route:
-      - destination:
-          host: {{ include "teddy.services.content.name" $root }}
-          subset: {{ .image.tag }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.services.content.name" $root }}
+            subset: {{ .image.tag }}
     {{- end }}
 {{- end }}
-    timeout: {{ .Values.services.content.timeout }}
 ---
 ##################################################################################################
 # captcha service traffic
@@ -390,20 +401,20 @@ spec:
   http:
 {{- range .Values.services.captcha.deploys }}
     {{- if .traffic.weight }}
-    - route:
-      - destination:
-          host: {{ include "teddy.services.captcha.name" $root }}
-          subset: {{ .image.tag }}
-        weight: {{ .traffic.weight }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.services.captcha.name" $root }}
+            subset: {{ .image.tag }}
+          weight: {{ .traffic.weight }}
     {{- end }}
 {{- end }}
 {{- range .Values.services.captcha.deploys }}
     {{- if not .traffic.weight }}
-    - route:
-      - destination:
-          host: {{ include "teddy.services.captcha.name" $root }}
-          subset: {{ .image.tag }}
+    - timeout: {{ .traffic.timeout }}
+      route:
+        - destination:
+            host: {{ include "teddy.services.captcha.name" $root }}
+            subset: {{ .image.tag }}
     {{- end }}
 {{- end }}
-    timeout: {{ .Values.services.captcha.timeout }}
----
