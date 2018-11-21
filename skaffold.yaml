@@ -1,0 +1,41 @@
+apiVersion: skaffold/v1alpha5
+kind: Config
+build:
+  tagPolicy:
+    sha256: {}
+  artifacts:
+  - image: zhsyourai/uaa-srv
+    context: ./uaa/
+  - image: zhsyourai/uaa-api
+    context: ./api/uaa
+  - image: zhsyourai/message-srv
+    context: ./message
+  - image: zhsyourai/message-api
+    context: ./api/message
+  - image: zhsyourai/content-srv
+    context: ./content
+  - image: zhsyourai/content-api
+    context: ./api/content
+  - image: zhsyourai/captcha-srv
+    context: ./captcha
+  - image: zhsyourai/base-api
+    context: ./api/base
+deploy:
+  helm:
+    releases:
+    - name: teddy
+      chartPath: install/teddy
+      #wait: true
+      #valuesFiles:
+      #- helm-skaffold-values.yaml
+      #values:
+        #image: gcr.io/k8s-skaffold/skaffold-helm
+        #recreatePods will pass --recreate-pods to helm upgrade
+        #recreatePods: true
+        #overrides builds an override values.yaml file to run with the helm deploy
+        #overrides:
+        # some:
+        #   key: someValue
+        #setValues get appended to the helm deploy with --set.
+        #setValues:
+        #some.key: someValue
