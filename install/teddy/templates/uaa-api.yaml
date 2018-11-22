@@ -29,7 +29,7 @@ spec:
     app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{- $root := . -}}
-{{- range .Values.apis.uaa.deploys -}}
+{{- range .Values.apis.uaa.deploys }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -57,7 +57,11 @@ spec:
       containers:
         - name: {{ include "teddy.apis.uaa.name" $root }}
           image: "{{ .image.repository }}:{{ .image.tag }}"
-          imagePullPolicy: {{ .image.pullPolicy }}
+{{- if .image.tag }}
+          image: "{{ .image.repository }}:{{ .image.tag }}"
+{{- else }}
+          image: "{{ .image.repository }}"
+{{- end }}
           ports:
             - name: http
               containerPort: 8080

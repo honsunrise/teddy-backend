@@ -13,7 +13,7 @@ apis:
           weight: 50
         image:
           repository: zhsyourai/base-api
-          tag: latest
+#          tag: latest
           pullPolicy: IfNotPresent
         resources:
           limits:
@@ -34,8 +34,8 @@ apis:
           timeout: 0.5s
           weight: 50
         image:
-          repository: zhsyourai/base-api
-          tag: latest
+          repository: zhsyourai/uaa-api
+#          tag: latest
           pullPolicy: IfNotPresent
         resources:
           limits:
@@ -57,7 +57,7 @@ apis:
           weight: 50
         image:
           repository: zhsyourai/content-api
-          tag: latest
+#          tag: latest
           pullPolicy: IfNotPresent
         resources:
           limits:
@@ -79,7 +79,7 @@ apis:
           weight: 50
         image:
           repository: zhsyourai/message-api
-          tag: latest
+#          tag: latest
           pullPolicy: IfNotPresent
         resources:
           limits:
@@ -103,7 +103,7 @@ services:
           weight: 50
         image:
           repository: zhsyourai/captcha-srv
-          tag: latest
+#          tag: latest
           pullPolicy: IfNotPresent
         resources:
           limits:
@@ -127,7 +127,7 @@ services:
           weight: 50
         image:
           repository: zhsyourai/uaa-srv
-          tag: latest
+#          tag: latest
           pullPolicy: IfNotPresent
         resources:
           limits:
@@ -149,7 +149,7 @@ services:
           weight: 50
         image:
           repository: zhsyourai/content-srv
-          tag: latest
+#          tag: latest
           pullPolicy: IfNotPresent
         resources:
           limits:
@@ -171,7 +171,7 @@ services:
           weight: 50
         image:
           repository: zhsyourai/message-srv
-          tag: latest
+#          tag: latest
           pullPolicy: IfNotPresent
         resources:
           limits:
