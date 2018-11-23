@@ -1,4 +1,5 @@
 {{- $root := . -}}
+{{- $use_subsets := 0 -}}
 ##################################################################################################
 # base api traffic
 ##################################################################################################
@@ -11,11 +12,23 @@ spec:
   trafficPolicy:
     loadBalancer:
       simple: ROUND_ROBIN
+{{- $use_subsets := 0 -}}
+{{- range .Values.apis.base.deploys -}}
+  {{- if .image.tag -}}
+    {{- $use_subsets := 1 -}}
+  {{- else -}}
+    {{- $use_subsets := 0 -}}
+  {{- end -}}
+{{- end -}}
+{{- if eq $use_subsets 1 }}
   subsets:
-{{- range .Values.apis.base.deploys }}
+{{- range .Values.apis.base.deploys -}}
+  {{- if .image.tag }}
     - name: {{ .image.tag }}
       labels:
         app.kubernetes.io/version: {{ .image.tag }}
+  {{- end -}}
+{{- end -}}
 {{- end }}
 ---
 apiVersion: networking.istio.io/v1alpha3
@@ -35,25 +48,26 @@ spec:
       route:
         - destination:
             host: {{ include "teddy.apis.base.name" $root }}
-    {{- end }}
-{{- end }}
-{{- range .Values.apis.base.deploys }}
-    {{- if and (not .traffic.headers) .traffic.weight }}
+            {{- if .image.tag }}
+            subset: {{ .image.tag }}
+            {{- end }}
+    {{- else if and (not .traffic.headers) .traffic.weight }}
     - timeout: {{ .traffic.timeout }}
       route:
         - destination:
             host: {{ include "teddy.apis.base.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
           weight: {{ .traffic.weight }}
-    {{- end }}
-{{- end }}
-{{- range .Values.apis.base.deploys }}
-    {{- if and (not .traffic.headers) (not .traffic.weight) }}
+    {{- else if and (not .traffic.headers) (not .traffic.weight) }}
     - timeout: {{ .traffic.timeout }}
       route:
         - destination:
             host: {{ include "teddy.apis.base.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
     {{- end }}
 {{- end }}
 ---
@@ -69,11 +83,23 @@ spec:
   trafficPolicy:
     loadBalancer:
       simple: ROUND_ROBIN
+{{- $use_subsets := 0 -}}
+{{- range .Values.apis.uaa.deploys -}}
+  {{- if .image.tag -}}
+    {{- $use_subsets := 1 -}}
+  {{- else -}}
+    {{- $use_subsets := 0 -}}
+  {{- end -}}
+{{- end -}}
+{{- if eq $use_subsets 1 }}
   subsets:
-{{- range .Values.apis.uaa.deploys }}
+{{- range .Values.apis.uaa.deploys -}}
+  {{- if .image.tag }}
     - name: {{ .image.tag }}
       labels:
         app.kubernetes.io/version: {{ .image.tag }}
+  {{- end -}}
+{{- end -}}
 {{- end }}
 ---
 apiVersion: networking.istio.io/v1alpha3
@@ -93,25 +119,26 @@ spec:
       route:
         - destination:
             host: {{ include "teddy.apis.uaa.name" $root }}
-    {{- end }}
-{{- end }}
-{{- range .Values.apis.uaa.deploys }}
-    {{- if and (not .traffic.headers) .traffic.weight }}
+            {{- if .image.tag }}
+            subset: {{ .image.tag }}
+            {{- end }}
+    {{- else if and (not .traffic.headers) .traffic.weight }}
     - timeout: {{ .traffic.timeout }}
       route:
         - destination:
             host: {{ include "teddy.apis.uaa.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
           weight: {{ .traffic.weight }}
-    {{- end }}
-{{- end }}
-{{- range .Values.apis.uaa.deploys }}
-    {{- if and (not .traffic.headers) (not .traffic.weight) }}
+    {{- else if and (not .traffic.headers) (not .traffic.weight) }}
     - timeout: {{ .traffic.timeout }}
       route:
         - destination:
             host: {{ include "teddy.apis.uaa.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
     {{- end }}
 {{- end }}
 ---
@@ -127,11 +154,23 @@ spec:
   trafficPolicy:
     loadBalancer:
       simple: ROUND_ROBIN
+{{- $use_subsets := 0 -}}
+{{- range .Values.apis.content.deploys -}}
+  {{- if .image.tag -}}
+    {{- $use_subsets := 1 -}}
+  {{- else -}}
+    {{- $use_subsets := 0 -}}
+  {{- end -}}
+{{- end -}}
+{{- if eq $use_subsets 1 }}
   subsets:
-{{- range .Values.apis.content.deploys }}
+{{- range .Values.apis.content.deploys -}}
+  {{- if .image.tag }}
     - name: {{ .image.tag }}
       labels:
         app.kubernetes.io/version: {{ .image.tag }}
+  {{- end -}}
+{{- end -}}
 {{- end }}
 ---
 apiVersion: networking.istio.io/v1alpha3
@@ -151,25 +190,26 @@ spec:
       route:
         - destination:
             host: {{ include "teddy.apis.content.name" $root }}
-    {{- end }}
-{{- end }}
-{{- range .Values.apis.content.deploys }}
-    {{- if and (not .traffic.headers) .traffic.weight }}
+            {{- if .image.tag }}
+            subset: {{ .image.tag }}
+            {{- end }}
+    {{- else if and (not .traffic.headers) .traffic.weight }}
     - timeout: {{ .traffic.timeout }}
       route:
         - destination:
             host: {{ include "teddy.apis.content.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
           weight: {{ .traffic.weight }}
-    {{- end }}
-{{- end }}
-{{- range .Values.apis.content.deploys }}
-    {{- if and (not .traffic.headers) (not .traffic.weight) }}
+    {{- else if and (not .traffic.headers) (not .traffic.weight) }}
     - timeout: {{ .traffic.timeout }}
       route:
         - destination:
             host: {{ include "teddy.apis.content.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
     {{- end }}
 {{- end }}
 ---
@@ -185,11 +225,23 @@ spec:
   trafficPolicy:
     loadBalancer:
       simple: ROUND_ROBIN
+{{- $use_subsets := 0 -}}
+{{- range .Values.apis.message.deploys -}}
+  {{- if .image.tag -}}
+    {{- $use_subsets := 1 -}}
+  {{- else -}}
+    {{- $use_subsets := 0 -}}
+  {{- end -}}
+{{- end -}}
+{{- if eq $use_subsets 1 }}
   subsets:
-{{- range .Values.apis.message.deploys }}
+{{- range .Values.apis.message.deploys -}}
+  {{- if .image.tag }}
     - name: {{ .image.tag }}
       labels:
         app.kubernetes.io/version: {{ .image.tag }}
+  {{- end -}}
+{{- end -}}
 {{- end }}
 ---
 apiVersion: networking.istio.io/v1alpha3
@@ -209,25 +261,26 @@ spec:
       route:
         - destination:
             host: {{ include "teddy.apis.message.name" $root }}
-    {{- end }}
-{{- end }}
-{{- range .Values.apis.message.deploys }}
-    {{- if and (not .traffic.headers) .traffic.weight }}
+            {{- if .image.tag }}
+            subset: {{ .image.tag }}
+            {{- end }}
+    {{- else if and (not .traffic.headers) .traffic.weight }}
     - timeout: {{ .traffic.timeout }}
       route:
         - destination:
             host: {{ include "teddy.apis.message.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
           weight: {{ .traffic.weight }}
-    {{- end }}
-{{- end }}
-{{- range .Values.apis.message.deploys }}
-    {{- if and (not .traffic.headers) (not .traffic.weight) }}
+    {{- else if and (not .traffic.headers) (not .traffic.weight) }}
     - timeout: {{ .traffic.timeout }}
       route:
         - destination:
             host: {{ include "teddy.apis.message.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
     {{- end }}
 {{- end }}
 ---
@@ -244,10 +297,23 @@ spec:
     loadBalancer:
       simple: ROUND_ROBIN
   subsets:
-{{- range .Values.services.uaa.deploys }}
+{{- $use_subsets := 0 -}}
+{{- range .Values.services.uaa.deploys -}}
+  {{- if .image.tag -}}
+    {{- $use_subsets := 1 -}}
+  {{- else -}}
+    {{- $use_subsets := 0 -}}
+  {{- end -}}
+{{- end -}}
+{{- if eq $use_subsets 1 }}
+  subsets:
+{{- range .Values.services.uaa.deploys -}}
+  {{- if .image.tag }}
     - name: {{ .image.tag }}
       labels:
         app.kubernetes.io/version: {{ .image.tag }}
+  {{- end -}}
+{{- end -}}
 {{- end }}
 ---
 apiVersion: networking.istio.io/v1alpha3
@@ -264,17 +330,18 @@ spec:
       route:
         - destination:
             host: {{ include "teddy.services.uaa.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
           weight: {{ .traffic.weight }}
-    {{- end }}
-{{- end }}
-{{- range .Values.services.uaa.deploys }}
-    {{- if not .traffic.weight }}
+    {{- else }}
     - timeout: {{ .traffic.timeout }}
       route:
         - destination:
             host: {{ include "teddy.services.uaa.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
     {{- end }}
 {{- end }}
 ---
@@ -290,11 +357,23 @@ spec:
   trafficPolicy:
     loadBalancer:
       simple: ROUND_ROBIN
+{{- $use_subsets := 0 -}}
+{{- range .Values.services.message.deploys -}}
+  {{- if .image.tag -}}
+    {{- $use_subsets := 1 -}}
+  {{- else -}}
+    {{- $use_subsets := 0 -}}
+  {{- end -}}
+{{- end -}}
+{{- if eq $use_subsets 1 }}
   subsets:
-{{- range .Values.services.message.deploys }}
+{{- range .Values.services.message.deploys -}}
+  {{- if .image.tag }}
     - name: {{ .image.tag }}
       labels:
         app.kubernetes.io/version: {{ .image.tag }}
+  {{- end -}}
+{{- end -}}
 {{- end }}
 ---
 apiVersion: networking.istio.io/v1alpha3
@@ -311,17 +390,18 @@ spec:
       route:
         - destination:
             host: {{ include "teddy.services.message.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
           weight: {{ .traffic.weight }}
-    {{- end }}
-{{- end }}
-{{- range .Values.services.message.deploys }}
-    {{- if not .traffic.weight }}
+    {{- else }}
     - timeout: {{ .traffic.timeout }}
       route:
         - destination:
             host: {{ include "teddy.services.message.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
     {{- end }}
 {{- end }}
 ---
@@ -337,11 +417,23 @@ spec:
   trafficPolicy:
     loadBalancer:
       simple: ROUND_ROBIN
+{{- $use_subsets := 0 -}}
+{{- range .Values.services.content.deploys -}}
+  {{- if .image.tag -}}
+    {{- $use_subsets := 1 -}}
+  {{- else -}}
+    {{- $use_subsets := 0 -}}
+  {{- end -}}
+{{- end -}}
+{{- if eq $use_subsets 1 }}
   subsets:
-{{- range .Values.services.content.deploys }}
+{{- range .Values.services.content.deploys -}}
+  {{- if .image.tag }}
     - name: {{ .image.tag }}
       labels:
         app.kubernetes.io/version: {{ .image.tag }}
+  {{- end -}}
+{{- end -}}
 {{- end }}
 ---
 apiVersion: networking.istio.io/v1alpha3
@@ -358,17 +450,18 @@ spec:
       route:
         - destination:
             host: {{ include "teddy.services.content.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
           weight: {{ .traffic.weight }}
-    {{- end }}
-{{- end }}
-{{- range .Values.services.content.deploys }}
-    {{- if not .traffic.weight }}
+    {{- else }}
     - timeout: {{ .traffic.timeout }}
       route:
         - destination:
             host: {{ include "teddy.services.content.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
     {{- end }}
 {{- end }}
 ---
@@ -385,10 +478,23 @@ spec:
     loadBalancer:
       simple: ROUND_ROBIN
   subsets:
-{{- range .Values.services.captcha.deploys }}
+{{- $use_subsets := 0 -}}
+{{- range .Values.services.captcha.deploys -}}
+  {{- if .image.tag -}}
+    {{- $use_subsets := 1 -}}
+  {{- else -}}
+    {{- $use_subsets := 0 -}}
+  {{- end -}}
+{{- end -}}
+{{- if eq $use_subsets 1 }}
+  subsets:
+{{- range .Values.services.captcha.deploys -}}
+  {{- if .image.tag }}
     - name: {{ .image.tag }}
       labels:
         app.kubernetes.io/version: {{ .image.tag }}
+  {{- end -}}
+{{- end -}}
 {{- end }}
 ---
 apiVersion: networking.istio.io/v1alpha3
@@ -405,16 +511,17 @@ spec:
       route:
         - destination:
             host: {{ include "teddy.services.captcha.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
           weight: {{ .traffic.weight }}
-    {{- end }}
-{{- end }}
-{{- range .Values.services.captcha.deploys }}
-    {{- if not .traffic.weight }}
+    {{- else }}
     - timeout: {{ .traffic.timeout }}
       route:
         - destination:
             host: {{ include "teddy.services.captcha.name" $root }}
+            {{- if .image.tag }}
             subset: {{ .image.tag }}
+            {{- end }}
     {{- end }}
 {{- end }}

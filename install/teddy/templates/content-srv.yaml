@@ -37,7 +37,9 @@ metadata:
   name: {{ include "teddy.services.content.name" $root }}
   labels:
     app.kubernetes.io/name: {{ include "teddy.services.content.name" $root }}
+{{- if .image.tag }}
     app.kubernetes.io/version: {{ .image.tag }}
+{{- end }}
     helm.sh/chart: {{ include "teddy.chart" $root }}
     app.kubernetes.io/instance: {{ $root.Release.Name }}
     app.kubernetes.io/managed-by: {{ $root.Release.Service }}
