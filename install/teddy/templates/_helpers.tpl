@@ -62,3 +62,21 @@ Create chart name and version as used by the chart label.
 {{- define "teddy.services.uaa.name" -}}
   {{- printf "%s" "srv-uaa" -}}
 {{- end -}}
+
+{{- define "utils.tagAsSubset" -}}
+ {{- $tuple := regexSplit ":" . -1 }}
+ {{- if len $tuple | eq 2 -}}
+    {{- index $tuple 1 | printf "subset: %s" -}}
+ {{- end -}}
+{{- end -}}
+
+{{- define "utils.tagAsSubsetDef" -}}
+ {{- $tuple := regexSplit ":" . -1 }}
+ {{- if len $tuple | eq 2 -}}
+subsets:
+  - name:
+    labels:
+{{ index $tuple 1 | printf "subset: %s" | indent 6 }}
+ {{- end -}}
+{{- end -}}
+

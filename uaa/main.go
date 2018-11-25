@@ -18,8 +18,6 @@ import (
 	"github.com/zhsyourai/teddy-backend/uaa/server"
 )
 
-const PORT = 9999
-
 func main() {
 	conf, err := config.NewConfig(file.NewSource(file.WithFormat(config.Yaml), file.WithPath("config.yaml")))
 	if err != nil {

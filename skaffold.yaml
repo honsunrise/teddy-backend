@@ -25,6 +25,15 @@ deploy:
     releases:
       - name: teddy
         chartPath: install/teddy
+        values:
+          apis.base.deploy.image.repository: zhsyourai/base-api
+          apis.content.deploy.image.repository: zhsyourai/content-api
+          apis.message.deploy.image.repository: zhsyourai/message-api
+          apis.uaa.deploy.image.repository: zhsyourai/uaa-api
+          services.captcha.deploy.image.repository: zhsyourai/captcha-srv
+          services.content.deploy.image.repository: zhsyourai/content-srv
+          services.message.deploy.image.repository: zhsyourai/message-srv
+          services.uaa.deploy.image.repository: zhsyourai/uaa-srv
         #wait: true
         #valuesFiles:
         #- helm-skaffold-values.yaml

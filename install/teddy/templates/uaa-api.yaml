@@ -20,16 +20,36 @@ metadata:
 spec:
   type: {{ default "ClusterIP" .Values.apis.uaa.type }}
   ports:
-    - port: {{ default 8080 .Values.apis.uaa.port }}
+    - port: 8083
       targetPort: http
       protocol: TCP
       name: http
   selector:
     app.kubernetes.io/name: {{ include "teddy.apis.uaa.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
-
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "teddy.apis.uaa.name" . }}-config
+data:
+  config.yaml:
+    server:
+      address: 0.0.0.0
+      port: 8083
+    databases:
+      mongodb:
+        - address: mongodb:27017
+          username: teddy
+          password: teddy
+          auth_db: teddy
+    mail:
+      host: test
+      port: 555
+      username: teddy
+      password: teddy
 {{- $root := . -}}
-{{- range .Values.apis.uaa.deploys }}
+{{- with .Values.apis.uaa }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -37,12 +57,10 @@ metadata:
   name: {{ include "teddy.apis.uaa.name" $root }}
   labels:
     app.kubernetes.io/name: {{ include "teddy.apis.uaa.name" $root }}
-{{- if .image.tag }}
-    app.kubernetes.io/version: {{ .image.tag }}
-{{- end }}
     helm.sh/chart: {{ include "teddy.chart" $root }}
     app.kubernetes.io/instance: {{ $root.Release.Name }}
     app.kubernetes.io/managed-by: {{ $root.Release.Service }}
+    app.kubernetes.io/version: {{ .version }}
 spec:
   replicas: {{ default 1 $root.Values.apis.uaa.replicas }}
   selector:
@@ -56,17 +74,20 @@ spec:
         app.kubernetes.io/instance: {{ $root.Release.Name }}
     spec:
       serviceAccountName: {{ include "teddy.apis.uaa.name" $root }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "teddy.apis.uaa.name" $root }}-config
       containers:
         - name: {{ include "teddy.apis.uaa.name" $root }}
-          image: "{{ .image.repository }}:{{ .image.tag }}"
-{{- if .image.tag }}
-          image: "{{ .image.repository }}:{{ .image.tag }}"
-{{- else }}
-          image: "{{ .image.repository }}"
-{{- end }}
+          image: "{{ .deploy.image.repository }}"
+          imagePullPolicy: {{ .deploy.image.pullPolicy }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: 8083
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -77,16 +98,16 @@ spec:
               path: /
               port: http
           resources:
-{{ toYaml .resources | indent 12 }}
-{{- with .nodeSelector }}
+{{ toYaml .deploy.resources | indent 12 }}
+{{- with .deploy.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
 {{- end }}
-{{- with .affinity }}
+{{- with .deploy.affinity }}
       affinity:
 {{ toYaml . | indent 8 }}
 {{- end }}
-{{- with .tolerations }}
+{{- with .deploy.tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}
 {{- end }}

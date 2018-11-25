@@ -27,9 +27,29 @@ spec:
   selector:
     app.kubernetes.io/name: {{ include "teddy.services.message.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
-
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "teddy.services.message.name" . }}-config
+data:
+  config.yaml:
+    server:
+      address: 0.0.0.0
+      port: 9092
+    databases:
+      mongodb:
+        - address: mongodb:27017
+          username: teddy
+          password: teddy
+          auth_db: teddy
+    mail:
+      host: test
+      port: 555
+      username: teddy
+      password: teddy
 {{- $root := . -}}
-{{- range .Values.services.message.deploys }}
+{{- with .Values.services.message }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -37,12 +57,10 @@ metadata:
   name: {{ include "teddy.services.message.name" $root }}
   labels:
     app.kubernetes.io/name: {{ include "teddy.services.message.name" $root }}
-{{- if .image.tag }}
-    app.kubernetes.io/version: {{ .image.tag }}
-{{- end }}
     helm.sh/chart: {{ include "teddy.chart" $root }}
     app.kubernetes.io/instance: {{ $root.Release.Name }}
     app.kubernetes.io/managed-by: {{ $root.Release.Service }}
+    app.kubernetes.io/version: {{ .version }}
 spec:
   replicas: {{ default 1 $root.Values.services.message.replicas }}
   selector:
@@ -56,14 +74,17 @@ spec:
         app.kubernetes.io/instance: {{ $root.Release.Name }}
     spec:
       serviceAccountName: {{ include "teddy.services.message.name" $root }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "teddy.services.message.name" $root }}-config
       containers:
         - name: {{ include "teddy.services.message.name" $root }}
-{{- if .image.tag }}
-          image: "{{ .image.repository }}:{{ .image.tag }}"
-{{- else }}
-          image: "{{ .image.repository }}"
-{{- end }}
-          imagePullPolicy: {{ .image.pullPolicy }}
+          image: "{{ .deploy.image.repository }}"
+          imagePullPolicy: {{ .deploy.image.pullPolicy }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app
           ports:
             - name: http
               containerPort: 8080
@@ -77,16 +98,16 @@ spec:
               path: /
               port: http
           resources:
-{{ toYaml .resources | indent 12 }}
-{{- with .nodeSelector }}
+{{ toYaml .deploy.resources | indent 12 }}
+{{- with .deploy.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
 {{- end }}
-{{- with .affinity }}
+{{- with .deploy.affinity }}
       affinity:
 {{ toYaml . | indent 8 }}
 {{- end }}
-{{- with .tolerations }}
+{{- with .deploy.tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}
 {{- end }}

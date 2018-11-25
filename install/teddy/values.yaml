@@ -4,185 +4,161 @@
 
 apis:
   base:
-    type: ClusterIP
-    port: 8080
-    deploys:
-      - replicas: 1
-        traffic:
-          timeout: 0.5s
-          weight: 50
-        image:
-          repository: zhsyourai/base-api
-#          tag: latest
-          pullPolicy: IfNotPresent
-        resources:
-          limits:
-            cpu: 100m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        nodeSelector: {}
-        tolerations: []
-        affinity: {}
+    version: v0
+    deploy:
+      replicas: 1
+      traffic:
+        timeout: 0.5s
+      image:
+        repository: zhsyourai/base-api
+        pullPolicy: IfNotPresent
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      nodeSelector: {}
+      tolerations: []
+      affinity: {}
   uaa:
-    type: ClusterIP
-    port: 8080
-    deploys:
-      - replicas: 1
-        traffic:
-          timeout: 0.5s
-          weight: 50
-        image:
-          repository: zhsyourai/uaa-api
-#          tag: latest
-          pullPolicy: IfNotPresent
-        resources:
-          limits:
-            cpu: 100m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        nodeSelector: {}
-        tolerations: []
-        affinity: {}
+    version: v0
+    deploy:
+      replicas: 1
+      traffic:
+        timeout: 0.5s
+      image:
+        repository: zhsyourai/uaa-api
+        pullPolicy: IfNotPresent
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      nodeSelector: {}
+      tolerations: []
+      affinity: {}
   content:
-    type: ClusterIP
-    port: 8080
-    deploys:
-      - replicas: 1
-        traffic:
-          timeout: 0.5s
-          weight: 50
-        image:
-          repository: zhsyourai/content-api
-#          tag: latest
-          pullPolicy: IfNotPresent
-        resources:
-          limits:
-            cpu: 100m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        nodeSelector: {}
-        tolerations: []
-        affinity: {}
+    version: v0
+    deploy:
+      replicas: 1
+      traffic:
+        timeout: 0.5s
+      image:
+        repository: zhsyourai/content-api
+        pullPolicy: IfNotPresent
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      nodeSelector: {}
+      tolerations: []
+      affinity: {}
   message:
-    type: ClusterIP
-    port: 8080
-    deploys:
-      - replicas: 1
-        traffic:
-          timeout: 0.5s
-          weight: 50
-        image:
-          repository: zhsyourai/message-api
-#          tag: latest
-          pullPolicy: IfNotPresent
-        resources:
-          limits:
-            cpu: 100m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        nodeSelector: {}
-        tolerations: []
-        affinity: {}
+    version: v0
+    deploy:
+      replicas: 1
+      traffic:
+        timeout: 0.5s
+      image:
+        repository: zhsyourai/message-api
+        pullPolicy: IfNotPresent
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      nodeSelector: {}
+      tolerations: []
+      affinity: {}
 
 services:
   captcha:
-    type: ClusterIP
-    port: 9090
-    deploys:
-      - replicas: 1
-        traffic:
-          timeout: 0.5s
-          weight: 50
-        image:
-          repository: zhsyourai/captcha-srv
-#          tag: latest
-          pullPolicy: IfNotPresent
-        resources:
-          limits:
-            cpu: 100m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        nodeSelector: {}
-        tolerations: []
-        affinity: {}
+    version: v0
+    deploy:
+      replicas: 1
+      traffic:
+        timeout: 0.5s
+      image:
+        repository: zhsyourai/captcha-srv
+        pullPolicy: IfNotPresent
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      nodeSelector: {}
+      tolerations: []
+      affinity: {}
   uaa:
-    type: ClusterIP
-    port: 9090
+    version: v0
     issuer: "uaa.teddy.com"
     jwksUriEndpoint: "/uaa/jwks.json"
-    deploys:
-      - replicas: 1
-        traffic:
-          timeout: 0.5s
-          weight: 50
-        image:
-          repository: zhsyourai/uaa-srv
-#          tag: latest
-          pullPolicy: IfNotPresent
-        resources:
-          limits:
-            cpu: 100m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        nodeSelector: {}
-        tolerations: []
-        affinity: {}
+    deploy:
+      replicas: 1
+      traffic:
+        timeout: 0.5s
+      image:
+        repository: zhsyourai/uaa-srv
+        pullPolicy: IfNotPresent
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      nodeSelector: {}
+      tolerations: []
+      affinity: {}
   content:
-    type: ClusterIP
-    port: 9090
-    deploys:
-      - replicas: 1
-        traffic:
-          timeout: 0.5s
-          weight: 50
-        image:
-          repository: zhsyourai/content-srv
-#          tag: latest
-          pullPolicy: IfNotPresent
-        resources:
-          limits:
-            cpu: 100m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        nodeSelector: {}
-        tolerations: []
-        affinity: {}
+    version: v0
+    deploy:
+      replicas: 1
+      traffic:
+        timeout: 0.5s
+      image:
+        repository: zhsyourai/content-srv
+        pullPolicy: IfNotPresent
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      nodeSelector: {}
+      tolerations: []
+      affinity: {}
   message:
-    type: ClusterIP
-    port: 9090
-    deploys:
-      - replicas: 1
-        traffic:
-          timeout: 0.5s
-          weight: 50
-        image:
-          repository: zhsyourai/message-srv
-#          tag: latest
-          pullPolicy: IfNotPresent
-        resources:
-          limits:
-            cpu: 100m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
-        nodeSelector: {}
-        tolerations: []
-        affinity: {}
+    version: v0
+    deploy:
+      replicas: 1
+      traffic:
+        timeout: 0.5s
+      image:
+        repository: zhsyourai/message-srv
+        pullPolicy: IfNotPresent
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+      nodeSelector: {}
+      tolerations: []
+      affinity: {}
 
 gateway:
   host: "*"
