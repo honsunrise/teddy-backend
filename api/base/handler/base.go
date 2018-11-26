@@ -19,12 +19,22 @@ func NewBaseHandler() (*Base, error) {
 }
 
 func (h *Base) Handler(root gin.IRoutes) {
-	root.GET("/base/captcha", h.GetCaptchaId)
-	root.GET("/base/captcha/:id", h.GetCaptchaData)
+	root.Any("/", h.ReturnOK)
+	root.GET("/captcha", h.GetCaptchaId)
+	root.GET("/captcha/:id", h.GetCaptchaData)
 
-	root.PUT("/base/profile/:id")
-	root.GET("/base/profile/:id")
-	root.POST("/base/profile/:id/avatar")
+	root.PUT("/profile/:id")
+	root.GET("/profile/:id")
+	root.POST("/profile/:id/avatar")
+}
+
+func (h *Base) ReturnOK(ctx *gin.Context) {
+	type okResp struct {
+		Status string `json:"status"`
+	}
+	var jsonResp okResp
+	jsonResp.Status = "OK"
+	ctx.JSON(http.StatusOK, &jsonResp)
 }
 
 func (h *Base) GetCaptchaId(ctx *gin.Context) {

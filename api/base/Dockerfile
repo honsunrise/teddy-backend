@@ -1,3 +1,6 @@
 FROM alpine:3.2
-ADD base-api /app/base-api
+RUN mkdir /app
+WORKDIR /app
+COPY base-api base-api
+RUN chmod +x base-api
 ENTRYPOINT [ "/app/base-api" ]

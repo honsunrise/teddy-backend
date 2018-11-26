@@ -1,3 +1,6 @@
 FROM alpine:3.2
-ADD uaa-api /app/uaa-api
+RUN mkdir /app
+WORKDIR /app
+COPY uaa-api uaa-api
+RUN chmod +x uaa-api
 ENTRYPOINT [ "/app/uaa-api" ]

@@ -21,7 +21,7 @@ metadata:
 spec:
   type: {{ default "ClusterIP" .Values.services.uaa.type }}
   ports:
-    - port: {{ default 8080 .Values.services.uaa.port }}
+    - port: 9093
       targetPort: http
       protocol: TCP
       name: http
@@ -34,7 +34,7 @@ kind: ConfigMap
 metadata:
   name: {{ include "teddy.services.uaa.name" . }}-config
 data:
-  config.yaml:
+  config.yaml: |
     server:
       address: 0.0.0.0
       port: 9093
@@ -85,19 +85,19 @@ spec:
           imagePullPolicy: {{ .deploy.image.pullPolicy }}
           volumeMounts:
             - name: config-volume
-              mountPath: /app
+              mountPath: /app/config
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: 9093
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
           readinessProbe:
-            httpGet:
-              path: /
-              port: http
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:9093"]
+            initialDelaySeconds: 5
+          livenessProbe:
+            exec:
+              command: ["/bin/grpc_health_probe", "-addr=:9093"]
+            initialDelaySeconds: 10
           resources:
 {{ toYaml .deploy.resources | indent 12 }}
 {{- with .deploy.nodeSelector }}

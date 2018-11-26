@@ -1,3 +1,6 @@
 FROM alpine:3.2
-ADD content-api /app/message-api
-ENTRYPOINT [ "/app/message-api" ]
+RUN mkdir /app
+WORKDIR /app
+COPY content-api content-api
+RUN chmod +x content-api
+ENTRYPOINT [ "/app/content-api" ]

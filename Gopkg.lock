@@ -383,7 +383,7 @@
   revision = "b5d43981345bdb2c233eb4bf3277847b48c6fdc6"
 
 [[projects]]
-  digest = "1:c3ad9841823db6da420a5625b367913b4ff54bbe60e8e3c98bd20e243e62e2d2"
+  digest = "1:95550b4aa2a79019c2a832c1a7d6a5446b046e3ee8cce12a042778ac0ac47baf"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -396,6 +396,8 @@
     "encoding",
     "encoding/proto",
     "grpclog",
+    "health",
+    "health/grpc_health_v1",
     "internal",
     "internal/backoff",
     "internal/channelz",
@@ -490,6 +492,7 @@
     "golang.org/x/crypto/bcrypt",
     "golang.org/x/net/context",
     "google.golang.org/grpc",
+    "google.golang.org/grpc/health",
     "gopkg.in/alecthomas/kingpin.v2",
     "gopkg.in/dgrijalva/jwt-go.v3",
     "gopkg.in/gomail.v2",

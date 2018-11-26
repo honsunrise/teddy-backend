@@ -4,10 +4,11 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
+	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
-	"github.com/zhsyourai/teddy-backend/api/uaa/client"
 	"github.com/zhsyourai/teddy-backend/api/uaa/handler"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/common/config/source/file"
@@ -17,7 +18,7 @@ import (
 )
 
 func main() {
-	conf, err := config.NewConfig(file.NewSource(file.WithFormat(config.Yaml), file.WithPath("config.yaml")))
+	conf, err := config.NewConfig(file.NewSource(file.WithFormat(config.Yaml), file.WithPath("config/config.yaml")))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,20 +55,20 @@ func main() {
 
 	// Create RESTful server (using Gin)
 	router := gin.Default()
-	router.Use(client.MessageNew())
-	router.Use(client.UaaNew())
-	router.Use(client.CaptchaNew())
-	uaa.Handler(router)
+	router.Use(clients.MessageNew())
+	router.Use(clients.UaaNew())
+	router.Use(clients.CaptchaNew())
+	uaa.Handler(router.Group("/uaa"))
 
 	srv := http.Server{
-		Addr:           ":8080",
+		Addr:           fmt.Sprintf("%s:%d", confType.Server.Address, confType.Server.Port),
 		Handler:        router,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 	}

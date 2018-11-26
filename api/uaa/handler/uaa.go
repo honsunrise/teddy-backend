@@ -28,13 +28,23 @@ func NewUaaHandler(generator *gin_jwt.JwtGenerator) (*Uaa, error) {
 }
 
 func (h *Uaa) Handler(root gin.IRoutes) {
-	root.POST("/uaa/register", h.Register)
-	root.POST("/uaa/login", h.Login)
-	root.Any("/uaa/logout", h.Logout)
-	root.POST("/uaa/changePassword", h.ChangePassword)
-	root.POST("/uaa/sendEmailCaptcha", h.SendEmailCaptcha)
-	root.POST("/uaa/resetPassword", h.ResetPassword)
-	root.GET("/uaa/jwks.json", h.JWKsJSON)
+	root.Any("/", h.ReturnOK)
+	root.POST("/register", h.Register)
+	root.POST("/login", h.Login)
+	root.Any("/logout", h.Logout)
+	root.POST("/changePassword", h.ChangePassword)
+	root.POST("/sendEmailCaptcha", h.SendEmailCaptcha)
+	root.POST("/resetPassword", h.ResetPassword)
+	root.GET("/jwks.json", h.JWKsJSON)
+}
+
+func (h *Uaa) ReturnOK(ctx *gin.Context) {
+	type okResp struct {
+		Status string `json:"status"`
+	}
+	var jsonResp okResp
+	jsonResp.Status = "OK"
+	ctx.JSON(http.StatusOK, &jsonResp)
 }
 
 // Uaa.Register is called by the API as /uaa/Register with post body

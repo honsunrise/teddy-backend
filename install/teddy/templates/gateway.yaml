@@ -5,7 +5,7 @@
   route:
     - destination:
         port:
-          number: {{ .Values.apis.uaa.port }}
+          number: 8083
         host: {{ include "teddy.apis.uaa.name" .}}
 - match:
     - uri:
@@ -13,7 +13,7 @@
   route:
     - destination:
         port:
-          number: {{ .Values.apis.base.port }}
+          number: 8080
         host: {{ include "teddy.apis.base.name" .}}
 - match:
     - uri:
@@ -21,7 +21,7 @@
   route:
     - destination:
         port:
-          number: {{ .Values.apis.content.port }}
+          number: 8081
         host: {{ include "teddy.apis.content.name" .}}
 - match:
     - uri:
@@ -29,7 +29,7 @@
   route:
     - destination:
         port:
-          number: {{ .Values.apis.message.port }}
+          number: 8083
         host: {{ include "teddy.apis.message.name" .}}
 {{- end -}}
 

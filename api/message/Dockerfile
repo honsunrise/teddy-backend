@@ -1,3 +1,6 @@
 FROM alpine:3.2
-ADD message-api /app/message-api
+RUN mkdir /app
+WORKDIR /app
+COPY message-api message-api
+RUN chmod +x message-api
 ENTRYPOINT [ "/app/message-api" ]

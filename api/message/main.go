@@ -1,7 +1,8 @@
 package main
 
 import (
-	"github.com/zhsyourai/teddy-backend/api/message/client"
+	"fmt"
+	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/api/message/handler"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/common/config/source/file"
@@ -14,7 +15,7 @@ import (
 )
 
 func main() {
-	conf, err := config.NewConfig(file.NewSource(file.WithFormat(config.Yaml), file.WithPath("config.yaml")))
+	conf, err := config.NewConfig(file.NewSource(file.WithFormat(config.Yaml), file.WithPath("config/config.yaml")))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,18 +32,18 @@ func main() {
 
 	// Create RESTful server (using Gin)
 	router := gin.Default()
-	router.Use(client.MessageNew())
-	message.Handler(router)
+	router.Use(clients.MessageNew())
+	message.Handler(router.Group("/message"))
 
 	srv := http.Server{
-		Addr:           ":8080",
+		Addr:           fmt.Sprintf("%s:%d", confType.Server.Address, confType.Server.Port),
 		Handler:        router,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
 	}

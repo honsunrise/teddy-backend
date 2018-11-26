@@ -1,6 +1,6 @@
 server:
   address: 0.0.0.0
-  port: 9090
+  port: 8083
 
 databases:
   mongodb:

@@ -33,7 +33,7 @@ kind: ConfigMap
 metadata:
   name: {{ include "teddy.apis.message.name" . }}-config
 data:
-  config.yaml:
+  config.yaml: |
     server:
       address: 0.0.0.0
       port: 8082
@@ -84,18 +84,18 @@ spec:
           imagePullPolicy: {{ .deploy.image.pullPolicy }}
           volumeMounts:
             - name: config-volume
-              mountPath: /app
+              mountPath: /app/config
           ports:
             - name: http
               containerPort: 8082
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /message
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: /message
               port: http
           resources:
 {{ toYaml .deploy.resources | indent 12 }}

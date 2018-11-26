@@ -26,12 +26,21 @@ var wsUpgrader = websocket.Upgrader{
 }
 
 func (h *Message) Handler(root gin.IRoutes) {
-	root.GET("/message/notify", h.Notify)
+	root.Any("/", h.ReturnOK)
+	root.GET("/notify", h.Notify)
+	root.GET("/inbox", h.Inbox)
+	root.DELETE("/inbox/:id", h.DeleteInbox)
+	root.PUT("/inbox/:id", h.MarkInboxRead)
+	root.POST("/inbox", h.PostInbox)
+}
 
-	root.GET("/message/inbox", h.Inbox)
-	root.DELETE("/message/inbox/:id", h.DeleteInbox)
-	root.PUT("/message/inbox/:id", h.MarkInboxRead)
-	root.POST("/message/inbox", h.PostInbox)
+func (h *Message) ReturnOK(ctx *gin.Context) {
+	type okResp struct {
+		Status string `json:"status"`
+	}
+	var jsonResp okResp
+	jsonResp.Status = "OK"
+	ctx.JSON(http.StatusOK, &jsonResp)
 }
 
 func (h *Message) PostInbox(ctx *gin.Context) {

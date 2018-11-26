@@ -7,6 +7,8 @@ import (
 	"github.com/zhsyourai/teddy-backend/common/types"
 	"github.com/zhsyourai/teddy-backend/common/utils"
 	"google.golang.org/grpc"
+	grpcHealth "google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	"net"
 
 	"context"
@@ -17,10 +19,8 @@ import (
 	"github.com/zhsyourai/teddy-backend/common/config"
 )
 
-const PORT = 9999
-
 func main() {
-	conf, err := config.NewConfig(file.NewSource(file.WithFormat(config.Yaml), file.WithPath("config.yaml")))
+	conf, err := config.NewConfig(file.NewSource(file.WithFormat(config.Yaml), file.WithPath("config/config.yaml")))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,6 +56,9 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 	proto.RegisterCaptchaServer(grpcServer, captchaSrv)
+
+	healthSrv := grpcHealth.NewServer()
+	grpc_health_v1.RegisterHealthServer(grpcServer, healthSrv)
 
 	// Run service
 	if err := grpcServer.Serve(lis); err != nil {
