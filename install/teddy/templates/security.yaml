@@ -26,6 +26,7 @@ spec:
     - name: {{ include "teddy.apis.uaa.name" . }}
       ports:
         - number: 8083
+  originIsOptional: true
   origins:
     - jwt:
         issuer: {{ .Values.apis.uaa.issuer }}
