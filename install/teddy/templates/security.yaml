@@ -9,7 +9,15 @@ spec:
 apiVersion: "authentication.istio.io/v1alpha1"
 kind: "Policy"
 metadata:
-  name: {{ .Release.Name | quote }}
+  name: mongodb-disable
+spec:
+  targets:
+    - name: {{ include "mongodb.fullname" . }}
+---
+apiVersion: "authentication.istio.io/v1alpha1"
+kind: "Policy"
+metadata:
+  name: apis-policy
 spec:
   peers:
     - mtls: {}
