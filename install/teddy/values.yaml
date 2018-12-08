@@ -1,6 +1,12 @@
 # Default values for teddy.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+mongodb:
+  nameOverride: mongodb
+  mongodbDatabase: teddy
+  mongodbUsername: teddy
+  mongodbPassword: q4fWHzYg*frm
+  mongodbRootPassword: zhscoderc..
 
 apis:
   base:
@@ -8,7 +14,7 @@ apis:
     deploy:
       replicas: 1
       traffic:
-        timeout: 0.5s
+        timeout: 10s
       image:
         repository: zhsyourai/base-api
         pullPolicy: IfNotPresent
@@ -24,10 +30,12 @@ apis:
       affinity: {}
   uaa:
     version: v0
+    issuer: "uaa.teddy.com"
+    jwksUriEndpoint: "/uaa/jwks.json"
     deploy:
       replicas: 1
       traffic:
-        timeout: 0.5s
+        timeout: 10s
       image:
         repository: zhsyourai/uaa-api
         pullPolicy: IfNotPresent
@@ -46,7 +54,7 @@ apis:
     deploy:
       replicas: 1
       traffic:
-        timeout: 0.5s
+        timeout: 10s
       image:
         repository: zhsyourai/content-api
         pullPolicy: IfNotPresent
@@ -65,7 +73,7 @@ apis:
     deploy:
       replicas: 1
       traffic:
-        timeout: 0.5s
+        timeout: 10s
       image:
         repository: zhsyourai/message-api
         pullPolicy: IfNotPresent
@@ -86,7 +94,7 @@ services:
     deploy:
       replicas: 1
       traffic:
-        timeout: 0.5s
+        timeout: 10s
       image:
         repository: zhsyourai/captcha-srv
         pullPolicy: IfNotPresent
@@ -102,12 +110,10 @@ services:
       affinity: {}
   uaa:
     version: v0
-    issuer: "uaa.teddy.com"
-    jwksUriEndpoint: "/uaa/jwks.json"
     deploy:
       replicas: 1
       traffic:
-        timeout: 0.5s
+        timeout: 10s
       image:
         repository: zhsyourai/uaa-srv
         pullPolicy: IfNotPresent
@@ -126,7 +132,7 @@ services:
     deploy:
       replicas: 1
       traffic:
-        timeout: 0.5s
+        timeout: 10s
       image:
         repository: zhsyourai/content-srv
         pullPolicy: IfNotPresent
@@ -145,7 +151,7 @@ services:
     deploy:
       replicas: 1
       traffic:
-        timeout: 0.5s
+        timeout: 10s
       image:
         repository: zhsyourai/message-srv
         pullPolicy: IfNotPresent

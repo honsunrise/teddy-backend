@@ -12,7 +12,10 @@ func NewContentHandler() (*Content, error) {
 	return &Content{}, nil
 }
 
-func (h *Content) Handler(root gin.IRoutes) {
+func (h *Content) HandlerNormal(root gin.IRoutes) {
+}
+
+func (h *Content) HandlerHealth(root gin.IRoutes) {
 	root.Any("/", h.ReturnOK)
 }
 

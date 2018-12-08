@@ -37,17 +37,42 @@ data:
     server:
       address: 0.0.0.0
       port: 8083
-    databases:
-      mongodb:
-        - address: mongodb:27017
-          username: teddy
-          password: teddy
-          auth_db: teddy
-    mail:
-      host: test
-      port: 555
-      username: teddy
-      password: teddy
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "teddy.apis.uaa.name" . }}-secret
+type: Opaque
+stringData:
+  JWTPkcs8: |-
+    -----BEGIN PRIVATE KEY-----
+    MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDYcSTVDxjjAmTd
+    aMWsw/+3bjaGxG4bupEgDiaAyUZ7PJLjibF5bEc9uCV8JuiWIf0/rmcvUw6PgQmF
+    z+gR8szDcgO+Dz/DCn99dHEWoy1GyqqU2IG71IRP3p01bWwOcoUYsasK9hwedvv8
+    CE3i0fA3ys84+czKkAS1eiPp00kt50teGrpymP6H54QrPAV4FzXbRzX73kjb9U/P
+    oPjV4GX2VZg3wes9vvm1MYwXUusKkXL36U1dJS+CVWKJlqrsFO4Bcp26g9CMwx6E
+    CjsPn7y/Bwx1XM48MIkd8zkP3Lm0avc1AkA7rJKNqbEEr9xlKny0HfY4mAnILoT4
+    BS12CHPFAgMBAAECggEBAIL6PQq9nxbIvRcLLww0c4uiI1b8iZE4Hlhil8Q5iPBM
+    oKsXCRHsh1P/Gpf9x6QKn4Eo3gJSZa5LrOKQBOTPpD/lwAQEoFY8BRh7HXBQgLal
+    MALw3dk3anYWxdWuCMTZYlemNFZmxm9dG3HR6KgI2TA6B5p3+AjgjCjx58e490DR
+    6JyYlg5txPWwWq7HbmxzxoZ5MHxrLvxtRbiFKGcT4QlxqAjCHIBTvkKw9TZjsNcj
+    PWq1hxiASVX83JJHTUrqGhacQuKT4hqVPJkUJf4jpp9ioPCMjfIbAdHBLqr2uWef
+    gz/NWW3MHnzkRf7z8AOYkqcMwjn/zFlV80hnHoyxHgUCgYEA9xKNl4MgZUz9JtV7
+    23wG6ndNcUYqyQwgXp2leWxIJx6mXxBPziY2Vu6xPQe/yeMsXGnoQ9qzpn+rfgoY
+    +jLGmCw+ZFI8WOn6q+HUwxkxF4s8sS8bwlPnrFuYbPLqsKkhqGFA6zit7Fi7TTnA
+    DHXTPbnMWD05YkQ4FqsvgOb+b1sCgYEA4ENBXPWn+DGNvS2qB0UtsNsDwtPSjUKb
+    ZQaPakpEQiOSX2W/rprVeqrg9EMcv86D2wvOdPC+m/rfA4u5XQbLy5MM9IHk66Ld
+    Xgvnt6IX1UrDJOi2CMW809INpOKJrlKnWHm0JJkYr96v5j9Vk3RN3YC6rxBAaQlQ
+    rLR/9UGqM18CgYEAnBaJgy2g+r5vs+fs7pVlXRzvvN8iSo8xp/SaRKKG1sgDPU11
+    zXvQmo0DRdYucOHm9Z8m0C9LjaVcdyzz6KTJV/ujkwds/pMa/RmXq4WvwPsC5cEo
+    HVWaqAXZvwKcB+1hyRlfxPqyzfykn74bOQP65yUJFrnfFdiZQqD1Ss8j8L8CgYBj
+    f9N/QArfRnUhiyIWCa5k+jcn+L1BKV0yrH9y5DJ2ubuWkdlCybWPsEMQfLpDq4e6
+    5vkZzzpykBLkStjaGkrPLpYf4YXEukTHFjcftU4ntvzv4kPpjnnh7R9amZwGeOuA
+    iLbRSg+27/FREaaRPpfRf+zUATzinVxq08a19QVjtwKBgFNP9fMsHPVDmlmyUokn
+    9MJ3kjiUAPozN293X263ER/essh24karFAzILYeEe0wt0h1zyEerm3Xl5/YE07jI
+    6qWh+9e/nu3EgGUaajLnHPvbNSOy9pQCQFHSFUJPzDOVLUSP0QhBhdgHvwYOy7w+
+    Po674oMZOf2n+ycloeVrIqN5
+    -----END PRIVATE KEY-----
 {{- $root := . -}}
 {{- with .Values.apis.uaa }}
 ---
@@ -78,6 +103,9 @@ spec:
         - name: config-volume
           configMap:
             name: {{ include "teddy.apis.uaa.name" $root }}-config
+        - name: secret-volume
+          secret:
+            secretName: {{ include "teddy.apis.uaa.name" $root }}-secret
       containers:
         - name: {{ include "teddy.apis.uaa.name" $root }}
           image: "{{ .deploy.image.repository }}"
@@ -85,18 +113,20 @@ spec:
           volumeMounts:
             - name: config-volume
               mountPath: /app/config
+            - name: secret-volume
+              mountPath: /app/secret
           ports:
             - name: http
               containerPort: 8083
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /uaa
-              port: http
+              path: /
+              port: 8183
           readinessProbe:
             httpGet:
-              path: /uaa
-              port: http
+              path: /
+              port: 8183
           resources:
 {{ toYaml .deploy.resources | indent 12 }}
 {{- with .deploy.nodeSelector }}

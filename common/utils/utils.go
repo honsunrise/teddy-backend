@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func BuildMongodbURI(databases []types.Database) string {
+func BuildMongodbURI(databases ...types.Database) string {
 	parts := make([]string, len(databases))
 	for i, database := range databases {
 		authPart := fmt.Sprintf("%s:%s@", database.Username, database.Password)

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"github.com/dchest/captcha"
+	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/captcha/proto"
 	"github.com/zhsyourai/teddy-backend/captcha/repositories"
 	"github.com/zhsyourai/teddy-backend/common/models"
@@ -77,6 +78,7 @@ func (h *captchaHandler) GetVoiceData(ctx context.Context, req *proto.GetVoiceDa
 }
 
 func (h *captchaHandler) GetRandomById(ctx context.Context, req *proto.GetRandomReq) (*proto.GetRandomResp, error) {
+	log.Infof("Get Random number req %v", req)
 	var resp proto.GetRandomResp
 	if err := validateGetRandomReq(req); err != nil {
 		return nil, err

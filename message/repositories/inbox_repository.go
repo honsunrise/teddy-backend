@@ -23,7 +23,7 @@ func NewInBoxRepository(client *mongo.Client) (InBoxRepository, error) {
 	return &inboxRepository{
 		ctx:         context.Background(),
 		client:      client,
-		collections: client.Database("Teddy").Collection("InBox"),
+		collections: client.Database("teddy").Collection("inbox"),
 	}, nil
 }
 

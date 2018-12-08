@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/common/log"
-	"github.com/zhsyourai/teddy-backend/api/base/client"
+	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/captcha/proto"
 	"github.com/zhsyourai/teddy-backend/common/errors"
 	"net/http"
@@ -18,14 +18,17 @@ func NewBaseHandler() (*Base, error) {
 	return &Base{}, nil
 }
 
-func (h *Base) Handler(root gin.IRoutes) {
-	root.Any("/", h.ReturnOK)
+func (h *Base) HandlerNormal(root gin.IRoutes) {
 	root.GET("/captcha", h.GetCaptchaId)
 	root.GET("/captcha/:id", h.GetCaptchaData)
 
 	root.PUT("/profile/:id")
 	root.GET("/profile/:id")
 	root.POST("/profile/:id/avatar")
+}
+
+func (h *Base) HandlerHealth(root gin.IRoutes) {
+	root.Any("/", h.ReturnOK)
 }
 
 func (h *Base) ReturnOK(ctx *gin.Context) {
@@ -39,7 +42,7 @@ func (h *Base) ReturnOK(ctx *gin.Context) {
 
 func (h *Base) GetCaptchaId(ctx *gin.Context) {
 	// extract the client from the context
-	captchaClient, ok := client.CaptchaFromContext(ctx)
+	captchaClient, ok := clients.CaptchaFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
@@ -65,7 +68,7 @@ func (h *Base) GetCaptchaId(ctx *gin.Context) {
 
 func (h *Base) GetCaptchaData(ctx *gin.Context) {
 	// extract the client from the context
-	captchaClient, ok := client.CaptchaFromContext(ctx)
+	captchaClient, ok := clients.CaptchaFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)

@@ -28,7 +28,7 @@ func NewInfoRepository(client *mongo.Client) (InfoRepository, error) {
 	return &infoRepository{
 		ctx:         context.Background(),
 		client:      client,
-		collections: client.Database("Teddy").Collection("Content"),
+		collections: client.Database("teddy").Collection("info"),
 	}, nil
 }
 

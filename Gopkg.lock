@@ -332,9 +332,12 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:5e4d81c50cffcb124b899e4f3eabec3930c73532f0096c27f94476728ba03028"
+  digest = "1:d6b0cfc5ae30841c4b116ac589629f56f8add0955a39f11d8c0d06ca67f5b3d5"
   name = "golang.org/x/sync"
-  packages = ["semaphore"]
+  packages = [
+    "errgroup",
+    "semaphore",
+  ]
   pruneopts = "UT"
   revision = "42b317875d0fa942474b76e1b46a6060d720ae6e"
 
@@ -491,8 +494,10 @@
     "github.com/sirupsen/logrus",
     "golang.org/x/crypto/bcrypt",
     "golang.org/x/net/context",
+    "golang.org/x/sync/errgroup",
     "google.golang.org/grpc",
     "google.golang.org/grpc/health",
+    "google.golang.org/grpc/health/grpc_health_v1",
     "gopkg.in/alecthomas/kingpin.v2",
     "gopkg.in/dgrijalva/jwt-go.v3",
     "gopkg.in/gomail.v2",

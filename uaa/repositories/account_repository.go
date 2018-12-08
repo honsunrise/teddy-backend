@@ -22,7 +22,7 @@ func NewAccountRepository(client *mongo.Client) (AccountRepository, error) {
 	return &accountRepository{
 		ctx:         context.Background(),
 		client:      client,
-		collections: client.Database("Teddy").Collection("Account"),
+		collections: client.Database("teddy").Collection("account"),
 	}, nil
 }
 

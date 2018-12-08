@@ -37,17 +37,25 @@ data:
     server:
       address: 0.0.0.0
       port: 9092
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "teddy.services.message.name" . }}-secret
+type: Opaque
+stringData:
+  config.yaml: |-
     databases:
       mongodb:
-        - address: mongodb:27017
-          username: teddy
-          password: teddy
-          auth_db: teddy
+        address: {{ include "mongodb.fullname" . }}:27017
+        username: {{ .Values.mongodb.mongodbUsername }}
+        password: {{ .Values.mongodb.mongodbPassword }}
+        auth_db: {{ .Values.mongodb.mongodbDatabase }}
     mail:
-      host: test
-      port: 555
-      username: teddy
-      password: teddy
+      host: smtp.163.com
+      port: 465
+      username: zhsyourai@163.com
+      password: 8228zhs..
 {{- $root := . -}}
 {{- with .Values.services.message }}
 ---
@@ -78,6 +86,9 @@ spec:
         - name: config-volume
           configMap:
             name: {{ include "teddy.services.message.name" $root }}-config
+        - name: secret-volume
+          secret:
+            secretName: {{ include "teddy.services.message.name" $root }}-secret
       containers:
         - name: {{ include "teddy.services.message.name" $root }}
           image: "{{ .deploy.image.repository }}"
@@ -85,6 +96,8 @@ spec:
           volumeMounts:
             - name: config-volume
               mountPath: /app/config
+            - name: secret-volume
+              mountPath: /app/secret
           ports:
             - name: http
               containerPort: 9092

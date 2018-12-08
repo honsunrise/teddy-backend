@@ -20,7 +20,7 @@ func NewKeyValuePairRepository(client *mongo.Client) (KeyValuePairRepository, er
 	return &keyValuePairRepository{
 		ctx:         context.Background(),
 		client:      client,
-		collections: client.Database("Teddy").Collection("Account"),
+		collections: client.Database("teddy").Collection("captcha"),
 	}, nil
 }
 

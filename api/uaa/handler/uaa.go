@@ -1,13 +1,14 @@
 package handler
 
 import (
+	"context"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/lestrrat-go/jwx/jwk"
 	log "github.com/sirupsen/logrus"
+	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
-	"github.com/zhsyourai/teddy-backend/api/uaa/client"
 	capProto "github.com/zhsyourai/teddy-backend/captcha/proto"
 	"github.com/zhsyourai/teddy-backend/common/errors"
 	msgProto "github.com/zhsyourai/teddy-backend/message/proto"
@@ -27,8 +28,7 @@ func NewUaaHandler(generator *gin_jwt.JwtGenerator) (*Uaa, error) {
 	return instance, nil
 }
 
-func (h *Uaa) Handler(root gin.IRoutes) {
-	root.Any("/", h.ReturnOK)
+func (h *Uaa) HandlerNormal(root gin.IRoutes) {
 	root.POST("/register", h.Register)
 	root.POST("/login", h.Login)
 	root.Any("/logout", h.Logout)
@@ -36,6 +36,10 @@ func (h *Uaa) Handler(root gin.IRoutes) {
 	root.POST("/sendEmailCaptcha", h.SendEmailCaptcha)
 	root.POST("/resetPassword", h.ResetPassword)
 	root.GET("/jwks.json", h.JWKsJSON)
+}
+
+func (h *Uaa) HandlerHealth(root gin.IRoutes) {
+	root.Any("/", h.ReturnOK)
 }
 
 func (h *Uaa) ReturnOK(ctx *gin.Context) {
@@ -66,7 +70,7 @@ func (h *Uaa) Register(ctx *gin.Context) {
 	ctx.Bind(&body)
 
 	// extract the client from the context
-	uaaClient, ok := client.UaaFromContext(ctx)
+	uaaClient, ok := clients.UaaFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
@@ -74,7 +78,7 @@ func (h *Uaa) Register(ctx *gin.Context) {
 	}
 
 	// extract the client from the context
-	captchaClient, ok := client.CaptchaFromContext(ctx)
+	captchaClient, ok := clients.CaptchaFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
@@ -82,8 +86,10 @@ func (h *Uaa) Register(ctx *gin.Context) {
 	}
 
 	// check email or phone
+	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
 	if body.Email != "" && body.Captcha != "" {
-		rsp, err := captchaClient.Verify(ctx, &capProto.VerifyReq{
+		rsp, err := captchaClient.Verify(timeoutCtx, &capProto.VerifyReq{
 			Type: capProto.CaptchaType_RANDOM_BY_ID,
 			Id:   body.Email,
 			Code: body.Captcha,
@@ -94,7 +100,7 @@ func (h *Uaa) Register(ctx *gin.Context) {
 			return
 		}
 	} else if body.Phone != "" && body.Captcha != "" {
-		rsp, err := captchaClient.Verify(ctx, &capProto.VerifyReq{
+		rsp, err := captchaClient.Verify(timeoutCtx, &capProto.VerifyReq{
 			Type: capProto.CaptchaType_RANDOM_BY_ID,
 			Id:   body.Phone,
 			Code: body.Captcha,
@@ -111,7 +117,9 @@ func (h *Uaa) Register(ctx *gin.Context) {
 	}
 
 	// make request
-	response, err := uaaClient.Register(ctx, &uaaProto.RegisterReq{
+	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	response, err := uaaClient.Register(timeoutCtx, &uaaProto.RegisterReq{
 		Username: body.Username,
 		Password: body.Password,
 		Roles:    body.Roles,
@@ -135,10 +143,12 @@ func (h *Uaa) Register(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &jsonResp)
 
 	// This step can happen error and will ignore
-	messageClient, ok := client.MessageFromContext(ctx)
+	messageClient, ok := clients.MessageFromContext(ctx)
 	if ok {
 		// Send welcome email
-		messageClient.SendEmail(ctx, &msgProto.SendEmailReq{
+		timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+		messageClient.SendEmail(timeoutCtx, &msgProto.SendEmailReq{
 			Email:   response.Email,
 			Topic:   "Welcome " + response.Username,
 			Content: "Hi " + response.Username,
@@ -149,7 +159,9 @@ func (h *Uaa) Register(ctx *gin.Context) {
 		})
 
 		// Send welcome inbox
-		messageClient.SendInBox(ctx, &msgProto.SendInBoxReq{
+		timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+		messageClient.SendInBox(timeoutCtx, &msgProto.SendInBoxReq{
 			Uid:     response.Uid,
 			Topic:   "Welcome " + body.Username,
 			Content: "Hi " + body.Username,
@@ -175,7 +187,7 @@ func (h *Uaa) Login(ctx *gin.Context) {
 	ctx.Bind(&body)
 
 	// extract the client from the context
-	uaaClient, ok := client.UaaFromContext(ctx)
+	uaaClient, ok := clients.UaaFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
@@ -183,7 +195,9 @@ func (h *Uaa) Login(ctx *gin.Context) {
 	}
 
 	// make request
-	response, err := uaaClient.VerifyPassword(ctx, &uaaProto.VerifyPasswordReq{
+	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	response, err := uaaClient.VerifyPassword(timeoutCtx, &uaaProto.VerifyPasswordReq{
 		Username: body.Username,
 		Password: body.Password,
 	})
@@ -237,14 +251,16 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 	ctx.Bind(&body)
 
 	// extract the client from the context
-	captchaClient, ok := client.CaptchaFromContext(ctx)
+	captchaClient, ok := clients.CaptchaFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
 		return
 	}
 
-	rsp, err := captchaClient.Verify(ctx, &capProto.VerifyReq{
+	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	rsp, err := captchaClient.Verify(timeoutCtx, &capProto.VerifyReq{
 		Type: capProto.CaptchaType_RANDOM_BY_ID,
 		Id:   body.CaptchaId,
 		Code: body.CaptchaSolution,
@@ -257,14 +273,16 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 	}
 
 	// extract the client from the context
-	uaaClient, ok := client.UaaFromContext(ctx)
+	uaaClient, ok := clients.UaaFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
 	}
 
 	// make request
-	_, err = uaaClient.ChangePassword(ctx, &uaaProto.ChangePasswordReq{
+	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	_, err = uaaClient.ChangePassword(timeoutCtx, &uaaProto.ChangePasswordReq{
 		Username:    body.Username,
 		NewPassword: body.NewPassword,
 		OldPassword: body.OldPassword,
@@ -291,14 +309,16 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	ctx.Bind(&body)
 
 	// extract the client from the context
-	captchaClient, ok := client.CaptchaFromContext(ctx)
+	captchaClient, ok := clients.CaptchaFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
 		return
 	}
 
-	rsp, err := captchaClient.Verify(ctx, &capProto.VerifyReq{
+	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	rsp, err := captchaClient.Verify(timeoutCtx, &capProto.VerifyReq{
 		Type: capProto.CaptchaType_IMAGE,
 		Id:   body.CaptchaId,
 		Code: body.CaptchaSolution,
@@ -311,14 +331,16 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	}
 
 	// extract the client from the context
-	messageClient, ok := client.MessageFromContext(ctx)
+	messageClient, ok := clients.MessageFromContext(ctx)
 	if !ok {
 		log.Error("message client not found")
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
 		return
 	}
 
-	captcha, err := captchaClient.GetRandomById(ctx, &capProto.GetRandomReq{
+	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	captcha, err := captchaClient.GetRandomById(timeoutCtx, &capProto.GetRandomReq{
 		Len: 6,
 		Id:  body.Email,
 	})
@@ -329,6 +351,8 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	}
 
 	// Send captcha email
+	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
 	_, err = messageClient.SendEmail(ctx, &msgProto.SendEmailReq{
 		Email:   body.Email,
 		Topic:   "Verify captcha",

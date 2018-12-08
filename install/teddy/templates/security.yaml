@@ -11,23 +11,25 @@ kind: "Policy"
 metadata:
   name: {{ .Release.Name | quote }}
 spec:
+  peers:
+    - mtls: {}
   targets:
-    - name: "api-base"
+    - name: {{ include "teddy.apis.base.name" . }}
       ports:
-        - number: {{ default 8080 .Values.apis.base.port }}
-    - name: "api-content"
+        - number: 8080
+    - name: {{ include "teddy.apis.content.name" . }}
       ports:
-        - number: {{ default 8080 .Values.apis.content.port }}
-    - name: "api-message"
+        - number: 8081
+    - name: {{ include "teddy.apis.message.name" . }}
       ports:
-        - number: {{ default 8080 .Values.apis.message.port }}
-    - name: "api-uaa"
+        - number: 8082
+    - name: {{ include "teddy.apis.uaa.name" . }}
       ports:
-        - number: {{ default 8080 .Values.apis.uaa.port }}
+        - number: 8083
   origins:
     - jwt:
-        issuer: {{ .Values.services.uaa.issuer }}
-        jwksUri: {{ printf "http://%s%s" (include "teddy.apis.uaa.name" .) .Values.services.uaa.jwksUriEndpoint }}
+        issuer: {{ .Values.apis.uaa.issuer }}
+        jwksUri: {{ printf "http://%s%s" (include "teddy.apis.uaa.name" .) .Values.apis.uaa.jwksUriEndpoint }}
   principalBinding: USE_ORIGIN
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
@@ -67,7 +69,7 @@ metadata:
   name: user
 spec:
   rules:
-    - services: ["teddy-api-*"]
+    - services: ["api-*"]
       methods: ["*"]
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
@@ -89,7 +91,7 @@ metadata:
   name: user-viewer
 spec:
   rules:
-    - services: ["teddy-api-*"]
+    - services: ["api-*"]
       methods: ["GET", "HEAD"]
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
@@ -264,3 +266,31 @@ spec:
     kind: ServiceRole
     name: {{ include "teddy.services.captcha.name" . }}-viewer
 ---
+##################################################################################################
+# mongodb service role
+##################################################################################################
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRole
+metadata:
+  name: mongodb-viewer
+spec:
+  rules:
+    - services: [{{- include "mongodb.fullname" . | quote -}}]
+      methods: ["*"]
+      constraints:
+        - key: "destination.port"
+          values: ["27017"]
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRoleBinding
+metadata:
+  name: bind-mongodb-viewer
+spec:
+  subjects:
+    - user: {{ include "teddy.services.captcha.name" . | quote }}
+    - user: {{ include "teddy.services.content.name" . | quote }}
+    - user: {{ include "teddy.services.message.name" . | quote }}
+    - user: {{ include "teddy.services.uaa.name" . | quote }}
+  roleRef:
+    kind: ServiceRole
+    name: "mongodb-viewer"

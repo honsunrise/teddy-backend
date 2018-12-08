@@ -37,17 +37,6 @@ data:
     server:
       address: 0.0.0.0
       port: 8082
-    databases:
-      mongodb:
-        - address: mongodb:27017
-          username: teddy
-          password: teddy
-          auth_db: teddy
-    mail:
-      host: test
-      port: 555
-      username: teddy
-      password: teddy
 {{- $root := . -}}
 {{- with .Values.apis.message }}
 ---
@@ -91,12 +80,12 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /message
-              port: http
+              path: /
+              port: 8182
           readinessProbe:
             httpGet:
-              path: /message
-              port: http
+              path: /
+              port: 8182
           resources:
 {{ toYaml .deploy.resources | indent 12 }}
 {{- with .deploy.nodeSelector }}

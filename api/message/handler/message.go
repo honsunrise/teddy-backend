@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/prometheus/common/log"
-	"github.com/zhsyourai/teddy-backend/api/message/client"
+	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/common/errors"
 	"github.com/zhsyourai/teddy-backend/common/types"
 	"github.com/zhsyourai/teddy-backend/message/proto"
@@ -25,13 +25,16 @@ var wsUpgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-func (h *Message) Handler(root gin.IRoutes) {
-	root.Any("/", h.ReturnOK)
+func (h *Message) HandlerNormal(root gin.IRoutes) {
 	root.GET("/notify", h.Notify)
 	root.GET("/inbox", h.Inbox)
 	root.DELETE("/inbox/:id", h.DeleteInbox)
 	root.PUT("/inbox/:id", h.MarkInboxRead)
 	root.POST("/inbox", h.PostInbox)
+}
+
+func (h *Message) HandlerHealth(root gin.IRoutes) {
+	root.Any("/", h.ReturnOK)
 }
 
 func (h *Message) ReturnOK(ctx *gin.Context) {
@@ -45,7 +48,7 @@ func (h *Message) ReturnOK(ctx *gin.Context) {
 
 func (h *Message) PostInbox(ctx *gin.Context) {
 	// extract the client from the context
-	_, ok := client.MessageFromContext(ctx)
+	_, ok := clients.MessageFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
@@ -63,7 +66,7 @@ func (h *Message) Inbox(ctx *gin.Context) {
 	}
 	uidStr := ctx.Query("uid")
 
-	messageClient, ok := client.MessageFromContext(ctx)
+	messageClient, ok := clients.MessageFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
@@ -104,7 +107,7 @@ func (h *Message) Inbox(ctx *gin.Context) {
 }
 
 func (h *Message) DeleteInbox(ctx *gin.Context) {
-	_, ok := client.MessageFromContext(ctx)
+	_, ok := clients.MessageFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
@@ -113,7 +116,7 @@ func (h *Message) DeleteInbox(ctx *gin.Context) {
 }
 
 func (h *Message) MarkInboxRead(ctx *gin.Context) {
-	_, ok := client.MessageFromContext(ctx)
+	_, ok := clients.MessageFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
@@ -122,7 +125,6 @@ func (h *Message) MarkInboxRead(ctx *gin.Context) {
 }
 
 func (h *Message) Notify(ctx *gin.Context) {
-	// TODO: Check acl
 	conn, err := wsUpgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
@@ -139,7 +141,7 @@ func (h *Message) Notify(ctx *gin.Context) {
 	}()
 
 	// extract the client from the context
-	messageClient, ok := client.MessageFromContext(ctx)
+	messageClient, ok := clients.MessageFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)

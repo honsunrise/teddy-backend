@@ -12,26 +12,39 @@ import (
 	"github.com/zhsyourai/teddy-backend/api/uaa/handler"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/common/config/source/file"
-	"github.com/zhsyourai/teddy-backend/common/types"
+	"golang.org/x/sync/errgroup"
+	"io/ioutil"
 	"net/http"
 	"time"
 )
+
+var (
+	g errgroup.Group
+)
+
+func init() {
+	log.SetReportCaller(true)
+}
 
 func main() {
 	conf, err := config.NewConfig(file.NewSource(file.WithFormat(config.Yaml), file.WithPath("config/config.yaml")))
 	if err != nil {
 		log.Fatal(err)
 	}
-	var confType types.Config
+	var confType Config
 	err = conf.Scan(&confType)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	certPEM, err := ioutil.ReadFile("secret/JWTPkcs8")
+	if err != nil {
+		log.Fatal(err)
+	}
 	// New jwt generator and extractor
 	const SigningAlgorithm = "RS512"
 	// Load Jwt PublicKey
-	block, _ := pem.Decode([]byte(confType.JWTPkcs8))
+	block, _ := pem.Decode(certPEM)
 	if block == nil {
 		log.Fatal("Jwt private key decode error")
 	}
@@ -54,22 +67,43 @@ func main() {
 	}
 
 	// Create RESTful server (using Gin)
-	router := gin.Default()
-	router.Use(clients.MessageNew())
-	router.Use(clients.UaaNew())
-	router.Use(clients.CaptchaNew())
-	uaa.Handler(router.Group("/uaa"))
+	routerNormal := gin.Default()
+	routerNormal.Use(clients.MessageNew())
+	routerNormal.Use(clients.UaaNew())
+	routerNormal.Use(clients.CaptchaNew())
+	uaa.HandlerNormal(routerNormal.Group("/uaa"))
 
-	srv := http.Server{
-		Addr:           fmt.Sprintf("%s:%d", confType.Server.Address, confType.Server.Port),
-		Handler:        router,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
+	routerHealth := gin.Default()
+	routerNormal.Use(clients.MessageNew())
+	routerNormal.Use(clients.UaaNew())
+	routerNormal.Use(clients.CaptchaNew())
+	uaa.HandlerHealth(routerHealth)
+
+	// For normal request
+	srv1 := http.Server{
+		Addr:         fmt.Sprintf("%s:%d", confType.Server.Address, confType.Server.Port),
+		Handler:      routerNormal,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
-	err = srv.ListenAndServe()
-	if err != nil {
+	// For health check port
+	srv2 := http.Server{
+		Addr:         fmt.Sprintf("%s:%d", confType.Server.Address, confType.Server.Port+100),
+		Handler:      routerHealth,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
+	g.Go(func() error {
+		return srv1.ListenAndServe()
+	})
+
+	g.Go(func() error {
+		return srv2.ListenAndServe()
+	})
+
+	if err := g.Wait(); err != nil {
 		log.Fatal(err)
 	}
 }
