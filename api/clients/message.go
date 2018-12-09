@@ -28,7 +28,7 @@ func MessageNew() gin.HandlerFunc {
 		if client == nil {
 			lock.Lock()
 			defer lock.Unlock()
-			_, addrs, err := net.LookupSRV("http", "tcp", messageSrvDomain)
+			_, addrs, err := net.LookupSRV("grpc", "tcp", messageSrvDomain)
 			if err != nil {
 				log.Errorf("Dial to captcha server error %v", err)
 				ctx.Next()

@@ -125,7 +125,9 @@ spec:
   rules:
     - services: [{{- printf "%s.%s.svc.cluster.local" (include "teddy.services.uaa.name" .) .Release.Namespace -}}]
       methods: ["POST"]
-      paths: ["com.teddy.srv.uaa.UAA/Get*", "com.teddy.srv.uaa.UAA/VerifyPassword"]
+      paths:
+        - "/com.teddy.srv.uaa.UAA/Get*"
+        - "/com.teddy.srv.uaa.UAA/VerifyPassword"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRole
@@ -135,7 +137,10 @@ spec:
   rules:
     - services: [{{- printf "%s.%s.svc.cluster.local" (include "teddy.services.uaa.name" .) .Release.Namespace -}}]
       methods: ["POST"]
-      paths: ["com.teddy.srv.uaa.UAA/DeleteByUsername", "com.teddy.srv.uaa.UAA/ChangePassword", "com.teddy.srv.uaa.UAA/Register"]
+      paths:
+        - "/com.teddy.srv.uaa.UAA/DeleteByUsername"
+        - "/com.teddy.srv.uaa.UAA/ChangePassword"
+        - "/com.teddy.srv.uaa.UAA/Register"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRoleBinding
@@ -143,7 +148,7 @@ metadata:
   name: binding-{{ include "teddy.services.uaa.name" . }}-viewer
 spec:
   subjects:
-    - user: {{ include "teddy.apis.uaa.name" . | quote }}
+    - user: {{ printf "cluster.local/ns/%s/sa/%s" .Release.Namespace (include "teddy.apis.uaa.name" .) | quote }}
   roleRef:
     kind: ServiceRole
     name: {{ printf "%s-viewer" (include "teddy.services.uaa.name" .) | quote }}
@@ -154,7 +159,7 @@ metadata:
   name: binding-{{ include "teddy.services.uaa.name" . }}-modifier
 spec:
   subjects:
-    - user: {{ include "teddy.apis.uaa.name" . | quote }}
+    - user: {{ printf "cluster.local/ns/%s/sa/%s" .Release.Namespace (include "teddy.apis.uaa.name" .) | quote }}
   roleRef:
     kind: ServiceRole
     name: {{ printf "%s-modifier" (include "teddy.services.uaa.name" .) | quote }}
@@ -170,7 +175,8 @@ spec:
   rules:
     - services: [{{- printf "%s.%s.svc.cluster.local" (include "teddy.services.content.name" .) .Release.Namespace -}}]
       methods: ["POST"]
-      paths: ["com.teddy.srv.content.Content/Get*"]
+      paths:
+        - "/com.teddy.srv.content.Content/Get*"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRole
@@ -180,7 +186,14 @@ spec:
   rules:
     - services: [{{- printf "%s.%s.svc.cluster.local" (include "teddy.services.content.name" .) .Release.Namespace -}}]
       methods: ["POST"]
-      paths: ["com.teddy.srv.content.Content/PublishInfo", "com.teddy.srv.content.Content/EditInfo", "com.teddy.srv.content.Content/DeleteInfo", "com.teddy.srv.content.Content/WatchInfo", "com.teddy.srv.content.Content/LikeInfo", "com.teddy.srv.content.Content/UnLikeInfo", "com.teddy.srv.content.Content/FavoriteInfo"]
+      paths:
+        - "/com.teddy.srv.content.Content/PublishInfo"
+        - "/com.teddy.srv.content.Content/EditInfo"
+        - "/com.teddy.srv.content.Content/DeleteInfo"
+        - "/com.teddy.srv.content.Content/WatchInfo"
+        - "/com.teddy.srv.content.Content/LikeInfo"
+        - "/com.teddy.srv.content.Content/UnLikeInfo"
+        - "/com.teddy.srv.content.Content/FavoriteInfo"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRoleBinding
@@ -188,7 +201,7 @@ metadata:
   name: binding-{{ include "teddy.services.content.name" . }}-viewer
 spec:
   subjects:
-    - user: {{ include "teddy.apis.content.name" . | quote }}
+    - user: {{ printf "cluster.local/ns/%s/sa/%s" .Release.Namespace (include "teddy.apis.content.name" .) | quote }}
   roleRef:
     kind: ServiceRole
     name: {{ printf "%s-modifier" (include "teddy.services.content.name" .) | quote }}
@@ -199,7 +212,7 @@ metadata:
   name: binding-{{ include "teddy.services.content.name" . }}-modifier
 spec:
   subjects:
-    - user: {{ include "teddy.apis.content.name" . | quote }}
+    - user: {{ printf "cluster.local/ns/%s/sa/%s" .Release.Namespace (include "teddy.apis.content.name" .) | quote }}
   roleRef:
     kind: ServiceRole
     name: {{ printf "%s-modifier" (include "teddy.services.content.name" .) | quote }}
@@ -215,7 +228,8 @@ spec:
   rules:
     - services: [{{- printf "%s.%s.svc.cluster.local" (include "teddy.services.message.name" .) .Release.Namespace -}}]
       methods: ["POST"]
-      paths: ["com.teddy.srv.message.Message/Get*"]
+      paths:
+        - "/com.teddy.srv.message.Message/Get*"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRole
@@ -225,7 +239,8 @@ spec:
   rules:
     - services: [{{- printf "%s.%s.svc.cluster.local" (include "teddy.services.message.name" .) .Release.Namespace -}}]
       methods: ["POST"]
-      paths: ["com.teddy.srv.message.Message/Send*"]
+      paths:
+        - "/com.teddy.srv.message.Message/Send*"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRoleBinding
@@ -233,7 +248,7 @@ metadata:
   name: binding-{{ include "teddy.services.message.name" . }}-viewer
 spec:
   subjects:
-    - user: {{ include "teddy.apis.message.name" . | quote }}
+    - user: {{ printf "cluster.local/ns/%s/sa/%s" .Release.Namespace (include "teddy.apis.message.name" .) | quote }}
   roleRef:
     kind: ServiceRole
     name: {{ printf "%s-viewer" (include "teddy.services.content.name" .) | quote }}
@@ -244,8 +259,8 @@ metadata:
   name: binding-{{ include "teddy.services.message.name" . }}-modifier
 spec:
   subjects:
-    - user: {{ include "teddy.apis.message.name" . | quote }}
-    - user: {{ include "teddy.apis.uaa.name" . | quote }}
+    - user: {{ printf "cluster.local/ns/%s/sa/%s" .Release.Namespace (include "teddy.apis.message.name" .) | quote }}
+    - user: {{ printf "cluster.local/ns/%s/sa/%s" .Release.Namespace (include "teddy.apis.uaa.name" .) | quote }}
   roleRef:
     kind: ServiceRole
     name: {{ printf "%s-sender" (include "teddy.services.content.name" .) | quote }}
@@ -261,7 +276,9 @@ spec:
   rules:
     - services: [{{- printf "%s.%s.svc.cluster.local" (include "teddy.services.captcha.name" .) .Release.Namespace -}}]
       methods: ["POST"]
-      paths: ["com.teddy.srv.captcha.Captcha/Get*", "com.teddy.srv.captcha.Captcha/Verify"]
+      paths:
+        - "/com.teddy.srv.captcha.Captcha/Get*"
+        - "/com.teddy.srv.captcha.Captcha/Verify"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRoleBinding
@@ -269,8 +286,8 @@ metadata:
   name: binding-{{ include "teddy.services.captcha.name" . }}-viewer
 spec:
   subjects:
-  - user: {{ include "teddy.apis.uaa.name" . | quote }}
-  - user: {{ include "teddy.apis.base.name" . | quote }}
+    - user: {{ printf "cluster.local/ns/%s/sa/%s" .Release.Namespace (include "teddy.apis.uaa.name" .) | quote }}
+    - user: {{ printf "cluster.local/ns/%s/sa/%s" .Release.Namespace (include "teddy.apis.base.name" .) | quote }}
   roleRef:
     kind: ServiceRole
     name: {{ include "teddy.services.captcha.name" . }}-viewer

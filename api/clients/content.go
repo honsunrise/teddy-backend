@@ -29,7 +29,7 @@ func ContentNew() gin.HandlerFunc {
 		if client == nil {
 			lock.Lock()
 			defer lock.Unlock()
-			_, addrs, err := net.LookupSRV("http", "tcp", contentSrvDomain)
+			_, addrs, err := net.LookupSRV("grpc", "tcp", contentSrvDomain)
 			if err != nil {
 				log.Errorf("Dial to captcha server error %v", err)
 				ctx.Next()

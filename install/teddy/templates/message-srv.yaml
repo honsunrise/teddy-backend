@@ -21,9 +21,8 @@ spec:
   type: {{ default "ClusterIP" .Values.services.message.type }}
   ports:
     - port: 9092
-      targetPort: http
-      protocol: TCP
-      name: http
+      targetPort: grpc
+      name: grpc
   selector:
     app.kubernetes.io/name: {{ include "teddy.services.message.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -99,9 +98,8 @@ spec:
             - name: secret-volume
               mountPath: /app/secret
           ports:
-            - name: http
+            - name: grpc
               containerPort: 9092
-              protocol: TCP
           readinessProbe:
             exec:
               command: ["/bin/grpc_health_probe", "-addr=:9092"]

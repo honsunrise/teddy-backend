@@ -21,9 +21,8 @@ spec:
   type: {{ default "ClusterIP" .Values.services.captcha.type }}
   ports:
     - port: 9090
-      targetPort: http
-      protocol: TCP
-      name: http
+      targetPort: grpc
+      name: grpc
   selector:
     app.kubernetes.io/name: {{ include "teddy.services.captcha.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -94,9 +93,8 @@ spec:
             - name: secret-volume
               mountPath: /app/secret
           ports:
-            - name: http
+            - name: grpc
               containerPort: 9090
-              protocol: TCP
           readinessProbe:
             exec:
               command: ["/bin/grpc_health_probe", "-addr=:9090"]

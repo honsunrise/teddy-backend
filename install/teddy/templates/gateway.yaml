@@ -29,7 +29,7 @@
   route:
     - destination:
         port:
-          number: 8083
+          number: 8082
         host: {{ include "teddy.apis.message.name" .}}
 {{- end -}}
 

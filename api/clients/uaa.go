@@ -28,7 +28,7 @@ func UaaNew() gin.HandlerFunc {
 		if client == nil {
 			lock.Lock()
 			defer lock.Unlock()
-			_, addrs, err := net.LookupSRV("http", "tcp", uaaSrvDomain)
+			_, addrs, err := net.LookupSRV("grpc", "tcp", uaaSrvDomain)
 			if err != nil {
 				log.Errorf("Dial to captcha server error %v", err)
 				ctx.Next()
