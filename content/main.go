@@ -41,7 +41,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	mongodbUri := utils.BuildMongodbURI(confType.Databases["mongodb"])
+	mongodbUri := utils.BuildMongodbURI(false, confType.Databases["mongodb"])
 
 	// New Mongodb client
 	mongodbClient, err := mongo.Connect(context.Background(), mongodbUri)

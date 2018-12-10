@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func BuildMongodbURI(databases ...types.Database) string {
+func BuildMongodbURI(ssl bool, databases ...types.Database) string {
 	parts := make([]string, len(databases))
 	for i, database := range databases {
 		authPart := fmt.Sprintf("%s:%s@", database.Username, database.Password)
@@ -27,5 +27,12 @@ func BuildMongodbURI(databases ...types.Database) string {
 	if result == "mongodb://" {
 		return ""
 	}
-	return strings.TrimRight(result, ",")
+	result = strings.TrimRight(result, ",")
+	if ssl {
+		result += "?ssl=true"
+	} else {
+		result += "?ssl=false"
+	}
+	result += "&connectTimeoutMS=2000"
+	return result
 }

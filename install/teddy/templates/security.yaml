@@ -2,9 +2,19 @@ apiVersion: "authentication.istio.io/v1alpha1"
 kind: "Policy"
 metadata:
   name: default
+---
+apiVersion: "authentication.istio.io/v1alpha1"
+kind: "Policy"
+metadata:
+  name: services-policy
 spec:
   peers:
     - mtls: {}
+  targets:
+    - name: {{ include "teddy.services.captcha.name" . }}
+    - name: {{ include "teddy.services.content.name" . }}
+    - name: {{ include "teddy.services.message.name" . }}
+    - name: {{ include "teddy.services.uaa.name" . }}
 ---
 apiVersion: "authentication.istio.io/v1alpha1"
 kind: "Policy"
@@ -73,7 +83,7 @@ spec:
     - services: ["api-*"]
       methods: ["*"]
       paths:
-        - "/v1/auth"
+        - "/v1/auth/*"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRoleBinding
@@ -97,7 +107,7 @@ spec:
     - services: ["api-*"]
       methods: ["*"]
       paths:
-        - "/v1/"
+        - "/v1/anon/*"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRoleBinding
@@ -108,7 +118,7 @@ spec:
     - user: "*"
   roleRef:
     kind: ServiceRole
-    name: "user-viewer"
+    name: "anonymous-user"
 ---
 ##################################################################################################
 # Uaa service role
@@ -287,32 +297,4 @@ spec:
   roleRef:
     kind: ServiceRole
     name: {{ include "teddy.services.captcha.name" . }}-viewer
----
-##################################################################################################
-# mongodb service role
-##################################################################################################
-apiVersion: "rbac.istio.io/v1alpha1"
-kind: ServiceRole
-metadata:
-  name: mongodb-viewer
-spec:
-  rules:
-    - services: [{{- include "mongodb.fullname" . | quote -}}]
-      methods: ["*"]
-      constraints:
-        - key: "destination.port"
-          values: ["27017"]
----
-apiVersion: "rbac.istio.io/v1alpha1"
-kind: ServiceRoleBinding
-metadata:
-  name: bind-mongodb-viewer
-spec:
-  subjects:
-    - user: {{ include "teddy.services.captcha.name" . | quote }}
-    - user: {{ include "teddy.services.content.name" . | quote }}
-    - user: {{ include "teddy.services.message.name" . | quote }}
-    - user: {{ include "teddy.services.uaa.name" . | quote }}
-  roleRef:
-    kind: ServiceRole
-    name: "mongodb-viewer"
+

@@ -2,11 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 mongodb:
-  nameOverride: mongodb
+  mongodbAddress: 10.107.206.141:27017
   mongodbDatabase: teddy
   mongodbUsername: teddy
   mongodbPassword: q4fWHzYg*frm
-  mongodbRootPassword: zhscoderc..
 
 apis:
   base:

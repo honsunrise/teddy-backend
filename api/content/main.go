@@ -41,7 +41,7 @@ func main() {
 	router := gin.Default()
 	router.Use(clients.ContentNew())
 	router.Use(clients.CaptchaNew())
-	content.HandlerNormal(router.Group("/v1/content"))
+	content.HandlerNormal(router.Group("/v1/anon/content"))
 	content.HandlerAuth(router.Group("/v1/auth/content"))
 	content.HandlerHealth(router)
 

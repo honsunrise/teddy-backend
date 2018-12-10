@@ -71,7 +71,7 @@ func main() {
 	router.Use(clients.MessageNew())
 	router.Use(clients.UaaNew())
 	router.Use(clients.CaptchaNew())
-	uaa.HandlerNormal(router.Group("/v1/uaa"))
+	uaa.HandlerNormal(router.Group("/v1/anon/uaa"))
 	uaa.HandlerAuth(router.Group("/v1/auth/uaa"))
 	uaa.HandlerHealth(router)
 

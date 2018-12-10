@@ -221,4 +221,3 @@ spec:
       route:
         - destination:
             host: {{ include "teddy.services.captcha.name" . }}
-

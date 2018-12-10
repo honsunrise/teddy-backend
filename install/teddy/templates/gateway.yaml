@@ -3,7 +3,7 @@
     - uri:
         prefix: /v1/auth/uaa
     - uri:
-        prefix: /v1/uaa
+        prefix: /v1/anon/uaa
   route:
     - destination:
         port:
@@ -13,7 +13,7 @@
     - uri:
         prefix: /v1/auth/base
     - uri:
-        prefix: /v1/base
+        prefix: /v1/anon/base
   route:
     - destination:
         port:
