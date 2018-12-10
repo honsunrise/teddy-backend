@@ -38,6 +38,12 @@ func (h *Uaa) HandlerNormal(root gin.IRoutes) {
 	root.GET("/jwks.json", h.JWKsJSON)
 }
 
+func (h *Uaa) HandlerAuth(root gin.IRoutes) {
+	root.Any("/logout", h.Logout)
+	root.POST("/changePassword", h.ChangePassword)
+	root.POST("/resetPassword", h.ResetPassword)
+}
+
 func (h *Uaa) HandlerHealth(root gin.IRoutes) {
 	root.Any("/", h.ReturnOK)
 }

@@ -9,14 +9,6 @@ spec:
 apiVersion: "authentication.istio.io/v1alpha1"
 kind: "Policy"
 metadata:
-  name: mongodb-disable
-spec:
-  targets:
-    - name: {{ include "mongodb.fullname" . }}
----
-apiVersion: "authentication.istio.io/v1alpha1"
-kind: "Policy"
-metadata:
   name: apis-policy
 spec:
   peers:
@@ -80,6 +72,8 @@ spec:
   rules:
     - services: ["api-*"]
       methods: ["*"]
+      paths:
+        - "/v1/auth"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRoleBinding
@@ -97,16 +91,18 @@ spec:
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRole
 metadata:
-  name: user-viewer
+  name: anonymous-user
 spec:
   rules:
     - services: ["api-*"]
-      methods: ["GET", "HEAD"]
+      methods: ["*"]
+      paths:
+        - "/v1/"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRoleBinding
 metadata:
-  name: binding-all-teddy-api-unauthenticated-users
+  name: binding-all-teddy-api-anonymous-users
 spec:
   subjects:
     - user: "*"

@@ -15,6 +15,9 @@ func NewContentHandler() (*Content, error) {
 func (h *Content) HandlerNormal(root gin.IRoutes) {
 }
 
+func (h *Content) HandlerAuth(root gin.IRoutes) {
+}
+
 func (h *Content) HandlerHealth(root gin.IRoutes) {
 	root.Any("/", h.ReturnOK)
 }

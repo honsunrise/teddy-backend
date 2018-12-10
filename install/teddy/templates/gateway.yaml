@@ -1,7 +1,9 @@
 {{- define "router" -}}
 - match:
     - uri:
-        prefix: /uaa
+        prefix: /v1/auth/uaa
+    - uri:
+        prefix: /v1/uaa
   route:
     - destination:
         port:
@@ -9,7 +11,9 @@
         host: {{ include "teddy.apis.uaa.name" .}}
 - match:
     - uri:
-        prefix: /base
+        prefix: /v1/auth/base
+    - uri:
+        prefix: /v1/base
   route:
     - destination:
         port:
@@ -17,7 +21,9 @@
         host: {{ include "teddy.apis.base.name" .}}
 - match:
     - uri:
-        prefix: /content
+        prefix: /v1/auth/content
+    - uri:
+        prefix: /v1/content
   route:
     - destination:
         port:
@@ -25,7 +31,9 @@
         host: {{ include "teddy.apis.content.name" .}}
 - match:
     - uri:
-        prefix: /message
+        prefix: /v1/auth/message
+    - uri:
+        prefix: /v1/message
   route:
     - destination:
         port:

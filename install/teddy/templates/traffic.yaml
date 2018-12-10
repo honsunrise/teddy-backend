@@ -221,18 +221,4 @@ spec:
       route:
         - destination:
             host: {{ include "teddy.services.captcha.name" . }}
----
-##################################################################################################
-# mongodb traffic
-##################################################################################################
-apiVersion: networking.istio.io/v1alpha3
-kind: DestinationRule
-metadata:
-  name: {{ include "mongodb.fullname" . }}
-spec:
-  host: {{ include "mongodb.fullname" . }}
-  trafficPolicy:
-    loadBalancer:
-      simple: ROUND_ROBIN
-    tls:
-      mode: DISABLE
+

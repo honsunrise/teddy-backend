@@ -32,24 +32,22 @@ func main() {
 		log.Fatal(err)
 	}
 
-	content, err := handler.NewBaseHandler()
+	base, err := handler.NewBaseHandler()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Create RESTful server (using Gin)
-	routerNormal := gin.Default()
-	routerNormal.Use(clients.CaptchaNew())
-	content.HandlerNormal(routerNormal.Group("/base"))
-
-	routerHealth := gin.Default()
-	routerHealth.Use(clients.CaptchaNew())
-	content.HandlerHealth(routerHealth)
+	router := gin.Default()
+	router.Use(clients.CaptchaNew())
+	base.HandlerNormal(router.Group("/v1/base"))
+	base.HandlerAuth(router.Group("/v1/auth/base"))
+	base.HandlerHealth(router)
 
 	// For normal request
 	srv1 := http.Server{
 		Addr:         fmt.Sprintf("%s:%d", confType.Server.Address, confType.Server.Port),
-		Handler:      routerNormal,
+		Handler:      router,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
@@ -57,7 +55,7 @@ func main() {
 	// For health check port
 	srv2 := http.Server{
 		Addr:         fmt.Sprintf("%s:%d", confType.Server.Address, confType.Server.Port+100),
-		Handler:      routerHealth,
+		Handler:      router,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}

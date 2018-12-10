@@ -22,8 +22,12 @@ func (h *Base) HandlerNormal(root gin.IRoutes) {
 	root.GET("/captcha", h.GetCaptchaId)
 	root.GET("/captcha/:id", h.GetCaptchaData)
 
-	root.PUT("/profile/:id")
 	root.GET("/profile/:id")
+}
+
+func (h *Base) HandlerAuth(root gin.IRoutes) {
+	root.PUT("/profile/:id")
+	root.GET("/profile/:id/detail")
 	root.POST("/profile/:id/avatar")
 }
 

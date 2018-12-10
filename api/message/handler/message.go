@@ -26,6 +26,10 @@ var wsUpgrader = websocket.Upgrader{
 }
 
 func (h *Message) HandlerNormal(root gin.IRoutes) {
+	root.GET("/system")
+}
+
+func (h *Message) HandlerAuth(root gin.IRoutes) {
 	root.GET("/notify", h.Notify)
 	root.GET("/inbox", h.Inbox)
 	root.DELETE("/inbox/:id", h.DeleteInbox)
