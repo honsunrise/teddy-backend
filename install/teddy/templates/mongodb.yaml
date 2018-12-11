@@ -9,12 +9,9 @@ spec:
   hosts:
     - external-mongodb.dummy
   addresses:
-    - 10.107.206.141
+    - {{ .Values.mongodb.mongodbAddress -}}/32
   ports:
     - number: 27017
-      name: mongodb
-      protocol: MONGO
-  location: MESH_INTERNAL
-  resolution: STATIC
-  endpoints:
-    - address: 10.107.206.141
+      name: tcp
+      protocol: TCP
+  location: MESH_EXTERNAL

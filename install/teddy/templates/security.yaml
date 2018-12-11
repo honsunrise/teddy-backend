@@ -257,19 +257,19 @@ spec:
     - user: {{ printf "cluster.local/ns/%s/sa/%s" .Release.Namespace (include "teddy.apis.message.name" .) | quote }}
   roleRef:
     kind: ServiceRole
-    name: {{ printf "%s-viewer" (include "teddy.services.content.name" .) | quote }}
+    name: {{ printf "%s-viewer" (include "teddy.services.message.name" .) | quote }}
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRoleBinding
 metadata:
-  name: binding-{{ include "teddy.services.message.name" . }}-modifier
+  name: binding-{{ include "teddy.services.message.name" . }}-sender
 spec:
   subjects:
     - user: {{ printf "cluster.local/ns/%s/sa/%s" .Release.Namespace (include "teddy.apis.message.name" .) | quote }}
     - user: {{ printf "cluster.local/ns/%s/sa/%s" .Release.Namespace (include "teddy.apis.uaa.name" .) | quote }}
   roleRef:
     kind: ServiceRole
-    name: {{ printf "%s-sender" (include "teddy.services.content.name" .) | quote }}
+    name: {{ printf "%s-sender" (include "teddy.services.message.name" .) | quote }}
 ---
 ##################################################################################################
 # captcha service role

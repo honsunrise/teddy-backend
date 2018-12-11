@@ -46,7 +46,7 @@ stringData:
   config.yaml: |-
     databases:
       mongodb:
-        address: {{ .Values.mongodb.mongodbAddress }}
+        address: {{ printf "%s:%d" .Values.mongodb.mongodbAddress .Values.mongodb.mongodbPort }}
         username: {{ .Values.mongodb.mongodbUsername }}
         password: {{ .Values.mongodb.mongodbPassword }}
         auth_db: {{ .Values.mongodb.mongodbDatabase }}

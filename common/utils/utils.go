@@ -33,6 +33,6 @@ func BuildMongodbURI(ssl bool, databases ...types.Database) string {
 	} else {
 		result += "?ssl=false"
 	}
-	result += "&connectTimeoutMS=2000"
+	result += "&connectTimeoutMS=20000"
 	return result
 }
