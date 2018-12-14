@@ -30,7 +30,7 @@ func MessageNew() gin.HandlerFunc {
 			defer lock.Unlock()
 			_, addrs, err := net.LookupSRV("grpc", "tcp", messageSrvDomain)
 			if err != nil {
-				log.Errorf("Dial to captcha server error %v", err)
+				log.Errorf("Lookup message srv error %v", err)
 				ctx.Next()
 				return
 			}
@@ -39,7 +39,7 @@ func MessageNew() gin.HandlerFunc {
 			}
 			conn, err := grpc.Dial(fmt.Sprintf("%s:%d", messageSrvDomain, addrs[0].Port), grpc.WithInsecure())
 			if err != nil {
-				log.Errorf("Dial to captcha server error %v", err)
+				log.Errorf("Dial to message server error %v", err)
 				ctx.Next()
 				return
 			}

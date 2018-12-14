@@ -30,7 +30,7 @@ func UaaNew() gin.HandlerFunc {
 			defer lock.Unlock()
 			_, addrs, err := net.LookupSRV("grpc", "tcp", uaaSrvDomain)
 			if err != nil {
-				log.Errorf("Dial to captcha server error %v", err)
+				log.Errorf("Lookup uaa srv error %v", err)
 				ctx.Next()
 				return
 			}
@@ -39,7 +39,7 @@ func UaaNew() gin.HandlerFunc {
 			}
 			conn, err := grpc.Dial(fmt.Sprintf("%s:%d", uaaSrvDomain, addrs[0].Port), grpc.WithInsecure())
 			if err != nil {
-				log.Errorf("Dial to captcha server error %v", err)
+				log.Errorf("Dial to uaa server error %v", err)
 				ctx.Next()
 				return
 			}

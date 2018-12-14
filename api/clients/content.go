@@ -31,7 +31,7 @@ func ContentNew() gin.HandlerFunc {
 			defer lock.Unlock()
 			_, addrs, err := net.LookupSRV("grpc", "tcp", contentSrvDomain)
 			if err != nil {
-				log.Errorf("Dial to captcha server error %v", err)
+				log.Errorf("Lookup content srv error %v", err)
 				ctx.Next()
 				return
 			}
@@ -40,7 +40,7 @@ func ContentNew() gin.HandlerFunc {
 			}
 			conn, err := grpc.Dial(fmt.Sprintf("%s:%d", contentSrvDomain, addrs[0].Port), grpc.WithInsecure())
 			if err != nil {
-				log.Errorf("Dial to captcha server error %v", err)
+				log.Errorf("Dial to content server error %v", err)
 				ctx.Next()
 				return
 			}

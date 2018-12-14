@@ -33,7 +33,7 @@ func CaptchaNew() gin.HandlerFunc {
 			defer lock.Unlock()
 			_, addrs, err := net.LookupSRV("grpc", "tcp", captchaSrvDomain)
 			if err != nil {
-				log.Errorf("Dial to captcha server error %v", err)
+				log.Errorf("Lookup captcha srv error %v", err)
 				ctx.Next()
 				return
 			}
