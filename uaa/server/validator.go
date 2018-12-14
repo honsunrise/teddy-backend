@@ -2,7 +2,7 @@ package server
 
 import (
 	"errors"
-	"github.com/zhsyourai/teddy-backend/uaa/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto"
 )
 
 var ErrPasswordEmpty = errors.New("password can't be empty")

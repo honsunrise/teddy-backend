@@ -5,9 +5,9 @@ import (
 	"context"
 	"github.com/dchest/captcha"
 	log "github.com/sirupsen/logrus"
+	"github.com/zhsyourai/teddy-backend/captcha/models"
 	"github.com/zhsyourai/teddy-backend/captcha/proto"
 	"github.com/zhsyourai/teddy-backend/captcha/repositories"
-	"github.com/zhsyourai/teddy-backend/common/models"
 	"math/rand"
 	"time"
 )

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/zhsyourai/teddy-backend/common/models"
 	"github.com/zhsyourai/teddy-backend/common/types"
+	"github.com/zhsyourai/teddy-backend/message/models"
 )
 
 type InBoxRepository interface {
