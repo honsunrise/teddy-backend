@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/zhsyourai/teddy-backend/content/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto"
 	"github.com/zhsyourai/teddy-backend/content/repositories"
 	context2 "golang.org/x/net/context"
 	"gopkg.in/gomail.v2"

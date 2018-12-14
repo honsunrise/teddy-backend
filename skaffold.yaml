@@ -4,21 +4,21 @@ build:
   tagPolicy:
     sha256: {}
   artifacts:
-    - image: zhsyourai/uaa-srv
+    - image: zhsyourai/srv-uaa
       context: ./uaa/
-    - image: zhsyourai/uaa-api
+    - image: zhsyourai/api-uaa
       context: ./api/uaa
-    - image: zhsyourai/message-srv
+    - image: zhsyourai/srv-message
       context: ./message
-    - image: zhsyourai/message-api
+    - image: zhsyourai/api-message
       context: ./api/message
-    - image: zhsyourai/content-srv
+    - image: zhsyourai/srv-content
       context: ./content
-    - image: zhsyourai/content-api
+    - image: zhsyourai/api-content
       context: ./api/content
-    - image: zhsyourai/captcha-srv
+    - image: zhsyourai/srv-captcha
       context: ./captcha
-    - image: zhsyourai/base-api
+    - image: zhsyourai/api-base
       context: ./api/base
 deploy:
   helm:
@@ -26,14 +26,14 @@ deploy:
       - name: teddy
         chartPath: install/teddy
         values:
-          apis.base.deploy.image.repository: zhsyourai/base-api
-          apis.content.deploy.image.repository: zhsyourai/content-api
-          apis.message.deploy.image.repository: zhsyourai/message-api
-          apis.uaa.deploy.image.repository: zhsyourai/uaa-api
-          services.captcha.deploy.image.repository: zhsyourai/captcha-srv
-          services.content.deploy.image.repository: zhsyourai/content-srv
-          services.message.deploy.image.repository: zhsyourai/message-srv
-          services.uaa.deploy.image.repository: zhsyourai/uaa-srv
+          apis.base.deploy.image.repository: zhsyourai/api-base
+          apis.content.deploy.image.repository: zhsyourai/api-content
+          apis.message.deploy.image.repository: zhsyourai/api-message
+          apis.uaa.deploy.image.repository: zhsyourai/api-uaa
+          services.captcha.deploy.image.repository: zhsyourai/srv-captcha
+          services.content.deploy.image.repository: zhsyourai/srv-content
+          services.message.deploy.image.repository: zhsyourai/srv-message
+          services.uaa.deploy.image.repository: zhsyourai/srv-uaa
         #wait: true
         #valuesFiles:
         #- helm-skaffold-values.yaml

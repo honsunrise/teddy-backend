@@ -7,8 +7,8 @@ import (
 	"github.com/prometheus/common/log"
 	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/common/errors"
+	"github.com/zhsyourai/teddy-backend/common/proto"
 	"github.com/zhsyourai/teddy-backend/common/types"
-	"github.com/zhsyourai/teddy-backend/message/proto"
 	"net/http"
 	"time"
 )

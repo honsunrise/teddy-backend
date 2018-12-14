@@ -9,10 +9,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
-	capProto "github.com/zhsyourai/teddy-backend/captcha/proto"
 	"github.com/zhsyourai/teddy-backend/common/errors"
-	msgProto "github.com/zhsyourai/teddy-backend/message/proto"
-	uaaProto "github.com/zhsyourai/teddy-backend/uaa/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto"
 	"net/http"
 	"time"
 )
@@ -95,8 +93,8 @@ func (h *Uaa) Register(ctx *gin.Context) {
 	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	if body.Email != "" && body.Captcha != "" {
-		rsp, err := captchaClient.Verify(timeoutCtx, &capProto.VerifyReq{
-			Type: capProto.CaptchaType_RANDOM_BY_ID,
+		rsp, err := captchaClient.Verify(timeoutCtx, &proto.VerifyReq{
+			Type: proto.CaptchaType_RANDOM_BY_ID,
 			Id:   body.Email,
 			Code: body.Captcha,
 		})
@@ -106,8 +104,8 @@ func (h *Uaa) Register(ctx *gin.Context) {
 			return
 		}
 	} else if body.Phone != "" && body.Captcha != "" {
-		rsp, err := captchaClient.Verify(timeoutCtx, &capProto.VerifyReq{
-			Type: capProto.CaptchaType_RANDOM_BY_ID,
+		rsp, err := captchaClient.Verify(timeoutCtx, &proto.VerifyReq{
+			Type: proto.CaptchaType_RANDOM_BY_ID,
 			Id:   body.Phone,
 			Code: body.Captcha,
 		})
@@ -125,7 +123,7 @@ func (h *Uaa) Register(ctx *gin.Context) {
 	// make request
 	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	response, err := uaaClient.Register(timeoutCtx, &uaaProto.RegisterReq{
+	response, err := uaaClient.Register(timeoutCtx, &proto.RegisterReq{
 		Username: body.Username,
 		Password: body.Password,
 		Roles:    body.Roles,
@@ -154,7 +152,7 @@ func (h *Uaa) Register(ctx *gin.Context) {
 		// Send welcome email
 		timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 		defer cancel()
-		messageClient.SendEmail(timeoutCtx, &msgProto.SendEmailReq{
+		messageClient.SendEmail(timeoutCtx, &proto.SendEmailReq{
 			Email:   response.Email,
 			Topic:   "Welcome " + response.Username,
 			Content: "Hi " + response.Username,
@@ -167,7 +165,7 @@ func (h *Uaa) Register(ctx *gin.Context) {
 		// Send welcome inbox
 		timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 		defer cancel()
-		messageClient.SendInBox(timeoutCtx, &msgProto.SendInBoxReq{
+		messageClient.SendInBox(timeoutCtx, &proto.SendInBoxReq{
 			Uid:     response.Uid,
 			Topic:   "Welcome " + body.Username,
 			Content: "Hi " + body.Username,
@@ -203,7 +201,7 @@ func (h *Uaa) Login(ctx *gin.Context) {
 	// make request
 	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	response, err := uaaClient.VerifyPassword(timeoutCtx, &uaaProto.VerifyPasswordReq{
+	response, err := uaaClient.VerifyPassword(timeoutCtx, &proto.VerifyPasswordReq{
 		Username: body.Username,
 		Password: body.Password,
 	})
@@ -266,8 +264,8 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 
 	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	rsp, err := captchaClient.Verify(timeoutCtx, &capProto.VerifyReq{
-		Type: capProto.CaptchaType_RANDOM_BY_ID,
+	rsp, err := captchaClient.Verify(timeoutCtx, &proto.VerifyReq{
+		Type: proto.CaptchaType_RANDOM_BY_ID,
 		Id:   body.CaptchaId,
 		Code: body.CaptchaSolution,
 	})
@@ -288,7 +286,7 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 	// make request
 	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	_, err = uaaClient.ChangePassword(timeoutCtx, &uaaProto.ChangePasswordReq{
+	_, err = uaaClient.ChangePassword(timeoutCtx, &proto.ChangePasswordReq{
 		Username:    body.Username,
 		NewPassword: body.NewPassword,
 		OldPassword: body.OldPassword,
@@ -324,8 +322,8 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 
 	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	rsp, err := captchaClient.Verify(timeoutCtx, &capProto.VerifyReq{
-		Type: capProto.CaptchaType_IMAGE,
+	rsp, err := captchaClient.Verify(timeoutCtx, &proto.VerifyReq{
+		Type: proto.CaptchaType_IMAGE,
 		Id:   body.CaptchaId,
 		Code: body.CaptchaSolution,
 	})
@@ -346,7 +344,7 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 
 	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	captcha, err := captchaClient.GetRandomById(timeoutCtx, &capProto.GetRandomReq{
+	captcha, err := captchaClient.GetRandomById(timeoutCtx, &proto.GetRandomReq{
 		Len: 6,
 		Id:  body.Email,
 	})
@@ -359,7 +357,7 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	// Send captcha email
 	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	_, err = messageClient.SendEmail(ctx, &msgProto.SendEmailReq{
+	_, err = messageClient.SendEmail(ctx, &proto.SendEmailReq{
 		Email:   body.Email,
 		Topic:   "Verify captcha",
 		Content: "Your captcha:" + captcha.Code,
