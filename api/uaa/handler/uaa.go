@@ -29,7 +29,6 @@ func NewUaaHandler(generator *gin_jwt.JwtGenerator) (*Uaa, error) {
 func (h *Uaa) HandlerNormal(root gin.IRoutes) {
 	root.POST("/register", h.Register)
 	root.POST("/login", h.Login)
-	root.Any("/logout", h.Logout)
 	root.POST("/changePassword", h.ChangePassword)
 	root.POST("/sendEmailCaptcha", h.SendEmailCaptcha)
 	root.POST("/resetPassword", h.ResetPassword)

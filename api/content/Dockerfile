@@ -1,5 +1,5 @@
 # Stage 1 (to create a "build" image)
-FROM golang:1.11.2-alpine AS builder
+FROM golang:1.10-alpine AS builder
 RUN go version
 RUN apk update && \
     apk add protobuf && \

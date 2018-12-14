@@ -23,7 +23,7 @@
     - uri:
         prefix: /v1/auth/content
     - uri:
-        prefix: /v1/content
+        prefix: /v1/anon/content
   route:
     - destination:
         port:
@@ -33,7 +33,7 @@
     - uri:
         prefix: /v1/auth/message
     - uri:
-        prefix: /v1/message
+        prefix: /v1/anon/message
   route:
     - destination:
         port:
