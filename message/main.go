@@ -13,7 +13,7 @@ import (
 	"context"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/message/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto"
 	"github.com/zhsyourai/teddy-backend/message/repositories"
 	"github.com/zhsyourai/teddy-backend/message/server"
 )

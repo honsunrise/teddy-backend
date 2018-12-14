@@ -2,8 +2,8 @@ package converter
 
 import (
 	"github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/zhsyourai/teddy-backend/common/proto"
 	"github.com/zhsyourai/teddy-backend/message/models"
-	"github.com/zhsyourai/teddy-backend/message/proto"
 	"time"
 )
 
