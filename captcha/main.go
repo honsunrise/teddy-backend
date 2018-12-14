@@ -12,10 +12,10 @@ import (
 
 	"context"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/zhsyourai/teddy-backend/captcha/proto"
 	"github.com/zhsyourai/teddy-backend/captcha/repositories"
 	"github.com/zhsyourai/teddy-backend/captcha/server"
 	"github.com/zhsyourai/teddy-backend/common/config"
+	"github.com/zhsyourai/teddy-backend/common/proto"
 )
 
 func init() {

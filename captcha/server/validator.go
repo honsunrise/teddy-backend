@@ -1,6 +1,6 @@
 package server
 
-import "github.com/zhsyourai/teddy-backend/captcha/proto"
+import "github.com/zhsyourai/teddy-backend/common/proto"
 
 func validateGetCaptchaIdReq(req *proto.GetCaptchaIdReq) error {
 	return nil

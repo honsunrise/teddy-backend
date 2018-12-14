@@ -147,18 +147,19 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:60a0bb9abbd1d0f4d38d575ca67d16a749c94142cab4a6f1cb0959d64a078910"
+  digest = "1:9c4c16f679be7dc47609803bc3e880713807c6604ef289a302ccb9bb1e7ec46b"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "common/config",
     "common/config/coder/json",
     "common/config/coder/yaml",
     "common/config/source/file",
+    "common/proto",
     "common/types",
     "common/utils",
   ]
   pruneopts = "UT"
-  revision = "9358963d626e9ab919a72d4cc3aaf872c15cd06e"
+  revision = "ea69d7d0f705c8bea11c259a7fedd1c55dc23195"
 
 [[projects]]
   branch = "master"
@@ -307,7 +308,6 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/golang/protobuf/proto",
     "github.com/golang/protobuf/ptypes/empty",
     "github.com/golang/protobuf/ptypes/timestamp",
     "github.com/mongodb/mongo-go-driver/bson",
@@ -316,6 +316,7 @@
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/common/config",
     "github.com/zhsyourai/teddy-backend/common/config/source/file",
+    "github.com/zhsyourai/teddy-backend/common/proto",
     "github.com/zhsyourai/teddy-backend/common/types",
     "github.com/zhsyourai/teddy-backend/common/utils",
     "google.golang.org/grpc",
