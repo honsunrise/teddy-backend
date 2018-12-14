@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/uaa/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto"
 	"google.golang.org/grpc"
 	"net"
 	"sync"

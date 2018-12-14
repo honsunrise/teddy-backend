@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zhsyourai/teddy-backend/content/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto"
 	"google.golang.org/grpc"
 )
 
