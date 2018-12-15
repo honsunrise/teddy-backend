@@ -2,26 +2,23 @@ package repositories
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
+	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/zhsyourai/teddy-backend/common/types"
 	"github.com/zhsyourai/teddy-backend/content/models"
 )
 
-var ErrTitleExisted = errors.New("info title has been existed")
-var ErrUpdateInfo = errors.New("info update error")
-
 type InfoRepository interface {
-	InsertInfo(info *models.Info) error
+	Insert(info *models.Info) error
 	FindAll(page uint32, size uint32, sorts []types.Sort) ([]models.Info, error)
 	FindByTags(tags []string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error)
 	FindByUser(uid string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error)
 	FindByTitle(title string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error)
 	FindByTitleAndUser(title string, uid string, page uint32, size uint32, sorts []types.Sort) ([]models.Info, error)
-	DeleteInfo(id string) error
-	UpdateInfo(id string, fields map[string]interface{}) error
+	Delete(id string) error
+	Update(id string, fields map[string]interface{}) error
 }
 
 func NewInfoRepository(client *mongo.Client) (InfoRepository, error) {
@@ -38,10 +35,11 @@ type infoRepository struct {
 	collections *mongo.Collection
 }
 
-func (repo *infoRepository) InsertInfo(info *models.Info) error {
+func (repo *infoRepository) Insert(info *models.Info) error {
 	filter := bson.D{{"title", info.Title}}
 	result := repo.collections.FindOne(repo.ctx, filter)
 	if result.Decode(nil) == mongo.ErrNoDocuments {
+		info.Id = objectid.New()
 		_, err := repo.collections.InsertOne(repo.ctx, info)
 		if err != nil {
 			return err
@@ -82,9 +80,12 @@ func (repo *infoRepository) internalFindInfo(uid string, title string, tags []st
 		{"$limit", int64(size)},
 		{"$sort", itemsSorts},
 	}
-	repo.collections.Aggregate(repo.ctx, pipeline)
-	items := make([]models.Info, 0, 50)
+	cur, err := repo.collections.Aggregate(repo.ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
 	defer cur.Close(repo.ctx)
+	items := make([]models.Info, 0, size)
 	for cur.Next(repo.ctx) {
 		var item models.Info
 		err := cur.Decode(&item)
@@ -93,7 +94,7 @@ func (repo *infoRepository) internalFindInfo(uid string, title string, tags []st
 		}
 		items = append(items, item)
 	}
-	err := cur.Err()
+	err = cur.Err()
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +121,7 @@ func (repo *infoRepository) FindByTitleAndUser(title string, uid string, page ui
 	return repo.internalFindInfo(uid, title, nil, page, size, sorts)
 }
 
-func (repo *infoRepository) DeleteInfo(id string) error {
+func (repo *infoRepository) Delete(id string) error {
 	filter := bson.D{{"_id", id}}
 	_, err := repo.collections.DeleteOne(repo.ctx, filter)
 	if err != nil {
@@ -129,11 +130,11 @@ func (repo *infoRepository) DeleteInfo(id string) error {
 	return nil
 }
 
-func (repo *infoRepository) UpdateInfo(id string, fields map[string]interface{}) error {
+func (repo *infoRepository) Update(id string, fields map[string]interface{}) error {
 	filter := bson.D{{"_id", id}}
 	var bsonFields = make(bson.D, len(fields))
 	for k, v := range fields {
-		bsonFields = append(bsonFields, bson.E{Key: fmt.Sprintf("items.%s", k), Value: v})
+		bsonFields = append(bsonFields, bson.E{Key: fmt.Sprintf("%s", k), Value: v})
 	}
 	update := bson.D{{"$set", bsonFields}}
 	ur, err := repo.collections.UpdateOne(repo.ctx, filter, update)

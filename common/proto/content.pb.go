@@ -1006,7 +1006,7 @@ func (c *contentClient) GetInfos(ctx context.Context, in *GetInfosReq, opts ...g
 
 func (c *contentClient) DeleteInfo(ctx context.Context, in *InfoIdReq, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/DeleteInfo", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.content.Content/Delete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1208,7 +1208,7 @@ func _Content_DeleteInfo_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/com.teddy.srv.content.Content/DeleteInfo",
+		FullMethod: "/com.teddy.srv.content.Content/Delete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServer).DeleteInfo(ctx, req.(*InfoIdReq))
@@ -1417,7 +1417,7 @@ var _Content_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Content_GetInfos_Handler,
 		},
 		{
-			MethodName: "DeleteInfo",
+			MethodName: "Delete",
 			Handler:    _Content_DeleteInfo_Handler,
 		},
 		{

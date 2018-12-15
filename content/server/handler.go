@@ -4,7 +4,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/zhsyourai/teddy-backend/common/proto"
 	"github.com/zhsyourai/teddy-backend/content/repositories"
-	context2 "golang.org/x/net/context"
+	"golang.org/x/net/context"
 	"gopkg.in/gomail.v2"
 )
 
@@ -23,62 +23,62 @@ type contentHandler struct {
 	mailErr chan error
 }
 
-func (h *contentHandler) GetTags(context2.Context, *proto.GetTagReq) (*proto.GetTagsResp, error) {
+func (h *contentHandler) GetTags(ctx context.Context, req *proto.GetTagReq) (*proto.GetTagsResp, error) {
 	panic("implement me")
 }
 
-func (h *contentHandler) PublishInfo(context2.Context, *proto.PublishInfoReq) (*empty.Empty, error) {
+func (h *contentHandler) PublishInfo(ctx context.Context, req *proto.PublishInfoReq) (*empty.Empty, error) {
 	panic("implement me")
 }
 
-func (h *contentHandler) EditInfo(context2.Context, *proto.EditInfoReq) (*empty.Empty, error) {
+func (h *contentHandler) EditInfo(ctx context.Context, req *proto.EditInfoReq) (*empty.Empty, error) {
 	panic("implement me")
 }
 
-func (h *contentHandler) GetInfos(context2.Context, *proto.GetInfosReq) (*proto.GetInfosResp, error) {
+func (h *contentHandler) GetInfos(ctx context.Context, req *proto.GetInfosReq) (*proto.GetInfosResp, error) {
 	panic("implement me")
 }
 
-func (h *contentHandler) DeleteInfo(context2.Context, *proto.InfoIdReq) (*empty.Empty, error) {
+func (h *contentHandler) DeleteInfo(ctx context.Context, req *proto.InfoIdReq) (*empty.Empty, error) {
 	panic("implement me")
 }
 
-func (h *contentHandler) WatchInfo(context2.Context, *proto.InfoIdReq) (*empty.Empty, error) {
+func (h *contentHandler) WatchInfo(ctx context.Context, req *proto.InfoIdReq) (*empty.Empty, error) {
 	panic("implement me")
 }
 
-func (h *contentHandler) LikeInfo(context2.Context, *proto.InfoIdReq) (*empty.Empty, error) {
+func (h *contentHandler) LikeInfo(ctx context.Context, req *proto.InfoIdReq) (*empty.Empty, error) {
 	panic("implement me")
 }
 
-func (h *contentHandler) UnLikeInfo(context2.Context, *proto.InfoIdReq) (*empty.Empty, error) {
+func (h *contentHandler) UnLikeInfo(ctx context.Context, req *proto.InfoIdReq) (*empty.Empty, error) {
 	panic("implement me")
 }
 
-func (h *contentHandler) GetUserLikes(context2.Context, *proto.UidPageReq) (*proto.InfoIdsResp, error) {
+func (h *contentHandler) GetUserLikes(ctx context.Context, req *proto.UidPageReq) (*proto.InfoIdsResp, error) {
 	panic("implement me")
 }
 
-func (h *contentHandler) GetUserUnlikes(context2.Context, *proto.UidPageReq) (*proto.InfoIdsResp, error) {
+func (h *contentHandler) GetUserUnlikes(ctx context.Context, req *proto.UidPageReq) (*proto.InfoIdsResp, error) {
 	panic("implement me")
 }
 
-func (h *contentHandler) GetInfoLiked(context2.Context, *proto.InfoIdPageReq) (*proto.UserIdsResp, error) {
+func (h *contentHandler) GetInfoLiked(ctx context.Context, req *proto.InfoIdPageReq) (*proto.UserIdsResp, error) {
 	panic("implement me")
 }
 
-func (h *contentHandler) GetInfoUnliked(context2.Context, *proto.InfoIdPageReq) (*proto.UserIdsResp, error) {
+func (h *contentHandler) GetInfoUnliked(ctx context.Context, req *proto.InfoIdPageReq) (*proto.UserIdsResp, error) {
 	panic("implement me")
 }
 
-func (h *contentHandler) FavoriteInfo(context2.Context, *proto.InfoIdReq) (*empty.Empty, error) {
+func (h *contentHandler) FavoriteInfo(ctx context.Context, req *proto.InfoIdReq) (*empty.Empty, error) {
 	panic("implement me")
 }
 
-func (h *contentHandler) GetUserFavorite(context2.Context, *proto.UidPageReq) (*proto.InfoIdsResp, error) {
+func (h *contentHandler) GetUserFavorite(ctx context.Context, req *proto.UidPageReq) (*proto.InfoIdsResp, error) {
 	panic("implement me")
 }
 
-func (h *contentHandler) GetInfoFavorited(context2.Context, *proto.InfoIdPageReq) (*proto.UserIdsResp, error) {
+func (h *contentHandler) GetInfoFavorited(ctx context.Context, req *proto.InfoIdPageReq) (*proto.UserIdsResp, error) {
 	panic("implement me")
 }

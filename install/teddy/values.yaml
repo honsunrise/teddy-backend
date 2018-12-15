@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 mongodb:
-  mongodbAddress: 10.102.36.159
+  mongodbAddress: 10.99.15.8
   mongodbPort: 27017
   mongodbDatabase: teddy
   mongodbUsername: teddy
