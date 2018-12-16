@@ -12,19 +12,19 @@ service Content {
     rpc PublishInfo (PublishInfoReq) returns (google.protobuf.Empty) {}
     rpc EditInfo (EditInfoReq) returns (google.protobuf.Empty) {}
     rpc GetInfos (GetInfosReq) returns (GetInfosResp) {}
-    rpc DeleteInfo (InfoIdReq) returns (google.protobuf.Empty) {}
-    rpc WatchInfo (InfoIdReq) returns (google.protobuf.Empty) {}
+    rpc DeleteInfo (InfoIDReq) returns (google.protobuf.Empty) {}
+    rpc WatchInfo (InfoIDReq) returns (google.protobuf.Empty) {}
 
-    rpc LikeInfo (InfoIdReq) returns (google.protobuf.Empty) {}
-    rpc UnLikeInfo (InfoIdReq) returns (google.protobuf.Empty) {}
-    rpc GetUserLikes (UidPageReq) returns (InfoIdsResp) {}
-    rpc GetUserUnlikes(UidPageReq) returns (InfoIdsResp) {}
-    rpc GetInfoLiked(InfoIdPageReq) returns (UserIdsResp) {}
-    rpc GetInfoUnliked (InfoIdPageReq) returns (UserIdsResp) {}
+    rpc LikeInfo (InfoIDReq) returns (google.protobuf.Empty) {}
+    rpc UnLikeInfo (InfoIDReq) returns (google.protobuf.Empty) {}
+    rpc GetUserThumbUp (UIDPageReq) returns (InfoIDsResp) {}
+    rpc GetUserThumbDown(UIDPageReq) returns (InfoIDsResp) {}
+    rpc GetInfoThumbUp(InfoIDPageReq) returns (UserIDsResp) {}
+    rpc GetInfoThumbDown(InfoIDPageReq) returns (UserIDsResp) {}
 
-    rpc FavoriteInfo (InfoIdReq) returns (google.protobuf.Empty) {}
-    rpc GetUserFavorite (UidPageReq) returns (InfoIdsResp) {}
-    rpc GetInfoFavorited (InfoIdPageReq) returns (UserIdsResp) {}
+    rpc FavoriteInfo (InfoIDReq) returns (google.protobuf.Empty) {}
+    rpc GetUserFavorite (UIDPageReq) returns (InfoIDsResp) {}
+    rpc GetInfoFavorite (InfoIDPageReq) returns (UserIDsResp) {}
 }
 
 message Tag {
@@ -67,7 +67,7 @@ message GetTagReq {
     string uid = 3;
 }
 
-message UidPageReq {
+message UIDPageReq {
     uint32 page = 1;
     uint32 size = 2;
     string uid = 3;
@@ -110,20 +110,20 @@ message GetInfosResp {
     repeated Info infos = 1;
 }
 
-message InfoIdReq {
+message InfoIDReq {
     string id = 1;
 }
 
-message InfoIdPageReq {
+message InfoIDPageReq {
     string id = 1;
     uint32 size = 2;
     string uid = 3;
 }
 
-message UserIdsResp {
+message UserIDsResp {
     repeated string uids = 1;
 }
 
-message InfoIdsResp {
+message InfoIDsResp {
     repeated string ids = 1;
 }
