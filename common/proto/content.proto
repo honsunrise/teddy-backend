@@ -35,17 +35,10 @@ message Tag {
     string lastUseBy = 5;
 }
 
-enum InfoType {
-    Text = 0;
-    Markdown = 1;
-    Json = 2;
-}
-
 message Info {
     string uid = 1;
     string id = 2;
     string title = 3;
-    InfoType type = 4;
     string content = 5;
     repeated string coverList = 6;
     string coverVideo = 7;
@@ -54,12 +47,12 @@ message Info {
     bool valid = 10;
     int64 watchCount = 11;
     repeated string tags = 12;
-    int64 likes = 13;
-    bool isLike = 14;
-    repeated string likeList = 15;
-    int64 unlike = 16;
-    bool isUnlike = 17;
-    repeated string unlikeList = 18;
+    int64 thumbUp = 13;
+    bool isThumbUp = 14;
+    repeated string thumbUpList = 15;
+    int64 thumbDown = 16;
+    bool isThumbDown = 17;
+    repeated string thumbDownList = 18;
     int64 favorites = 19;
     bool isFavorite = 20;
     repeated string favoriteList = 21;
