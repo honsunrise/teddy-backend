@@ -29,10 +29,9 @@ service Content {
 
 message Tag {
     string tag = 1;
-    uint64 hot = 2;
-    google.protobuf.Timestamp firstShow = 3;
-    google.protobuf.Timestamp lastUse = 4;
-    string lastUseBy = 5;
+    uint64 usage = 2;
+    google.protobuf.Timestamp createTime = 3;
+    google.protobuf.Timestamp lastUseTime = 4;
 }
 
 message Info {
@@ -81,7 +80,7 @@ message PublishInfoReq {
     string title = 2;
     string content = 3;
     repeated string tags = 4;
-    map<string, string> coverRes = 5;
+    map<string, string> coverResources = 5;
     bool canReview = 6;
 }
 
@@ -91,10 +90,8 @@ message EditInfoReq {
     string title = 3;
     string content = 4;
     repeated string tags = 5;
-    map<string, string> imgList = 6;
-    map<string, string> videoList = 7;
-    bool external = 8;
-    bool canReview = 9;
+    map<string, string> coverResources = 6;
+    bool canReview = 7;
 }
 
 message GetInfosReq {
