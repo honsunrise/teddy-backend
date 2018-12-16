@@ -98,6 +98,8 @@ message GetInfosReq {
     uint32 page = 1;
     uint32 size = 2;
     string uid = 3;
+    string title = 4;
+    repeated string tags = 5;
 }
 
 message GetInfosResp {
