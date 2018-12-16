@@ -35,11 +35,17 @@ message Tag {
     string lastUseBy = 5;
 }
 
+enum InfoType {
+    Text = 0;
+    Markdown = 1;
+    Json = 2;
+}
+
 message Info {
     string uid = 1;
     string id = 2;
     string title = 3;
-    uint32 type = 4;
+    InfoType type = 4;
     string content = 5;
     repeated string coverList = 6;
     string coverVideo = 7;
