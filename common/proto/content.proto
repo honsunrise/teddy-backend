@@ -81,10 +81,8 @@ message PublishInfoReq {
     string title = 2;
     string content = 3;
     repeated string tags = 4;
-    map<string, string> imgList = 5;
-    map<string, string> videoList = 6;
-    bool external = 7;
-    bool canReview = 8;
+    map<string, string> coverRes = 5;
+    bool canReview = 6;
 }
 
 message EditInfoReq {
