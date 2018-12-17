@@ -12,14 +12,15 @@ service Content {
     rpc PublishInfo (PublishInfoReq) returns (google.protobuf.Empty) {}
     rpc EditInfo (EditInfoReq) returns (google.protobuf.Empty) {}
     rpc GetInfos (GetInfosReq) returns (GetInfosResp) {}
-    rpc DeleteInfo (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
-    rpc WatchInfo (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
+    rpc DeleteInfo (InfoIDReq) returns (google.protobuf.Empty) {}
+    rpc WatchInfo (InfoIDReq) returns (google.protobuf.Empty) {}
 
     rpc ThumbUp (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
-    rpc ThumbDown (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
     rpc GetUserThumbUp (UIDPageReq) returns (InfoIDsResp) {}
-    rpc GetUserThumbDown(UIDPageReq) returns (InfoIDsResp) {}
     rpc GetInfoThumbUp(InfoIDPageReq) returns (UserIDsResp) {}
+
+    rpc ThumbDown (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
+    rpc GetUserThumbDown(UIDPageReq) returns (InfoIDsResp) {}
     rpc GetInfoThumbDown(InfoIDPageReq) returns (UserIDsResp) {}
 
     rpc FavoriteInfo (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
@@ -117,6 +118,10 @@ message GetInfosReq {
 
 message GetInfosResp {
     repeated Info infos = 1;
+}
+
+message InfoIDReq {
+    string infoID = 1;
 }
 
 message InfoIDAndUIDReq {
