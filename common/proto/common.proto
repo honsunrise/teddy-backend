@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package teddy.protobuf;
+
+option go_package = "proto";
+
+enum Order {
+    ASC = 0;
+    DESC = 1;
+    None = 2;
+}
+
+message Sort {
+    string name = 1;
+    Order order = 2;
+}
