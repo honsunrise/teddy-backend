@@ -12,19 +12,29 @@ service Content {
     rpc PublishInfo (PublishInfoReq) returns (google.protobuf.Empty) {}
     rpc EditInfo (EditInfoReq) returns (google.protobuf.Empty) {}
     rpc GetInfos (GetInfosReq) returns (GetInfosResp) {}
-    rpc DeleteInfo (InfoIDReq) returns (google.protobuf.Empty) {}
-    rpc WatchInfo (InfoIDReq) returns (google.protobuf.Empty) {}
+    rpc DeleteInfo (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
+    rpc WatchInfo (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
 
-    rpc LikeInfo (InfoIDReq) returns (google.protobuf.Empty) {}
-    rpc UnLikeInfo (InfoIDReq) returns (google.protobuf.Empty) {}
+    rpc ThumbUp (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
+    rpc ThumbDown (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
     rpc GetUserThumbUp (UIDPageReq) returns (InfoIDsResp) {}
     rpc GetUserThumbDown(UIDPageReq) returns (InfoIDsResp) {}
     rpc GetInfoThumbUp(InfoIDPageReq) returns (UserIDsResp) {}
     rpc GetInfoThumbDown(InfoIDPageReq) returns (UserIDsResp) {}
 
-    rpc FavoriteInfo (InfoIDReq) returns (google.protobuf.Empty) {}
+    rpc FavoriteInfo (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
     rpc GetUserFavorite (UIDPageReq) returns (InfoIDsResp) {}
     rpc GetInfoFavorite (InfoIDPageReq) returns (UserIDsResp) {}
+}
+
+enum SortType {
+    ASC = 0;
+    DESC = 1;
+}
+
+message Sort {
+    string name = 1;
+    SortType type = 2;
 }
 
 message Tag {
@@ -62,13 +72,15 @@ message Info {
 message GetTagReq {
     uint32 page = 1;
     uint32 size = 2;
-    string uid = 3;
+    repeated Sort sorts = 3;
+    string uid = 4;
 }
 
 message UIDPageReq {
     uint32 page = 1;
     uint32 size = 2;
-    string uid = 3;
+    repeated Sort sorts = 3;
+    string uid = 4;
 }
 
 message GetTagsResp {
@@ -97,29 +109,41 @@ message EditInfoReq {
 message GetInfosReq {
     uint32 page = 1;
     uint32 size = 2;
-    string uid = 3;
-    string title = 4;
-    repeated string tags = 5;
+    repeated Sort sorts = 3;
+    string uid = 4;
+    string title = 5;
+    repeated string tags = 6;
 }
 
 message GetInfosResp {
     repeated Info infos = 1;
 }
 
-message InfoIDReq {
-    string id = 1;
+message InfoIDAndUIDReq {
+    string uid = 1;
+    string infoID = 2;
 }
 
 message InfoIDPageReq {
-    string id = 1;
+    string infoID = 1;
     uint32 size = 2;
-    string uid = 3;
+    repeated Sort sorts = 3;
+}
+
+message UIDWithTime {
+    string uid = 1;
+    google.protobuf.Timestamp time = 2;
 }
 
 message UserIDsResp {
-    repeated string uids = 1;
+    repeated UIDWithTime items = 1;
+}
+
+message InfoIDWithTime {
+    string infoId = 1;
+    google.protobuf.Timestamp time = 2;
 }
 
 message InfoIDsResp {
-    repeated string ids = 1;
+    repeated InfoIDWithTime ids = 1;
 }
