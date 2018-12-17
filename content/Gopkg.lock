@@ -139,7 +139,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9c4c16f679be7dc47609803bc3e880713807c6604ef289a302ccb9bb1e7ec46b"
+  digest = "1:ba9392e0cfa4245d23619f221408262fcf2dadb2f0241bac6c1d7eb98a95ebf9"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "common/config",
@@ -151,7 +151,7 @@
     "common/utils",
   ]
   pruneopts = "UT"
-  revision = "ea69d7d0f705c8bea11c259a7fedd1c55dc23195"
+  revision = "1d0a5280a0bc09f45789db4b04b92825fb2e9542"
 
 [[projects]]
   branch = "master"
@@ -178,7 +178,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "891ebc4b82d6e74f468c533b06f983c7be918a96"
+  revision = "e147a9138326bc0e9d4e179541ffd8af41cff8a9"
 
 [[projects]]
   branch = "master"
@@ -228,7 +228,7 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "bd91e49a0898e27abb88c339b432fa53d7497ac0"
+  revision = "936bffa7f85bf0dd0ec21b13d4d1a022672eeb98"
 
 [[projects]]
   digest = "1:03af1505694005143ff6dc5d0e2802c8200ddb618b1d3f7201482f53798b99b4"
@@ -301,7 +301,9 @@
   analyzer-version = 1
   input-imports = [
     "github.com/golang/protobuf/ptypes/empty",
+    "github.com/golang/protobuf/ptypes/timestamp",
     "github.com/mongodb/mongo-go-driver/bson",
+    "github.com/mongodb/mongo-go-driver/bson/objectid",
     "github.com/mongodb/mongo-go-driver/mongo",
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/common/config",

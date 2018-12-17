@@ -13,7 +13,7 @@ type TagRepository interface {
 	Insert(tag *models.Tag) error
 	FindOne(tag string) (models.Tag, error)
 	FindAll(page uint32, size uint32, sorts []types.Sort) ([]models.Tag, error)
-	UpdateHot(tag string, hot uint64) error
+	IncUsage(tag string, inc uint64) error
 	UpdateLastUse(tag string, lastUse time.Time) error
 	DeleteOne(tag string) error
 	DeleteAll(tags []string) error
@@ -94,9 +94,9 @@ func (repo *tagRepository) FindAll(page uint32, size uint32, sorts []types.Sort)
 	return items, nil
 }
 
-func (repo *tagRepository) UpdateHot(tag string, hot uint64) error {
+func (repo *tagRepository) IncUsage(tag string, inc uint64) error {
 	filter := bson.D{{"_id", tag}}
-	update := bson.D{{"$set", bson.D{{Key: "hot", Value: hot}}}}
+	update := bson.D{{"$inc", bson.D{{Key: "usage", Value: inc}}}}
 	ur, err := repo.collections.UpdateOne(repo.ctx, filter, update)
 	if err != nil {
 		return err

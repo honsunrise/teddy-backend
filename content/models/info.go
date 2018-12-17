@@ -5,27 +5,28 @@ import (
 	"time"
 )
 
+type InfoType uint32
+
 type Info struct {
 	Id             objectid.ObjectID `bson:"_id"`
-	Uid            string            `bson:"uid"`
+	UID            string            `bson:"uid"`
 	Title          string            `bson:"title"`
-	Type           uint32            `bson:"type"`
 	Content        string            `bson:"content"`
-	CoverList      []string          `bson:"coverList"`
-	CoverVideo     string            `bson:"coverVideo"`
+	ContentTime    time.Time         `bson:"contentTime"`
+	CoverResources map[string]string `bson:"coverResources"`
 	PublishTime    time.Time         `bson:"publishTime"`
 	LastReviewTime time.Time         `bson:"lastReviewTime"`
 	Valid          bool              `bson:"valid"`
 	WatchCount     int64             `bson:"watchCount"`
 	Tags           []string          `bson:"tags"`
-	Likes          int64             `bson:"likes"`
-	IsLike         bool              `bson:"isLike"`
-	LikeList       []string          `bson:"likeList"`
-	Unlike         int64             `bson:"unlike"`
-	IsUnlike       bool              `bson:"isUnlike"`
-	UnlikeList     []string          `bson:"unlikeList"`
+	ThumbUp        int64             `bson:"thumbUp"`
+	IsThumbUp      bool              `bson:"-"`
+	ThumbUpList    []string          `bson:"thumbUpList"`
+	ThumbDown      int64             `bson:"thumbDown"`
+	IsThumbDown    bool              `bson:"-"`
+	ThumbDownList  []string          `bson:"thumbDownList"`
 	Favorites      int64             `bson:"favorites"`
-	IsFavorite     bool              `bson:"isFavorite"`
+	IsFavorite     bool              `bson:"-"`
 	FavoriteList   []string          `bson:"favoriteList"`
 	LastModifyTime time.Time         `bson:"lastModifyTime"`
 	CanReview      bool              `bson:"canReview"`
