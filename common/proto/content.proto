@@ -7,8 +7,6 @@ option go_package = "proto";
 import "github.com/golang/protobuf/ptypes/empty/empty.proto";
 import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
 
-import "github.com/zhsyourai/teddy-backend/common/proto/common.proto";
-
 service Content {
     rpc GetTags (GetTagReq) returns (GetTagsResp) {}
     rpc PublishInfo (PublishInfoReq) returns (google.protobuf.Empty) {}
@@ -28,6 +26,17 @@ service Content {
     rpc FavoriteInfo (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
     rpc GetUserFavorite (UIDPageReq) returns (InfoIDsResp) {}
     rpc GetInfoFavorite (InfoIDPageReq) returns (UserIDsResp) {}
+}
+
+enum Order {
+    ASC = 0;
+    DESC = 1;
+    None = 2;
+}
+
+message Sort {
+    string name = 1;
+    Order order = 2;
 }
 
 message Tag {
@@ -65,14 +74,14 @@ message Info {
 message GetTagReq {
     uint32 page = 1;
     uint32 size = 2;
-    repeated teddy.protobuf.Sort sorts = 3;
+    repeated Sort sorts = 3;
     string uid = 4;
 }
 
 message UIDPageReq {
     uint32 page = 1;
     uint32 size = 2;
-    repeated teddy.protobuf.Sort sorts = 3;
+    repeated Sort sorts = 3;
     string uid = 4;
 }
 
@@ -102,7 +111,7 @@ message EditInfoReq {
 message GetInfosReq {
     uint32 page = 1;
     uint32 size = 2;
-    repeated teddy.protobuf.Sort sorts = 3;
+    repeated Sort sorts = 3;
     string uid = 4;
     string title = 5;
     repeated string tags = 6;
@@ -124,7 +133,7 @@ message InfoIDAndUIDReq {
 message InfoIDPageReq {
     string infoID = 1;
     uint32 size = 2;
-    repeated teddy.protobuf.Sort sorts = 3;
+    repeated Sort sorts = 3;
 }
 
 message UIDWithTime {
