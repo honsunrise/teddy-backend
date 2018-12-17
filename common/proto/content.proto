@@ -126,8 +126,9 @@ message InfoIDAndUIDReq {
 
 message InfoIDPageReq {
     string infoID = 1;
-    uint32 size = 2;
-    repeated Sort sorts = 3;
+    uint32 page = 2;
+    uint32 size = 3;
+    repeated Sort sorts = 4;
 }
 
 message UIDWithTime {
