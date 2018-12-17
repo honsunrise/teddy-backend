@@ -28,15 +28,9 @@ service Content {
     rpc GetInfoFavorite (InfoIDPageReq) returns (UserIDsResp) {}
 }
 
-enum Order {
-    ASC = 0;
-    DESC = 1;
-    None = 2;
-}
-
 message Sort {
     string name = 1;
-    Order order = 2;
+    bool asc = 2;
 }
 
 message Tag {
