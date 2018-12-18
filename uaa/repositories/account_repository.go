@@ -13,6 +13,8 @@ var ErrUpdateAccount = errors.New("uaa update error")
 type AccountRepository interface {
 	InsertAccount(account *models.Account) error
 	FindAccountByUsername(username string) (*models.Account, error)
+	FindAccountByEmail(username string) (*models.Account, error)
+	FindAccountByPhone(username string) (*models.Account, error)
 	FindAll() ([]*models.Account, error)
 	DeleteAccountByUsername(username string) error
 	UpdateAccountByUsername(username string, account map[string]interface{}) error
@@ -43,6 +45,26 @@ func (repo *accountRepository) InsertAccount(account *models.Account) error {
 func (repo *accountRepository) FindAccountByUsername(username string) (*models.Account, error) {
 	var account models.Account
 	filter := bson.D{{"username", username}}
+	err := repo.collections.FindOne(repo.ctx, filter).Decode(&account)
+	if err != nil {
+		return nil, err
+	}
+	return &account, nil
+}
+
+func (repo *accountRepository) FindAccountByEmail(email string) (*models.Account, error) {
+	var account models.Account
+	filter := bson.D{{"email", email}}
+	err := repo.collections.FindOne(repo.ctx, filter).Decode(&account)
+	if err != nil {
+		return nil, err
+	}
+	return &account, nil
+}
+
+func (repo *accountRepository) FindAccountByPhone(phone string) (*models.Account, error) {
+	var account models.Account
+	filter := bson.D{{"phone", phone}}
 	err := repo.collections.FindOne(repo.ctx, filter).Decode(&account)
 	if err != nil {
 		return nil, err
@@ -82,11 +104,11 @@ func (repo *accountRepository) DeleteAccountByUsername(username string) (err err
 func (repo *accountRepository) UpdateAccountByUsername(username string,
 	fields map[string]interface{}) error {
 	filter := bson.D{{"username", username}}
-	var bsonFields []bson.E
+	var bsonFields = make(bson.D, 0, len(fields))
 	for k, v := range fields {
 		bsonFields = append(bsonFields, bson.E{Key: k, Value: v})
 	}
-	update := bson.D{{"$set", bson.A{bsonFields}}}
+	update := bson.D{{"$set", bsonFields}}
 	ur, err := repo.collections.UpdateOne(repo.ctx, filter, update)
 	if err != nil {
 		return err

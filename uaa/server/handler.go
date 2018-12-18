@@ -42,6 +42,36 @@ func (h *accountHandler) GetAll(context.Context, *empty.Empty) (*proto.GetAllRes
 	return &resp, nil
 }
 
+func (h *accountHandler) GetByEmail(ctx context.Context, req *proto.GetByEmailReq) (*proto.Account, error) {
+	if err := validateGetByEmailReq(req); err != nil {
+		return nil, err
+	}
+
+	acc, err := h.repo.FindAccountByEmail(req.GetEmail())
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	var resp proto.Account
+	converter.CopyFromAccountToPBAccount(acc, &resp)
+	return &resp, nil
+}
+
+func (h *accountHandler) GetByPhone(ctx context.Context, req *proto.GetByPhoneReq) (*proto.Account, error) {
+	if err := validateGetByPhoneReq(req); err != nil {
+		return nil, err
+	}
+
+	acc, err := h.repo.FindAccountByPhone(req.GetPhone())
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	var resp proto.Account
+	converter.CopyFromAccountToPBAccount(acc, &resp)
+	return &resp, nil
+}
+
 func (h *accountHandler) GetByUsername(ctx context.Context, req *proto.GetByUsernameReq) (*proto.Account, error) {
 	if err := validateGetByUsernameReq(req); err != nil {
 		return nil, err

@@ -177,15 +177,16 @@ func (repo *inboxRepository) UpdateInBoxItems(uid string, ids []string, fields m
 		}},
 	}
 
-	var bsonFields = make(bson.D, len(fields))
+	var bsonFields = make(bson.D, 0, len(fields))
 	for k, v := range fields {
 		bsonFields = append(bsonFields, bson.E{Key: fmt.Sprintf("items.%s", k), Value: v})
 	}
 
 	update := bson.D{{"$set", bsonFields}}
-
-	_, err := repo.collections.UpdateOne(repo.ctx, filter, update)
+	ur, err := repo.collections.UpdateOne(repo.ctx, filter, update)
 	if err != nil {
+		return err
+	} else if ur.ModifiedCount == 0 {
 		return err
 	}
 	return nil

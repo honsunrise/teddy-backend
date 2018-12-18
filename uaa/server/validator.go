@@ -32,13 +32,26 @@ func validateRegisterReq(req *proto.RegisterReq) error {
 	return nil
 }
 
+func validateGetByEmailReq(req *proto.GetByEmailReq) error {
+	if req.Email == "" {
+		return ErrUsernameEmpty
+	}
+	return nil
+}
+
+func validateGetByPhoneReq(req *proto.GetByPhoneReq) error {
+	if req.Phone == "" {
+		return ErrUsernameEmpty
+	}
+	return nil
+}
+
 func validateGetByUsernameReq(req *proto.GetByUsernameReq) error {
 	if req.Username == "" {
 		return ErrUsernameEmpty
 	}
 	return nil
 }
-
 func validateDeleteByUsernameReq(req *proto.DeleteByUsernameReq) error {
 	if req.Username == "" {
 		return ErrUsernameEmpty

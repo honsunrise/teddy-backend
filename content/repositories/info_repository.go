@@ -145,7 +145,7 @@ func (repo *infoRepository) Delete(id objectid.ObjectID) error {
 
 func (repo *infoRepository) Update(id objectid.ObjectID, fields map[string]interface{}) error {
 	filter := bson.D{{"_id", id}}
-	var bsonFields = make(bson.D, len(fields))
+	var bsonFields = make(bson.D, 0, len(fields))
 	for k, v := range fields {
 		bsonFields = append(bsonFields, bson.E{Key: fmt.Sprintf("%s", k), Value: v})
 	}

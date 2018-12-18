@@ -264,7 +264,7 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	rsp, err := captchaClient.Verify(timeoutCtx, &proto.VerifyReq{
-		Type: proto.CaptchaType_RANDOM_BY_ID,
+		Type: proto.CaptchaType_IMAGE,
 		Id:   body.CaptchaId,
 		Code: body.CaptchaSolution,
 	})
@@ -312,6 +312,23 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	ctx.Bind(&body)
 
 	// extract the client from the context
+	uaaClient, ok := clients.UaaFromContext(ctx)
+	if !ok {
+		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+	}
+
+	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	tmpAccount, err := uaaClient.GetByEmail(timeoutCtx, &proto.GetByEmailReq{
+		Email: body.Email,
+	})
+
+	if err == nil && tmpAccount != nil {
+		ctx.AbortWithError(http.StatusBadRequest, ErrAccountExist)
+		return
+	}
+
+	// extract the client from the context
 	captchaClient, ok := clients.CaptchaFromContext(ctx)
 	if !ok {
 		log.Error(errors.ErrCaptchaNotCorrect)
@@ -319,7 +336,7 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 		return
 	}
 
-	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	rsp, err := captchaClient.Verify(timeoutCtx, &proto.VerifyReq{
 		Type: proto.CaptchaType_IMAGE,
@@ -329,7 +346,7 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 
 	if err != nil || !rsp.Correct {
 		log.Error(errors.ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusBadRequest, errors.ErrCaptchaNotCorrect)
 		return
 	}
 
@@ -349,7 +366,7 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	})
 	if err != nil {
 		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
@@ -367,7 +384,7 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	})
 	if err != nil {
 		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
