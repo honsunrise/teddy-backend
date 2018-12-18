@@ -9,6 +9,8 @@ import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
 
 service UAA {
 	rpc GetAll(google.protobuf.Empty) returns (GetAllResp) {}
+    rpc GetByEmail(GetByEmailReq) returns (Account) {}
+    rpc GetByPhone(GetByPhoneReq) returns (Account) {}
 	rpc GetByUsername(GetByUsernameReq) returns (Account) {}
     rpc DeleteByUsername(DeleteByUsernameReq) returns (google.protobuf.Empty) {}
     rpc Register(RegisterReq) returns (Account) {}
@@ -32,6 +34,14 @@ message Account {
 
 message GetAllResp {
     repeated Account accounts = 1;
+}
+
+message GetByPhoneReq {
+    string phone = 1;
+}
+
+message GetByEmailReq {
+    string email = 1;
 }
 
 message GetByUsernameReq {
