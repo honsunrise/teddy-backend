@@ -16,15 +16,6 @@ service UAA {
     rpc ChangePassword(ChangePasswordReq) returns (google.protobuf.Empty) {}
 }
 
-enum OAuthType {
-    GOOGLE = 0;
-    WECHAT = 1;
-    QQ = 2;
-    SINA = 3;
-    FACEBOOK = 4;
-    TWITTER = 5;
-}
-
 message Account {
     string uid = 1;
     string username = 2;
@@ -34,7 +25,7 @@ message Account {
     bool accountLocked = 6;
     bool credentialsExpired = 7;
     repeated string roles = 8;
-    map<uint32, string> oauthUserIds = 9;
+    map<string, string> oauthUserIds = 9;
     google.protobuf.Timestamp createDate = 10;
     google.protobuf.Timestamp updateDate = 11;
 }
