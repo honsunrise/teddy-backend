@@ -11,19 +11,23 @@ service Content {
     rpc GetTags (GetTagReq) returns (GetTagsResp) {}
     rpc PublishInfo (PublishInfoReq) returns (google.protobuf.Empty) {}
     rpc EditInfo (EditInfoReq) returns (google.protobuf.Empty) {}
+    rpc GetInfo (GetInfoReq) returns (Info) {}
     rpc GetInfos (GetInfosReq) returns (GetInfosResp) {}
     rpc DeleteInfo (InfoIDReq) returns (google.protobuf.Empty) {}
     rpc WatchInfo (InfoIDReq) returns (google.protobuf.Empty) {}
 
     rpc ThumbUp (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
+    rpc DeleteThumbUp (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
     rpc GetUserThumbUp (UIDPageReq) returns (InfoIDsResp) {}
     rpc GetInfoThumbUp(InfoIDPageReq) returns (UserIDsResp) {}
 
     rpc ThumbDown (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
+    rpc DeleteThumbDown (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
     rpc GetUserThumbDown(UIDPageReq) returns (InfoIDsResp) {}
     rpc GetInfoThumbDown(InfoIDPageReq) returns (UserIDsResp) {}
 
-    rpc FavoriteInfo (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
+    rpc Favorite (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
+    rpc DeleteFavorite (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
     rpc GetUserFavorite (UIDPageReq) returns (InfoIDsResp) {}
     rpc GetInfoFavorite (InfoIDPageReq) returns (UserIDsResp) {}
 }
@@ -100,6 +104,10 @@ message EditInfoReq {
     repeated string tags = 5;
     map<string, string> coverResources = 6;
     bool canReview = 7;
+}
+
+message GetInfoReq {
+   string id = 1;
 }
 
 message GetInfosReq {
