@@ -12,8 +12,8 @@ var ErrUpdateAccount = errors.New("uaa update error")
 
 type AccountRepository interface {
 	InsertAccount(account *models.Account) error
-	FindAccountByUsername(username string) (models.Account, error)
-	FindAll() ([]models.Account, error)
+	FindAccountByUsername(username string) (*models.Account, error)
+	FindAll() ([]*models.Account, error)
 	DeleteAccountByUsername(username string) error
 	UpdateAccountByUsername(username string, account map[string]interface{}) error
 }
@@ -40,32 +40,34 @@ func (repo *accountRepository) InsertAccount(account *models.Account) error {
 	return nil
 }
 
-func (repo *accountRepository) FindAccountByUsername(username string) (account models.Account, err error) {
+func (repo *accountRepository) FindAccountByUsername(username string) (*models.Account, error) {
+	var account models.Account
 	filter := bson.D{{"username", username}}
-	err = repo.collections.FindOne(repo.ctx, filter).Decode(&account)
+	err := repo.collections.FindOne(repo.ctx, filter).Decode(&account)
 	if err != nil {
-		return
+		return nil, err
 	}
-	return
+	return &account, nil
 }
 
-func (repo *accountRepository) FindAll() (accounts []models.Account, err error) {
+func (repo *accountRepository) FindAll() ([]*models.Account, error) {
+	accounts := make([]*models.Account, 0, 100)
 	var cur mongo.Cursor
-	cur, err = repo.collections.Find(repo.ctx, nil)
+	cur, err := repo.collections.Find(repo.ctx, nil)
 	if err != nil {
-		return
+		return nil, err
 	}
 	defer cur.Close(repo.ctx)
 	for cur.Next(repo.ctx) {
 		var elem models.Account
 		err = cur.Decode(&elem)
 		if err != nil {
-			return
+			return nil, err
 		}
-		accounts = append(accounts, elem)
+		accounts = append(accounts, &elem)
 	}
 	err = cur.Err()
-	return
+	return accounts, nil
 }
 
 func (repo *accountRepository) DeleteAccountByUsername(username string) (err error) {

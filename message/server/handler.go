@@ -16,9 +16,12 @@ import (
 
 func NewMessageServer(repo repositories.InBoxRepository, host string, port int, username string, password string) (proto.MessageServer, error) {
 	instance := &notifyHandler{
-		repo:    repo,
-		mailCh:  make(chan *gomail.Message),
-		mailErr: make(chan error),
+		repo:     repo,
+		mailCh:   make(chan *messageWithErrChan),
+		host:     host,
+		port:     port,
+		username: username,
+		password: password,
 	}
 	instance.startMailSender()
 	return instance, nil
@@ -26,8 +29,7 @@ func NewMessageServer(repo repositories.InBoxRepository, host string, port int, 
 
 type notifyHandler struct {
 	repo     repositories.InBoxRepository
-	mailCh   chan *gomail.Message
-	mailErr  chan error
+	mailCh   chan *messageWithErrChan
 	host     string
 	port     int
 	username string
@@ -36,9 +38,12 @@ type notifyHandler struct {
 	notifyChMap sync.Map
 }
 
-func (h *notifyHandler) startMailSender() {
-	// Load config
+type messageWithErrChan struct {
+	mailErr chan error
+	message *gomail.Message
+}
 
+func (h *notifyHandler) startMailSender() {
 	go func() {
 		d := gomail.NewPlainDialer(h.host, h.port, h.username, h.password)
 
@@ -47,20 +52,23 @@ func (h *notifyHandler) startMailSender() {
 		open := false
 		for {
 			select {
-			case m, ok := <-h.mailCh:
+			case me, ok := <-h.mailCh:
 				if !ok {
 					return
 				}
 				if !open {
 					if s, err = d.Dial(); err != nil {
-						h.mailErr <- err
+						me.mailErr <- err
 						open = false
 					} else {
 						open = true
 					}
-				} else {
-					if err := gomail.Send(s, m); err != nil {
-						h.mailErr <- err
+				}
+				if open == true {
+					if err := gomail.Send(s, me.message); err != nil {
+						me.mailErr <- err
+					} else {
+						close(me.mailErr)
 					}
 				}
 			case <-time.After(30 * time.Second):
@@ -73,6 +81,15 @@ func (h *notifyHandler) startMailSender() {
 	}()
 }
 
+func (h *notifyHandler) _sendEmail(ctx context.Context, message *gomail.Message) error {
+	me := &messageWithErrChan{
+		mailErr: make(chan error),
+		message: message,
+	}
+	h.mailCh <- me
+	return <-me.mailErr
+}
+
 func (h *notifyHandler) SendEmail(ctx context.Context, req *proto.SendEmailReq) (*empty.Empty, error) {
 	log.Infof("Send Email to %v", req)
 
@@ -83,17 +100,16 @@ func (h *notifyHandler) SendEmail(ctx context.Context, req *proto.SendEmailReq) 
 	}
 
 	m := gomail.NewMessage()
-	m.SetHeader("From", "alex@example.com")
+	m.SetHeader("From", h.username)
 	m.SetHeader("To", req.Email)
 	m.SetHeader("Subject", req.Topic)
 	m.SetBody("text/html", req.Content)
 
-	select {
-	case err := <-h.mailErr:
+	err := h._sendEmail(ctx, m)
+	if err != nil {
 		return nil, err
-	case h.mailCh <- m:
-		return &resp, nil
 	}
+	return &resp, nil
 }
 
 func (h *notifyHandler) SendSMS(ctx context.Context, req *proto.SendSMSReq) (*empty.Empty, error) {

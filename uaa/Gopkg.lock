@@ -139,7 +139,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9c4c16f679be7dc47609803bc3e880713807c6604ef289a302ccb9bb1e7ec46b"
+  digest = "1:18ac6685c1271b5f47c7e8d4862dd87ba81dadc1342cbd45e541eaf0e09b60d0"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "common/config",
@@ -151,7 +151,7 @@
     "common/utils",
   ]
   pruneopts = "UT"
-  revision = "dbd4f562555a35ca0f1f16c960786dc620c6ac32"
+  revision = "21616683ed17acc947a948f237f0c773e5d07c20"
 
 [[projects]]
   branch = "master"
@@ -180,7 +180,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "891ebc4b82d6e74f468c533b06f983c7be918a96"
+  revision = "e147a9138326bc0e9d4e179541ffd8af41cff8a9"
 
 [[projects]]
   branch = "master"
@@ -199,7 +199,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "4d1cda033e0619309c606fc686de3adcf599539e"
+  revision = "074acd46bca67915925527c07849494d115e7c43"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -230,7 +230,7 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "bd91e49a0898e27abb88c339b432fa53d7497ac0"
+  revision = "67d6565462c5a0d99b88193d59fefa10ca7e3010"
 
 [[projects]]
   digest = "1:03af1505694005143ff6dc5d0e2802c8200ddb618b1d3f7201482f53798b99b4"

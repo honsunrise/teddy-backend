@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"errors"
 	"github.com/golang/protobuf/ptypes/empty"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/proto"
@@ -13,11 +12,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
-
-var UserNotFoundErr = errors.New("user not found")
-var UserHasBeenRegisteredErr = errors.New("user has been registered")
-var OldPasswordNotCorrectErr = errors.New("old password not correct")
-var PasswordModifyErr = errors.New("password modify error")
 
 func NewAccountServer(repo repositories.AccountRepository, uidGen components.UidGenerator) (proto.UAAServer, error) {
 	return &accountHandler{
@@ -32,17 +26,17 @@ type accountHandler struct {
 }
 
 func (h *accountHandler) GetAll(context.Context, *empty.Empty) (*proto.GetAllResp, error) {
-	accs, err := h.repo.FindAll()
+	accounts, err := h.repo.FindAll()
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
 
 	var resp proto.GetAllResp
-	for _, v := range accs {
-		var pbacc proto.Account
-		converter.CopyFromAccountToPBAccount(&v, &pbacc)
-		resp.Accounts = append(resp.Accounts, &pbacc)
+	for _, v := range accounts {
+		var pbAcc proto.Account
+		converter.CopyFromAccountToPBAccount(v, &pbAcc)
+		resp.Accounts = append(resp.Accounts, &pbAcc)
 	}
 
 	return &resp, nil
@@ -59,7 +53,7 @@ func (h *accountHandler) GetByUsername(ctx context.Context, req *proto.GetByUser
 		return nil, err
 	}
 	var resp proto.Account
-	converter.CopyFromAccountToPBAccount(&acc, &resp)
+	converter.CopyFromAccountToPBAccount(acc, &resp)
 	return &resp, nil
 }
 
@@ -82,10 +76,11 @@ func (h *accountHandler) Register(ctx context.Context, req *proto.RegisterReq) (
 		return nil, err
 	}
 
-	_, err := h.repo.FindAccountByUsername(req.GetUsername())
-	if err == nil {
-		return nil, err
+	tmpAccount, err := h.repo.FindAccountByUsername(req.GetUsername())
+	if err == nil && tmpAccount != nil {
+		return nil, ErrAccountExist
 	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.GetPassword()), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
@@ -100,9 +95,9 @@ func (h *accountHandler) Register(ctx context.Context, req *proto.RegisterReq) (
 	account.UID = uid
 	account.Username = req.GetUsername()
 	account.Password = hashedPassword
-	// TODO: Check Roles
 	account.Roles = req.GetRoles()
 	account.CreateDate = time.Now()
+	account.OAuthUserIds = make(map[string]string)
 	account.Email = req.Email
 	account.CredentialsExpired = false
 	account.AccountLocked = false
@@ -134,7 +129,7 @@ func (h *accountHandler) VerifyPassword(ctx context.Context, req *proto.VerifyPa
 		return nil, UserNotFoundErr
 	}
 	var resp proto.Account
-	converter.CopyFromAccountToPBAccount(&acc, &resp)
+	converter.CopyFromAccountToPBAccount(acc, &resp)
 	return &resp, nil
 }
 

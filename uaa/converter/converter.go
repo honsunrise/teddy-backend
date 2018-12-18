@@ -19,10 +19,7 @@ func CopyFromAccountToPBAccount(acc *models.Account, pbacc *proto.Account) {
 	pbacc.AccountLocked = acc.AccountLocked
 	pbacc.CredentialsExpired = acc.CredentialsExpired
 	pbacc.Roles = acc.Roles
-	pbacc.OauthUserIds = make(map[uint32]string, len(acc.OAuthUserIds))
-	for k, v := range acc.OAuthUserIds {
-		pbacc.OauthUserIds[uint32(k)] = v
-	}
+	pbacc.OauthUserIds = acc.OAuthUserIds
 	pbacc.CreateDate = &timestamp.Timestamp{
 		Seconds: acc.CreateDate.Unix(),
 		Nanos:   int32(acc.CreateDate.Nanosecond()),
@@ -45,10 +42,7 @@ func CopyFromPBAccountToAccount(pbacc *proto.Account, acc *models.Account) {
 	acc.AccountLocked = pbacc.AccountLocked
 	acc.CredentialsExpired = pbacc.CredentialsExpired
 	acc.Roles = pbacc.Roles
-	acc.OAuthUserIds = make(map[models.OAuthType]string, len(pbacc.OauthUserIds))
-	for k, v := range pbacc.OauthUserIds {
-		acc.OAuthUserIds[models.OAuthType(k)] = v
-	}
+	acc.OAuthUserIds = pbacc.OauthUserIds
 	acc.CreateDate = time.Unix(pbacc.CreateDate.Seconds, int64(pbacc.CreateDate.Nanos))
 	acc.UpdateDate = time.Unix(pbacc.UpdateDate.Seconds, int64(pbacc.UpdateDate.Nanos))
 }

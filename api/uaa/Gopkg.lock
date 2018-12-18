@@ -70,12 +70,12 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:8f8811f9be822914c3a25c6a071e93beb4c805d7b026cbf298bc577bc1cc945b"
+  digest = "1:236d7e1bdb50d8f68559af37dbcf9d142d56b431c9b2176d41e2a009b664cda8"
   name = "github.com/google/uuid"
   packages = ["."]
   pruneopts = "UT"
-  revision = "064e2069ce9c359c118179501254f67d7d37ba24"
-  version = "0.2"
+  revision = "9b3b1e0f5f99ae461456d768e7d301a7acdaa2d8"
+  version = "v1.1.0"
 
 [[projects]]
   digest = "1:8eb1de8112c9924d59bf1d3e5c26f5eaa2bfc2a5fcbb92dc1c2e4546d695f277"
@@ -179,7 +179,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:0247ae10d4e396936187df9399b5e0b9c3a43d162b096498a765103cf0199fc3"
+  digest = "1:ae0c1bc2c541f1945eee7541b46f7390acf05504fe3a2c483a2a9d99522118e8"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
@@ -193,7 +193,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "60ea25af04ae53da2f0d0172d5070f50f5bf7d17"
+  revision = "21616683ed17acc947a948f237f0c773e5d07c20"
 
 [[projects]]
   branch = "master"
@@ -205,7 +205,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7a2e3d6819e7a97a877f8604e737901c6941e76d56ae98a51a1ca2f13de351fb"
+  digest = "1:89a0cb976397aa9157a45bb2b896d0bcd07ee095ac975e0f03c53250c402265e"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -217,7 +217,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "610586996380ceef02dd726cc09df7e00a3f8e56"
+  revision = "e147a9138326bc0e9d4e179541ffd8af41cff8a9"
 
 [[projects]]
   branch = "master"
@@ -229,14 +229,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:21d0d5a534afd0c16c486a72e2dde75b62463938b7517ec8fbc4f98e088465fa"
+  digest = "1:ba8cbf57cfd92d5f8592b4aca1a35d92c162363d32aeabd5b12555f8896635e7"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "586ba8c9bb141bbbea1ffb47b201443fd43385dd"
+  revision = "074acd46bca67915925527c07849494d115e7c43"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -267,7 +267,7 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "bd91e49a0898e27abb88c339b432fa53d7497ac0"
+  revision = "67d6565462c5a0d99b88193d59fefa10ca7e3010"
 
 [[projects]]
   digest = "1:9edd250a3c46675d0679d87540b30c9ed253b19bd1fd1af08f4f5fb3c79fc487"

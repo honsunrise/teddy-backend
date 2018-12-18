@@ -37,7 +37,7 @@ func (repo *keyValuePairRepository) FindKeyValuePairByKeyAndValueAndExpire(key s
 		{"key", key},
 		{"value", value},
 		{"expire_time", bson.D{
-			{"$lt", time.UnixNano()},
+			{"$gt", time},
 		}},
 	}
 
@@ -50,7 +50,7 @@ func (repo *keyValuePairRepository) FindKeyValuePairByKeyAndValueAndExpire(key s
 
 func (repo *keyValuePairRepository) DeleteKeyValuePairLT(time time.Time) error {
 	filter := bson.D{
-		{"expire_time", bson.D{{"$lt", time.UnixNano()}}},
+		{"expire_time", bson.D{{"$lt", time}}},
 	}
 	_, err := repo.collections.DeleteMany(repo.ctx, filter)
 	if err != nil {

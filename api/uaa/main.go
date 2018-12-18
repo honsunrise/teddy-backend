@@ -68,9 +68,9 @@ func main() {
 
 	// Create RESTful server (using Gin)
 	router := gin.Default()
-	router.Use(clients.MessageNew())
-	router.Use(clients.UaaNew())
-	router.Use(clients.CaptchaNew())
+	router.Use(clients.MessageNew(messageSrvAddrFunc))
+	router.Use(clients.UaaNew(uaaSrvAddrFunc))
+	router.Use(clients.CaptchaNew(captchaSrvAddrFunc))
 	uaa.HandlerNormal(router.Group("/v1/anon/uaa"))
 	uaa.HandlerAuth(router.Group("/v1/auth/uaa"))
 	uaa.HandlerHealth(router)

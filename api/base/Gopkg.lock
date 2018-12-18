@@ -2,25 +2,6 @@
 
 
 [[projects]]
-  branch = "master"
-  digest = "1:315c5f2f60c76d89b871c73f9bd5fe689cad96597afd50fb9992228ef80bdd34"
-  name = "github.com/alecthomas/template"
-  packages = [
-    ".",
-    "parse",
-  ]
-  pruneopts = "UT"
-  revision = "a0175ee3bccc567396460bf5acd36800cb10c49c"
-
-[[projects]]
-  branch = "master"
-  digest = "1:c198fdc381e898e8fb62b8eb62758195091c313ad18e52a3067366e1dda2fb3c"
-  name = "github.com/alecthomas/units"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a"
-
-[[projects]]
   digest = "1:abeb38ade3f32a92943e5be54f55ed6d6e3b6602761d74b4aab4c9dd45c18abd"
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
@@ -129,14 +110,6 @@
   version = "1.0.1"
 
 [[projects]]
-  branch = "master"
-  digest = "1:c47550d71ea17823202a58abc3f635da0a341284342e64fb0d1a95a4cf790301"
-  name = "github.com/prometheus/common"
-  packages = ["log"]
-  pruneopts = "UT"
-  revision = "4724e9255275ce38f7179b2478abeae4e28c904f"
-
-[[projects]]
   digest = "1:69b1cc331fca23d702bd72f860c6a647afd0aa9fcbc1d0659b1365e26546dd70"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
@@ -154,7 +127,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:cf8e2642c9ef535de2b3266a6c194cbcd7868da7bf8ce19c997759915174a1e3"
+  digest = "1:411b92ceb0a08241b14d7d9b8be42928ef30b33889d4455c184a38e0e41d0afd"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
@@ -167,7 +140,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "9b415933b27113a2c7a564f9694283a9f2736269"
+  revision = "7876b5c761dcaa770add3b6a55a612a9d60a4f66"
 
 [[projects]]
   branch = "master"
@@ -179,7 +152,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7a2e3d6819e7a97a877f8604e737901c6941e76d56ae98a51a1ca2f13de351fb"
+  digest = "1:89a0cb976397aa9157a45bb2b896d0bcd07ee095ac975e0f03c53250c402265e"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -191,7 +164,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "610586996380ceef02dd726cc09df7e00a3f8e56"
+  revision = "e147a9138326bc0e9d4e179541ffd8af41cff8a9"
 
 [[projects]]
   branch = "master"
@@ -203,16 +176,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:0c6fb22a3020b2a1f7dd05bb22bd3c84dd30e4b9b3c6b26edfda163a61afc007"
+  digest = "1:ba8cbf57cfd92d5f8592b4aca1a35d92c162363d32aeabd5b12555f8896635e7"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
-    "windows/registry",
-    "windows/svc/eventlog",
   ]
   pruneopts = "UT"
-  revision = "586ba8c9bb141bbbea1ffb47b201443fd43385dd"
+  revision = "dcdaa6325bcb8d3c07805583fe12153f08a41e2b"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -243,7 +214,7 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "bd91e49a0898e27abb88c339b432fa53d7497ac0"
+  revision = "67d6565462c5a0d99b88193d59fefa10ca7e3010"
 
 [[projects]]
   digest = "1:9edd250a3c46675d0679d87540b30c9ed253b19bd1fd1af08f4f5fb3c79fc487"
@@ -286,14 +257,6 @@
   version = "v1.17.0"
 
 [[projects]]
-  digest = "1:c06d9e11d955af78ac3bbb26bd02e01d2f61f689e1a3bce2ef6fb683ef8a7f2d"
-  name = "gopkg.in/alecthomas/kingpin.v2"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "947dcec5ba9c011838740e680966fd7087a71d0d"
-  version = "v2.2.6"
-
-[[projects]]
   digest = "1:cbc72c4c4886a918d6ab4b95e347ffe259846260f99ebdd8a198c2331cf2b2e9"
   name = "gopkg.in/go-playground/validator.v8"
   packages = ["."]
@@ -314,7 +277,6 @@
   analyzer-version = 1
   input-imports = [
     "github.com/gin-gonic/gin",
-    "github.com/prometheus/common/log",
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/api/clients",
     "github.com/zhsyourai/teddy-backend/common/config",
