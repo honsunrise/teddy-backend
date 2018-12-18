@@ -45,8 +45,8 @@ message Info {
     string id = 2;
     string title = 3;
     string content = 5;
-    repeated string coverList = 6;
-    string coverVideo = 7;
+    google.protobuf.Timestamp contentTime = 6;
+    map<string, string> coverResources = 7;
     google.protobuf.Timestamp publishTime = 8;
     google.protobuf.Timestamp lastReviewTime = 9;
     bool valid = 10;
