@@ -139,7 +139,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ba9392e0cfa4245d23619f221408262fcf2dadb2f0241bac6c1d7eb98a95ebf9"
+  digest = "1:da73437a987f61e22153ea6651ada6b0509f90e03712ac87c881319585089262"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "common/config",
@@ -151,7 +151,7 @@
     "common/utils",
   ]
   pruneopts = "UT"
-  revision = "1d0a5280a0bc09f45789db4b04b92825fb2e9542"
+  revision = "d09657e35796e588b3081acc94cffa2182b4b179"
 
 [[projects]]
   branch = "master"
@@ -197,7 +197,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "4d1cda033e0619309c606fc686de3adcf599539e"
+  revision = "dcdaa6325bcb8d3c07805583fe12153f08a41e2b"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -228,7 +228,7 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "936bffa7f85bf0dd0ec21b13d4d1a022672eeb98"
+  revision = "67d6565462c5a0d99b88193d59fefa10ca7e3010"
 
 [[projects]]
   digest = "1:03af1505694005143ff6dc5d0e2802c8200ddb618b1d3f7201482f53798b99b4"
@@ -273,22 +273,6 @@
   version = "v1.17.0"
 
 [[projects]]
-  branch = "v3"
-  digest = "1:7388652e2215a3f45d341d58766ed58317971030eb1cbd75f005f96ace8e9196"
-  name = "gopkg.in/alexcesaro/quotedprintable.v3"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "2caba252f4dc53eaf6b553000885530023f54623"
-
-[[projects]]
-  digest = "1:eebd52aee67d9f1e0af1859a584e14b1817581dd5f90d4585418c27b6a93c966"
-  name = "gopkg.in/gomail.v2"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "41f3572897373c5538c50a2402db15db079fa4fd"
-  version = "2.0.0"
-
-[[projects]]
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
@@ -315,7 +299,6 @@
     "google.golang.org/grpc",
     "google.golang.org/grpc/health",
     "google.golang.org/grpc/health/grpc_health_v1",
-    "gopkg.in/gomail.v2",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

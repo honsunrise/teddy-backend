@@ -1335,7 +1335,7 @@ func (c *contentClient) GetInfoThumbDown(ctx context.Context, in *InfoIDPageReq,
 
 func (c *contentClient) Favorite(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/Favorite", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/FavThumb", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1344,7 +1344,7 @@ func (c *contentClient) Favorite(ctx context.Context, in *InfoIDAndUIDReq, opts 
 
 func (c *contentClient) DeleteFavorite(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/DeleteFavorite", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/DeleteFavoThumb", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1353,7 +1353,7 @@ func (c *contentClient) DeleteFavorite(ctx context.Context, in *InfoIDAndUIDReq,
 
 func (c *contentClient) GetUserFavorite(ctx context.Context, in *UIDPageReq, opts ...grpc.CallOption) (*InfoIDsResp, error) {
 	out := new(InfoIDsResp)
-	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/GetUserFavorite", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/GetUserFavThumb", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1676,7 +1676,7 @@ func _Content_Favorite_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/teddy.srv.content.Content/Favorite",
+		FullMethod: "/teddy.srv.content.Content/FavThumb",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServer).Favorite(ctx, req.(*InfoIDAndUIDReq))
@@ -1694,7 +1694,7 @@ func _Content_DeleteFavorite_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/teddy.srv.content.Content/DeleteFavorite",
+		FullMethod: "/teddy.srv.content.Content/DeleteFavoThumb",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServer).DeleteFavorite(ctx, req.(*InfoIDAndUIDReq))
@@ -1712,7 +1712,7 @@ func _Content_GetUserFavorite_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/teddy.srv.content.Content/GetUserFavorite",
+		FullMethod: "/teddy.srv.content.Content/GetUserFavThumb",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServer).GetUserFavorite(ctx, req.(*UIDPageReq))
@@ -1803,15 +1803,15 @@ var _Content_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Content_GetInfoThumbDown_Handler,
 		},
 		{
-			MethodName: "Favorite",
+			MethodName: "FavThumb",
 			Handler:    _Content_Favorite_Handler,
 		},
 		{
-			MethodName: "DeleteFavorite",
+			MethodName: "DeleteFavoThumb",
 			Handler:    _Content_DeleteFavorite_Handler,
 		},
 		{
-			MethodName: "GetUserFavorite",
+			MethodName: "GetUserFavThumb",
 			Handler:    _Content_GetUserFavorite_Handler,
 		},
 		{

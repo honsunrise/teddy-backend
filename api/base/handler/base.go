@@ -2,7 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/prometheus/common/log"
+	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/common/errors"
 	"github.com/zhsyourai/teddy-backend/common/proto"
@@ -48,7 +48,7 @@ func (h *Base) GetCaptchaId(ctx *gin.Context) {
 	// extract the client from the context
 	captchaClient, ok := clients.CaptchaFromContext(ctx)
 	if !ok {
-		log.Error(errors.ErrCaptchaNotCorrect)
+		log.Error(errors.ErrClientNotFound)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
 		return
 	}
@@ -74,7 +74,7 @@ func (h *Base) GetCaptchaData(ctx *gin.Context) {
 	// extract the client from the context
 	captchaClient, ok := clients.CaptchaFromContext(ctx)
 	if !ok {
-		log.Error(errors.ErrCaptchaNotCorrect)
+		log.Error(errors.ErrClientNotFound)
 		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
 		return
 	}

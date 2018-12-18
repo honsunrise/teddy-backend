@@ -63,10 +63,15 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *proto.PublishInfo
 		return nil, err
 	}
 
+	uid, err := objectid.FromHex(req.Uid)
+	if err != nil {
+		return nil, err
+	}
+
 	now := time.Now()
 	info := models.Info{
 		Id:             objectid.New(),
-		UID:            req.Uid,
+		UID:            uid,
 		Title:          req.Title,
 		Content:        req.Content,
 		CoverResources: req.CoverResources,
@@ -85,7 +90,7 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *proto.PublishInfo
 		CanReview:      req.CanReview,
 	}
 
-	err := h.infoRepo.Insert(&info)
+	err = h.infoRepo.Insert(&info)
 	if err != nil {
 		return nil, err
 	}
@@ -127,8 +132,40 @@ func (h *contentHandler) GetInfos(ctx context.Context, req *proto.GetInfosReq) (
 	results := make([]*proto.Info, 0, len(infos))
 	for _, info := range infos {
 		results = append(results, &proto.Info{
-			Id: info.Id.Hex(),
-			//TODO: fill other field
+			Id:      info.Id.Hex(),
+			Uid:     info.UID.Hex(),
+			Title:   info.Title,
+			Content: info.Content,
+			ContentTime: &timestamp.Timestamp{
+				Seconds: info.ContentTime.Unix(),
+				Nanos:   int32(info.ContentTime.Nanosecond()),
+			},
+			CoverResources: info.CoverResources,
+			PublishTime: &timestamp.Timestamp{
+				Seconds: info.PublishTime.Unix(),
+				Nanos:   int32(info.PublishTime.Nanosecond()),
+			},
+			LastReviewTime: &timestamp.Timestamp{
+				Seconds: info.LastReviewTime.Unix(),
+				Nanos:   int32(info.LastReviewTime.Nanosecond()),
+			},
+			Valid:         info.Valid,
+			WatchCount:    info.WatchCount,
+			Tags:          info.Tags,
+			ThumbUp:       info.ThumbUp,
+			IsThumbUp:     info.IsThumbUp,
+			ThumbUpList:   info.ThumbUpList,
+			ThumbDown:     info.ThumbDown,
+			IsThumbDown:   info.IsThumbDown,
+			ThumbDownList: info.ThumbDownList,
+			Favorites:     info.Favorites,
+			IsFavorite:    info.IsFavorite,
+			FavoriteList:  info.FavoriteList,
+			LastModifyTime: &timestamp.Timestamp{
+				Seconds: info.LastModifyTime.Unix(),
+				Nanos:   int32(info.LastModifyTime.Nanosecond()),
+			},
+			CanReview: info.CanReview,
 		})
 	}
 	resp.Infos = results
