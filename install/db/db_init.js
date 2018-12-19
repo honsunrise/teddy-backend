@@ -15,3 +15,5 @@ db.createUser(
         roles: [{role: "readWrite", db: "teddy"}]
     }
 );
+
+db.info.

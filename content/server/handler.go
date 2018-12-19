@@ -4,6 +4,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
+	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/proto"
 	"github.com/zhsyourai/teddy-backend/common/types"
 	"github.com/zhsyourai/teddy-backend/content/converter"
@@ -64,8 +65,28 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *proto.PublishInfo
 	if err := validatePublishInfoReq(req); err != nil {
 		return nil, err
 	}
-
 	now := time.Now()
+
+	for _, tag := range req.Tags {
+		_, err := h.tagRepo.FindOne(tag)
+		if err == nil {
+			err = h.tagRepo.IncUsage(tag, 1)
+			if err != nil {
+				log.Errorf("inc tag use times error %v", err)
+			}
+		} else {
+			err = h.tagRepo.Insert(&models.Tag{
+				Tag:         tag,
+				Usage:       1,
+				CreateTime:  now,
+				LastUseTime: now,
+			})
+			if err != nil {
+				log.Errorf("insert tag error %v", err)
+			}
+		}
+	}
+
 	info := models.Info{
 		Id:             objectid.New(),
 		UID:            req.Uid,
@@ -98,6 +119,44 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *proto.PublishInfo
 func (h *contentHandler) EditInfo(ctx context.Context, req *proto.EditInfoReq) (*empty.Empty, error) {
 	var resp empty.Empty
 	if err := validateEditInfoReq(req); err != nil {
+		return nil, err
+	}
+
+	infoID, err := objectid.FromHex(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	now := time.Now()
+
+	for _, tag := range req.Tags {
+		_, err := h.tagRepo.FindOne(tag)
+		if err == nil {
+			err = h.tagRepo.IncUsage(tag, 1)
+			if err != nil {
+				log.Errorf("inc tag use times error %v", err)
+			}
+		} else {
+			err = h.tagRepo.Insert(&models.Tag{
+				Tag:         tag,
+				Usage:       1,
+				CreateTime:  now,
+				LastUseTime: now,
+			})
+			if err != nil {
+				log.Errorf("insert tag error %v", err)
+			}
+		}
+	}
+
+	err = h.infoRepo.Update(infoID, map[string]interface{}{
+		"uid":            req.Uid,
+		"title":          req.Title,
+		"content":        req.Content,
+		"coverResources": req.CoverResources,
+		"canReview":      req.CanReview,
+	})
+	if err != nil {
 		return nil, err
 	}
 

@@ -3,6 +3,7 @@ package repositories
 import "errors"
 
 var ErrUpdateInfo = errors.New("info update error")
+var ErrDeleteInfo = errors.New("delete info error")
 var ErrTitleExisted = errors.New("info title has been existed")
 
 var ErrUpdateTag = errors.New("tag update error")

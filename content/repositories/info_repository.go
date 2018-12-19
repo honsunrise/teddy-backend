@@ -152,9 +152,11 @@ func (repo *infoRepository) FindByTitleAndUser(title string, uid string, page ui
 
 func (repo *infoRepository) Delete(id objectid.ObjectID) error {
 	filter := bson.D{{"_id", id}}
-	_, err := repo.collections.DeleteOne(repo.ctx, filter)
+	dr, err := repo.collections.DeleteOne(repo.ctx, filter)
 	if err != nil {
 		return err
+	} else if dr.DeletedCount == 0 {
+		return ErrDeleteInfo
 	}
 	return nil
 }

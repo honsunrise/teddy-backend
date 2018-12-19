@@ -11,7 +11,7 @@ import (
 
 type TagRepository interface {
 	Insert(tag *models.Tag) error
-	FindOne(tag string) (models.Tag, error)
+	FindOne(tag string) (*models.Tag, error)
 	FindAll(page uint32, size uint32, sorts []types.Sort) ([]*models.Tag, error)
 	IncUsage(tag string, inc uint64) error
 	UpdateLastUse(tag string, lastUse time.Time) error
@@ -34,28 +34,22 @@ type tagRepository struct {
 }
 
 func (repo *tagRepository) Insert(tag *models.Tag) error {
-	filter := bson.D{{"_id", tag.Tag}}
-	result := repo.collections.FindOne(repo.ctx, filter)
-	if result.Decode(nil) == mongo.ErrNoDocuments {
-		_, err := repo.collections.InsertOne(repo.ctx, tag)
-		if err != nil {
-			return err
-		}
-	} else {
-		return ErrTagExisted
+	_, err := repo.collections.InsertOne(repo.ctx, tag)
+	if err != nil {
+		return err
 	}
 	return nil
 }
 
-func (repo *tagRepository) FindOne(tag string) (models.Tag, error) {
+func (repo *tagRepository) FindOne(tag string) (*models.Tag, error) {
 	var tagEntry models.Tag
 	filter := bson.D{{"_id", tag}}
 	result := repo.collections.FindOne(repo.ctx, filter)
 	err := result.Decode(&tagEntry)
-	if err == nil {
-		return models.Tag{}, err
+	if err != nil {
+		return nil, err
 	}
-	return tagEntry, nil
+	return &tagEntry, nil
 }
 
 func (repo *tagRepository) FindAll(page uint32, size uint32, sorts []types.Sort) ([]*models.Tag, error) {

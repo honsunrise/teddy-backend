@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/golang/protobuf/ptypes"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/common/errors"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func buildSort(sort string) ([]*proto.Sort, error) {
@@ -132,7 +134,35 @@ func (h *Content) GetAllTags(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, resp)
+	type tagsResult struct {
+		Tag         string    `json:"tag"`
+		Usage       uint64    `json:"usage"`
+		CreateTime  time.Time `json:"create_time"`
+		LastUseTime time.Time `json:"last_use_time"`
+	}
+
+	results := make([]*tagsResult, 0, len(resp.Tags))
+	for _, tag := range resp.Tags {
+		createTime, err := ptypes.Timestamp(tag.CreateTime)
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+
+		lastUseTime, err := ptypes.Timestamp(tag.LastUseTime)
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+		results = append(results, &tagsResult{
+			Tag:         tag.Tag,
+			Usage:       tag.Usage,
+			CreateTime:  createTime,
+			LastUseTime: lastUseTime,
+		})
+	}
+
+	ctx.JSON(http.StatusOK, results)
 }
 
 func (h *Content) GetAllContents(ctx *gin.Context) {
@@ -178,7 +208,80 @@ func (h *Content) GetAllContents(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, resp)
+	type infosResult struct {
+		Id             string            `json:"id"`
+		UID            string            `json:"uid"`
+		Title          string            `json:"title"`
+		Content        string            `json:"content"`
+		ContentTime    time.Time         `json:"contentTime"`
+		CoverResources map[string]string `json:"coverResources"`
+		PublishTime    time.Time         `json:"publishTime"`
+		LastReviewTime time.Time         `json:"lastReviewTime"`
+		Valid          bool              `json:"valid"`
+		WatchCount     int64             `json:"watchCount"`
+		Tags           []string          `json:"tags"`
+		ThumbUp        int64             `json:"thumbUp"`
+		IsThumbUp      bool              `json:"-"`
+		ThumbUpList    []string          `json:"thumbUpList"`
+		ThumbDown      int64             `json:"thumbDown"`
+		IsThumbDown    bool              `json:"-"`
+		ThumbDownList  []string          `json:"thumbDownList"`
+		Favorites      int64             `json:"favorites"`
+		IsFavorite     bool              `json:"-"`
+		FavoriteList   []string          `json:"favoriteList"`
+		LastModifyTime time.Time         `json:"lastModifyTime"`
+		CanReview      bool              `json:"canReview"`
+	}
+
+	results := make([]*infosResult, 0, len(resp.Infos))
+	for _, info := range resp.Infos {
+		publishTime, err := ptypes.Timestamp(info.PublishTime)
+		if err != nil {
+			log.Error(err)
+		}
+
+		lastReviewTime, err := ptypes.Timestamp(info.LastReviewTime)
+		if err != nil {
+			log.Error(err)
+		}
+
+		lastModifyTime, err := ptypes.Timestamp(info.LastModifyTime)
+		if err != nil {
+			log.Error(err)
+		}
+
+		contentTime, err := ptypes.Timestamp(info.ContentTime)
+		if err != nil {
+			log.Error(err)
+		}
+
+		results = append(results, &infosResult{
+			Id:             info.Id,
+			UID:            info.Uid,
+			Title:          info.Title,
+			Content:        info.Content,
+			ContentTime:    contentTime,
+			CoverResources: info.CoverResources,
+			PublishTime:    publishTime,
+			LastReviewTime: lastReviewTime,
+			Valid:          info.Valid,
+			WatchCount:     info.WatchCount,
+			Tags:           info.Tags,
+			ThumbUp:        info.ThumbUp,
+			IsThumbUp:      info.IsThumbUp,
+			ThumbUpList:    info.ThumbUpList,
+			ThumbDown:      info.ThumbDown,
+			IsThumbDown:    info.IsThumbDown,
+			ThumbDownList:  info.ThumbDownList,
+			Favorites:      info.Favorites,
+			IsFavorite:     info.IsFavorite,
+			FavoriteList:   info.FavoriteList,
+			LastModifyTime: lastModifyTime,
+			CanReview:      info.CanReview,
+		})
+	}
+
+	ctx.JSON(http.StatusOK, results)
 }
 
 func (h *Content) Search(ctx *gin.Context) {
@@ -203,11 +306,21 @@ func (h *Content) PublishContent(ctx *gin.Context) {
 		Tags           []string          `json:"tags"`
 		CanReview      bool              `json:"can_review"`
 		CoverResources map[string]string `json:"cover_resources"`
+		ContentTime    time.Time         `json:"content_time"`
 	}
 	var req publishInfoReq
 	ctx.BindJSON(&req)
 
-	_, err := contentClient.PublishInfo(ctx, &proto.PublishInfoReq{})
+	//TODO: Get uid
+	uid := "7791850604"
+	_, err := contentClient.PublishInfo(ctx, &proto.PublishInfoReq{
+		Uid:            uid,
+		Title:          req.Title,
+		Content:        req.Content,
+		Tags:           req.Tags,
+		CanReview:      req.CanReview,
+		CoverResources: req.CoverResources,
+	})
 
 	if err != nil {
 		log.Error(err)
@@ -226,7 +339,7 @@ func (h *Content) GetContentDetail(ctx *gin.Context) {
 	}
 
 	infoID := ctx.Param("id")
-	resp, err := contentClient.GetInfo(ctx, &proto.GetInfoReq{
+	info, err := contentClient.GetInfo(ctx, &proto.GetInfoReq{
 		Id: infoID,
 	})
 
@@ -236,6 +349,75 @@ func (h *Content) GetContentDetail(ctx *gin.Context) {
 		return
 	}
 
+	type infosResult struct {
+		Id             string            `json:"id"`
+		UID            string            `json:"uid"`
+		Title          string            `json:"title"`
+		Content        string            `json:"content"`
+		ContentTime    time.Time         `json:"contentTime"`
+		CoverResources map[string]string `json:"coverResources"`
+		PublishTime    time.Time         `json:"publishTime"`
+		LastReviewTime time.Time         `json:"lastReviewTime"`
+		Valid          bool              `json:"valid"`
+		WatchCount     int64             `json:"watchCount"`
+		Tags           []string          `json:"tags"`
+		ThumbUp        int64             `json:"thumbUp"`
+		IsThumbUp      bool              `json:"-"`
+		ThumbUpList    []string          `json:"thumbUpList"`
+		ThumbDown      int64             `json:"thumbDown"`
+		IsThumbDown    bool              `json:"-"`
+		ThumbDownList  []string          `json:"thumbDownList"`
+		Favorites      int64             `json:"favorites"`
+		IsFavorite     bool              `json:"-"`
+		FavoriteList   []string          `json:"favoriteList"`
+		LastModifyTime time.Time         `json:"lastModifyTime"`
+		CanReview      bool              `json:"canReview"`
+	}
+
+	publishTime, err := ptypes.Timestamp(info.PublishTime)
+	if err != nil {
+		log.Error(err)
+	}
+
+	lastReviewTime, err := ptypes.Timestamp(info.LastReviewTime)
+	if err != nil {
+		log.Error(err)
+	}
+
+	lastModifyTime, err := ptypes.Timestamp(info.LastModifyTime)
+	if err != nil {
+		log.Error(err)
+	}
+
+	contentTime, err := ptypes.Timestamp(info.ContentTime)
+	if err != nil {
+		log.Error(err)
+	}
+
+	resp := &infosResult{
+		Id:             info.Id,
+		UID:            info.Uid,
+		Title:          info.Title,
+		Content:        info.Content,
+		ContentTime:    contentTime,
+		CoverResources: info.CoverResources,
+		PublishTime:    publishTime,
+		LastReviewTime: lastReviewTime,
+		Valid:          info.Valid,
+		WatchCount:     info.WatchCount,
+		Tags:           info.Tags,
+		ThumbUp:        info.ThumbUp,
+		IsThumbUp:      info.IsThumbUp,
+		ThumbUpList:    info.ThumbUpList,
+		ThumbDown:      info.ThumbDown,
+		IsThumbDown:    info.IsThumbDown,
+		ThumbDownList:  info.ThumbDownList,
+		Favorites:      info.Favorites,
+		IsFavorite:     info.IsFavorite,
+		FavoriteList:   info.FavoriteList,
+		LastModifyTime: lastModifyTime,
+		CanReview:      info.CanReview,
+	}
 	ctx.JSON(http.StatusOK, resp)
 }
 
@@ -247,7 +429,6 @@ func (h *Content) UpdateContent(ctx *gin.Context) {
 	}
 
 	type updateInfoReq struct {
-		ID             string            `json:"id"`
 		Title          string            `json:"title"`
 		Content        string            `json:"content"`
 		Tags           []string          `json:"tags"`
@@ -257,7 +438,15 @@ func (h *Content) UpdateContent(ctx *gin.Context) {
 	var req updateInfoReq
 	ctx.BindJSON(&req)
 
-	_, err := contentClient.EditInfo(ctx, &proto.EditInfoReq{})
+	infoID := ctx.Param("id")
+	_, err := contentClient.EditInfo(ctx, &proto.EditInfoReq{
+		Id:             infoID,
+		Title:          req.Title,
+		Content:        req.Content,
+		Tags:           req.Tags,
+		CanReview:      req.CanReview,
+		CoverResources: req.CoverResources,
+	})
 
 	if err != nil {
 		log.Error(err)
@@ -450,7 +639,7 @@ func (h *Content) FavThumb(ctx *gin.Context) {
 	}
 
 	//TODO: fill uid
-	var uid string
+	uid := "7791850604"
 	var err error
 	infoID := ctx.Param("id")
 	if strings.Contains(ctx.Request.RequestURI, "favorite") {
