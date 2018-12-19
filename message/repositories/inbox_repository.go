@@ -72,13 +72,13 @@ func (repo *inboxRepository) internalFindInBoxItems(uid string, itemType models.
 			}
 		}
 	}
-	pipeline := bson.D{
-		{"$match", bson.D{{"uid", uid}}},
-		{"$unwind", "$items"},
-		{"$match", dynFilter},
-		{"$skip", int64(size * page)},
-		{"$limit", int64(size)},
-		{"$sort", itemsSorts},
+	pipeline := mongo.Pipeline{
+		bson.D{{"$match", bson.D{{"uid", uid}}}},
+		bson.D{{"$unwind", "$items"}},
+		bson.D{{"$match", dynFilter}},
+		bson.D{{"$skip", int64(size * page)}},
+		bson.D{{"$limit", int64(size)}},
+		bson.D{{"$sort", itemsSorts}},
 	}
 
 	cur, err := repo.collections.Aggregate(repo.ctx, pipeline)
@@ -117,11 +117,11 @@ func (repo *inboxRepository) FindInBoxItem(uid string, id string) (models.InBoxI
 
 func (repo *inboxRepository) FindInBoxUnreadCount(uid string) (int64, error) {
 	var cur mongo.Cursor
-	pipeline := bson.D{
-		{"$match", bson.D{{"uid", uid}}},
-		{"$unwind", "$items"},
-		{"$match", bson.D{{"items.unread", true}}},
-		{"$count", "count"},
+	pipeline := mongo.Pipeline{
+		bson.D{{"$match", bson.D{{"uid", uid}}}},
+		bson.D{{"$unwind", "$items"}},
+		bson.D{{"$match", bson.D{{"items.unread", true}}}},
+		bson.D{{"$count", "count"}},
 	}
 
 	repo.collections.Aggregate(repo.ctx, pipeline)

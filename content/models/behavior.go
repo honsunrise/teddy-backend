@@ -11,13 +11,13 @@ type BehaviorInfoItem struct {
 }
 
 type BehaviorUserItem struct {
-	UID  objectid.ObjectID `bson:"uid"`
-	Time time.Time         `bson:"time"`
+	UID  string    `bson:"uid"`
+	Time time.Time `bson:"time"`
 }
 
 type Behavior struct {
 	Id        objectid.ObjectID  `bson:"_id"`
-	UID       objectid.ObjectID  `bson:"uid"`
+	UID       string             `bson:"uid"`
 	FirstTime time.Time          `bson:"firstTime"`
 	LastTime  time.Time          `bson:"lastTime"`
 	Count     uint64             `bson:"count"`

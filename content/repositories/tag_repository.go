@@ -12,7 +12,7 @@ import (
 type TagRepository interface {
 	Insert(tag *models.Tag) error
 	FindOne(tag string) (models.Tag, error)
-	FindAll(page uint32, size uint32, sorts []types.Sort) ([]models.Tag, error)
+	FindAll(page uint32, size uint32, sorts []types.Sort) ([]*models.Tag, error)
 	IncUsage(tag string, inc uint64) error
 	UpdateLastUse(tag string, lastUse time.Time) error
 	DeleteOne(tag string) error
@@ -58,8 +58,12 @@ func (repo *tagRepository) FindOne(tag string) (models.Tag, error) {
 	return tagEntry, nil
 }
 
-func (repo *tagRepository) FindAll(page uint32, size uint32, sorts []types.Sort) ([]models.Tag, error) {
+func (repo *tagRepository) FindAll(page uint32, size uint32, sorts []types.Sort) ([]*models.Tag, error) {
 	var cur mongo.Cursor
+	pipeline := mongo.Pipeline{
+		bson.D{{"$skip", int64(size * page)}},
+		bson.D{{"$limit", int64(size)}},
+	}
 
 	var itemsSorts = make(bson.D, 0, len(sorts))
 	if len(sorts) != 0 {
@@ -70,14 +74,14 @@ func (repo *tagRepository) FindAll(page uint32, size uint32, sorts []types.Sort)
 				itemsSorts = append(itemsSorts, bson.E{Key: sort.Name, Value: -1})
 			}
 		}
+		pipeline = append(pipeline, bson.D{{"$sort", itemsSorts}})
 	}
-	pipeline := bson.D{
-		{"$skip", int64(size * page)},
-		{"$limit", int64(size)},
-		{"$sort", itemsSorts},
+
+	cur, err := repo.collections.Aggregate(repo.ctx, pipeline)
+	if err != nil {
+		return nil, err
 	}
-	repo.collections.Aggregate(repo.ctx, pipeline)
-	items := make([]models.Tag, 0, size)
+	items := make([]*models.Tag, 0, size)
 	defer cur.Close(repo.ctx)
 	for cur.Next(repo.ctx) {
 		var item models.Tag
@@ -85,9 +89,9 @@ func (repo *tagRepository) FindAll(page uint32, size uint32, sorts []types.Sort)
 		if err != nil {
 			return nil, err
 		}
-		items = append(items, item)
+		items = append(items, &item)
 	}
-	err := cur.Err()
+	err = cur.Err()
 	if err != nil {
 		return nil, err
 	}

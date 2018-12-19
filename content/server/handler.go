@@ -48,12 +48,14 @@ func (h *contentHandler) GetTags(ctx context.Context, req *proto.GetTagReq) (*pr
 		return nil, err
 	}
 
+	result := make([]*proto.Tag, 0, len(tags))
 	for _, tag := range tags {
 		pbTag := &proto.Tag{}
-		converter.CopyFromTagToPBTag(&tag, pbTag)
-		resp.Tags = append(resp.Tags, pbTag)
+		converter.CopyFromTagToPBTag(tag, pbTag)
+		result = append(result, pbTag)
 	}
 
+	resp.Tags = result
 	return &resp, nil
 }
 
@@ -63,20 +65,15 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *proto.PublishInfo
 		return nil, err
 	}
 
-	uid, err := objectid.FromHex(req.Uid)
-	if err != nil {
-		return nil, err
-	}
-
 	now := time.Now()
 	info := models.Info{
 		Id:             objectid.New(),
-		UID:            uid,
+		UID:            req.Uid,
 		Title:          req.Title,
 		Content:        req.Content,
 		CoverResources: req.CoverResources,
 		PublishTime:    now,
-		LastReviewTime: nil,
+		LastReviewTime: time.Now(),
 		Valid:          true,
 		WatchCount:     0,
 		Tags:           req.Tags,
@@ -90,7 +87,7 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *proto.PublishInfo
 		CanReview:      req.CanReview,
 	}
 
-	err = h.infoRepo.Insert(&info)
+	err := h.infoRepo.Insert(&info)
 	if err != nil {
 		return nil, err
 	}
@@ -107,13 +104,67 @@ func (h *contentHandler) EditInfo(ctx context.Context, req *proto.EditInfoReq) (
 	return &resp, nil
 }
 
+func (h *contentHandler) GetInfo(ctx context.Context, req *proto.GetInfoReq) (*proto.Info, error) {
+	if err := validateGetInfoReq(req); err != nil {
+		return nil, err
+	}
+
+	infoID, err := objectid.FromHex(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	info, err := h.infoRepo.FindOne(infoID)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := proto.Info{
+		Id:      info.Id.Hex(),
+		Uid:     info.UID,
+		Title:   info.Title,
+		Content: info.Content,
+		ContentTime: &timestamp.Timestamp{
+			Seconds: info.ContentTime.Unix(),
+			Nanos:   int32(info.ContentTime.Nanosecond()),
+		},
+		CoverResources: info.CoverResources,
+		PublishTime: &timestamp.Timestamp{
+			Seconds: info.PublishTime.Unix(),
+			Nanos:   int32(info.PublishTime.Nanosecond()),
+		},
+		LastReviewTime: &timestamp.Timestamp{
+			Seconds: info.LastReviewTime.Unix(),
+			Nanos:   int32(info.LastReviewTime.Nanosecond()),
+		},
+		Valid:         info.Valid,
+		WatchCount:    info.WatchCount,
+		Tags:          info.Tags,
+		ThumbUp:       info.ThumbUp,
+		IsThumbUp:     info.IsThumbUp,
+		ThumbUpList:   info.ThumbUpList,
+		ThumbDown:     info.ThumbDown,
+		IsThumbDown:   info.IsThumbDown,
+		ThumbDownList: info.ThumbDownList,
+		Favorites:     info.Favorites,
+		IsFavorite:    info.IsFavorite,
+		FavoriteList:  info.FavoriteList,
+		LastModifyTime: &timestamp.Timestamp{
+			Seconds: info.LastModifyTime.Unix(),
+			Nanos:   int32(info.LastModifyTime.Nanosecond()),
+		},
+		CanReview: info.CanReview,
+	}
+	return &resp, nil
+}
+
 func (h *contentHandler) GetInfos(ctx context.Context, req *proto.GetInfosReq) (*proto.GetInfosResp, error) {
 	var resp proto.GetInfosResp
 	if err := validateGetInfosReq(req); err != nil {
 		return nil, err
 	}
 
-	var infos []models.Info
+	var infos []*models.Info
 	var err error
 
 	if req.Uid != "" && req.Title == "" {
@@ -133,7 +184,7 @@ func (h *contentHandler) GetInfos(ctx context.Context, req *proto.GetInfosReq) (
 	for _, info := range infos {
 		results = append(results, &proto.Info{
 			Id:      info.Id.Hex(),
-			Uid:     info.UID.Hex(),
+			Uid:     info.UID,
 			Title:   info.Title,
 			Content: info.Content,
 			ContentTime: &timestamp.Timestamp{
@@ -216,17 +267,12 @@ func (h *contentHandler) _behaviorInsert(ctx context.Context,
 		return nil, err
 	}
 
-	uid, err := objectid.FromHex(req.Uid)
-	if err != nil {
-		return nil, err
-	}
-
 	infoID, err := objectid.FromHex(req.InfoID)
 	if err != nil {
 		return nil, err
 	}
 
-	err = repo.Insert(uid, &models.BehaviorInfoItem{
+	err = repo.Insert(req.Uid, &models.BehaviorInfoItem{
 		InfoId: infoID,
 		Time:   time.Now(),
 	})
@@ -245,12 +291,7 @@ func (h *contentHandler) _behaviorFindInfoByUser(ctx context.Context,
 		return nil, err
 	}
 
-	uid, err := objectid.FromHex(req.Uid)
-	if err != nil {
-		return nil, err
-	}
-
-	items, err := repo.FindInfoByUser(uid, req.Page, req.Size, req.Sorts)
+	items, err := repo.FindInfoByUser(req.Uid, req.Page, req.Size, req.Sorts)
 
 	if err != nil {
 		return nil, err
@@ -291,7 +332,7 @@ func (h *contentHandler) _behaviorFindUserByInfo(ctx context.Context,
 	results := make([]*proto.UIDWithTime, 0, len(items))
 	for _, item := range items {
 		results = append(results, &proto.UIDWithTime{
-			Uid: item.UID.Hex(),
+			Uid: item.UID,
 			Time: &timestamp.Timestamp{
 				Seconds: item.Time.Unix(),
 				Nanos:   int32(item.Time.Nanosecond()),
@@ -299,6 +340,25 @@ func (h *contentHandler) _behaviorFindUserByInfo(ctx context.Context,
 		})
 	}
 	resp.Items = results
+	return &resp, nil
+}
+
+func (h *contentHandler) _behaviorDelete(ctx context.Context,
+	repo repositories.BehaviorRepository, req *proto.InfoIDAndUIDReq) (*empty.Empty, error) {
+	var resp empty.Empty
+	if err := validateInfoIDAndUIDReq(req); err != nil {
+		return nil, err
+	}
+
+	infoID, err := objectid.FromHex(req.InfoID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = repo.Delete(req.Uid, infoID)
+	if err != nil {
+		return nil, err
+	}
 	return &resp, nil
 }
 
@@ -326,7 +386,15 @@ func (h *contentHandler) GetInfoThumbDown(ctx context.Context, req *proto.InfoID
 	return h._behaviorFindUserByInfo(ctx, h.thumbDownRepo, req)
 }
 
-func (h *contentHandler) FavoriteInfo(ctx context.Context, req *proto.InfoIDAndUIDReq) (*empty.Empty, error) {
+func (h *contentHandler) DeleteThumbUp(ctx context.Context, req *proto.InfoIDAndUIDReq) (*empty.Empty, error) {
+	return h._behaviorDelete(ctx, h.thumbUpRepo, req)
+}
+
+func (h *contentHandler) DeleteThumbDown(ctx context.Context, req *proto.InfoIDAndUIDReq) (*empty.Empty, error) {
+	return h._behaviorDelete(ctx, h.thumbDownRepo, req)
+}
+
+func (h *contentHandler) Favorite(ctx context.Context, req *proto.InfoIDAndUIDReq) (*empty.Empty, error) {
 	return h._behaviorInsert(ctx, h.favoriteRepo, req)
 }
 
@@ -336,4 +404,8 @@ func (h *contentHandler) GetUserFavorite(ctx context.Context, req *proto.UIDPage
 
 func (h *contentHandler) GetInfoFavorite(ctx context.Context, req *proto.InfoIDPageReq) (*proto.UserIDsResp, error) {
 	return h._behaviorFindUserByInfo(ctx, h.favoriteRepo, req)
+}
+
+func (h *contentHandler) DeleteFavorite(ctx context.Context, req *proto.InfoIDAndUIDReq) (*empty.Empty, error) {
+	return h._behaviorDelete(ctx, h.favoriteRepo, req)
 }

@@ -53,8 +53,24 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	favoriteRepo, err := repositories.NewFavoriteRepository(mongodbClient)
+	if err != nil {
+		log.Fatal(err)
+	}
+	tagsRepo, err := repositories.NewTagRepository(mongodbClient)
+	if err != nil {
+		log.Fatal(err)
+	}
+	thumbUpRepo, err := repositories.NewThumbUpRepository(mongodbClient)
+	if err != nil {
+		log.Fatal(err)
+	}
+	thumbDownRepo, err := repositories.NewThumbDownRepository(mongodbClient)
+	if err != nil {
+		log.Fatal(err)
+	}
 	// New Handler
-	accountHandler, err := server.NewContentServer(accountRepo)
+	accountHandler, err := server.NewContentServer(accountRepo, tagsRepo, favoriteRepo, thumbUpRepo, thumbDownRepo)
 	if err != nil {
 		log.Fatal(err)
 	}

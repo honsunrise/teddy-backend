@@ -14,6 +14,10 @@ func validateEditInfoReq(req *proto.EditInfoReq) error {
 	return nil
 }
 
+func validateGetInfoReq(req *proto.GetInfoReq) error {
+	return nil
+}
+
 func validateGetInfosReq(req *proto.GetInfosReq) error {
 	return nil
 }

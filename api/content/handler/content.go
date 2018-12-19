@@ -11,6 +11,35 @@ import (
 	"strings"
 )
 
+func buildSort(sort string) ([]*proto.Sort, error) {
+	rawSorts := strings.Split(sort, ",")
+	sorts := make([]*proto.Sort, 0, len(rawSorts))
+	for _, item := range rawSorts {
+		nameAndOrder := strings.Split(item, ":")
+		if len(nameAndOrder) == 1 {
+			sorts = append(sorts, &proto.Sort{
+				Name: nameAndOrder[0],
+				Asc:  false,
+			})
+		} else if len(nameAndOrder) == 2 {
+			if strings.ToUpper(nameAndOrder[1]) == "ASC" {
+				sorts = append(sorts, &proto.Sort{
+					Name: nameAndOrder[0],
+					Asc:  true,
+				})
+			} else if strings.ToUpper(nameAndOrder[1]) == "DESC" {
+				sorts = append(sorts, &proto.Sort{
+					Name: nameAndOrder[0],
+					Asc:  false,
+				})
+			} else {
+				return nil, errors.ErrOrderNotCorrect
+			}
+		}
+	}
+	return sorts, nil
+}
+
 type Content struct {
 }
 
@@ -81,31 +110,13 @@ func (h *Content) GetAllTags(ctx *gin.Context) {
 		return
 	}
 
-	rawSofts := strings.Split(ctx.Query("sort"), ",")
-	sorts := make([]*proto.Sort, 0, len(rawSofts))
-	for _, item := range rawSofts {
-		nameAndOrder := strings.Split(item, ":")
-		if len(nameAndOrder) == 1 {
-			sorts = append(sorts, &proto.Sort{
-				Name: nameAndOrder[0],
-				Asc:  false,
-			})
-		} else if len(nameAndOrder) == 2 {
-			if strings.ToUpper(nameAndOrder[1]) == "asc" {
-				sorts = append(sorts, &proto.Sort{
-					Name: nameAndOrder[0],
-					Asc:  true,
-				})
-			} else if strings.ToUpper(nameAndOrder[1]) == "desc" {
-				sorts = append(sorts, &proto.Sort{
-					Name: nameAndOrder[0],
-					Asc:  false,
-				})
-			} else {
-				log.Error(errors.ErrOrderNotCorrect)
-				ctx.AbortWithError(http.StatusInternalServerError, errors.ErrOrderNotCorrect)
-				return
-			}
+	var sorts []*proto.Sort
+	if ctx.Query("sort") != "" {
+		sorts, err = buildSort(ctx.Query("sort"))
+		if err != nil {
+			log.Error(errors.ErrOrderNotCorrect)
+			ctx.AbortWithError(http.StatusInternalServerError, errors.ErrOrderNotCorrect)
+			return
 		}
 	}
 
@@ -145,31 +156,13 @@ func (h *Content) GetAllContents(ctx *gin.Context) {
 		return
 	}
 
-	rawSofts := strings.Split(ctx.Query("sort"), ",")
-	sorts := make([]*proto.Sort, 0, len(rawSofts))
-	for _, item := range rawSofts {
-		nameAndOrder := strings.Split(item, ":")
-		if len(nameAndOrder) == 1 {
-			sorts = append(sorts, &proto.Sort{
-				Name: nameAndOrder[0],
-				Asc:  false,
-			})
-		} else if len(nameAndOrder) == 2 {
-			if strings.ToUpper(nameAndOrder[1]) == "asc" {
-				sorts = append(sorts, &proto.Sort{
-					Name: nameAndOrder[0],
-					Asc:  true,
-				})
-			} else if strings.ToUpper(nameAndOrder[1]) == "desc" {
-				sorts = append(sorts, &proto.Sort{
-					Name: nameAndOrder[0],
-					Asc:  false,
-				})
-			} else {
-				log.Error(errors.ErrOrderNotCorrect)
-				ctx.AbortWithError(http.StatusInternalServerError, errors.ErrOrderNotCorrect)
-				return
-			}
+	var sorts []*proto.Sort
+	if ctx.Query("sort") != "" {
+		sorts, err = buildSort(ctx.Query("sort"))
+		if err != nil {
+			log.Error(errors.ErrOrderNotCorrect)
+			ctx.AbortWithError(http.StatusInternalServerError, errors.ErrOrderNotCorrect)
+			return
 		}
 	}
 
@@ -340,31 +333,13 @@ func (h *Content) GetUserFavThumb(ctx *gin.Context) {
 		return
 	}
 
-	rawSofts := strings.Split(ctx.Query("sort"), ",")
-	sorts := make([]*proto.Sort, 0, len(rawSofts))
-	for _, item := range rawSofts {
-		nameAndOrder := strings.Split(item, ":")
-		if len(nameAndOrder) == 1 {
-			sorts = append(sorts, &proto.Sort{
-				Name: nameAndOrder[0],
-				Asc:  false,
-			})
-		} else if len(nameAndOrder) == 2 {
-			if strings.ToUpper(nameAndOrder[1]) == "asc" {
-				sorts = append(sorts, &proto.Sort{
-					Name: nameAndOrder[0],
-					Asc:  true,
-				})
-			} else if strings.ToUpper(nameAndOrder[1]) == "desc" {
-				sorts = append(sorts, &proto.Sort{
-					Name: nameAndOrder[0],
-					Asc:  false,
-				})
-			} else {
-				log.Error(errors.ErrOrderNotCorrect)
-				ctx.AbortWithError(http.StatusInternalServerError, errors.ErrOrderNotCorrect)
-				return
-			}
+	var sorts []*proto.Sort
+	if ctx.Query("sort") != "" {
+		sorts, err = buildSort(ctx.Query("sort"))
+		if err != nil {
+			log.Error(errors.ErrOrderNotCorrect)
+			ctx.AbortWithError(http.StatusInternalServerError, errors.ErrOrderNotCorrect)
+			return
 		}
 	}
 
@@ -423,31 +398,13 @@ func (h *Content) GetInfoFavThumb(ctx *gin.Context) {
 		return
 	}
 
-	rawSofts := strings.Split(ctx.Query("sort"), ",")
-	sorts := make([]*proto.Sort, 0, len(rawSofts))
-	for _, item := range rawSofts {
-		nameAndOrder := strings.Split(item, ":")
-		if len(nameAndOrder) == 1 {
-			sorts = append(sorts, &proto.Sort{
-				Name: nameAndOrder[0],
-				Asc:  false,
-			})
-		} else if len(nameAndOrder) == 2 {
-			if strings.ToUpper(nameAndOrder[1]) == "asc" {
-				sorts = append(sorts, &proto.Sort{
-					Name: nameAndOrder[0],
-					Asc:  true,
-				})
-			} else if strings.ToUpper(nameAndOrder[1]) == "desc" {
-				sorts = append(sorts, &proto.Sort{
-					Name: nameAndOrder[0],
-					Asc:  false,
-				})
-			} else {
-				log.Error(errors.ErrOrderNotCorrect)
-				ctx.AbortWithError(http.StatusInternalServerError, errors.ErrOrderNotCorrect)
-				return
-			}
+	var sorts []*proto.Sort
+	if ctx.Query("sort") != "" {
+		sorts, err = buildSort(ctx.Query("sort"))
+		if err != nil {
+			log.Error(errors.ErrOrderNotCorrect)
+			ctx.AbortWithError(http.StatusInternalServerError, errors.ErrOrderNotCorrect)
+			return
 		}
 	}
 

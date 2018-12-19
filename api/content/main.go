@@ -39,8 +39,8 @@ func main() {
 
 	// Create RESTful server (using Gin)
 	router := gin.Default()
-	router.Use(clients.ContentNew())
-	router.Use(clients.CaptchaNew())
+	router.Use(clients.ContentNew(contentSrvAddrFunc))
+	router.Use(clients.CaptchaNew(captchaSrvAddrFunc))
 	content.HandlerNormal(router.Group("/v1/anon/content"))
 	content.HandlerAuth(router.Group("/v1/auth/content"))
 	content.HandlerHealth(router)

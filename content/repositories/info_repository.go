@@ -13,11 +13,12 @@ import (
 type InfoRepository interface {
 	Insert(info *models.Info) error
 	IncWatchCount(id objectid.ObjectID, count int64) error
-	FindAll(page uint32, size uint32, sorts []*proto.Sort) ([]models.Info, error)
-	FindByTags(tags []string, page uint32, size uint32, sorts []*proto.Sort) ([]models.Info, error)
-	FindByUser(uid string, page uint32, size uint32, sorts []*proto.Sort) ([]models.Info, error)
-	FindByTitle(title string, page uint32, size uint32, sorts []*proto.Sort) ([]models.Info, error)
-	FindByTitleAndUser(title string, uid string, page uint32, size uint32, sorts []*proto.Sort) ([]models.Info, error)
+	FindOne(id objectid.ObjectID) (*models.Info, error)
+	FindAll(page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error)
+	FindByTags(tags []string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error)
+	FindByUser(uid string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error)
+	FindByTitle(title string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error)
+	FindByTitleAndUser(title string, uid string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error)
 	Delete(id objectid.ObjectID) error
 	Update(id objectid.ObjectID, fields map[string]interface{}) error
 }
@@ -63,9 +64,22 @@ func (repo *infoRepository) IncWatchCount(id objectid.ObjectID, count int64) err
 	return nil
 }
 
+func (repo *infoRepository) FindOne(id objectid.ObjectID) (*models.Info, error) {
+	var info models.Info
+	filter := bson.D{{"_id", id}}
+	err := repo.collections.FindOne(repo.ctx, filter).Decode(&info)
+	if err != nil {
+		return nil, err
+	}
+	return &info, nil
+}
+
 func (repo *infoRepository) internalFindInfo(uid string, title string, tags []string, page uint32,
-	size uint32, sorts []*proto.Sort) ([]models.Info, error) {
+	size uint32, sorts []*proto.Sort) ([]*models.Info, error) {
 	var cur mongo.Cursor
+
+	pipeline := mongo.Pipeline{}
+
 	var dynFilter = make(bson.D, 0, 3)
 	if uid != "" {
 		dynFilter = append(dynFilter, bson.E{Key: "uid", Value: uid})
@@ -76,6 +90,12 @@ func (repo *infoRepository) internalFindInfo(uid string, title string, tags []st
 	if title != "" {
 		dynFilter = append(dynFilter, bson.E{Key: "$text", Value: bson.D{{"$search", title}}})
 	}
+	if len(dynFilter) != 0 {
+		pipeline = append(pipeline, bson.D{{"$match", dynFilter}})
+	}
+
+	pipeline = append(pipeline, bson.D{{"$skip", int64(size * page)}})
+	pipeline = append(pipeline, bson.D{{"$limit", int64(size)}})
 
 	var itemsSorts = make(bson.D, 0, len(sorts))
 	if len(sorts) != 0 {
@@ -86,26 +106,22 @@ func (repo *infoRepository) internalFindInfo(uid string, title string, tags []st
 				itemsSorts = append(itemsSorts, bson.E{Key: sort.Name, Value: -1})
 			}
 		}
+		pipeline = append(pipeline, bson.D{{"$sort", itemsSorts}})
 	}
-	pipeline := bson.D{
-		{"$match", dynFilter},
-		{"$skip", int64(size * page)},
-		{"$limit", int64(size)},
-		{"$sort", itemsSorts},
-	}
+
 	cur, err := repo.collections.Aggregate(repo.ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	defer cur.Close(repo.ctx)
-	items := make([]models.Info, 0, size)
+	items := make([]*models.Info, 0, size)
 	for cur.Next(repo.ctx) {
 		var item models.Info
 		err := cur.Decode(&item)
 		if err != nil {
 			return nil, err
 		}
-		items = append(items, item)
+		items = append(items, &item)
 	}
 	err = cur.Err()
 	if err != nil {
@@ -114,23 +130,23 @@ func (repo *infoRepository) internalFindInfo(uid string, title string, tags []st
 	return items, nil
 }
 
-func (repo *infoRepository) FindAll(page uint32, size uint32, sorts []*proto.Sort) ([]models.Info, error) {
+func (repo *infoRepository) FindAll(page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error) {
 	return repo.internalFindInfo("", "", nil, page, size, sorts)
 }
 
-func (repo *infoRepository) FindByTags(tags []string, page uint32, size uint32, sorts []*proto.Sort) ([]models.Info, error) {
+func (repo *infoRepository) FindByTags(tags []string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error) {
 	return repo.internalFindInfo("", "", tags, page, size, sorts)
 }
 
-func (repo *infoRepository) FindByUser(uid string, page uint32, size uint32, sorts []*proto.Sort) ([]models.Info, error) {
+func (repo *infoRepository) FindByUser(uid string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error) {
 	return repo.internalFindInfo(uid, "", nil, page, size, sorts)
 }
 
-func (repo *infoRepository) FindByTitle(title string, page uint32, size uint32, sorts []*proto.Sort) ([]models.Info, error) {
+func (repo *infoRepository) FindByTitle(title string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error) {
 	return repo.internalFindInfo("", title, nil, page, size, sorts)
 }
 
-func (repo *infoRepository) FindByTitleAndUser(title string, uid string, page uint32, size uint32, sorts []*proto.Sort) ([]models.Info, error) {
+func (repo *infoRepository) FindByTitleAndUser(title string, uid string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error) {
 	return repo.internalFindInfo(uid, title, nil, page, size, sorts)
 }
 

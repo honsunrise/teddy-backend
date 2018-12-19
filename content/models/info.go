@@ -9,7 +9,7 @@ type InfoType uint32
 
 type Info struct {
 	Id             objectid.ObjectID `bson:"_id"`
-	UID            objectid.ObjectID `bson:"uid"`
+	UID            string            `bson:"uid"`
 	Title          string            `bson:"title"`
 	Content        string            `bson:"content"`
 	ContentTime    time.Time         `bson:"contentTime"`
