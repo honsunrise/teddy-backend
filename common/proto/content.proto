@@ -46,7 +46,7 @@ message Tag {
 
 message Info {
     string uid = 1;
-    string id = 2;
+    string infoID = 2;
     string title = 3;
     string content = 5;
     google.protobuf.Timestamp contentTime = 6;
@@ -97,7 +97,7 @@ message PublishInfoReq {
 }
 
 message EditInfoReq {
-    string id = 1;
+    string infoID = 1;
     string uid = 2;
     string title = 3;
     string content = 4;
@@ -107,7 +107,8 @@ message EditInfoReq {
 }
 
 message GetInfoReq {
-   string id = 1;
+   string infoID = 1;
+   string uid = 2;
 }
 
 message GetInfosReq {
