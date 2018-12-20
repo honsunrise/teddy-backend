@@ -1,48 +1,41 @@
 package converter
 
 import (
-	"github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/zhsyourai/teddy-backend/common/proto"
 	"github.com/zhsyourai/teddy-backend/uaa/models"
-	"time"
 )
 
-func CopyFromAccountToPBAccount(acc *models.Account, pbacc *proto.Account) {
+func CopyFromAccountToPBAccount(acc *models.Account, pbacc *proto.Account) error {
 	if acc == nil || pbacc == nil {
-		return
+		return nil
 	}
 	pbacc.Uid = acc.UID
 	pbacc.Username = acc.Username
 	pbacc.Email = acc.Email
 	pbacc.Password = acc.Password
-	pbacc.AccountExpired = acc.AccountExpired
-	pbacc.AccountLocked = acc.AccountLocked
+	pbacc.Locked = acc.Locked
 	pbacc.CredentialsExpired = acc.CredentialsExpired
 	pbacc.Roles = acc.Roles
-	pbacc.OauthUserIds = acc.OAuthUserIds
-	pbacc.CreateDate = &timestamp.Timestamp{
-		Seconds: acc.CreateDate.Unix(),
-		Nanos:   int32(acc.CreateDate.Nanosecond()),
-	}
-	pbacc.UpdateDate = &timestamp.Timestamp{
-		Seconds: acc.UpdateDate.Unix(),
-		Nanos:   int32(acc.UpdateDate.Nanosecond()),
-	}
-}
+	pbacc.OauthUIDs = acc.OAuthUIds
+	pbacc.LastSignInIP = acc.LastSignInIP
 
-func CopyFromPBAccountToAccount(pbacc *proto.Account, acc *models.Account) {
-	if acc == nil || pbacc == nil {
-		return
+	tmp, err := ptypes.TimestampProto(acc.CreateDate)
+	if err != nil {
+		return err
 	}
-	acc.UID = pbacc.Uid
-	acc.Username = pbacc.Username
-	acc.Email = pbacc.Email
-	acc.Password = pbacc.Password
-	acc.AccountExpired = pbacc.AccountExpired
-	acc.AccountLocked = pbacc.AccountLocked
-	acc.CredentialsExpired = pbacc.CredentialsExpired
-	acc.Roles = pbacc.Roles
-	acc.OAuthUserIds = pbacc.OauthUserIds
-	acc.CreateDate = time.Unix(pbacc.CreateDate.Seconds, int64(pbacc.CreateDate.Nanos))
-	acc.UpdateDate = time.Unix(pbacc.UpdateDate.Seconds, int64(pbacc.UpdateDate.Nanos))
+	pbacc.CreateDate = tmp
+
+	tmp, err = ptypes.TimestampProto(acc.UpdateDate)
+	if err != nil {
+		return err
+	}
+	pbacc.UpdateDate = tmp
+
+	tmp, err = ptypes.TimestampProto(acc.LastSignInTime)
+	if err != nil {
+		return err
+	}
+	pbacc.LastSignInTime = tmp
+	return nil
 }

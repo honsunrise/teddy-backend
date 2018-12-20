@@ -2,7 +2,10 @@ package server
 
 import (
 	"context"
+	"errors"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/mongodb/mongo-go-driver/mongo"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/proto"
 	"github.com/zhsyourai/teddy-backend/uaa/components"
@@ -25,8 +28,8 @@ type accountHandler struct {
 	uidGen components.UidGenerator
 }
 
-func (h *accountHandler) GetAll(context.Context, *empty.Empty) (*proto.GetAllResp, error) {
-	accounts, err := h.repo.FindAll()
+func (h *accountHandler) GetAll(ctx context.Context, req *proto.GetAllReq) (*proto.GetAllResp, error) {
+	accounts, err := h.repo.FindAll(req.Page, req.Size, req.Sorts)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -42,12 +45,12 @@ func (h *accountHandler) GetAll(context.Context, *empty.Empty) (*proto.GetAllRes
 	return &resp, nil
 }
 
-func (h *accountHandler) GetByEmail(ctx context.Context, req *proto.GetByEmailReq) (*proto.Account, error) {
-	if err := validateGetByEmailReq(req); err != nil {
+func (h *accountHandler) GetOne(ctx context.Context, req *proto.GetOneReq) (*proto.Account, error) {
+	if err := validateGetOneReq(req); err != nil {
 		return nil, err
 	}
 
-	acc, err := h.repo.FindAccountByEmail(req.GetEmail())
+	acc, err := h.repo.FindOne(req.GetPrincipal())
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -57,62 +60,29 @@ func (h *accountHandler) GetByEmail(ctx context.Context, req *proto.GetByEmailRe
 	return &resp, nil
 }
 
-func (h *accountHandler) GetByPhone(ctx context.Context, req *proto.GetByPhoneReq) (*proto.Account, error) {
-	if err := validateGetByPhoneReq(req); err != nil {
+func (h *accountHandler) RegisterByNormal(ctx context.Context, req *proto.RegisterNormalReq) (*proto.Account, error) {
+	if err := validateRegisterNormalReq(req); err != nil {
 		return nil, err
 	}
 
-	acc, err := h.repo.FindAccountByPhone(req.GetPhone())
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	var resp proto.Account
-	converter.CopyFromAccountToPBAccount(acc, &resp)
-	return &resp, nil
-}
-
-func (h *accountHandler) GetByUsername(ctx context.Context, req *proto.GetByUsernameReq) (*proto.Account, error) {
-	if err := validateGetByUsernameReq(req); err != nil {
-		return nil, err
+	_, err := h.repo.FindOne(req.GetUsername())
+	if err != mongo.ErrNoDocuments {
+		return nil, ErrAccountExist
 	}
 
-	acc, err := h.repo.FindAccountByUsername(req.GetUsername())
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	var resp proto.Account
-	converter.CopyFromAccountToPBAccount(acc, &resp)
-	return &resp, nil
-}
-
-func (h *accountHandler) DeleteByUsername(ctx context.Context, req *proto.DeleteByUsernameReq) (*empty.Empty, error) {
-	if err := validateDeleteByUsernameReq(req); err != nil {
-		return nil, err
+	_, err = h.repo.FindOne(req.GetEmail())
+	if err != mongo.ErrNoDocuments {
+		return nil, ErrAccountExist
 	}
 
-	err := h.repo.DeleteAccountByUsername(req.GetUsername())
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	var resp empty.Empty
-	return &resp, nil
-}
-
-func (h *accountHandler) Register(ctx context.Context, req *proto.RegisterReq) (*proto.Account, error) {
-	if err := validateRegisterReq(req); err != nil {
-		return nil, err
-	}
-
-	tmpAccount, err := h.repo.FindAccountByUsername(req.GetUsername())
-	if err == nil && tmpAccount != nil {
+	_, err = h.repo.FindOne(req.GetPhone())
+	if err != mongo.ErrNoDocuments {
 		return nil, ErrAccountExist
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.GetPassword()), bcrypt.DefaultCost)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	uid, err := h.uidGen.NexID()
@@ -127,11 +97,17 @@ func (h *accountHandler) Register(ctx context.Context, req *proto.RegisterReq) (
 	account.Password = hashedPassword
 	account.Roles = req.GetRoles()
 	account.CreateDate = time.Now()
-	account.OAuthUserIds = make(map[string]string)
-	account.Email = req.Email
+	account.OAuthUIds = make(map[string]string)
 	account.CredentialsExpired = false
-	account.AccountLocked = false
-	account.AccountExpired = false
+	account.Locked = false
+
+	if x, ok := req.GetContact().(*proto.RegisterNormalReq_Email); ok {
+		account.Email = x.Email
+	} else if x, ok := req.GetContact().(*proto.RegisterNormalReq_Phone); ok {
+		account.Phone = x.Phone
+	} else {
+		panic(errors.New("never happen"))
+	}
 
 	err = h.repo.InsertAccount(&account)
 	if err != nil {
@@ -143,12 +119,16 @@ func (h *accountHandler) Register(ctx context.Context, req *proto.RegisterReq) (
 	return &resp, nil
 }
 
-func (h *accountHandler) VerifyPassword(ctx context.Context, req *proto.VerifyPasswordReq) (*proto.Account, error) {
+func (h *accountHandler) RegisterByOAuth(ctx context.Context, req *proto.RegisterOAuthReq) (*proto.Account, error) {
+	panic("implement me")
+}
+
+func (h *accountHandler) VerifyPassword(ctx context.Context, req *proto.VerifyAccountReq) (*proto.Account, error) {
 	if err := validateVerifyPasswordReq(req); err != nil {
 		return nil, err
 	}
 
-	acc, err := h.repo.FindAccountByUsername(req.GetUsername())
+	acc, err := h.repo.FindOne(req.GetPrincipal())
 	if err != nil {
 		log.Error(err)
 		return nil, UserNotFoundErr
@@ -163,12 +143,63 @@ func (h *accountHandler) VerifyPassword(ctx context.Context, req *proto.VerifyPa
 	return &resp, nil
 }
 
+func (h *accountHandler) DeleteOne(ctx context.Context, req *proto.UIDReq) (*empty.Empty, error) {
+	if err := validateUIDReq(req); err != nil {
+		return nil, err
+	}
+
+	err := h.repo.DeleteOne(req.GetUid())
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	var resp empty.Empty
+	return &resp, nil
+}
+
+func (h *accountHandler) DoLockAccount(ctx context.Context, req *proto.UIDReq) (*empty.Empty, error) {
+	panic("implement me")
+}
+
+func (h *accountHandler) DoCredentialsExpired(ctx context.Context, req *proto.UIDReq) (*empty.Empty, error) {
+	panic("implement me")
+}
+
+func (h *accountHandler) UpdateSignIn(ctx context.Context, req *proto.UpdateSignInReq) (*empty.Empty, error) {
+	if err := validateUpdateSignInReq(req); err != nil {
+		return nil, err
+	}
+
+	acc, err := h.repo.FindOne(req.GetPrincipal())
+	if err != nil {
+		log.Error(err)
+		return nil, UserNotFoundErr
+	}
+
+	lastSignInTime, err := ptypes.Timestamp(req.Time)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	err = h.repo.UpdateOne(acc.UID, map[string]interface{}{
+		"last_sign_in_ip":   req.Ip,
+		"last_sign_in_time": lastSignInTime,
+	})
+	if err != nil {
+		log.Error(err)
+		return nil, PasswordModifyErr
+	}
+	var resp empty.Empty
+	return &resp, nil
+}
+
 func (h *accountHandler) ChangePassword(ctx context.Context, req *proto.ChangePasswordReq) (*empty.Empty, error) {
 	if err := validateChangePasswordReq(req); err != nil {
 		return nil, err
 	}
 
-	acc, err := h.repo.FindAccountByUsername(req.GetUsername())
+	acc, err := h.repo.FindOne(req.GetPrincipal())
 	if err != nil {
 		log.Error(err)
 		return nil, UserNotFoundErr
@@ -183,7 +214,7 @@ func (h *accountHandler) ChangePassword(ctx context.Context, req *proto.ChangePa
 		log.Error(err)
 		return nil, PasswordModifyErr
 	}
-	err = h.repo.UpdateAccountByUsername(req.GetUsername(), map[string]interface{}{
+	err = h.repo.UpdateOne(acc.UID, map[string]interface{}{
 		"password": hashedPassword,
 	})
 	if err != nil {

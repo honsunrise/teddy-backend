@@ -53,7 +53,6 @@ func (repo *tagRepository) FindOne(tag string) (*models.Tag, error) {
 }
 
 func (repo *tagRepository) FindAll(page uint32, size uint32, sorts []types.Sort) ([]*models.Tag, error) {
-	var cur mongo.Cursor
 	pipeline := mongo.Pipeline{
 		bson.D{{"$skip", int64(size * page)}},
 		bson.D{{"$limit", int64(size)}},

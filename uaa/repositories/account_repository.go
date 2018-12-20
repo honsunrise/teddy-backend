@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
+	"github.com/zhsyourai/teddy-backend/common/proto"
 	"github.com/zhsyourai/teddy-backend/uaa/models"
 )
 
@@ -12,12 +13,10 @@ var ErrUpdateAccount = errors.New("uaa update error")
 
 type AccountRepository interface {
 	InsertAccount(account *models.Account) error
-	FindAccountByUsername(username string) (*models.Account, error)
-	FindAccountByEmail(username string) (*models.Account, error)
-	FindAccountByPhone(username string) (*models.Account, error)
-	FindAll() ([]*models.Account, error)
-	DeleteAccountByUsername(username string) error
-	UpdateAccountByUsername(username string, account map[string]interface{}) error
+	FindOne(principal string) (*models.Account, error)
+	FindAll(page, size uint32, sorts []*proto.Sort) ([]*models.Account, error)
+	DeleteOne(uid string) error
+	UpdateOne(uid string, account map[string]interface{}) error
 }
 
 func NewAccountRepository(client *mongo.Client) (AccountRepository, error) {
@@ -42,9 +41,14 @@ func (repo *accountRepository) InsertAccount(account *models.Account) error {
 	return nil
 }
 
-func (repo *accountRepository) FindAccountByUsername(username string) (*models.Account, error) {
+func (repo *accountRepository) FindOne(principal string) (*models.Account, error) {
 	var account models.Account
-	filter := bson.D{{"username", username}}
+	filter := bson.D{{"$or", bson.A{
+		bson.D{{"_id", principal}},
+		bson.D{{"username", principal}},
+		bson.D{{"email", principal}},
+		bson.D{{"phone", principal}},
+	}}}
 	err := repo.collections.FindOne(repo.ctx, filter).Decode(&account)
 	if err != nil {
 		return nil, err
@@ -72,10 +76,29 @@ func (repo *accountRepository) FindAccountByPhone(phone string) (*models.Account
 	return &account, nil
 }
 
-func (repo *accountRepository) FindAll() ([]*models.Account, error) {
-	accounts := make([]*models.Account, 0, 100)
-	var cur mongo.Cursor
-	cur, err := repo.collections.Find(repo.ctx, nil)
+func (repo *accountRepository) FindAll(page, size uint32, sorts []*proto.Sort) ([]*models.Account, error) {
+	pipeline := mongo.Pipeline{
+		bson.D{{"$skip", int64(size * page)}},
+		bson.D{{"$limit", int64(size)}},
+	}
+
+	var itemsSorts = make(bson.D, 0, len(sorts))
+	if len(sorts) != 0 {
+		for _, sort := range sorts {
+			if sort.Asc {
+				itemsSorts = append(itemsSorts, bson.E{Key: sort.Name, Value: 1})
+			} else {
+				itemsSorts = append(itemsSorts, bson.E{Key: sort.Name, Value: -1})
+			}
+		}
+		pipeline = append(pipeline, bson.D{{"$sort", itemsSorts}})
+	}
+
+	cur, err := repo.collections.Aggregate(repo.ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	accounts := make([]*models.Account, 0, size)
 	if err != nil {
 		return nil, err
 	}
@@ -92,8 +115,8 @@ func (repo *accountRepository) FindAll() ([]*models.Account, error) {
 	return accounts, nil
 }
 
-func (repo *accountRepository) DeleteAccountByUsername(username string) (err error) {
-	filter := bson.D{{"username", username}}
+func (repo *accountRepository) DeleteOne(uid string) (err error) {
+	filter := bson.D{{"_id", uid}}
 	_, err = repo.collections.DeleteOne(repo.ctx, filter)
 	if err != nil {
 		return
@@ -101,9 +124,9 @@ func (repo *accountRepository) DeleteAccountByUsername(username string) (err err
 	return
 }
 
-func (repo *accountRepository) UpdateAccountByUsername(username string,
+func (repo *accountRepository) UpdateOne(uid string,
 	fields map[string]interface{}) error {
-	filter := bson.D{{"username", username}}
+	filter := bson.D{{"_id", uid}}
 	var bsonFields = make(bson.D, 0, len(fields))
 	for k, v := range fields {
 		bsonFields = append(bsonFields, bson.E{Key: k, Value: v})
