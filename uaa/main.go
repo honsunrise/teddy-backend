@@ -14,7 +14,7 @@ import (
 	"context"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/common/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto/uaa"
 	"github.com/zhsyourai/teddy-backend/uaa/repositories"
 	"github.com/zhsyourai/teddy-backend/uaa/server"
 )
@@ -72,7 +72,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	proto.RegisterUAAServer(grpcServer, accountSrv)
+	uaa.RegisterUAAServer(grpcServer, accountSrv)
 
 	healthSrv := grpcHealth.NewServer()
 	grpc_health_v1.RegisterHealthServer(grpcServer, healthSrv)

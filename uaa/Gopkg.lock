@@ -139,19 +139,19 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f3e6afbbfaabbd05d129cb57f3bb2d95867bc22d7c73685caccc58e385577812"
+  digest = "1:3b3040699bdb2ec6cf4eddc70ca02f6d12067336b5056bb5618e690ea5f80c09"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "common/config",
     "common/config/coder/json",
     "common/config/coder/yaml",
     "common/config/source/file",
-    "common/proto",
+    "common/proto/uaa",
     "common/types",
     "common/utils",
   ]
   pruneopts = "UT"
-  revision = "b61aff1bc609f5b86fa513c384d055cc96f430f2"
+  revision = "a193c52d92ed945b29cb0757cdcaa56b43048812"
 
 [[projects]]
   branch = "master"
@@ -192,14 +192,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ba8cbf57cfd92d5f8592b4aca1a35d92c162363d32aeabd5b12555f8896635e7"
+  digest = "1:ba2c0719b7ca1fb531afa5aae9bda558846438a075f0e0282d3dffcd887de90d"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "074acd46bca67915925527c07849494d115e7c43"
+  revision = "7c4c994c65f702f41ed7d6620a2cb34107576a77"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -293,7 +293,7 @@
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/common/config",
     "github.com/zhsyourai/teddy-backend/common/config/source/file",
-    "github.com/zhsyourai/teddy-backend/common/proto",
+    "github.com/zhsyourai/teddy-backend/common/proto/uaa",
     "github.com/zhsyourai/teddy-backend/common/types",
     "github.com/zhsyourai/teddy-backend/common/utils",
     "golang.org/x/crypto/bcrypt",

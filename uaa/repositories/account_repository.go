@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/zhsyourai/teddy-backend/common/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto/uaa"
 	"github.com/zhsyourai/teddy-backend/uaa/models"
 )
 
@@ -14,7 +14,7 @@ var ErrUpdateAccount = errors.New("uaa update error")
 type AccountRepository interface {
 	InsertAccount(account *models.Account) error
 	FindOne(principal string) (*models.Account, error)
-	FindAll(page, size uint32, sorts []*proto.Sort) ([]*models.Account, error)
+	FindAll(page, size uint32, sorts []*uaa.Sort) ([]*models.Account, error)
 	DeleteOne(uid string) error
 	UpdateOne(uid string, account map[string]interface{}) error
 }
@@ -76,7 +76,7 @@ func (repo *accountRepository) FindAccountByPhone(phone string) (*models.Account
 	return &account, nil
 }
 
-func (repo *accountRepository) FindAll(page, size uint32, sorts []*proto.Sort) ([]*models.Account, error) {
+func (repo *accountRepository) FindAll(page, size uint32, sorts []*uaa.Sort) ([]*models.Account, error) {
 	pipeline := mongo.Pipeline{
 		bson.D{{"$skip", int64(size * page)}},
 		bson.D{{"$limit", int64(size)}},

@@ -1,12 +1,12 @@
-package converter
+package server
 
 import (
 	"github.com/golang/protobuf/ptypes"
-	"github.com/zhsyourai/teddy-backend/common/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto/uaa"
 	"github.com/zhsyourai/teddy-backend/uaa/models"
 )
 
-func CopyFromAccountToPBAccount(acc *models.Account, pbacc *proto.Account) error {
+func copyFromAccountToPBAccount(acc *models.Account, pbacc *uaa.Account) error {
 	if acc == nil || pbacc == nil {
 		return nil
 	}

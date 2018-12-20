@@ -1,18 +1,10 @@
 package server
 
 import (
-	"errors"
-	"github.com/zhsyourai/teddy-backend/common/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto/uaa"
 )
 
-var ErrPasswordEmpty = errors.New("password can't be empty")
-var ErrUsernameEmpty = errors.New("username can't be empty")
-var ErrRolesEmpty = errors.New("role can't be empty")
-var ErrEmailOrPhoneEmpty = errors.New("email or phone can't be empty")
-var ErrOldPasswordEmpty = errors.New("old password empty")
-var ErrNewPasswordEmpty = errors.New("new password empty")
-
-func validateRegisterNormalReq(req *proto.RegisterNormalReq) error {
+func validateRegisterNormalReq(req *uaa.RegisterNormalReq) error {
 	if req.Password == "" {
 		return ErrPasswordEmpty
 	} else if req.Username == "" {
@@ -27,21 +19,21 @@ func validateRegisterNormalReq(req *proto.RegisterNormalReq) error {
 	return nil
 }
 
-func validateGetOneReq(req *proto.GetOneReq) error {
+func validateGetOneReq(req *uaa.GetOneReq) error {
 	if req.Principal == "" {
 		return ErrUsernameEmpty
 	}
 	return nil
 }
 
-func validateUIDReq(req *proto.UIDReq) error {
+func validateUIDReq(req *uaa.UIDReq) error {
 	if req.Uid == "" {
 		return ErrUsernameEmpty
 	}
 	return nil
 }
 
-func validateVerifyPasswordReq(req *proto.VerifyAccountReq) error {
+func validateVerifyPasswordReq(req *uaa.VerifyAccountReq) error {
 	if req.Principal == "" {
 		return ErrUsernameEmpty
 	} else if req.Password == "" {
@@ -50,7 +42,7 @@ func validateVerifyPasswordReq(req *proto.VerifyAccountReq) error {
 	return nil
 }
 
-func validateChangePasswordReq(req *proto.ChangePasswordReq) error {
+func validateChangePasswordReq(req *uaa.ChangePasswordReq) error {
 	if req.Principal == "" {
 		return ErrUsernameEmpty
 	} else if req.OldPassword == "" {
@@ -61,7 +53,7 @@ func validateChangePasswordReq(req *proto.ChangePasswordReq) error {
 	return nil
 }
 
-func validateUpdateSignInReq(req *proto.UpdateSignInReq) error {
+func validateUpdateSignInReq(req *uaa.UpdateSignInReq) error {
 	if req.Ip == "" {
 
 	} else if req.Time == nil {
