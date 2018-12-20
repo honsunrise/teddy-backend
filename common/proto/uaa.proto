@@ -88,6 +88,7 @@ message ChangePasswordReq {
 }
 
 message UpdateSignInReq {
-    string ip = 1;
-    google.protobuf.Timestamp time = 2;
+    string principal = 1;
+    string ip = 2;
+    google.protobuf.Timestamp time = 3;
 }
