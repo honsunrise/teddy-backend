@@ -6,7 +6,7 @@ GOPATH:=$(shell go env GOPATH)
 proto:
 	protoc --proto_path=${GOPATH}/src \
 	    --go_out=plugins=grpc:${GOPATH}/src \
-	    ${GOPATH}/src/github.com/zhsyourai/teddy-backend/common/proto/content.proto
+	    ${GOPATH}/src/github.com/zhsyourai/teddy-backend/common/proto/content/content.proto
 
 test:
 	go test -v ./... -cover
