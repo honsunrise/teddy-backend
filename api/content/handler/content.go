@@ -221,13 +221,13 @@ func (h *Content) GetAllContents(ctx *gin.Context) {
 		WatchCount     int64             `json:"watchCount"`
 		Tags           []string          `json:"tags"`
 		ThumbUp        int64             `json:"thumbUp"`
-		IsThumbUp      bool              `json:"-"`
+		IsThumbUp      bool              `json:"isThumbUp"`
 		ThumbUpList    []string          `json:"thumbUpList"`
 		ThumbDown      int64             `json:"thumbDown"`
-		IsThumbDown    bool              `json:"-"`
+		IsThumbDown    bool              `json:"isThumbDown"`
 		ThumbDownList  []string          `json:"thumbDownList"`
 		Favorites      int64             `json:"favorites"`
-		IsFavorite     bool              `json:"-"`
+		IsFavorite     bool              `json:"isFavorite"`
 		FavoriteList   []string          `json:"favoriteList"`
 		LastModifyTime time.Time         `json:"lastModifyTime"`
 		CanReview      bool              `json:"canReview"`
@@ -256,7 +256,7 @@ func (h *Content) GetAllContents(ctx *gin.Context) {
 		}
 
 		results = append(results, &infosResult{
-			Id:             info.Id,
+			Id:             info.InfoID,
 			UID:            info.Uid,
 			Title:          info.Title,
 			Content:        info.Content,
@@ -340,7 +340,8 @@ func (h *Content) GetContentDetail(ctx *gin.Context) {
 
 	infoID := ctx.Param("id")
 	info, err := contentClient.GetInfo(ctx, &proto.GetInfoReq{
-		Id: infoID,
+		InfoID: infoID,
+		Uid:    "7791850604",
 	})
 
 	if err != nil {
@@ -362,13 +363,13 @@ func (h *Content) GetContentDetail(ctx *gin.Context) {
 		WatchCount     int64             `json:"watchCount"`
 		Tags           []string          `json:"tags"`
 		ThumbUp        int64             `json:"thumbUp"`
-		IsThumbUp      bool              `json:"-"`
+		IsThumbUp      bool              `json:"isThumbUp"`
 		ThumbUpList    []string          `json:"thumbUpList"`
 		ThumbDown      int64             `json:"thumbDown"`
-		IsThumbDown    bool              `json:"-"`
+		IsThumbDown    bool              `json:"isThumbDown"`
 		ThumbDownList  []string          `json:"thumbDownList"`
 		Favorites      int64             `json:"favorites"`
-		IsFavorite     bool              `json:"-"`
+		IsFavorite     bool              `json:"isFavorite"`
 		FavoriteList   []string          `json:"favoriteList"`
 		LastModifyTime time.Time         `json:"lastModifyTime"`
 		CanReview      bool              `json:"canReview"`
@@ -395,7 +396,7 @@ func (h *Content) GetContentDetail(ctx *gin.Context) {
 	}
 
 	resp := &infosResult{
-		Id:             info.Id,
+		Id:             info.InfoID,
 		UID:            info.Uid,
 		Title:          info.Title,
 		Content:        info.Content,
@@ -440,7 +441,7 @@ func (h *Content) UpdateContent(ctx *gin.Context) {
 
 	infoID := ctx.Param("id")
 	_, err := contentClient.EditInfo(ctx, &proto.EditInfoReq{
-		Id:             infoID,
+		InfoID:         infoID,
 		Title:          req.Title,
 		Content:        req.Content,
 		Tags:           req.Tags,

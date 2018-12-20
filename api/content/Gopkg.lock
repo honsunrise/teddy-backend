@@ -127,7 +127,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:26ea7f0d048ec5580e8dc42fb6010b938c47df494fc4f8aa24346c8538d56db7"
+  digest = "1:827e64b3c0371b6debedd1cb4b9e323b894968d7e2c110c818ae4fe778a14133"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
@@ -140,7 +140,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "4d73ec0f105cc4b6ffb7dab23b04ec78d06cff9c"
+  revision = "e6b3b4498978e3a58cd02fecb5a392ab932cb9b4"
 
 [[projects]]
   branch = "master"
@@ -277,6 +277,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/gin-gonic/gin",
+    "github.com/golang/protobuf/ptypes",
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/api/clients",
     "github.com/zhsyourai/teddy-backend/common/config",

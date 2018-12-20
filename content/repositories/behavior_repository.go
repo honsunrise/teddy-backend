@@ -92,6 +92,11 @@ func (repo *behaviorRepository) FindInfoByUser(uid string,
 		bson.D{{"$match", bson.D{{"uid", uid}}}},
 		bson.D{{"$skip", int64(size * page)}},
 		bson.D{{"$limit", int64(size)}},
+		bson.D{{"$project", bson.D{
+			{"_id", 0},
+			{"infoId", "$items.infoId"},
+			{"time", "$items.time"},
+		}}},
 	}
 	var itemsSorts = make(bson.D, 0, len(sorts))
 	if len(sorts) != 0 {
@@ -104,12 +109,6 @@ func (repo *behaviorRepository) FindInfoByUser(uid string,
 		}
 		pipeline = append(pipeline, bson.D{{"$sort", itemsSorts}})
 	}
-
-	pipeline = append(pipeline, bson.D{{"$project", bson.D{
-		{"_id", 0},
-		{"infoId", "$items.infoId"},
-		{"time", "$items.time"},
-	}}})
 
 	cur, err := repo.collections.Aggregate(repo.ctx, pipeline)
 	if err != nil {

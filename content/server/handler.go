@@ -99,11 +99,8 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *proto.PublishInfo
 		WatchCount:     0,
 		Tags:           req.Tags,
 		ThumbUp:        0,
-		ThumbUpList:    []string{},
 		ThumbDown:      0,
-		ThumbDownList:  []string{},
 		Favorites:      0,
-		FavoriteList:   []string{},
 		LastModifyTime: now,
 		CanReview:      req.CanReview,
 	}
@@ -122,7 +119,7 @@ func (h *contentHandler) EditInfo(ctx context.Context, req *proto.EditInfoReq) (
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.Id)
+	infoID, err := objectid.FromHex(req.InfoID)
 	if err != nil {
 		return nil, err
 	}
@@ -163,23 +160,66 @@ func (h *contentHandler) EditInfo(ctx context.Context, req *proto.EditInfoReq) (
 	return &resp, nil
 }
 
-func (h *contentHandler) GetInfo(ctx context.Context, req *proto.GetInfoReq) (*proto.Info, error) {
-	if err := validateGetInfoReq(req); err != nil {
-		return nil, err
-	}
-
-	infoID, err := objectid.FromHex(req.Id)
+func (h *contentHandler) fillInfo(uid string, info *models.Info) (*proto.Info, error) {
+	isThumbUp, err := h.thumbUpRepo.IsExist(uid, info.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	info, err := h.infoRepo.FindOne(infoID)
+	isThumbDown, err := h.thumbDownRepo.IsExist(uid, info.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	resp := proto.Info{
-		Id:      info.Id.Hex(),
+	isFavorite, err := h.favoriteRepo.IsExist(uid, info.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	tmpList, err := h.thumbUpRepo.FindUserByInfo(info.Id, 0, 10, []*proto.Sort{
+		&proto.Sort{
+			Name: "time",
+			Asc:  false,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	thumbUpList := make([]string, 0, len(tmpList))
+	for _, v := range tmpList {
+		thumbUpList = append(thumbUpList, v.UID)
+	}
+
+	tmpList, err = h.thumbDownRepo.FindUserByInfo(info.Id, 0, 10, []*proto.Sort{
+		&proto.Sort{
+			Name: "time",
+			Asc:  false,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	thumbDownList := make([]string, 0, len(tmpList))
+	for _, v := range tmpList {
+		thumbDownList = append(thumbDownList, v.UID)
+	}
+
+	tmpList, err = h.favoriteRepo.FindUserByInfo(info.Id, 0, 10, []*proto.Sort{
+		&proto.Sort{
+			Name: "time",
+			Asc:  false,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	favoriteList := make([]string, 0, len(tmpList))
+	for _, v := range tmpList {
+		favoriteList = append(favoriteList, v.UID)
+	}
+
+	resp := &proto.Info{
+		InfoID:  info.Id.Hex(),
 		Uid:     info.UID,
 		Title:   info.Title,
 		Content: info.Content,
@@ -200,21 +240,43 @@ func (h *contentHandler) GetInfo(ctx context.Context, req *proto.GetInfoReq) (*p
 		WatchCount:    info.WatchCount,
 		Tags:          info.Tags,
 		ThumbUp:       info.ThumbUp,
-		IsThumbUp:     info.IsThumbUp,
-		ThumbUpList:   info.ThumbUpList,
+		IsThumbUp:     isThumbUp,
+		ThumbUpList:   thumbUpList,
 		ThumbDown:     info.ThumbDown,
-		IsThumbDown:   info.IsThumbDown,
-		ThumbDownList: info.ThumbDownList,
+		IsThumbDown:   isThumbDown,
+		ThumbDownList: thumbDownList,
 		Favorites:     info.Favorites,
-		IsFavorite:    info.IsFavorite,
-		FavoriteList:  info.FavoriteList,
+		IsFavorite:    isFavorite,
+		FavoriteList:  favoriteList,
 		LastModifyTime: &timestamp.Timestamp{
 			Seconds: info.LastModifyTime.Unix(),
 			Nanos:   int32(info.LastModifyTime.Nanosecond()),
 		},
 		CanReview: info.CanReview,
 	}
-	return &resp, nil
+	return resp, nil
+}
+
+func (h *contentHandler) GetInfo(ctx context.Context, req *proto.GetInfoReq) (*proto.Info, error) {
+	if err := validateGetInfoReq(req); err != nil {
+		return nil, err
+	}
+
+	infoID, err := objectid.FromHex(req.InfoID)
+	if err != nil {
+		return nil, err
+	}
+
+	info, err := h.infoRepo.FindOne(infoID)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := h.fillInfo(req.Uid, info)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 func (h *contentHandler) GetInfos(ctx context.Context, req *proto.GetInfosReq) (*proto.GetInfosResp, error) {
@@ -239,46 +301,15 @@ func (h *contentHandler) GetInfos(ctx context.Context, req *proto.GetInfosReq) (
 		return nil, err
 	}
 
-	results := make([]*proto.Info, 0, len(infos))
+	pInfos := make([]*proto.Info, 0, len(infos))
 	for _, info := range infos {
-		results = append(results, &proto.Info{
-			Id:      info.Id.Hex(),
-			Uid:     info.UID,
-			Title:   info.Title,
-			Content: info.Content,
-			ContentTime: &timestamp.Timestamp{
-				Seconds: info.ContentTime.Unix(),
-				Nanos:   int32(info.ContentTime.Nanosecond()),
-			},
-			CoverResources: info.CoverResources,
-			PublishTime: &timestamp.Timestamp{
-				Seconds: info.PublishTime.Unix(),
-				Nanos:   int32(info.PublishTime.Nanosecond()),
-			},
-			LastReviewTime: &timestamp.Timestamp{
-				Seconds: info.LastReviewTime.Unix(),
-				Nanos:   int32(info.LastReviewTime.Nanosecond()),
-			},
-			Valid:         info.Valid,
-			WatchCount:    info.WatchCount,
-			Tags:          info.Tags,
-			ThumbUp:       info.ThumbUp,
-			IsThumbUp:     info.IsThumbUp,
-			ThumbUpList:   info.ThumbUpList,
-			ThumbDown:     info.ThumbDown,
-			IsThumbDown:   info.IsThumbDown,
-			ThumbDownList: info.ThumbDownList,
-			Favorites:     info.Favorites,
-			IsFavorite:    info.IsFavorite,
-			FavoriteList:  info.FavoriteList,
-			LastModifyTime: &timestamp.Timestamp{
-				Seconds: info.LastModifyTime.Unix(),
-				Nanos:   int32(info.LastModifyTime.Nanosecond()),
-			},
-			CanReview: info.CanReview,
-		})
+		pInfo, err := h.fillInfo(req.Uid, info)
+		if err != nil {
+			return nil, err
+		}
+		pInfos = append(pInfos, pInfo)
 	}
-	resp.Infos = results
+	resp.Infos = pInfos
 	return &resp, nil
 }
 

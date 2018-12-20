@@ -19,15 +19,9 @@ type Info struct {
 	Valid          bool              `bson:"valid"`
 	WatchCount     int64             `bson:"watchCount"`
 	Tags           []string          `bson:"tags"`
-	ThumbUp        int64             `bson:"thumbUp"`
-	IsThumbUp      bool              `bson:"-"`
-	ThumbUpList    []string          `bson:"thumbUpList"`
-	ThumbDown      int64             `bson:"thumbDown"`
-	IsThumbDown    bool              `bson:"-"`
-	ThumbDownList  []string          `bson:"thumbDownList"`
-	Favorites      int64             `bson:"favorites"`
-	IsFavorite     bool              `bson:"-"`
-	FavoriteList   []string          `bson:"favoriteList"`
 	LastModifyTime time.Time         `bson:"lastModifyTime"`
 	CanReview      bool              `bson:"canReview"`
+	ThumbUp        int64             `bson:"thumbUp"`
+	ThumbDown      int64             `bson:"thumbDown"`
+	Favorites      int64             `bson:"favorites"`
 }
