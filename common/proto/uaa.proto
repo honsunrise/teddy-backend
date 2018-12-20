@@ -16,7 +16,7 @@ service UAA {
     rpc ChangePassword(ChangePasswordReq) returns (google.protobuf.Empty) {}
     rpc UpdateSignIn (UpdateSignInReq) returns (google.protobuf.Empty) {}
 
-    rpc DeleteByUsername(UIDReq) returns (google.protobuf.Empty) {}
+    rpc DeleteOne(UIDReq) returns (google.protobuf.Empty) {}
     rpc DoLockAccount(UIDReq) returns (google.protobuf.Empty) {}
     rpc DoCredentialsExpired(UIDReq) returns (google.protobuf.Empty) {}
 }
