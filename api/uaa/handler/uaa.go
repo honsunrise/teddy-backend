@@ -59,120 +59,113 @@ func (h *Uaa) Register(ctx *gin.Context) {
 	// Now time
 	now := time.Now()
 
-	// parse body
-	type registerReq struct {
-		Username string   `json:"username"`
-		Password string   `json:"password"`
-		Roles    []string `json:"roles"`
-		Email    string   `json:"email,omitempty"`
-		Phone    string   `json:"phone,omitempty"`
-		Captcha  string   `json:"captcha,omitempty"`
-	}
-	var body registerReq
+	if ctx.Query("type") == "email" {
+		// parse body
+		type registerReq struct {
+			Username string   `json:"username"`
+			Password string   `json:"password"`
+			Roles    []string `json:"roles"`
+			Email    string   `json:"email"`
+			Captcha  string   `json:"captcha"`
+		}
+		var body registerReq
 
-	ctx.Bind(&body)
+		ctx.Bind(&body)
 
-	// extract the client from the context
-	uaaClient, ok := clients.UaaFromContext(ctx)
-	if !ok {
-		log.Error(errors.ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
-		return
-	}
+		// extract the client from the context
+		uaaClient, ok := clients.UaaFromContext(ctx)
+		if !ok {
+			log.Error(errors.ErrCaptchaNotCorrect)
+			ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+			return
+		}
 
-	// extract the client from the context
-	captchaClient, ok := clients.CaptchaFromContext(ctx)
-	if !ok {
-		log.Error(errors.ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
-		return
-	}
+		// extract the client from the context
+		captchaClient, ok := clients.CaptchaFromContext(ctx)
+		if !ok {
+			log.Error(errors.ErrCaptchaNotCorrect)
+			ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+			return
+		}
 
-	// check email or phone
-	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
-	if body.Email != "" && body.Captcha != "" {
-		rsp, err := captchaClient.Verify(timeoutCtx, &proto.VerifyReq{
-			Type: proto.CaptchaType_RANDOM_BY_ID,
-			Id:   body.Email,
-			Code: body.Captcha,
-		})
-		if err != nil || !rsp.Correct {
+		// check email or phone
+		timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+		if body.Email != "" && body.Captcha != "" {
+			rsp, err := captchaClient.Verify(timeoutCtx, &proto.VerifyReq{
+				Type: proto.CaptchaType_RANDOM_BY_ID,
+				Id:   body.Email,
+				Code: body.Captcha,
+			})
+			if err != nil || !rsp.Correct {
+				log.Error(errors.ErrCaptchaNotCorrect)
+				ctx.AbortWithError(http.StatusInternalServerError, errors.ErrCaptchaNotCorrect)
+				return
+			}
+		} else {
 			log.Error(errors.ErrCaptchaNotCorrect)
 			ctx.AbortWithError(http.StatusInternalServerError, errors.ErrCaptchaNotCorrect)
 			return
 		}
-	} else if body.Phone != "" && body.Captcha != "" {
-		rsp, err := captchaClient.Verify(timeoutCtx, &proto.VerifyReq{
-			Type: proto.CaptchaType_RANDOM_BY_ID,
-			Id:   body.Phone,
-			Code: body.Captcha,
+
+		// make request
+		timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+		response, err := uaaClient.RegisterByNormal(timeoutCtx, &proto.RegisterNormalReq{
+			Username: body.Username,
+			Password: body.Password,
+			Roles:    body.Roles,
+			Contact: &proto.RegisterNormalReq_Email{
+				Email: body.Email,
+			},
 		})
-		if err != nil || !rsp.Correct {
-			log.Error(errors.ErrCaptchaNotCorrect)
-			ctx.AbortWithError(http.StatusInternalServerError, errors.ErrCaptchaNotCorrect)
+		if err != nil {
+			log.Error(err)
+			ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
+		}
+
+		type registerResp struct {
+			Uid        string    `json:"uid"`
+			CreateDate time.Time `json:"create_date"`
+		}
+		var jsonResp registerResp
+		jsonResp.Uid = response.Uid
+		jsonResp.CreateDate = time.Unix(response.CreateDate.Seconds, int64(response.CreateDate.Nanos))
+
+		ctx.JSON(http.StatusOK, &jsonResp)
+
+		// This step can happen error and will ignore
+		messageClient, ok := clients.MessageFromContext(ctx)
+		if ok {
+			// Send welcome email
+			timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
+			defer cancel()
+			messageClient.SendEmail(timeoutCtx, &proto.SendEmailReq{
+				Email:   response.Email,
+				Topic:   "Welcome " + response.Username,
+				Content: "Hi " + response.Username,
+				SendTime: &timestamp.Timestamp{
+					Seconds: now.Unix(),
+					Nanos:   int32(now.Nanosecond()),
+				},
+			})
+
+			// Send welcome inbox
+			timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
+			defer cancel()
+			messageClient.SendInBox(timeoutCtx, &proto.SendInBoxReq{
+				Uid:     response.Uid,
+				Topic:   "Welcome " + body.Username,
+				Content: "Hi " + body.Username,
+				SendTime: &timestamp.Timestamp{
+					Seconds: now.Unix(),
+					Nanos:   int32(now.Nanosecond()),
+				},
+			})
 		}
 	} else {
-		log.Error(errors.ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrCaptchaNotCorrect)
-		return
-	}
-
-	// make request
-	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
-	response, err := uaaClient.Register(timeoutCtx, &proto.RegisterReq{
-		Username: body.Username,
-		Password: body.Password,
-		Roles:    body.Roles,
-		Email:    body.Email,
-		Phone:    body.Phone,
-	})
-	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	type registerResp struct {
-		Uid        string    `json:"uid"`
-		CreateDate time.Time `json:"create_date"`
-	}
-	var jsonResp registerResp
-	jsonResp.Uid = response.Uid
-	jsonResp.CreateDate = time.Unix(response.CreateDate.Seconds, int64(response.CreateDate.Nanos))
-
-	ctx.JSON(http.StatusOK, &jsonResp)
-
-	// This step can happen error and will ignore
-	messageClient, ok := clients.MessageFromContext(ctx)
-	if ok {
-		// Send welcome email
-		timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
-		defer cancel()
-		messageClient.SendEmail(timeoutCtx, &proto.SendEmailReq{
-			Email:   response.Email,
-			Topic:   "Welcome " + response.Username,
-			Content: "Hi " + response.Username,
-			SendTime: &timestamp.Timestamp{
-				Seconds: now.Unix(),
-				Nanos:   int32(now.Nanosecond()),
-			},
-		})
-
-		// Send welcome inbox
-		timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
-		defer cancel()
-		messageClient.SendInBox(timeoutCtx, &proto.SendInBoxReq{
-			Uid:     response.Uid,
-			Topic:   "Welcome " + body.Username,
-			Content: "Hi " + body.Username,
-			SendTime: &timestamp.Timestamp{
-				Seconds: now.Unix(),
-				Nanos:   int32(now.Nanosecond()),
-			},
-		})
+		ctx.AbortWithStatus(http.StatusNotFound)
 	}
 }
 
@@ -181,9 +174,9 @@ func (h *Uaa) Login(ctx *gin.Context) {
 
 	// parse body
 	type loginReq struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-		Captcha  string `json:"captcha"`
+		Principal string `json:"principal"`
+		Password  string `json:"password"`
+		Captcha   string `json:"captcha"`
 	}
 	var body loginReq
 
@@ -200,9 +193,9 @@ func (h *Uaa) Login(ctx *gin.Context) {
 	// make request
 	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	response, err := uaaClient.VerifyPassword(timeoutCtx, &proto.VerifyPasswordReq{
-		Username: body.Username,
-		Password: body.Password,
+	response, err := uaaClient.VerifyPassword(timeoutCtx, &proto.VerifyAccountReq{
+		Principal: body.Principal,
+		Password:  body.Password,
 	})
 	if err != nil {
 		log.Error(err)
@@ -286,7 +279,7 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	_, err = uaaClient.ChangePassword(timeoutCtx, &proto.ChangePasswordReq{
-		Username:    body.Username,
+		Principal:   body.Username,
 		NewPassword: body.NewPassword,
 		OldPassword: body.OldPassword,
 	})
@@ -319,8 +312,8 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 
 	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	tmpAccount, err := uaaClient.GetByEmail(timeoutCtx, &proto.GetByEmailReq{
-		Email: body.Email,
+	tmpAccount, err := uaaClient.GetOne(timeoutCtx, &proto.GetOneReq{
+		Principal: body.Email,
 	})
 
 	if err == nil && tmpAccount != nil {

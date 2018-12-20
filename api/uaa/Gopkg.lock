@@ -179,7 +179,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f99aae0b27a34ede709f524d3cedd79ad8c5320b159c82480ac0dcc07617510c"
+  digest = "1:5298c0f656630207e6df5ca148b660fda0ba8583c7130097dbff688133c04575"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
@@ -193,7 +193,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "ef376b4d711b40e8c88e7e89a436d8324075c0b5"
+  revision = "b61aff1bc609f5b86fa513c384d055cc96f430f2"
 
 [[projects]]
   branch = "master"
@@ -267,7 +267,7 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "67d6565462c5a0d99b88193d59fefa10ca7e3010"
+  revision = "5a97ab628bfb2f65f6befec18f4bc7bc7f382b77"
 
 [[projects]]
   digest = "1:9edd250a3c46675d0679d87540b30c9ed253b19bd1fd1af08f4f5fb3c79fc487"
