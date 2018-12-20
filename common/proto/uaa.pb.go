@@ -29,14 +29,16 @@ type Account struct {
 	Uid                  string               `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
 	Username             string               `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
 	Email                string               `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Password             []byte               `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
-	AccountExpired       bool                 `protobuf:"varint,5,opt,name=accountExpired,proto3" json:"accountExpired,omitempty"`
-	AccountLocked        bool                 `protobuf:"varint,6,opt,name=accountLocked,proto3" json:"accountLocked,omitempty"`
-	CredentialsExpired   bool                 `protobuf:"varint,7,opt,name=credentialsExpired,proto3" json:"credentialsExpired,omitempty"`
-	Roles                []string             `protobuf:"bytes,8,rep,name=roles,proto3" json:"roles,omitempty"`
-	OauthUserIds         map[string]string    `protobuf:"bytes,9,rep,name=oauthUserIds,proto3" json:"oauthUserIds,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	CreateDate           *timestamp.Timestamp `protobuf:"bytes,10,opt,name=createDate,proto3" json:"createDate,omitempty"`
-	UpdateDate           *timestamp.Timestamp `protobuf:"bytes,11,opt,name=updateDate,proto3" json:"updateDate,omitempty"`
+	Phone                string               `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"`
+	Password             []byte               `protobuf:"bytes,5,opt,name=password,proto3" json:"password,omitempty"`
+	Roles                []string             `protobuf:"bytes,6,rep,name=roles,proto3" json:"roles,omitempty"`
+	OauthUIDs            map[string]string    `protobuf:"bytes,7,rep,name=oauthUIDs,proto3" json:"oauthUIDs,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Locked               bool                 `protobuf:"varint,9,opt,name=locked,proto3" json:"locked,omitempty"`
+	CredentialsExpired   bool                 `protobuf:"varint,10,opt,name=credentialsExpired,proto3" json:"credentialsExpired,omitempty"`
+	CreateDate           *timestamp.Timestamp `protobuf:"bytes,11,opt,name=createDate,proto3" json:"createDate,omitempty"`
+	UpdateDate           *timestamp.Timestamp `protobuf:"bytes,12,opt,name=updateDate,proto3" json:"updateDate,omitempty"`
+	LastSignInIP         string               `protobuf:"bytes,13,opt,name=lastSignInIP,proto3" json:"lastSignInIP,omitempty"`
+	LastSignInTime       *timestamp.Timestamp `protobuf:"bytes,14,opt,name=lastSignInTime,proto3" json:"lastSignInTime,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_unrecognized     []byte               `json:"-"`
 	XXX_sizecache        int32                `json:"-"`
@@ -46,7 +48,7 @@ func (m *Account) Reset()         { *m = Account{} }
 func (m *Account) String() string { return proto.CompactTextString(m) }
 func (*Account) ProtoMessage()    {}
 func (*Account) Descriptor() ([]byte, []int) {
-	return fileDescriptor_uaa_e29788bb7cf95f36, []int{0}
+	return fileDescriptor_uaa_61527220a96fba71, []int{0}
 }
 func (m *Account) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Account.Unmarshal(m, b)
@@ -87,32 +89,18 @@ func (m *Account) GetEmail() string {
 	return ""
 }
 
+func (m *Account) GetPhone() string {
+	if m != nil {
+		return m.Phone
+	}
+	return ""
+}
+
 func (m *Account) GetPassword() []byte {
 	if m != nil {
 		return m.Password
 	}
 	return nil
-}
-
-func (m *Account) GetAccountExpired() bool {
-	if m != nil {
-		return m.AccountExpired
-	}
-	return false
-}
-
-func (m *Account) GetAccountLocked() bool {
-	if m != nil {
-		return m.AccountLocked
-	}
-	return false
-}
-
-func (m *Account) GetCredentialsExpired() bool {
-	if m != nil {
-		return m.CredentialsExpired
-	}
-	return false
 }
 
 func (m *Account) GetRoles() []string {
@@ -122,11 +110,25 @@ func (m *Account) GetRoles() []string {
 	return nil
 }
 
-func (m *Account) GetOauthUserIds() map[string]string {
+func (m *Account) GetOauthUIDs() map[string]string {
 	if m != nil {
-		return m.OauthUserIds
+		return m.OauthUIDs
 	}
 	return nil
+}
+
+func (m *Account) GetLocked() bool {
+	if m != nil {
+		return m.Locked
+	}
+	return false
+}
+
+func (m *Account) GetCredentialsExpired() bool {
+	if m != nil {
+		return m.CredentialsExpired
+	}
+	return false
 }
 
 func (m *Account) GetCreateDate() *timestamp.Timestamp {
@@ -143,6 +145,196 @@ func (m *Account) GetUpdateDate() *timestamp.Timestamp {
 	return nil
 }
 
+func (m *Account) GetLastSignInIP() string {
+	if m != nil {
+		return m.LastSignInIP
+	}
+	return ""
+}
+
+func (m *Account) GetLastSignInTime() *timestamp.Timestamp {
+	if m != nil {
+		return m.LastSignInTime
+	}
+	return nil
+}
+
+type Sort struct {
+	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Asc                  bool     `protobuf:"varint,2,opt,name=asc,proto3" json:"asc,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Sort) Reset()         { *m = Sort{} }
+func (m *Sort) String() string { return proto.CompactTextString(m) }
+func (*Sort) ProtoMessage()    {}
+func (*Sort) Descriptor() ([]byte, []int) {
+	return fileDescriptor_uaa_61527220a96fba71, []int{1}
+}
+func (m *Sort) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Sort.Unmarshal(m, b)
+}
+func (m *Sort) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Sort.Marshal(b, m, deterministic)
+}
+func (dst *Sort) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Sort.Merge(dst, src)
+}
+func (m *Sort) XXX_Size() int {
+	return xxx_messageInfo_Sort.Size(m)
+}
+func (m *Sort) XXX_DiscardUnknown() {
+	xxx_messageInfo_Sort.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Sort proto.InternalMessageInfo
+
+func (m *Sort) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Sort) GetAsc() bool {
+	if m != nil {
+		return m.Asc
+	}
+	return false
+}
+
+type UIDReq struct {
+	Uid                  string   `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UIDReq) Reset()         { *m = UIDReq{} }
+func (m *UIDReq) String() string { return proto.CompactTextString(m) }
+func (*UIDReq) ProtoMessage()    {}
+func (*UIDReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_uaa_61527220a96fba71, []int{2}
+}
+func (m *UIDReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UIDReq.Unmarshal(m, b)
+}
+func (m *UIDReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UIDReq.Marshal(b, m, deterministic)
+}
+func (dst *UIDReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UIDReq.Merge(dst, src)
+}
+func (m *UIDReq) XXX_Size() int {
+	return xxx_messageInfo_UIDReq.Size(m)
+}
+func (m *UIDReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_UIDReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UIDReq proto.InternalMessageInfo
+
+func (m *UIDReq) GetUid() string {
+	if m != nil {
+		return m.Uid
+	}
+	return ""
+}
+
+type GetAllReq struct {
+	Page                 uint32   `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	Size                 uint32   `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	Sorts                []*Sort  `protobuf:"bytes,3,rep,name=sorts,proto3" json:"sorts,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetAllReq) Reset()         { *m = GetAllReq{} }
+func (m *GetAllReq) String() string { return proto.CompactTextString(m) }
+func (*GetAllReq) ProtoMessage()    {}
+func (*GetAllReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_uaa_61527220a96fba71, []int{3}
+}
+func (m *GetAllReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetAllReq.Unmarshal(m, b)
+}
+func (m *GetAllReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetAllReq.Marshal(b, m, deterministic)
+}
+func (dst *GetAllReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetAllReq.Merge(dst, src)
+}
+func (m *GetAllReq) XXX_Size() int {
+	return xxx_messageInfo_GetAllReq.Size(m)
+}
+func (m *GetAllReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetAllReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetAllReq proto.InternalMessageInfo
+
+func (m *GetAllReq) GetPage() uint32 {
+	if m != nil {
+		return m.Page
+	}
+	return 0
+}
+
+func (m *GetAllReq) GetSize() uint32 {
+	if m != nil {
+		return m.Size
+	}
+	return 0
+}
+
+func (m *GetAllReq) GetSorts() []*Sort {
+	if m != nil {
+		return m.Sorts
+	}
+	return nil
+}
+
+type GetOneReq struct {
+	Principal            string   `protobuf:"bytes,1,opt,name=principal,proto3" json:"principal,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetOneReq) Reset()         { *m = GetOneReq{} }
+func (m *GetOneReq) String() string { return proto.CompactTextString(m) }
+func (*GetOneReq) ProtoMessage()    {}
+func (*GetOneReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_uaa_61527220a96fba71, []int{4}
+}
+func (m *GetOneReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetOneReq.Unmarshal(m, b)
+}
+func (m *GetOneReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetOneReq.Marshal(b, m, deterministic)
+}
+func (dst *GetOneReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetOneReq.Merge(dst, src)
+}
+func (m *GetOneReq) XXX_Size() int {
+	return xxx_messageInfo_GetOneReq.Size(m)
+}
+func (m *GetOneReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetOneReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetOneReq proto.InternalMessageInfo
+
+func (m *GetOneReq) GetPrincipal() string {
+	if m != nil {
+		return m.Principal
+	}
+	return ""
+}
+
 type GetAllResp struct {
 	Accounts             []*Account `protobuf:"bytes,1,rep,name=accounts,proto3" json:"accounts,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
@@ -154,7 +346,7 @@ func (m *GetAllResp) Reset()         { *m = GetAllResp{} }
 func (m *GetAllResp) String() string { return proto.CompactTextString(m) }
 func (*GetAllResp) ProtoMessage()    {}
 func (*GetAllResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_uaa_e29788bb7cf95f36, []int{1}
+	return fileDescriptor_uaa_61527220a96fba71, []int{5}
 }
 func (m *GetAllResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetAllResp.Unmarshal(m, b)
@@ -181,268 +373,261 @@ func (m *GetAllResp) GetAccounts() []*Account {
 	return nil
 }
 
-type GetByPhoneReq struct {
-	Phone                string   `protobuf:"bytes,1,opt,name=phone,proto3" json:"phone,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+type RegisterNormalReq struct {
+	Roles    []string `protobuf:"bytes,1,rep,name=roles,proto3" json:"roles,omitempty"`
+	Username string   `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Password string   `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	// Types that are valid to be assigned to Contact:
+	//	*RegisterNormalReq_Email
+	//	*RegisterNormalReq_Phone
+	Contact              isRegisterNormalReq_Contact `protobuf_oneof:"contact"`
+	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
+	XXX_unrecognized     []byte                      `json:"-"`
+	XXX_sizecache        int32                       `json:"-"`
 }
 
-func (m *GetByPhoneReq) Reset()         { *m = GetByPhoneReq{} }
-func (m *GetByPhoneReq) String() string { return proto.CompactTextString(m) }
-func (*GetByPhoneReq) ProtoMessage()    {}
-func (*GetByPhoneReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_uaa_e29788bb7cf95f36, []int{2}
+func (m *RegisterNormalReq) Reset()         { *m = RegisterNormalReq{} }
+func (m *RegisterNormalReq) String() string { return proto.CompactTextString(m) }
+func (*RegisterNormalReq) ProtoMessage()    {}
+func (*RegisterNormalReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_uaa_61527220a96fba71, []int{6}
 }
-func (m *GetByPhoneReq) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetByPhoneReq.Unmarshal(m, b)
+func (m *RegisterNormalReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_RegisterNormalReq.Unmarshal(m, b)
 }
-func (m *GetByPhoneReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetByPhoneReq.Marshal(b, m, deterministic)
+func (m *RegisterNormalReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_RegisterNormalReq.Marshal(b, m, deterministic)
 }
-func (dst *GetByPhoneReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetByPhoneReq.Merge(dst, src)
+func (dst *RegisterNormalReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RegisterNormalReq.Merge(dst, src)
 }
-func (m *GetByPhoneReq) XXX_Size() int {
-	return xxx_messageInfo_GetByPhoneReq.Size(m)
+func (m *RegisterNormalReq) XXX_Size() int {
+	return xxx_messageInfo_RegisterNormalReq.Size(m)
 }
-func (m *GetByPhoneReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetByPhoneReq.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetByPhoneReq proto.InternalMessageInfo
-
-func (m *GetByPhoneReq) GetPhone() string {
-	if m != nil {
-		return m.Phone
-	}
-	return ""
+func (m *RegisterNormalReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_RegisterNormalReq.DiscardUnknown(m)
 }
 
-type GetByEmailReq struct {
-	Email                string   `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
+var xxx_messageInfo_RegisterNormalReq proto.InternalMessageInfo
 
-func (m *GetByEmailReq) Reset()         { *m = GetByEmailReq{} }
-func (m *GetByEmailReq) String() string { return proto.CompactTextString(m) }
-func (*GetByEmailReq) ProtoMessage()    {}
-func (*GetByEmailReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_uaa_e29788bb7cf95f36, []int{3}
-}
-func (m *GetByEmailReq) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetByEmailReq.Unmarshal(m, b)
-}
-func (m *GetByEmailReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetByEmailReq.Marshal(b, m, deterministic)
-}
-func (dst *GetByEmailReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetByEmailReq.Merge(dst, src)
-}
-func (m *GetByEmailReq) XXX_Size() int {
-	return xxx_messageInfo_GetByEmailReq.Size(m)
-}
-func (m *GetByEmailReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetByEmailReq.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetByEmailReq proto.InternalMessageInfo
-
-func (m *GetByEmailReq) GetEmail() string {
-	if m != nil {
-		return m.Email
-	}
-	return ""
-}
-
-type GetByUsernameReq struct {
-	Username             string   `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *GetByUsernameReq) Reset()         { *m = GetByUsernameReq{} }
-func (m *GetByUsernameReq) String() string { return proto.CompactTextString(m) }
-func (*GetByUsernameReq) ProtoMessage()    {}
-func (*GetByUsernameReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_uaa_e29788bb7cf95f36, []int{4}
-}
-func (m *GetByUsernameReq) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetByUsernameReq.Unmarshal(m, b)
-}
-func (m *GetByUsernameReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetByUsernameReq.Marshal(b, m, deterministic)
-}
-func (dst *GetByUsernameReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetByUsernameReq.Merge(dst, src)
-}
-func (m *GetByUsernameReq) XXX_Size() int {
-	return xxx_messageInfo_GetByUsernameReq.Size(m)
-}
-func (m *GetByUsernameReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetByUsernameReq.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetByUsernameReq proto.InternalMessageInfo
-
-func (m *GetByUsernameReq) GetUsername() string {
-	if m != nil {
-		return m.Username
-	}
-	return ""
-}
-
-type DeleteByUsernameReq struct {
-	Username             string   `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *DeleteByUsernameReq) Reset()         { *m = DeleteByUsernameReq{} }
-func (m *DeleteByUsernameReq) String() string { return proto.CompactTextString(m) }
-func (*DeleteByUsernameReq) ProtoMessage()    {}
-func (*DeleteByUsernameReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_uaa_e29788bb7cf95f36, []int{5}
-}
-func (m *DeleteByUsernameReq) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DeleteByUsernameReq.Unmarshal(m, b)
-}
-func (m *DeleteByUsernameReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DeleteByUsernameReq.Marshal(b, m, deterministic)
-}
-func (dst *DeleteByUsernameReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DeleteByUsernameReq.Merge(dst, src)
-}
-func (m *DeleteByUsernameReq) XXX_Size() int {
-	return xxx_messageInfo_DeleteByUsernameReq.Size(m)
-}
-func (m *DeleteByUsernameReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_DeleteByUsernameReq.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DeleteByUsernameReq proto.InternalMessageInfo
-
-func (m *DeleteByUsernameReq) GetUsername() string {
-	if m != nil {
-		return m.Username
-	}
-	return ""
-}
-
-type RegisterReq struct {
-	Username             string   `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
-	Password             string   `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	Email                string   `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Phone                string   `protobuf:"bytes,4,opt,name=phone,proto3" json:"phone,omitempty"`
-	Roles                []string `protobuf:"bytes,5,rep,name=roles,proto3" json:"roles,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *RegisterReq) Reset()         { *m = RegisterReq{} }
-func (m *RegisterReq) String() string { return proto.CompactTextString(m) }
-func (*RegisterReq) ProtoMessage()    {}
-func (*RegisterReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_uaa_e29788bb7cf95f36, []int{6}
-}
-func (m *RegisterReq) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_RegisterReq.Unmarshal(m, b)
-}
-func (m *RegisterReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_RegisterReq.Marshal(b, m, deterministic)
-}
-func (dst *RegisterReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RegisterReq.Merge(dst, src)
-}
-func (m *RegisterReq) XXX_Size() int {
-	return xxx_messageInfo_RegisterReq.Size(m)
-}
-func (m *RegisterReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_RegisterReq.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_RegisterReq proto.InternalMessageInfo
-
-func (m *RegisterReq) GetUsername() string {
-	if m != nil {
-		return m.Username
-	}
-	return ""
-}
-
-func (m *RegisterReq) GetPassword() string {
-	if m != nil {
-		return m.Password
-	}
-	return ""
-}
-
-func (m *RegisterReq) GetEmail() string {
-	if m != nil {
-		return m.Email
-	}
-	return ""
-}
-
-func (m *RegisterReq) GetPhone() string {
-	if m != nil {
-		return m.Phone
-	}
-	return ""
-}
-
-func (m *RegisterReq) GetRoles() []string {
+func (m *RegisterNormalReq) GetRoles() []string {
 	if m != nil {
 		return m.Roles
 	}
 	return nil
 }
 
-type VerifyPasswordReq struct {
-	Username             string   `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
-	Password             string   `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *VerifyPasswordReq) Reset()         { *m = VerifyPasswordReq{} }
-func (m *VerifyPasswordReq) String() string { return proto.CompactTextString(m) }
-func (*VerifyPasswordReq) ProtoMessage()    {}
-func (*VerifyPasswordReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_uaa_e29788bb7cf95f36, []int{7}
-}
-func (m *VerifyPasswordReq) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_VerifyPasswordReq.Unmarshal(m, b)
-}
-func (m *VerifyPasswordReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_VerifyPasswordReq.Marshal(b, m, deterministic)
-}
-func (dst *VerifyPasswordReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_VerifyPasswordReq.Merge(dst, src)
-}
-func (m *VerifyPasswordReq) XXX_Size() int {
-	return xxx_messageInfo_VerifyPasswordReq.Size(m)
-}
-func (m *VerifyPasswordReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_VerifyPasswordReq.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_VerifyPasswordReq proto.InternalMessageInfo
-
-func (m *VerifyPasswordReq) GetUsername() string {
+func (m *RegisterNormalReq) GetUsername() string {
 	if m != nil {
 		return m.Username
 	}
 	return ""
 }
 
-func (m *VerifyPasswordReq) GetPassword() string {
+func (m *RegisterNormalReq) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
+type isRegisterNormalReq_Contact interface {
+	isRegisterNormalReq_Contact()
+}
+
+type RegisterNormalReq_Email struct {
+	Email string `protobuf:"bytes,4,opt,name=email,proto3,oneof"`
+}
+
+type RegisterNormalReq_Phone struct {
+	Phone string `protobuf:"bytes,5,opt,name=phone,proto3,oneof"`
+}
+
+func (*RegisterNormalReq_Email) isRegisterNormalReq_Contact() {}
+
+func (*RegisterNormalReq_Phone) isRegisterNormalReq_Contact() {}
+
+func (m *RegisterNormalReq) GetContact() isRegisterNormalReq_Contact {
+	if m != nil {
+		return m.Contact
+	}
+	return nil
+}
+
+func (m *RegisterNormalReq) GetEmail() string {
+	if x, ok := m.GetContact().(*RegisterNormalReq_Email); ok {
+		return x.Email
+	}
+	return ""
+}
+
+func (m *RegisterNormalReq) GetPhone() string {
+	if x, ok := m.GetContact().(*RegisterNormalReq_Phone); ok {
+		return x.Phone
+	}
+	return ""
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*RegisterNormalReq) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _RegisterNormalReq_OneofMarshaler, _RegisterNormalReq_OneofUnmarshaler, _RegisterNormalReq_OneofSizer, []interface{}{
+		(*RegisterNormalReq_Email)(nil),
+		(*RegisterNormalReq_Phone)(nil),
+	}
+}
+
+func _RegisterNormalReq_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*RegisterNormalReq)
+	// contact
+	switch x := m.Contact.(type) {
+	case *RegisterNormalReq_Email:
+		b.EncodeVarint(4<<3 | proto.WireBytes)
+		b.EncodeStringBytes(x.Email)
+	case *RegisterNormalReq_Phone:
+		b.EncodeVarint(5<<3 | proto.WireBytes)
+		b.EncodeStringBytes(x.Phone)
+	case nil:
+	default:
+		return fmt.Errorf("RegisterNormalReq.Contact has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _RegisterNormalReq_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*RegisterNormalReq)
+	switch tag {
+	case 4: // contact.email
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		x, err := b.DecodeStringBytes()
+		m.Contact = &RegisterNormalReq_Email{x}
+		return true, err
+	case 5: // contact.phone
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		x, err := b.DecodeStringBytes()
+		m.Contact = &RegisterNormalReq_Phone{x}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _RegisterNormalReq_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*RegisterNormalReq)
+	// contact
+	switch x := m.Contact.(type) {
+	case *RegisterNormalReq_Email:
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(len(x.Email)))
+		n += len(x.Email)
+	case *RegisterNormalReq_Phone:
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(len(x.Phone)))
+		n += len(x.Phone)
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
+}
+
+type RegisterOAuthReq struct {
+	Roles                []string `protobuf:"bytes,1,rep,name=roles,proto3" json:"roles,omitempty"`
+	OauthProvider        string   `protobuf:"bytes,2,opt,name=oauthProvider,proto3" json:"oauthProvider,omitempty"`
+	OauthUID             string   `protobuf:"bytes,3,opt,name=oauthUID,proto3" json:"oauthUID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *RegisterOAuthReq) Reset()         { *m = RegisterOAuthReq{} }
+func (m *RegisterOAuthReq) String() string { return proto.CompactTextString(m) }
+func (*RegisterOAuthReq) ProtoMessage()    {}
+func (*RegisterOAuthReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_uaa_61527220a96fba71, []int{7}
+}
+func (m *RegisterOAuthReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_RegisterOAuthReq.Unmarshal(m, b)
+}
+func (m *RegisterOAuthReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_RegisterOAuthReq.Marshal(b, m, deterministic)
+}
+func (dst *RegisterOAuthReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RegisterOAuthReq.Merge(dst, src)
+}
+func (m *RegisterOAuthReq) XXX_Size() int {
+	return xxx_messageInfo_RegisterOAuthReq.Size(m)
+}
+func (m *RegisterOAuthReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_RegisterOAuthReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RegisterOAuthReq proto.InternalMessageInfo
+
+func (m *RegisterOAuthReq) GetRoles() []string {
+	if m != nil {
+		return m.Roles
+	}
+	return nil
+}
+
+func (m *RegisterOAuthReq) GetOauthProvider() string {
+	if m != nil {
+		return m.OauthProvider
+	}
+	return ""
+}
+
+func (m *RegisterOAuthReq) GetOauthUID() string {
+	if m != nil {
+		return m.OauthUID
+	}
+	return ""
+}
+
+type VerifyAccountReq struct {
+	Principal            string   `protobuf:"bytes,1,opt,name=principal,proto3" json:"principal,omitempty"`
+	Password             string   `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *VerifyAccountReq) Reset()         { *m = VerifyAccountReq{} }
+func (m *VerifyAccountReq) String() string { return proto.CompactTextString(m) }
+func (*VerifyAccountReq) ProtoMessage()    {}
+func (*VerifyAccountReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_uaa_61527220a96fba71, []int{8}
+}
+func (m *VerifyAccountReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_VerifyAccountReq.Unmarshal(m, b)
+}
+func (m *VerifyAccountReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_VerifyAccountReq.Marshal(b, m, deterministic)
+}
+func (dst *VerifyAccountReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_VerifyAccountReq.Merge(dst, src)
+}
+func (m *VerifyAccountReq) XXX_Size() int {
+	return xxx_messageInfo_VerifyAccountReq.Size(m)
+}
+func (m *VerifyAccountReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_VerifyAccountReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_VerifyAccountReq proto.InternalMessageInfo
+
+func (m *VerifyAccountReq) GetPrincipal() string {
+	if m != nil {
+		return m.Principal
+	}
+	return ""
+}
+
+func (m *VerifyAccountReq) GetPassword() string {
 	if m != nil {
 		return m.Password
 	}
@@ -450,7 +635,7 @@ func (m *VerifyPasswordReq) GetPassword() string {
 }
 
 type ChangePasswordReq struct {
-	Username             string   `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	Principal            string   `protobuf:"bytes,1,opt,name=principal,proto3" json:"principal,omitempty"`
 	OldPassword          string   `protobuf:"bytes,2,opt,name=oldPassword,proto3" json:"oldPassword,omitempty"`
 	NewPassword          string   `protobuf:"bytes,3,opt,name=newPassword,proto3" json:"newPassword,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -462,7 +647,7 @@ func (m *ChangePasswordReq) Reset()         { *m = ChangePasswordReq{} }
 func (m *ChangePasswordReq) String() string { return proto.CompactTextString(m) }
 func (*ChangePasswordReq) ProtoMessage()    {}
 func (*ChangePasswordReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_uaa_e29788bb7cf95f36, []int{8}
+	return fileDescriptor_uaa_61527220a96fba71, []int{9}
 }
 func (m *ChangePasswordReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ChangePasswordReq.Unmarshal(m, b)
@@ -482,9 +667,9 @@ func (m *ChangePasswordReq) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ChangePasswordReq proto.InternalMessageInfo
 
-func (m *ChangePasswordReq) GetUsername() string {
+func (m *ChangePasswordReq) GetPrincipal() string {
 	if m != nil {
-		return m.Username
+		return m.Principal
 	}
 	return ""
 }
@@ -503,17 +688,65 @@ func (m *ChangePasswordReq) GetNewPassword() string {
 	return ""
 }
 
+type UpdateSignInReq struct {
+	Ip                   string               `protobuf:"bytes,1,opt,name=ip,proto3" json:"ip,omitempty"`
+	Time                 *timestamp.Timestamp `protobuf:"bytes,2,opt,name=time,proto3" json:"time,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
+}
+
+func (m *UpdateSignInReq) Reset()         { *m = UpdateSignInReq{} }
+func (m *UpdateSignInReq) String() string { return proto.CompactTextString(m) }
+func (*UpdateSignInReq) ProtoMessage()    {}
+func (*UpdateSignInReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_uaa_61527220a96fba71, []int{10}
+}
+func (m *UpdateSignInReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UpdateSignInReq.Unmarshal(m, b)
+}
+func (m *UpdateSignInReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UpdateSignInReq.Marshal(b, m, deterministic)
+}
+func (dst *UpdateSignInReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateSignInReq.Merge(dst, src)
+}
+func (m *UpdateSignInReq) XXX_Size() int {
+	return xxx_messageInfo_UpdateSignInReq.Size(m)
+}
+func (m *UpdateSignInReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateSignInReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpdateSignInReq proto.InternalMessageInfo
+
+func (m *UpdateSignInReq) GetIp() string {
+	if m != nil {
+		return m.Ip
+	}
+	return ""
+}
+
+func (m *UpdateSignInReq) GetTime() *timestamp.Timestamp {
+	if m != nil {
+		return m.Time
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Account)(nil), "com.teddy.srv.uaa.Account")
-	proto.RegisterMapType((map[string]string)(nil), "com.teddy.srv.uaa.Account.OauthUserIdsEntry")
+	proto.RegisterMapType((map[string]string)(nil), "com.teddy.srv.uaa.Account.OauthUIDsEntry")
+	proto.RegisterType((*Sort)(nil), "com.teddy.srv.uaa.Sort")
+	proto.RegisterType((*UIDReq)(nil), "com.teddy.srv.uaa.UIDReq")
+	proto.RegisterType((*GetAllReq)(nil), "com.teddy.srv.uaa.GetAllReq")
+	proto.RegisterType((*GetOneReq)(nil), "com.teddy.srv.uaa.GetOneReq")
 	proto.RegisterType((*GetAllResp)(nil), "com.teddy.srv.uaa.GetAllResp")
-	proto.RegisterType((*GetByPhoneReq)(nil), "com.teddy.srv.uaa.GetByPhoneReq")
-	proto.RegisterType((*GetByEmailReq)(nil), "com.teddy.srv.uaa.GetByEmailReq")
-	proto.RegisterType((*GetByUsernameReq)(nil), "com.teddy.srv.uaa.GetByUsernameReq")
-	proto.RegisterType((*DeleteByUsernameReq)(nil), "com.teddy.srv.uaa.DeleteByUsernameReq")
-	proto.RegisterType((*RegisterReq)(nil), "com.teddy.srv.uaa.RegisterReq")
-	proto.RegisterType((*VerifyPasswordReq)(nil), "com.teddy.srv.uaa.VerifyPasswordReq")
+	proto.RegisterType((*RegisterNormalReq)(nil), "com.teddy.srv.uaa.RegisterNormalReq")
+	proto.RegisterType((*RegisterOAuthReq)(nil), "com.teddy.srv.uaa.RegisterOAuthReq")
+	proto.RegisterType((*VerifyAccountReq)(nil), "com.teddy.srv.uaa.VerifyAccountReq")
 	proto.RegisterType((*ChangePasswordReq)(nil), "com.teddy.srv.uaa.ChangePasswordReq")
+	proto.RegisterType((*UpdateSignInReq)(nil), "com.teddy.srv.uaa.UpdateSignInReq")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -528,14 +761,16 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type UAAClient interface {
-	GetAll(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*GetAllResp, error)
-	GetByEmail(ctx context.Context, in *GetByEmailReq, opts ...grpc.CallOption) (*Account, error)
-	GetByPhone(ctx context.Context, in *GetByPhoneReq, opts ...grpc.CallOption) (*Account, error)
-	GetByUsername(ctx context.Context, in *GetByUsernameReq, opts ...grpc.CallOption) (*Account, error)
-	DeleteByUsername(ctx context.Context, in *DeleteByUsernameReq, opts ...grpc.CallOption) (*empty.Empty, error)
-	Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*Account, error)
-	VerifyPassword(ctx context.Context, in *VerifyPasswordReq, opts ...grpc.CallOption) (*Account, error)
+	GetAll(ctx context.Context, in *GetAllReq, opts ...grpc.CallOption) (*GetAllResp, error)
+	GetOne(ctx context.Context, in *GetOneReq, opts ...grpc.CallOption) (*Account, error)
+	RegisterByNormal(ctx context.Context, in *RegisterNormalReq, opts ...grpc.CallOption) (*Account, error)
+	RegisterByOAuth(ctx context.Context, in *RegisterOAuthReq, opts ...grpc.CallOption) (*Account, error)
+	VerifyPassword(ctx context.Context, in *VerifyAccountReq, opts ...grpc.CallOption) (*Account, error)
 	ChangePassword(ctx context.Context, in *ChangePasswordReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	UpdateSignIn(ctx context.Context, in *UpdateSignInReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	DeleteByUsername(ctx context.Context, in *UIDReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	DoLockAccount(ctx context.Context, in *UIDReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	DoCredentialsExpired(ctx context.Context, in *UIDReq, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
 type uAAClient struct {
@@ -546,7 +781,7 @@ func NewUAAClient(cc *grpc.ClientConn) UAAClient {
 	return &uAAClient{cc}
 }
 
-func (c *uAAClient) GetAll(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*GetAllResp, error) {
+func (c *uAAClient) GetAll(ctx context.Context, in *GetAllReq, opts ...grpc.CallOption) (*GetAllResp, error) {
 	out := new(GetAllResp)
 	err := c.cc.Invoke(ctx, "/com.teddy.srv.uaa.UAA/GetAll", in, out, opts...)
 	if err != nil {
@@ -555,52 +790,34 @@ func (c *uAAClient) GetAll(ctx context.Context, in *empty.Empty, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *uAAClient) GetByEmail(ctx context.Context, in *GetByEmailReq, opts ...grpc.CallOption) (*Account, error) {
+func (c *uAAClient) GetOne(ctx context.Context, in *GetOneReq, opts ...grpc.CallOption) (*Account, error) {
 	out := new(Account)
-	err := c.cc.Invoke(ctx, "/com.teddy.srv.uaa.UAA/GetByEmail", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.uaa.UAA/GetOne", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *uAAClient) GetByPhone(ctx context.Context, in *GetByPhoneReq, opts ...grpc.CallOption) (*Account, error) {
+func (c *uAAClient) RegisterByNormal(ctx context.Context, in *RegisterNormalReq, opts ...grpc.CallOption) (*Account, error) {
 	out := new(Account)
-	err := c.cc.Invoke(ctx, "/com.teddy.srv.uaa.UAA/GetByPhone", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.uaa.UAA/RegisterByNormal", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *uAAClient) GetByUsername(ctx context.Context, in *GetByUsernameReq, opts ...grpc.CallOption) (*Account, error) {
+func (c *uAAClient) RegisterByOAuth(ctx context.Context, in *RegisterOAuthReq, opts ...grpc.CallOption) (*Account, error) {
 	out := new(Account)
-	err := c.cc.Invoke(ctx, "/com.teddy.srv.uaa.UAA/GetByUsername", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.uaa.UAA/RegisterByOAuth", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *uAAClient) DeleteByUsername(ctx context.Context, in *DeleteByUsernameReq, opts ...grpc.CallOption) (*empty.Empty, error) {
-	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/com.teddy.srv.uaa.UAA/DeleteByUsername", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *uAAClient) Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*Account, error) {
-	out := new(Account)
-	err := c.cc.Invoke(ctx, "/com.teddy.srv.uaa.UAA/Register", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *uAAClient) VerifyPassword(ctx context.Context, in *VerifyPasswordReq, opts ...grpc.CallOption) (*Account, error) {
+func (c *uAAClient) VerifyPassword(ctx context.Context, in *VerifyAccountReq, opts ...grpc.CallOption) (*Account, error) {
 	out := new(Account)
 	err := c.cc.Invoke(ctx, "/com.teddy.srv.uaa.UAA/VerifyPassword", in, out, opts...)
 	if err != nil {
@@ -618,16 +835,54 @@ func (c *uAAClient) ChangePassword(ctx context.Context, in *ChangePasswordReq, o
 	return out, nil
 }
 
+func (c *uAAClient) UpdateSignIn(ctx context.Context, in *UpdateSignInReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.uaa.UAA/UpdateSignIn", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *uAAClient) DeleteByUsername(ctx context.Context, in *UIDReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.uaa.UAA/DeleteByUsername", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *uAAClient) DoLockAccount(ctx context.Context, in *UIDReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.uaa.UAA/DoLockAccount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *uAAClient) DoCredentialsExpired(ctx context.Context, in *UIDReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/com.teddy.srv.uaa.UAA/DoCredentialsExpired", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UAAServer is the server API for UAA service.
 type UAAServer interface {
-	GetAll(context.Context, *empty.Empty) (*GetAllResp, error)
-	GetByEmail(context.Context, *GetByEmailReq) (*Account, error)
-	GetByPhone(context.Context, *GetByPhoneReq) (*Account, error)
-	GetByUsername(context.Context, *GetByUsernameReq) (*Account, error)
-	DeleteByUsername(context.Context, *DeleteByUsernameReq) (*empty.Empty, error)
-	Register(context.Context, *RegisterReq) (*Account, error)
-	VerifyPassword(context.Context, *VerifyPasswordReq) (*Account, error)
+	GetAll(context.Context, *GetAllReq) (*GetAllResp, error)
+	GetOne(context.Context, *GetOneReq) (*Account, error)
+	RegisterByNormal(context.Context, *RegisterNormalReq) (*Account, error)
+	RegisterByOAuth(context.Context, *RegisterOAuthReq) (*Account, error)
+	VerifyPassword(context.Context, *VerifyAccountReq) (*Account, error)
 	ChangePassword(context.Context, *ChangePasswordReq) (*empty.Empty, error)
+	UpdateSignIn(context.Context, *UpdateSignInReq) (*empty.Empty, error)
+	DeleteByUsername(context.Context, *UIDReq) (*empty.Empty, error)
+	DoLockAccount(context.Context, *UIDReq) (*empty.Empty, error)
+	DoCredentialsExpired(context.Context, *UIDReq) (*empty.Empty, error)
 }
 
 func RegisterUAAServer(s *grpc.Server, srv UAAServer) {
@@ -635,7 +890,7 @@ func RegisterUAAServer(s *grpc.Server, srv UAAServer) {
 }
 
 func _UAA_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(empty.Empty)
+	in := new(GetAllReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -647,103 +902,67 @@ func _UAA_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interfac
 		FullMethod: "/com.teddy.srv.uaa.UAA/GetAll",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UAAServer).GetAll(ctx, req.(*empty.Empty))
+		return srv.(UAAServer).GetAll(ctx, req.(*GetAllReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UAA_GetByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetByEmailReq)
+func _UAA_GetOne_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOneReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UAAServer).GetByEmail(ctx, in)
+		return srv.(UAAServer).GetOne(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/com.teddy.srv.uaa.UAA/GetByEmail",
+		FullMethod: "/com.teddy.srv.uaa.UAA/GetOne",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UAAServer).GetByEmail(ctx, req.(*GetByEmailReq))
+		return srv.(UAAServer).GetOne(ctx, req.(*GetOneReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UAA_GetByPhone_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetByPhoneReq)
+func _UAA_RegisterByNormal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterNormalReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UAAServer).GetByPhone(ctx, in)
+		return srv.(UAAServer).RegisterByNormal(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/com.teddy.srv.uaa.UAA/GetByPhone",
+		FullMethod: "/com.teddy.srv.uaa.UAA/RegisterByNormal",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UAAServer).GetByPhone(ctx, req.(*GetByPhoneReq))
+		return srv.(UAAServer).RegisterByNormal(ctx, req.(*RegisterNormalReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UAA_GetByUsername_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetByUsernameReq)
+func _UAA_RegisterByOAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterOAuthReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UAAServer).GetByUsername(ctx, in)
+		return srv.(UAAServer).RegisterByOAuth(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/com.teddy.srv.uaa.UAA/GetByUsername",
+		FullMethod: "/com.teddy.srv.uaa.UAA/RegisterByOAuth",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UAAServer).GetByUsername(ctx, req.(*GetByUsernameReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UAA_DeleteByUsername_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteByUsernameReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UAAServer).DeleteByUsername(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/com.teddy.srv.uaa.UAA/DeleteByUsername",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UAAServer).DeleteByUsername(ctx, req.(*DeleteByUsernameReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UAA_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RegisterReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UAAServer).Register(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/com.teddy.srv.uaa.UAA/Register",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UAAServer).Register(ctx, req.(*RegisterReq))
+		return srv.(UAAServer).RegisterByOAuth(ctx, req.(*RegisterOAuthReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _UAA_VerifyPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(VerifyPasswordReq)
+	in := new(VerifyAccountReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -755,7 +974,7 @@ func _UAA_VerifyPassword_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: "/com.teddy.srv.uaa.UAA/VerifyPassword",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UAAServer).VerifyPassword(ctx, req.(*VerifyPasswordReq))
+		return srv.(UAAServer).VerifyPassword(ctx, req.(*VerifyAccountReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -778,6 +997,78 @@ func _UAA_ChangePassword_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UAA_UpdateSignIn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateSignInReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UAAServer).UpdateSignIn(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.uaa.UAA/UpdateSignIn",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UAAServer).UpdateSignIn(ctx, req.(*UpdateSignInReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UAA_DeleteByUsername_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UIDReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UAAServer).DeleteByUsername(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.uaa.UAA/DeleteByUsername",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UAAServer).DeleteByUsername(ctx, req.(*UIDReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UAA_DoLockAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UIDReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UAAServer).DoLockAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.uaa.UAA/DoLockAccount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UAAServer).DoLockAccount(ctx, req.(*UIDReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UAA_DoCredentialsExpired_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UIDReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UAAServer).DoCredentialsExpired(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/com.teddy.srv.uaa.UAA/DoCredentialsExpired",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UAAServer).DoCredentialsExpired(ctx, req.(*UIDReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _UAA_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "com.teddy.srv.uaa.UAA",
 	HandlerType: (*UAAServer)(nil),
@@ -787,24 +1078,16 @@ var _UAA_serviceDesc = grpc.ServiceDesc{
 			Handler:    _UAA_GetAll_Handler,
 		},
 		{
-			MethodName: "GetByEmail",
-			Handler:    _UAA_GetByEmail_Handler,
+			MethodName: "GetOne",
+			Handler:    _UAA_GetOne_Handler,
 		},
 		{
-			MethodName: "GetByPhone",
-			Handler:    _UAA_GetByPhone_Handler,
+			MethodName: "RegisterByNormal",
+			Handler:    _UAA_RegisterByNormal_Handler,
 		},
 		{
-			MethodName: "GetByUsername",
-			Handler:    _UAA_GetByUsername_Handler,
-		},
-		{
-			MethodName: "DeleteByUsername",
-			Handler:    _UAA_DeleteByUsername_Handler,
-		},
-		{
-			MethodName: "Register",
-			Handler:    _UAA_Register_Handler,
+			MethodName: "RegisterByOAuth",
+			Handler:    _UAA_RegisterByOAuth_Handler,
 		},
 		{
 			MethodName: "VerifyPassword",
@@ -814,59 +1097,88 @@ var _UAA_serviceDesc = grpc.ServiceDesc{
 			MethodName: "ChangePassword",
 			Handler:    _UAA_ChangePassword_Handler,
 		},
+		{
+			MethodName: "UpdateSignIn",
+			Handler:    _UAA_UpdateSignIn_Handler,
+		},
+		{
+			MethodName: "DeleteByUsername",
+			Handler:    _UAA_DeleteByUsername_Handler,
+		},
+		{
+			MethodName: "DoLockAccount",
+			Handler:    _UAA_DoLockAccount_Handler,
+		},
+		{
+			MethodName: "DoCredentialsExpired",
+			Handler:    _UAA_DoCredentialsExpired_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "github.com/zhsyourai/teddy-backend/common/proto/uaa.proto",
 }
 
 func init() {
-	proto.RegisterFile("github.com/zhsyourai/teddy-backend/common/proto/uaa.proto", fileDescriptor_uaa_e29788bb7cf95f36)
+	proto.RegisterFile("github.com/zhsyourai/teddy-backend/common/proto/uaa.proto", fileDescriptor_uaa_61527220a96fba71)
 }
 
-var fileDescriptor_uaa_e29788bb7cf95f36 = []byte{
-	// 691 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x94, 0x4f, 0x6f, 0xd3, 0x4c,
-	0x10, 0xc6, 0xeb, 0xa6, 0x69, 0xd3, 0x49, 0x5b, 0x35, 0xfb, 0xbe, 0x42, 0x96, 0x25, 0x90, 0x65,
-	0x4a, 0x95, 0x03, 0x38, 0xa2, 0x95, 0x10, 0x94, 0x03, 0x4a, 0x69, 0x54, 0x10, 0x95, 0x88, 0xac,
-	0x96, 0x03, 0xb7, 0xad, 0x3d, 0x75, 0xac, 0xd8, 0x5e, 0xe3, 0x5d, 0xb7, 0x98, 0x13, 0x37, 0xf8,
-	0xd8, 0xc8, 0x7f, 0x63, 0x37, 0x0e, 0xae, 0xc4, 0xa5, 0xdd, 0x19, 0x3f, 0xf3, 0x78, 0x76, 0xe6,
-	0xe7, 0xc0, 0x1b, 0xdb, 0x11, 0xb3, 0xe8, 0x5a, 0x37, 0x99, 0x37, 0xfa, 0x31, 0xe3, 0x31, 0x8b,
-	0x42, 0xea, 0x8c, 0x04, 0x5a, 0x56, 0xfc, 0xe2, 0x9a, 0x9a, 0x73, 0xf4, 0xad, 0x91, 0xc9, 0x3c,
-	0x8f, 0xf9, 0xa3, 0x20, 0x64, 0x82, 0x8d, 0x22, 0x4a, 0xf5, 0xf4, 0x44, 0x06, 0x26, 0xf3, 0xf4,
-	0x54, 0xa9, 0xf3, 0xf0, 0x56, 0x8f, 0x28, 0x55, 0x8e, 0x2b, 0x6e, 0x36, 0x73, 0xa9, 0x6f, 0x67,
-	0x55, 0xd7, 0xd1, 0xcd, 0x28, 0x10, 0x71, 0x80, 0x7c, 0x84, 0x5e, 0x20, 0xe2, 0xec, 0x6f, 0xe6,
-	0xa3, 0xbc, 0x6d, 0x2f, 0x12, 0x8e, 0x87, 0x5c, 0x50, 0x2f, 0x58, 0x9c, 0xb2, 0x62, 0xed, 0xf7,
-	0x06, 0x6c, 0x8d, 0x4d, 0x93, 0x45, 0xbe, 0x20, 0xfb, 0xd0, 0x89, 0x1c, 0x4b, 0x96, 0x54, 0x69,
-	0xb8, 0x6d, 0x24, 0x47, 0xa2, 0x40, 0x2f, 0xe2, 0x18, 0xfa, 0xd4, 0x43, 0x79, 0x3d, 0x4d, 0x97,
-	0x31, 0xf9, 0x1f, 0xba, 0xe8, 0x51, 0xc7, 0x95, 0x3b, 0xe9, 0x83, 0x2c, 0x48, 0x2a, 0x02, 0xca,
-	0xf9, 0x1d, 0x0b, 0x2d, 0x79, 0x43, 0x95, 0x86, 0x3b, 0x46, 0x19, 0x93, 0x43, 0xd8, 0xa3, 0xd9,
-	0xab, 0x26, 0xdf, 0x03, 0x27, 0x44, 0x4b, 0xee, 0xaa, 0xd2, 0xb0, 0x67, 0xdc, 0xcb, 0x92, 0x03,
-	0xd8, 0xcd, 0x33, 0x17, 0xcc, 0x9c, 0xa3, 0x25, 0x6f, 0xa6, 0xb2, 0x7a, 0x92, 0xe8, 0x40, 0xcc,
-	0x10, 0x2d, 0xf4, 0x85, 0x43, 0x5d, 0x5e, 0x38, 0x6e, 0xa5, 0xd2, 0x86, 0x27, 0x49, 0xbf, 0x21,
-	0x73, 0x91, 0xcb, 0x3d, 0xb5, 0x93, 0xf4, 0x9b, 0x06, 0x64, 0x0a, 0x3b, 0x8c, 0x46, 0x62, 0x76,
-	0xc5, 0x31, 0xfc, 0x68, 0x71, 0x79, 0x5b, 0xed, 0x0c, 0xfb, 0x47, 0xcf, 0xf5, 0xa5, 0xdd, 0xe8,
-	0xf9, 0x94, 0xf4, 0xcf, 0x15, 0xf9, 0xc4, 0x17, 0x61, 0x6c, 0xd4, 0x1c, 0xc8, 0x09, 0x80, 0x19,
-	0x22, 0x15, 0x78, 0x46, 0x05, 0xca, 0xa0, 0x4a, 0xc3, 0xfe, 0x91, 0xa2, 0xdb, 0x8c, 0xd9, 0x2e,
-	0xea, 0xc5, 0x62, 0xf4, 0xcb, 0x62, 0x0f, 0x46, 0x45, 0x9d, 0xd4, 0x46, 0x81, 0x55, 0xd4, 0xf6,
-	0xdb, 0x6b, 0x17, 0x6a, 0xe5, 0x1d, 0x0c, 0x96, 0x5a, 0x4b, 0x56, 0x3a, 0xc7, 0xb8, 0x58, 0xe9,
-	0x1c, 0xe3, 0x64, 0x0c, 0xb7, 0xd4, 0x8d, 0x8a, 0x7d, 0x66, 0xc1, 0xc9, 0xfa, 0x6b, 0x49, 0x3b,
-	0x03, 0x38, 0x47, 0x31, 0x76, 0x5d, 0x03, 0x79, 0x40, 0x5e, 0x41, 0x2f, 0x9f, 0x37, 0x97, 0xa5,
-	0x74, 0x28, 0xca, 0xea, 0xa1, 0x18, 0xa5, 0x56, 0x7b, 0x06, 0xbb, 0xe7, 0x28, 0x4e, 0xe3, 0xe9,
-	0x8c, 0xf9, 0x68, 0xe0, 0xb7, 0xe4, 0x85, 0x41, 0x72, 0xce, 0x9b, 0xc8, 0x82, 0x52, 0x36, 0x49,
-	0xa8, 0xc9, 0x65, 0x19, 0x4e, 0x52, 0x05, 0x27, 0x4d, 0x87, 0xfd, 0x54, 0x76, 0x95, 0x53, 0x97,
-	0x28, 0xab, 0x50, 0x4a, 0x75, 0x28, 0xb5, 0x97, 0xf0, 0xdf, 0x19, 0xba, 0x28, 0xf0, 0xe1, 0x25,
-	0xbf, 0x24, 0xe8, 0x1b, 0x68, 0x3b, 0x5c, 0x60, 0xd8, 0xa2, 0xad, 0xd1, 0x9d, 0x7f, 0x0f, 0x25,
-	0xdd, 0xcd, 0xdf, 0x43, 0x79, 0xfb, 0x8d, 0xca, 0xed, 0x17, 0x2c, 0x76, 0x2b, 0x2c, 0x6a, 0x9f,
-	0x60, 0xf0, 0x05, 0x43, 0xe7, 0x26, 0x9e, 0xe6, 0x9e, 0xff, 0xd0, 0x8e, 0xc6, 0x61, 0xf0, 0x7e,
-	0x46, 0x7d, 0x1b, 0x1f, 0x6a, 0xa6, 0x42, 0x9f, 0xb9, 0xd6, 0xb4, 0xee, 0x57, 0x4d, 0x25, 0x0a,
-	0x1f, 0xef, 0x4a, 0x45, 0x76, 0xcf, 0x6a, 0xea, 0xe8, 0x67, 0x17, 0x3a, 0x57, 0xe3, 0x31, 0x19,
-	0xc3, 0x66, 0x86, 0x12, 0x79, 0xb4, 0x44, 0xef, 0x24, 0xf9, 0xe9, 0x52, 0x1e, 0x37, 0xc0, 0xb4,
-	0xa0, 0x4f, 0x5b, 0x23, 0x17, 0x29, 0x8d, 0x39, 0x20, 0x44, 0x6d, 0x96, 0x2f, 0xf8, 0x51, 0xfe,
-	0x42, 0x67, 0xc5, 0x2d, 0xa5, 0x72, 0xb5, 0x5b, 0x01, 0x6d, 0x8b, 0x9b, 0x91, 0xc3, 0x5b, 0x20,
-	0x46, 0x9e, 0xae, 0x32, 0xac, 0x40, 0xd8, 0xe2, 0x79, 0x09, 0xfb, 0xf7, 0xc9, 0x25, 0x87, 0x0d,
-	0x15, 0x0d, 0x78, 0x2b, 0x2b, 0x86, 0xac, 0xad, 0x91, 0x0f, 0xd0, 0x2b, 0xd8, 0x26, 0x4f, 0x1a,
-	0xdc, 0x2a, 0xe0, 0xb7, 0xf6, 0xb7, 0x57, 0x87, 0x93, 0x1c, 0x34, 0xe8, 0x97, 0xf8, 0x6d, 0x71,
-	0x9d, 0xc2, 0x5e, 0x9d, 0xd2, 0x46, 0xd7, 0x25, 0x90, 0x57, 0xdf, 0xf8, 0x74, 0xeb, 0x6b, 0x37,
-	0xcb, 0x6d, 0xa6, 0xff, 0x8e, 0xff, 0x04, 0x00, 0x00, 0xff, 0xff, 0xe9, 0xe7, 0x68, 0xad, 0xa2,
-	0x07, 0x00, 0x00,
+var fileDescriptor_uaa_61527220a96fba71 = []byte{
+	// 897 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x56, 0x5d, 0x6f, 0xdb, 0x36,
+	0x14, 0x8d, 0xfc, 0x95, 0xf8, 0x26, 0x76, 0x13, 0xa2, 0xc8, 0x34, 0xa1, 0x03, 0x0c, 0xad, 0x0f,
+	0x2e, 0xb0, 0xca, 0x40, 0x0a, 0x0c, 0x5b, 0xb7, 0x17, 0xbb, 0x0a, 0xb2, 0x60, 0xc1, 0xe2, 0x29,
+	0x75, 0x1f, 0xf6, 0xc6, 0x48, 0xac, 0xac, 0x59, 0x12, 0x35, 0x92, 0x4a, 0xa7, 0xfe, 0x8d, 0xbd,
+	0xee, 0xe7, 0xec, 0x87, 0x0d, 0x24, 0x4d, 0x7f, 0xc4, 0x8e, 0x0d, 0xf4, 0x25, 0xe1, 0xbd, 0xbc,
+	0xe7, 0xf0, 0xea, 0xf2, 0x1c, 0xc9, 0xf0, 0x63, 0x9c, 0x88, 0x69, 0x79, 0xef, 0x85, 0x34, 0x1b,
+	0x7c, 0x9e, 0xf2, 0x8a, 0x96, 0x0c, 0x27, 0x03, 0x41, 0xa2, 0xa8, 0x7a, 0x7d, 0x8f, 0xc3, 0x19,
+	0xc9, 0xa3, 0x41, 0x48, 0xb3, 0x8c, 0xe6, 0x83, 0x82, 0x51, 0x41, 0x07, 0x25, 0xc6, 0x9e, 0x5a,
+	0xa1, 0xb3, 0x90, 0x66, 0x9e, 0xaa, 0xf4, 0x38, 0x7b, 0xf0, 0x4a, 0x8c, 0x9d, 0x37, 0x2b, 0x6c,
+	0x31, 0x4d, 0x71, 0x1e, 0x6b, 0xd4, 0x7d, 0xf9, 0x71, 0x50, 0x88, 0xaa, 0x20, 0x7c, 0x40, 0xb2,
+	0x42, 0x54, 0xfa, 0xaf, 0xe6, 0x71, 0x7e, 0xda, 0x0f, 0x12, 0x49, 0x46, 0xb8, 0xc0, 0x59, 0xb1,
+	0x5c, 0x69, 0xb0, 0xfb, 0x5f, 0x03, 0x0e, 0x87, 0x61, 0x48, 0xcb, 0x5c, 0xa0, 0x53, 0xa8, 0x97,
+	0x49, 0x64, 0x5b, 0x3d, 0xab, 0xdf, 0x0e, 0xe4, 0x12, 0x39, 0x70, 0x54, 0x72, 0xc2, 0x72, 0x9c,
+	0x11, 0xbb, 0xa6, 0xd2, 0x8b, 0x18, 0x3d, 0x87, 0x26, 0xc9, 0x70, 0x92, 0xda, 0x75, 0xb5, 0xa1,
+	0x03, 0x99, 0x2d, 0xa6, 0x34, 0x27, 0x76, 0x43, 0x67, 0x55, 0x20, 0x79, 0x0a, 0xcc, 0xf9, 0x27,
+	0xca, 0x22, 0xbb, 0xd9, 0xb3, 0xfa, 0x27, 0xc1, 0x22, 0x96, 0x08, 0x46, 0x53, 0xc2, 0xed, 0x56,
+	0xaf, 0x2e, 0x11, 0x2a, 0x40, 0x57, 0xd0, 0xa6, 0xb8, 0x14, 0xd3, 0xc9, 0xb5, 0xcf, 0xed, 0xc3,
+	0x5e, 0xbd, 0x7f, 0x7c, 0xf1, 0xca, 0xdb, 0x18, 0x98, 0x37, 0x6f, 0xdd, 0xbb, 0x35, 0xb5, 0x97,
+	0xb9, 0x60, 0x55, 0xb0, 0xc4, 0xa2, 0x73, 0x68, 0xa5, 0x34, 0x9c, 0x91, 0xc8, 0x6e, 0xf7, 0xac,
+	0xfe, 0x51, 0x30, 0x8f, 0x90, 0x07, 0x28, 0x64, 0x24, 0x22, 0xb9, 0x48, 0x70, 0xca, 0x2f, 0xff,
+	0x2e, 0x12, 0x46, 0x22, 0x1b, 0x54, 0xcd, 0x96, 0x1d, 0xf4, 0x16, 0x20, 0x64, 0x04, 0x0b, 0xe2,
+	0x63, 0x41, 0xec, 0xe3, 0x9e, 0xd5, 0x3f, 0xbe, 0x70, 0xbc, 0x98, 0xd2, 0x38, 0x25, 0x9e, 0x99,
+	0xb7, 0xf7, 0xde, 0x8c, 0x37, 0x58, 0xa9, 0x96, 0xd8, 0xb2, 0x88, 0x0c, 0xf6, 0x64, 0x3f, 0x76,
+	0x59, 0x8d, 0x5c, 0x38, 0x49, 0x31, 0x17, 0x77, 0x49, 0x9c, 0x5f, 0xe7, 0xd7, 0x63, 0xbb, 0xa3,
+	0xe6, 0xba, 0x96, 0x43, 0x23, 0xe8, 0x2e, 0x63, 0x49, 0x63, 0x77, 0xf7, 0x9e, 0xf1, 0x08, 0xe1,
+	0xfc, 0x0c, 0xdd, 0xf5, 0x21, 0x4a, 0x39, 0xcc, 0x48, 0x65, 0xe4, 0x30, 0x23, 0x95, 0xbc, 0xaa,
+	0x07, 0x9c, 0x96, 0x46, 0x0b, 0x3a, 0x78, 0x5b, 0xfb, 0xc1, 0x72, 0xbf, 0x83, 0xc6, 0x1d, 0x65,
+	0x02, 0x21, 0x68, 0x28, 0xb1, 0x68, 0x90, 0x5a, 0x4b, 0x1e, 0xcc, 0x43, 0x85, 0x39, 0x0a, 0xe4,
+	0xd2, 0x75, 0xa0, 0x35, 0xb9, 0xf6, 0x03, 0xf2, 0xd7, 0xa6, 0xe4, 0xdc, 0x7b, 0x68, 0x5f, 0x11,
+	0x31, 0x4c, 0x53, 0xb9, 0x8d, 0xa0, 0x51, 0xe0, 0x58, 0xd3, 0x75, 0x02, 0xb5, 0x96, 0x39, 0x9e,
+	0x7c, 0xd6, 0x3d, 0x74, 0x02, 0xb5, 0x46, 0xaf, 0xa1, 0xc9, 0x29, 0x13, 0xdc, 0xae, 0x2b, 0xa5,
+	0x7c, 0xb5, 0x45, 0x29, 0xb2, 0xbd, 0x40, 0x57, 0xb9, 0xaf, 0xd4, 0x19, 0xb7, 0x39, 0x91, 0x67,
+	0xbc, 0x80, 0x76, 0xc1, 0x92, 0x3c, 0x4c, 0x0a, 0x9c, 0xce, 0x1b, 0x59, 0x26, 0x5c, 0x1f, 0xc0,
+	0xb4, 0xc3, 0x0b, 0xf4, 0x3d, 0x1c, 0x61, 0xad, 0x38, 0x6e, 0x5b, 0xea, 0x28, 0xe7, 0x69, 0x51,
+	0x06, 0x8b, 0x5a, 0xf7, 0x5f, 0x0b, 0xce, 0x02, 0x12, 0x27, 0x5c, 0x10, 0xf6, 0x1b, 0x65, 0x19,
+	0x56, 0x4f, 0xb7, 0x50, 0xbe, 0xb5, 0xaa, 0xfc, 0x5d, 0x9e, 0x5b, 0xf5, 0x91, 0xb6, 0xdd, 0xd2,
+	0x47, 0xe7, 0xc6, 0x8f, 0xca, 0x79, 0xbf, 0x1c, 0x18, 0x47, 0x9e, 0x1b, 0x47, 0x36, 0x4d, 0x5e,
+	0x85, 0xa3, 0x36, 0x1c, 0x86, 0x34, 0x17, 0x38, 0x14, 0xee, 0x9f, 0x70, 0x6a, 0xba, 0xbb, 0x1d,
+	0x96, 0x62, 0xfa, 0x74, 0x73, 0x2f, 0xa1, 0xa3, 0xac, 0x35, 0x66, 0xf4, 0x21, 0x89, 0x08, 0x9b,
+	0x77, 0xb8, 0x9e, 0x94, 0x6d, 0x1a, 0x03, 0x9a, 0x36, 0x4d, 0xec, 0xde, 0xc0, 0xe9, 0x07, 0xc2,
+	0x92, 0x8f, 0x95, 0x99, 0xd2, 0xbe, 0x2b, 0x58, 0x7b, 0xe8, 0xda, 0xfa, 0x43, 0xbb, 0x25, 0x9c,
+	0xbd, 0x9b, 0xe2, 0x3c, 0x26, 0xe3, 0x79, 0x66, 0x3f, 0x5d, 0x0f, 0x8e, 0x69, 0x1a, 0x8d, 0xd7,
+	0x19, 0x57, 0x53, 0xb2, 0x22, 0x27, 0x9f, 0xc6, 0xeb, 0x83, 0x5e, 0x4d, 0xb9, 0xbf, 0xc3, 0xb3,
+	0x89, 0xb2, 0xa8, 0x36, 0x90, 0x3c, 0xb4, 0x0b, 0xb5, 0xa4, 0x98, 0x9f, 0x56, 0x4b, 0x0a, 0xe4,
+	0x41, 0x43, 0xbe, 0x6b, 0x15, 0xff, 0x6e, 0x27, 0xaa, 0xba, 0x8b, 0x7f, 0x5a, 0x50, 0x9f, 0x0c,
+	0x87, 0xe8, 0x0a, 0x5a, 0x5a, 0x70, 0xe8, 0xc5, 0x16, 0x69, 0x2d, 0xac, 0xe1, 0x7c, 0xb3, 0x63,
+	0x97, 0x17, 0xee, 0x01, 0xf2, 0x15, 0xd1, 0x6d, 0x4e, 0x9e, 0x22, 0xd2, 0xfa, 0x77, 0x76, 0x28,
+	0xd8, 0x3d, 0x40, 0x1f, 0x96, 0xd2, 0x18, 0x55, 0x5a, 0xba, 0xe8, 0xe5, 0x16, 0xc4, 0x86, 0xba,
+	0xf7, 0xf0, 0xbe, 0x87, 0x67, 0x4b, 0x5e, 0x25, 0x3a, 0xf4, 0xed, 0x0e, 0x5a, 0x23, 0xcb, 0x3d,
+	0xac, 0x77, 0xd0, 0xd5, 0xe2, 0x5a, 0xdc, 0xe5, 0x36, 0xd2, 0xc7, 0xfa, 0xdb, 0x43, 0x3a, 0x86,
+	0xee, 0xba, 0xc6, 0xb6, 0x0e, 0x60, 0x43, 0x86, 0xce, 0xf9, 0xc6, 0x9d, 0x5f, 0xca, 0xaf, 0xb6,
+	0x7b, 0x80, 0x6e, 0xe0, 0x64, 0x55, 0x3e, 0xc8, 0xdd, 0xc2, 0xf7, 0x48, 0x5f, 0x3b, 0xd8, 0xae,
+	0xe0, 0xd4, 0x27, 0x29, 0x11, 0x64, 0x54, 0x4d, 0xcc, 0x8b, 0xe2, 0xeb, 0x6d, 0x8c, 0xea, 0x95,
+	0xbb, 0x83, 0xc8, 0x87, 0x8e, 0x4f, 0x6f, 0x68, 0x38, 0x33, 0x3f, 0x08, 0xbe, 0x88, 0xe5, 0x57,
+	0x78, 0xee, 0xd3, 0x77, 0x9b, 0x1f, 0xd0, 0x2f, 0x21, 0x1b, 0x1d, 0xfe, 0xd1, 0xd4, 0xb9, 0x96,
+	0xfa, 0xf7, 0xe6, 0xff, 0x00, 0x00, 0x00, 0xff, 0xff, 0xb9, 0x21, 0x36, 0xe0, 0x70, 0x09, 0x00,
+	0x00,
 }

@@ -8,65 +8,86 @@ import "github.com/golang/protobuf/ptypes/empty/empty.proto";
 import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
 
 service UAA {
-	rpc GetAll(google.protobuf.Empty) returns (GetAllResp) {}
-    rpc GetByEmail(GetByEmailReq) returns (Account) {}
-    rpc GetByPhone(GetByPhoneReq) returns (Account) {}
-	rpc GetByUsername(GetByUsernameReq) returns (Account) {}
-    rpc DeleteByUsername(DeleteByUsernameReq) returns (google.protobuf.Empty) {}
-    rpc Register(RegisterReq) returns (Account) {}
-    rpc VerifyPassword(VerifyPasswordReq) returns (Account) {}
+	rpc GetAll(GetAllReq) returns (GetAllResp) {}
+    rpc GetOne(GetOneReq) returns (Account) {}
+    rpc RegisterByNormal(RegisterNormalReq) returns (Account) {}
+    rpc RegisterByOAuth(RegisterOAuthReq) returns (Account) {}
+    rpc VerifyPassword(VerifyAccountReq) returns (Account) {}
     rpc ChangePassword(ChangePasswordReq) returns (google.protobuf.Empty) {}
+    rpc UpdateSignIn (UpdateSignInReq) returns (google.protobuf.Empty) {}
+
+    rpc DeleteByUsername(UIDReq) returns (google.protobuf.Empty) {}
+    rpc DoLockAccount(UIDReq) returns (google.protobuf.Empty) {}
+    rpc DoCredentialsExpired(UIDReq) returns (google.protobuf.Empty) {}
 }
 
 message Account {
     string uid = 1;
     string username = 2;
     string email = 3;
-    bytes password = 4;
-    bool accountExpired = 5;
-    bool accountLocked = 6;
-    bool credentialsExpired = 7;
-    repeated string roles = 8;
-    map<string, string> oauthUserIds = 9;
-    google.protobuf.Timestamp createDate = 10;
-    google.protobuf.Timestamp updateDate = 11;
+    string phone = 4;
+    bytes password = 5;
+    repeated string roles = 6;
+    map<string, string> oauthUIDs = 7;
+    bool locked = 9;
+    bool credentialsExpired = 10;
+    google.protobuf.Timestamp createDate = 11;
+    google.protobuf.Timestamp updateDate = 12;
+    string lastSignInIP = 13;
+    google.protobuf.Timestamp lastSignInTime = 14;
+}
+
+message Sort {
+    string name = 1;
+    bool asc = 2;
+}
+
+message UIDReq {
+    string uid = 1;
+}
+
+message GetAllReq {
+    uint32 page = 1;
+    uint32 size = 2;
+    repeated Sort sorts = 3;
+}
+
+message GetOneReq {
+    string principal = 1;
 }
 
 message GetAllResp {
     repeated Account accounts = 1;
 }
 
-message GetByPhoneReq {
-    string phone = 1;
+message RegisterNormalReq {
+    repeated string roles = 1;
+    string username = 2;
+    string password = 3;
+    oneof contact {
+        string email = 4;
+        string phone = 5;
+    }
 }
 
-message GetByEmailReq {
-    string email = 1;
+message RegisterOAuthReq {
+    repeated string roles = 1;
+    string oauthProvider = 2;
+    string oauthUID = 3;
 }
 
-message GetByUsernameReq {
-    string username = 1;
-}
-
-message DeleteByUsernameReq {
-    string username = 1;
-}
-
-message RegisterReq {
-    string username = 1;
-    string password = 2;
-    string email = 3;
-    string phone = 4;
-    repeated string roles = 5;
-}
-
-message VerifyPasswordReq {
-    string username = 1;
+message VerifyAccountReq {
+    string principal = 1;
     string password = 2;
 }
 
 message ChangePasswordReq {
-    string username = 1;
+    string principal = 1;
     string oldPassword = 2;
     string newPassword = 3;
+}
+
+message UpdateSignInReq {
+    string ip = 1;
+    google.protobuf.Timestamp time = 2;
 }
