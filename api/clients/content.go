@@ -5,21 +5,21 @@ import (
 	"sync"
 
 	"github.com/gin-gonic/gin"
-	"github.com/zhsyourai/teddy-backend/common/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto/content"
 	"google.golang.org/grpc"
 )
 
 var contentKey = "__teddy_content_client_key__"
 
 // FromContext retrieves the client from the Context
-func ContentFromContext(ctx *gin.Context) (proto.ContentClient, bool) {
-	c, ok := ctx.Value(contentKey).(proto.ContentClient)
+func ContentFromContext(ctx *gin.Context) (content.ContentClient, bool) {
+	c, ok := ctx.Value(contentKey).(content.ContentClient)
 	return c, ok
 }
 
 // Client returns a wrapper for the UaaClient
 func ContentNew(f AddressFunc) gin.HandlerFunc {
-	var client proto.ContentClient = nil
+	var client content.ContentClient = nil
 	lock := sync.Mutex{}
 	return func(ctx *gin.Context) {
 		if client == nil {
@@ -37,7 +37,7 @@ func ContentNew(f AddressFunc) gin.HandlerFunc {
 				ctx.Next()
 				return
 			}
-			client = proto.NewContentClient(conn)
+			client = content.NewContentClient(conn)
 		}
 		ctx.Set(contentKey, client)
 		ctx.Next()

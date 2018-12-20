@@ -3,7 +3,7 @@ package clients
 import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/common/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto/captcha"
 	"google.golang.org/grpc"
 	"sync"
 )
@@ -11,8 +11,8 @@ import (
 var captchaKey = "__teddy_captcha_client_key__"
 
 // FromContext retrieves the client from the Context
-func CaptchaFromContext(ctx *gin.Context) (proto.CaptchaClient, bool) {
-	c, ok := ctx.Value(captchaKey).(proto.CaptchaClient)
+func CaptchaFromContext(ctx *gin.Context) (captcha.CaptchaClient, bool) {
+	c, ok := ctx.Value(captchaKey).(captcha.CaptchaClient)
 	if c == nil {
 		return nil, false
 	}
@@ -21,7 +21,7 @@ func CaptchaFromContext(ctx *gin.Context) (proto.CaptchaClient, bool) {
 
 // Client returns a wrapper for the UaaClient
 func CaptchaNew(f AddressFunc) gin.HandlerFunc {
-	var client proto.CaptchaClient = nil
+	var client captcha.CaptchaClient = nil
 	lock := sync.Mutex{}
 	return func(ctx *gin.Context) {
 		if client == nil {
@@ -39,7 +39,7 @@ func CaptchaNew(f AddressFunc) gin.HandlerFunc {
 				ctx.Next()
 				return
 			}
-			client = proto.NewCaptchaClient(conn)
+			client = captcha.NewCaptchaClient(conn)
 		}
 		ctx.Set(captchaKey, client)
 		ctx.Next()

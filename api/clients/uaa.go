@@ -3,7 +3,7 @@ package clients
 import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/common/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto/uaa"
 	"google.golang.org/grpc"
 	"sync"
 )
@@ -11,14 +11,14 @@ import (
 var uaaKey = "__teddy_uaa_client_key__"
 
 // FromContext retrieves the client from the Context
-func UaaFromContext(ctx *gin.Context) (proto.UAAClient, bool) {
-	c, ok := ctx.Value(uaaKey).(proto.UAAClient)
+func UaaFromContext(ctx *gin.Context) (uaa.UAAClient, bool) {
+	c, ok := ctx.Value(uaaKey).(uaa.UAAClient)
 	return c, ok
 }
 
 // Client returns a wrapper for the UaaClient
 func UaaNew(f AddressFunc) gin.HandlerFunc {
-	var client proto.UAAClient = nil
+	var client uaa.UAAClient = nil
 	lock := sync.Mutex{}
 	return func(ctx *gin.Context) {
 		if client == nil {
@@ -37,7 +37,7 @@ func UaaNew(f AddressFunc) gin.HandlerFunc {
 				ctx.Next()
 				return
 			}
-			client = proto.NewUAAClient(conn)
+			client = uaa.NewUAAClient(conn)
 		}
 		ctx.Set(uaaKey, client)
 		ctx.Next()
