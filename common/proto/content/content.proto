@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package teddy.srv.content;
 
-option go_package = "proto";
+option go_package = "content";
 
 import "github.com/golang/protobuf/ptypes/empty/empty.proto";
 import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";

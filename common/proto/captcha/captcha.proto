@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package com.teddy.srv.captcha;
+package teddy.srv.captcha;
 
-option go_package = "proto";
+option go_package = "captcha";
 
 import "github.com/golang/protobuf/ptypes/empty/empty.proto";
 import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
