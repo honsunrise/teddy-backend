@@ -9,8 +9,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
-	"github.com/zhsyourai/teddy-backend/common/errors"
-	"github.com/zhsyourai/teddy-backend/common/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto/captcha"
+	"github.com/zhsyourai/teddy-backend/common/proto/message"
+	"github.com/zhsyourai/teddy-backend/common/proto/uaa"
 	"net/http"
 	"time"
 )
@@ -75,16 +76,16 @@ func (h *Uaa) Register(ctx *gin.Context) {
 		// extract the client from the context
 		uaaClient, ok := clients.UaaFromContext(ctx)
 		if !ok {
-			log.Error(errors.ErrCaptchaNotCorrect)
-			ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+			log.Error(ErrCaptchaNotCorrect)
+			ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 			return
 		}
 
 		// extract the client from the context
 		captchaClient, ok := clients.CaptchaFromContext(ctx)
 		if !ok {
-			log.Error(errors.ErrCaptchaNotCorrect)
-			ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+			log.Error(ErrCaptchaNotCorrect)
+			ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 			return
 		}
 
@@ -92,30 +93,30 @@ func (h *Uaa) Register(ctx *gin.Context) {
 		timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 		defer cancel()
 		if body.Email != "" && body.Captcha != "" {
-			rsp, err := captchaClient.Verify(timeoutCtx, &proto.VerifyReq{
-				Type: proto.CaptchaType_RANDOM_BY_ID,
+			rsp, err := captchaClient.Verify(timeoutCtx, &captcha.VerifyReq{
+				Type: captcha.CaptchaType_RANDOM_BY_ID,
 				Id:   body.Email,
 				Code: body.Captcha,
 			})
 			if err != nil || !rsp.Correct {
-				log.Error(errors.ErrCaptchaNotCorrect)
-				ctx.AbortWithError(http.StatusInternalServerError, errors.ErrCaptchaNotCorrect)
+				log.Error(ErrCaptchaNotCorrect)
+				ctx.AbortWithError(http.StatusInternalServerError, ErrCaptchaNotCorrect)
 				return
 			}
 		} else {
-			log.Error(errors.ErrCaptchaNotCorrect)
-			ctx.AbortWithError(http.StatusInternalServerError, errors.ErrCaptchaNotCorrect)
+			log.Error(ErrCaptchaNotCorrect)
+			ctx.AbortWithError(http.StatusInternalServerError, ErrCaptchaNotCorrect)
 			return
 		}
 
 		// make request
 		timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 		defer cancel()
-		response, err := uaaClient.RegisterByNormal(timeoutCtx, &proto.RegisterNormalReq{
+		response, err := uaaClient.RegisterByNormal(timeoutCtx, &uaa.RegisterNormalReq{
 			Username: body.Username,
 			Password: body.Password,
 			Roles:    body.Roles,
-			Contact: &proto.RegisterNormalReq_Email{
+			Contact: &uaa.RegisterNormalReq_Email{
 				Email: body.Email,
 			},
 		})
@@ -141,7 +142,7 @@ func (h *Uaa) Register(ctx *gin.Context) {
 			// Send welcome email
 			timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 			defer cancel()
-			messageClient.SendEmail(timeoutCtx, &proto.SendEmailReq{
+			messageClient.SendEmail(timeoutCtx, &message.SendEmailReq{
 				Email:   response.Email,
 				Topic:   "Welcome " + response.Username,
 				Content: "Hi " + response.Username,
@@ -154,7 +155,7 @@ func (h *Uaa) Register(ctx *gin.Context) {
 			// Send welcome inbox
 			timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 			defer cancel()
-			messageClient.SendInBox(timeoutCtx, &proto.SendInBoxReq{
+			messageClient.SendInBox(timeoutCtx, &message.SendInBoxReq{
 				Uid:     response.Uid,
 				Topic:   "Welcome " + body.Username,
 				Content: "Hi " + body.Username,
@@ -185,15 +186,15 @@ func (h *Uaa) Login(ctx *gin.Context) {
 	// extract the client from the context
 	uaaClient, ok := clients.UaaFromContext(ctx)
 	if !ok {
-		log.Error(errors.ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		log.Error(ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
 
 	// make request
 	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	response, err := uaaClient.VerifyPassword(timeoutCtx, &proto.VerifyAccountReq{
+	response, err := uaaClient.VerifyPassword(timeoutCtx, &uaa.VerifyAccountReq{
 		Principal: body.Principal,
 		Password:  body.Password,
 	})
@@ -249,36 +250,36 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 	// extract the client from the context
 	captchaClient, ok := clients.CaptchaFromContext(ctx)
 	if !ok {
-		log.Error(errors.ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		log.Error(ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
 
 	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	rsp, err := captchaClient.Verify(timeoutCtx, &proto.VerifyReq{
-		Type: proto.CaptchaType_IMAGE,
+	rsp, err := captchaClient.Verify(timeoutCtx, &captcha.VerifyReq{
+		Type: captcha.CaptchaType_IMAGE,
 		Id:   body.CaptchaId,
 		Code: body.CaptchaSolution,
 	})
 
 	if err != nil || !rsp.Correct {
-		log.Error(errors.ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrCaptchaNotCorrect)
+		log.Error(ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrCaptchaNotCorrect)
 		return
 	}
 
 	// extract the client from the context
 	uaaClient, ok := clients.UaaFromContext(ctx)
 	if !ok {
-		log.Error(errors.ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		log.Error(ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 	}
 
 	// make request
 	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	_, err = uaaClient.ChangePassword(timeoutCtx, &proto.ChangePasswordReq{
+	_, err = uaaClient.ChangePassword(timeoutCtx, &uaa.ChangePasswordReq{
 		Principal:   body.Username,
 		NewPassword: body.NewPassword,
 		OldPassword: body.OldPassword,
@@ -307,12 +308,12 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	// extract the client from the context
 	uaaClient, ok := clients.UaaFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 	}
 
 	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	tmpAccount, err := uaaClient.GetOne(timeoutCtx, &proto.GetOneReq{
+	tmpAccount, err := uaaClient.GetOne(timeoutCtx, &uaa.GetOneReq{
 		Principal: body.Email,
 	})
 
@@ -324,22 +325,22 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	// extract the client from the context
 	captchaClient, ok := clients.CaptchaFromContext(ctx)
 	if !ok {
-		log.Error(errors.ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		log.Error(ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
 
 	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	rsp, err := captchaClient.Verify(timeoutCtx, &proto.VerifyReq{
-		Type: proto.CaptchaType_IMAGE,
+	rsp, err := captchaClient.Verify(timeoutCtx, &captcha.VerifyReq{
+		Type: captcha.CaptchaType_IMAGE,
 		Id:   body.CaptchaId,
 		Code: body.CaptchaSolution,
 	})
 
 	if err != nil || !rsp.Correct {
-		log.Error(errors.ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusBadRequest, errors.ErrCaptchaNotCorrect)
+		log.Error(ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusBadRequest, ErrCaptchaNotCorrect)
 		return
 	}
 
@@ -347,13 +348,13 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	messageClient, ok := clients.MessageFromContext(ctx)
 	if !ok {
 		log.Error("message client not found")
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
 
 	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	captcha, err := captchaClient.GetRandomById(timeoutCtx, &proto.GetRandomReq{
+	random, err := captchaClient.GetRandomById(timeoutCtx, &captcha.GetRandomReq{
 		Len: 6,
 		Id:  body.Email,
 	})
@@ -366,10 +367,10 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	// Send captcha email
 	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	_, err = messageClient.SendEmail(ctx, &proto.SendEmailReq{
+	_, err = messageClient.SendEmail(ctx, &message.SendEmailReq{
 		Email:   body.Email,
 		Topic:   "Verify captcha",
-		Content: "Your captcha:" + captcha.Code,
+		Content: "Your captcha:" + random.Code,
 		SendTime: &timestamp.Timestamp{
 			Seconds: now.Unix(),
 			Nanos:   int32(now.Nanosecond()),
