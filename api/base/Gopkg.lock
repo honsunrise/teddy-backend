@@ -135,10 +135,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f00ea038205e2c3542946358685b341fb80682f1ee388e06b496457aadf1143b"
+  digest = "1:a71d9c9a9652798079eccf788438582be8b0e93d4b270585cc2f1d16d8e85afe"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
+    "api/nice_error",
     "common/config",
     "common/config/coder/json",
     "common/config/coder/yaml",
@@ -150,7 +151,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "afb5bde67e645a3bcae323e5fa423d50f7fee6d6"
+  revision = "6bb7691ec18bfcde952a92015a9ec494af928a7c"
 
 [[projects]]
   branch = "master"
@@ -182,18 +183,18 @@
   name = "golang.org/x/sync"
   packages = ["errgroup"]
   pruneopts = "UT"
-  revision = "42b317875d0fa942474b76e1b46a6060d720ae6e"
+  revision = "37e7f081c4d4c64e13b10787722085407fe5d15f"
 
 [[projects]]
   branch = "master"
-  digest = "1:d0c37951b9d5107f44e2222ba08311a113bf094a244544915eda6a3f87f12c45"
+  digest = "1:3d5e79e10549fd9119cbefd614b6d351ef5bd0be2f2b103a4199788e784cbc68"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "8ff4e546d48be377a38a3ab13ef2dd4dd8dce06a"
+  revision = "b4a75ba826a64a70990f11a225237acd6ef35c9f"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -224,7 +225,7 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "a1fde740824669f161e97af4237fb80b8734444d"
+  revision = "bd9b4fb69e2ffd37621a6caa54dcbead29b546f2"
 
 [[projects]]
   digest = "1:9edd250a3c46675d0679d87540b30c9ed253b19bd1fd1af08f4f5fb3c79fc487"
@@ -290,6 +291,7 @@
     "github.com/gin-gonic/gin",
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/api/clients",
+    "github.com/zhsyourai/teddy-backend/api/nice_error",
     "github.com/zhsyourai/teddy-backend/common/config",
     "github.com/zhsyourai/teddy-backend/common/config/source/file",
     "github.com/zhsyourai/teddy-backend/common/proto/captcha",

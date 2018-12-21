@@ -2,9 +2,10 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/common/proto/captcha"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"net/http"
 	"path"
 	"strings"
@@ -44,11 +45,9 @@ func (h *Base) ReturnOK(ctx *gin.Context) {
 }
 
 func (h *Base) GetCaptchaId(ctx *gin.Context) {
-	// extract the client from the context
 	captchaClient, ok := clients.CaptchaFromContext(ctx)
 	if !ok {
-		log.Error(ErrClientNotFound)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
@@ -56,8 +55,7 @@ func (h *Base) GetCaptchaId(ctx *gin.Context) {
 		Len: 6,
 	})
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -70,11 +68,9 @@ func (h *Base) GetCaptchaId(ctx *gin.Context) {
 }
 
 func (h *Base) GetCaptchaData(ctx *gin.Context) {
-	// extract the client from the context
 	captchaClient, ok := clients.CaptchaFromContext(ctx)
 	if !ok {
-		log.Error(ErrClientNotFound)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
@@ -86,7 +82,6 @@ func (h *Base) GetCaptchaData(ctx *gin.Context) {
 		return
 	}
 
-	// Fill header
 	ctx.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	ctx.Header("Pragma", "no-cache")
 	ctx.Header("Expires", "0")
@@ -103,8 +98,11 @@ func (h *Base) GetCaptchaData(ctx *gin.Context) {
 			Reload: reload,
 		})
 		if err != nil {
-			log.Error(err)
-			ctx.AbortWithError(http.StatusInternalServerError, err)
+			if status.Code(err) == codes.NotFound {
+				ctx.Error(ErrCaptchaNotFound).SetType(gin.ErrorTypePublic)
+			} else {
+				ctx.Error(err)
+			}
 			return
 		}
 		if !download {
@@ -119,8 +117,11 @@ func (h *Base) GetCaptchaData(ctx *gin.Context) {
 			Reload: reload,
 		})
 		if err != nil {
-			log.Error(err)
-			ctx.AbortWithError(http.StatusInternalServerError, err)
+			if status.Code(err) == codes.NotFound {
+				ctx.Error(ErrCaptchaNotFound).SetType(gin.ErrorTypePublic)
+			} else {
+				ctx.Error(err)
+			}
 			return
 		}
 		if !download {

@@ -28,7 +28,7 @@ type NiceError struct {
 }
 
 func (ne *NiceError) Error() string {
-	return fmt.Sprintf("<%s>%s", ne.Title, ne.Detail)
+	return fmt.Sprintf("<%s> %s", ne.Title, ne.Detail)
 }
 
 type niceError struct{}

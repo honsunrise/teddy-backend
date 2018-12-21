@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/base/handler"
 	"github.com/zhsyourai/teddy-backend/api/clients"
+	"github.com/zhsyourai/teddy-backend/api/nice_error"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/common/config/source/file"
 	"golang.org/x/sync/errgroup"
@@ -42,6 +43,7 @@ func main() {
 	router := gin.Default()
 	router.Use(cors.Default())
 	router.Use(clients.CaptchaNew(captchaSrvAddrFunc))
+	router.Use(nice_error.NewNiceError())
 	base.HandlerNormal(router.Group("/v1/anon/base"))
 	base.HandlerAuth(router.Group("/v1/auth/base"))
 	base.HandlerHealth(router)
