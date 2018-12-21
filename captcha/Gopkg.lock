@@ -147,7 +147,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:0d81b789c2192f422f17f72e00263d55873212a307899be542854adbd83abfc4"
+  digest = "1:ac4da7b894d8109b4ee6b01de81f9743462bf30841c659b9016adb91c9a1fa55"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "common/config",
@@ -159,7 +159,7 @@
     "common/utils",
   ]
   pruneopts = "T"
-  revision = "7fb14fe914edb54cd563f91f4c1098e534227199"
+  revision = "9c189eb911a0426816a8e3d3dc161ee5955435d6"
 
 [[projects]]
   branch = "master"
