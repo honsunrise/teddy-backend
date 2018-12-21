@@ -15,7 +15,7 @@ import (
 	"github.com/zhsyourai/teddy-backend/captcha/repositories"
 	"github.com/zhsyourai/teddy-backend/captcha/server"
 	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/common/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto/captcha"
 )
 
 func init() {
@@ -67,7 +67,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	proto.RegisterCaptchaServer(grpcServer, captchaSrv)
+	captcha.RegisterCaptchaServer(grpcServer, captchaSrv)
 
 	healthSrv := grpcHealth.NewServer()
 	grpc_health_v1.RegisterHealthServer(grpcServer, healthSrv)

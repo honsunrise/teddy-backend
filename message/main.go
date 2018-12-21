@@ -13,7 +13,7 @@ import (
 	"context"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/common/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto/message"
 	"github.com/zhsyourai/teddy-backend/message/repositories"
 	"github.com/zhsyourai/teddy-backend/message/server"
 )
@@ -67,7 +67,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	proto.RegisterMessageServer(grpcServer, messageSrv)
+	message.RegisterMessageServer(grpcServer, messageSrv)
 
 	healthSrv := grpcHealth.NewServer()
 	grpc_health_v1.RegisterHealthServer(grpcServer, healthSrv)

@@ -1,23 +1,23 @@
 package server
 
-import "github.com/zhsyourai/teddy-backend/common/proto"
+import "github.com/zhsyourai/teddy-backend/common/proto/captcha"
 
-func validateGetCaptchaIdReq(req *proto.GetCaptchaIdReq) error {
+func validateGetCaptchaIdReq(req *captcha.GetCaptchaIdReq) error {
 	return nil
 }
 
-func validateGetImageDataReq(req *proto.GetImageDataReq) error {
+func validateGetImageDataReq(req *captcha.GetImageDataReq) error {
 	return nil
 }
 
-func validateGetRandomReq(req *proto.GetRandomReq) error {
+func validateGetRandomReq(req *captcha.GetRandomReq) error {
 	return nil
 }
 
-func validateGetVoiceDataReq(req *proto.GetVoiceDataReq) error {
+func validateGetVoiceDataReq(req *captcha.GetVoiceDataReq) error {
 	return nil
 }
 
-func validateVerifyReq(req *proto.VerifyReq) error {
+func validateVerifyReq(req *captcha.VerifyReq) error {
 	return nil
 }

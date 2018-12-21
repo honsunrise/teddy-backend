@@ -3,17 +3,17 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3e38fc80f8fb9482345b1a596b21dfa2f86d696061cbd76a6620a5658e038132"
+  digest = "1:c60a3cf726bd2b005d067adceae01519b419e2a769a4ed3d13ac733d249a18f3"
   name = "github.com/dchest/captcha"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "6a29415a8364ec2971fdc62d9e415ed53fc20410"
 
 [[projects]]
-  digest = "1:abeb38ade3f32a92943e5be54f55ed6d6e3b6602761d74b4aab4c9dd45c18abd"
+  digest = "1:7fc160b460a6fc506b37fcca68332464c3f2cd57b6e3f111f26c5bbfd2d5518e"
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
   version = "v1.4.7"
 
@@ -21,7 +21,7 @@
   digest = "1:2cd7915ab26ede7d95b8749e6b1f933f1c6d5398030684e6505940a10f31cfda"
   name = "github.com/ghodss/yaml"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "0ca9ea5df5451ffdf184b4428c902747c2c11cd7"
   version = "v1.0.0"
 
@@ -29,12 +29,12 @@
   digest = "1:586ea76dbd0374d6fb649a91d70d652b7fe0ccffb8910a77468e7702e7901f3d"
   name = "github.com/go-stack/stack"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "2fee6af1a9795aafbe0253a0cfbdf668e1fb8a9a"
   version = "v1.8.0"
 
 [[projects]]
-  digest = "1:5ac24c0ad5dc117fb2b6d90d205c876ec599c09cccb702a36586680e09cb20b5"
+  digest = "1:a2ecb56e5053d942aafc86738915fb94c9131bac848c543b8b6764365fd69080"
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
@@ -44,23 +44,23 @@
     "ptypes/empty",
     "ptypes/timestamp",
   ]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
   version = "v1.2.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:4a0c6bb4805508a6287675fac876be2ac1182539ca8a32468d8128882e9d5009"
+  digest = "1:6027b20c168728321bd99ad01f35118eded457b01c03e647a84833ab331f2f5b"
   name = "github.com/golang/snappy"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "2e65f85255dbc3072edf28d6b5b8efc472979f5a"
 
 [[projects]]
-  digest = "1:8eb1de8112c9924d59bf1d3e5c26f5eaa2bfc2a5fcbb92dc1c2e4546d695f277"
+  digest = "1:3477d9dd8c135faab978bac762eaeafb31f28d6da97ef500d5c271966f74140a"
   name = "github.com/imdario/mergo"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "9f23e2d6bd2a77f959b2bf6acdbefd708a83a4a4"
   version = "v0.3.6"
 
@@ -68,7 +68,7 @@
   digest = "1:0a69a1c0db3591fcefb47f115b224592c8dfa4368b7ba9fae509d5e16cdc95c8"
   name = "github.com/konsorten/go-windows-terminal-sequences"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "5c8c8bd35d3832f5d134ae1e1e375b69a4d25242"
   version = "v1.0.1"
 
@@ -76,12 +76,12 @@
   digest = "1:53bc4cd4914cd7cd52139990d5170d6dc99067ae31c56530621b18b35fc30318"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "3536a929edddb9a5b34bd6861dc4a9647cb459fe"
   version = "v1.1.2"
 
 [[projects]]
-  digest = "1:529f54d656a5240fc1af45f291eabbea6ce904659faac0fd0b0a4cd90c5c95f2"
+  digest = "1:f0d7f944167d79b6dfa62ada224e0534c7cf3f579d06497a86bf7fdcce38e0b0"
   name = "github.com/mongodb/mongo-go-driver"
   packages = [
     "bson",
@@ -117,64 +117,64 @@
     "x/bsonx",
     "x/bsonx/bsoncore",
   ]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "dbffb1c211bf96fbd721b4bd6911331e5c1886ab"
   version = "v0.0.18"
 
 [[projects]]
-  digest = "1:69b1cc331fca23d702bd72f860c6a647afd0aa9fcbc1d0659b1365e26546dd70"
+  digest = "1:a204f9aa04d3305be0d4d8f69f42aee6c649a8f9f9a8dbbbaff54bdad5ce50c7"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "bcd833dfe83d3cebad139e4a29ed79cb2318bf95"
   version = "v1.2.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:40fdfd6ab85ca32b6935853bbba35935dcb1d796c8135efd85947566c76e662e"
+  digest = "1:fb87ad6629b8ae41bdf7bec0a22cc4a5553ab550b4a52c88edacfbfe61ffd87d"
   name = "github.com/xdg/scram"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "7eeb5667e42c09cb51bf7b7c28aea8c56767da90"
 
 [[projects]]
   digest = "1:577b99fc55ee19cbf1ffd072808c91ced78cd732bd9d0517bec9b90e532069cb"
   name = "github.com/xdg/stringprep"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "bd625b8dc1e3b0f57412280ccbcc317f0c69d8db"
   version = "v1.0.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:9c4c16f679be7dc47609803bc3e880713807c6604ef289a302ccb9bb1e7ec46b"
+  digest = "1:0d81b789c2192f422f17f72e00263d55873212a307899be542854adbd83abfc4"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "common/config",
     "common/config/coder/json",
     "common/config/coder/yaml",
     "common/config/source/file",
-    "common/proto",
+    "common/proto/captcha",
     "common/types",
     "common/utils",
   ]
-  pruneopts = "UT"
-  revision = "ea69d7d0f705c8bea11c259a7fedd1c55dc23195"
+  pruneopts = "T"
+  revision = "7fb14fe914edb54cd563f91f4c1098e534227199"
 
 [[projects]]
   branch = "master"
-  digest = "1:9ff2b9f8d4e47013a213b9ea0d850ed787c51f5eab2038842d82397ad85a19c1"
+  digest = "1:d470cb69884835b1800e93ceceb85afcf981ea647e61d99398a76af7a95bad6a"
   name = "golang.org/x/crypto"
   packages = [
     "pbkdf2",
     "ssh/terminal",
   ]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
 
 [[projects]]
   branch = "master"
-  digest = "1:89a0cb976397aa9157a45bb2b896d0bcd07ee095ac975e0f03c53250c402265e"
+  digest = "1:6a668f89e7e121bf970a6dc37c729f05f5261ae64e27945326d896ad158e5a10"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -185,30 +185,30 @@
     "internal/timeseries",
     "trace",
   ]
-  pruneopts = "UT"
-  revision = "891ebc4b82d6e74f468c533b06f983c7be918a96"
+  pruneopts = "T"
+  revision = "927f97764cc334a6575f4b7a1584a147864d5723"
 
 [[projects]]
   branch = "master"
-  digest = "1:5e4d81c50cffcb124b899e4f3eabec3930c73532f0096c27f94476728ba03028"
+  digest = "1:c20b4d66e71aae7504855ab3cf6ad99b68134712dd0ed4786144136fb14c66e9"
   name = "golang.org/x/sync"
   packages = ["semaphore"]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "42b317875d0fa942474b76e1b46a6060d720ae6e"
 
 [[projects]]
   branch = "master"
-  digest = "1:ba8cbf57cfd92d5f8592b4aca1a35d92c162363d32aeabd5b12555f8896635e7"
+  digest = "1:aa469d73e14584061fd0f3a4c7527554ead40d74ca2a063acf6814b6ca9562f5"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
-  pruneopts = "UT"
-  revision = "4d1cda033e0619309c606fc686de3adcf599539e"
+  pruneopts = "T"
+  revision = "8ff4e546d48be377a38a3ab13ef2dd4dd8dce06a"
 
 [[projects]]
-  digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
+  digest = "1:6164911cb5e94e8d8d5131d646613ff82c14f5a8ce869de2f6d80d9889df8c5a"
   name = "golang.org/x/text"
   packages = [
     "collate",
@@ -226,20 +226,20 @@
     "unicode/norm",
     "unicode/rangetable",
   ]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
   version = "v0.3.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:077c1c599507b3b3e9156d17d36e1e61928ee9b53a5b420f10f28ebd4a0b275c"
+  digest = "1:1119ca20856adc40ca72eded119b9d9b594f80144841dd2a1f89d26d4ab407d6"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  pruneopts = "UT"
-  revision = "bd91e49a0898e27abb88c339b432fa53d7497ac0"
+  pruneopts = "T"
+  revision = "a1fde740824669f161e97af4237fb80b8734444d"
 
 [[projects]]
-  digest = "1:03af1505694005143ff6dc5d0e2802c8200ddb618b1d3f7201482f53798b99b4"
+  digest = "1:c32026b4d2b9f7240ad72edf0dffca4e5863d5edc1ea25416d64929926b5ac67"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -276,7 +276,7 @@
     "status",
     "tap",
   ]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "df014850f6dee74ba2fc94874043a9f3f75fbfd8"
   version = "v1.17.0"
 
@@ -284,7 +284,7 @@
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  pruneopts = "UT"
+  pruneopts = "T"
   revision = "51d6538a90f86fe93ac480b35f37b2be17fef232"
   version = "v2.2.2"
 
@@ -298,7 +298,7 @@
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/common/config",
     "github.com/zhsyourai/teddy-backend/common/config/source/file",
-    "github.com/zhsyourai/teddy-backend/common/proto",
+    "github.com/zhsyourai/teddy-backend/common/proto/captcha",
     "github.com/zhsyourai/teddy-backend/common/types",
     "github.com/zhsyourai/teddy-backend/common/utils",
     "google.golang.org/grpc",

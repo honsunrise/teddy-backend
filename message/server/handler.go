@@ -5,8 +5,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/rs/xid"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/common/proto"
-	"github.com/zhsyourai/teddy-backend/message/converter"
+	"github.com/zhsyourai/teddy-backend/common/proto/message"
 	"github.com/zhsyourai/teddy-backend/message/models"
 	"github.com/zhsyourai/teddy-backend/message/repositories"
 	"gopkg.in/gomail.v2"
@@ -14,7 +13,7 @@ import (
 	"time"
 )
 
-func NewMessageServer(repo repositories.InBoxRepository, host string, port int, username string, password string) (proto.MessageServer, error) {
+func NewMessageServer(repo repositories.InBoxRepository, host string, port int, username string, password string) (message.MessageServer, error) {
 	instance := &notifyHandler{
 		repo:     repo,
 		mailCh:   make(chan *messageWithErrChan),
@@ -90,7 +89,7 @@ func (h *notifyHandler) _sendEmail(ctx context.Context, message *gomail.Message)
 	return <-me.mailErr
 }
 
-func (h *notifyHandler) SendEmail(ctx context.Context, req *proto.SendEmailReq) (*empty.Empty, error) {
+func (h *notifyHandler) SendEmail(ctx context.Context, req *message.SendEmailReq) (*empty.Empty, error) {
 	log.Infof("Send Email to %v", req)
 
 	var resp empty.Empty
@@ -112,7 +111,7 @@ func (h *notifyHandler) SendEmail(ctx context.Context, req *proto.SendEmailReq) 
 	return &resp, nil
 }
 
-func (h *notifyHandler) SendSMS(ctx context.Context, req *proto.SendSMSReq) (*empty.Empty, error) {
+func (h *notifyHandler) SendSMS(ctx context.Context, req *message.SendSMSReq) (*empty.Empty, error) {
 	var resp empty.Empty
 
 	if err := validateSendSMSReq(req); err != nil {
@@ -121,7 +120,7 @@ func (h *notifyHandler) SendSMS(ctx context.Context, req *proto.SendSMSReq) (*em
 	return &resp, nil
 }
 
-func (h *notifyHandler) SendInBox(ctx context.Context, req *proto.SendInBoxReq) (*empty.Empty, error) {
+func (h *notifyHandler) SendInBox(ctx context.Context, req *message.SendInBoxReq) (*empty.Empty, error) {
 	var resp empty.Empty
 
 	if err := validateSendInBoxReq(req); err != nil {
@@ -144,7 +143,7 @@ func (h *notifyHandler) SendInBox(ctx context.Context, req *proto.SendInBoxReq) 
 	return &resp, nil
 }
 
-func (h *notifyHandler) SendNotify(ctx context.Context, req *proto.SendNotifyReq) (*empty.Empty, error) {
+func (h *notifyHandler) SendNotify(ctx context.Context, req *message.SendNotifyReq) (*empty.Empty, error) {
 	var resp empty.Empty
 
 	if err := validateSendNotifyReq(req); err != nil {
@@ -161,8 +160,8 @@ func (h *notifyHandler) SendNotify(ctx context.Context, req *proto.SendNotifyReq
 	return &resp, nil
 }
 
-func (h *notifyHandler) GetInBox(ctx context.Context, req *proto.GetInBoxReq) (*proto.GetInboxResp, error) {
-	var resp proto.GetInboxResp
+func (h *notifyHandler) GetInBox(ctx context.Context, req *message.GetInBoxReq) (*message.GetInboxResp, error) {
+	var resp message.GetInboxResp
 	if err := validateGetInBoxReq(req); err != nil {
 		return nil, err
 	}
@@ -170,27 +169,27 @@ func (h *notifyHandler) GetInBox(ctx context.Context, req *proto.GetInBoxReq) (*
 	if err != nil {
 		return nil, err
 	}
-	resp.Items = make([]*proto.InBoxItem, len(items))
+	resp.Items = make([]*message.InBoxItem, len(items))
 	for i, item := range items {
-		var pbItem proto.InBoxItem
-		converter.CopyFromInBoxItemToPBInBoxItem(&item, &pbItem)
+		var pbItem message.InBoxItem
+		copyFromInBoxItemToPBInBoxItem(&item, &pbItem)
 		resp.Items[i] = &pbItem
 	}
 
 	return &resp, nil
 }
 
-func (h *notifyHandler) GetNotify(req *proto.GetNotifyReq, resp proto.Message_GetNotifyServer) error {
+func (h *notifyHandler) GetNotify(req *message.GetNotifyReq, resp message.Message_GetNotifyServer) error {
 	if err := validateGetNotifyReq(req); err != nil {
 		return err
 	}
 
 	tmp, _ := h.notifyChMap.LoadOrStore(req.Uid, make(chan *models.NotifyItem))
 	inBoxCh := tmp.(chan *models.NotifyItem)
-	var pbItem proto.NotifyItem
+	var pbItem message.NotifyItem
 	for {
 		item := <-inBoxCh
-		converter.CopyFromNotifyItemToPBNotifyItem(item, &pbItem)
+		copyFromNotifyItemToPBNotifyItem(item, &pbItem)
 		if err := resp.Send(&pbItem); err != nil {
 			close(inBoxCh)
 			h.notifyChMap.Delete(req.Uid)

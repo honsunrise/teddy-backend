@@ -7,7 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/captcha/models"
 	"github.com/zhsyourai/teddy-backend/captcha/repositories"
-	"github.com/zhsyourai/teddy-backend/common/proto"
+	captchaProto "github.com/zhsyourai/teddy-backend/common/proto/captcha"
 	"math/rand"
 	"time"
 )
@@ -16,7 +16,7 @@ const (
 	Expiration = 10 * time.Minute
 )
 
-func NewCaptchaServer(repo repositories.KeyValuePairRepository) (proto.CaptchaServer, error) {
+func NewCaptchaServer(repo repositories.KeyValuePairRepository) (captchaProto.CaptchaServer, error) {
 	instance := &captchaHandler{
 		repo: repo,
 	}
@@ -35,8 +35,8 @@ func (h *captchaHandler) cleanTack() {
 	}
 }
 
-func (h *captchaHandler) GetCaptchaId(ctx context.Context, req *proto.GetCaptchaIdReq) (*proto.GetCaptchaIdResp, error) {
-	var resp proto.GetCaptchaIdResp
+func (h *captchaHandler) GetCaptchaId(ctx context.Context, req *captchaProto.GetCaptchaIdReq) (*captchaProto.GetCaptchaIdResp, error) {
+	var resp captchaProto.GetCaptchaIdResp
 	if err := validateGetCaptchaIdReq(req); err != nil {
 		return nil, err
 	}
@@ -45,8 +45,8 @@ func (h *captchaHandler) GetCaptchaId(ctx context.Context, req *proto.GetCaptcha
 	return &resp, nil
 }
 
-func (h *captchaHandler) GetImageData(ctx context.Context, req *proto.GetImageDataReq) (*proto.GetImageDataResp, error) {
-	var resp proto.GetImageDataResp
+func (h *captchaHandler) GetImageData(ctx context.Context, req *captchaProto.GetImageDataReq) (*captchaProto.GetImageDataResp, error) {
+	var resp captchaProto.GetImageDataResp
 	if err := validateGetImageDataReq(req); err != nil {
 		return nil, err
 	}
@@ -61,8 +61,8 @@ func (h *captchaHandler) GetImageData(ctx context.Context, req *proto.GetImageDa
 	return &resp, nil
 }
 
-func (h *captchaHandler) GetVoiceData(ctx context.Context, req *proto.GetVoiceDataReq) (*proto.GetVoiceDataResp, error) {
-	var resp proto.GetVoiceDataResp
+func (h *captchaHandler) GetVoiceData(ctx context.Context, req *captchaProto.GetVoiceDataReq) (*captchaProto.GetVoiceDataResp, error) {
+	var resp captchaProto.GetVoiceDataResp
 	if err := validateGetVoiceDataReq(req); err != nil {
 		return nil, err
 	}
@@ -77,9 +77,9 @@ func (h *captchaHandler) GetVoiceData(ctx context.Context, req *proto.GetVoiceDa
 	return &resp, nil
 }
 
-func (h *captchaHandler) GetRandomById(ctx context.Context, req *proto.GetRandomReq) (*proto.GetRandomResp, error) {
+func (h *captchaHandler) GetRandomById(ctx context.Context, req *captchaProto.GetRandomReq) (*captchaProto.GetRandomResp, error) {
 	log.Infof("Get Random number req %v", req)
-	var resp proto.GetRandomResp
+	var resp captchaProto.GetRandomResp
 	if err := validateGetRandomReq(req); err != nil {
 		return nil, err
 	}
@@ -102,21 +102,21 @@ func (h *captchaHandler) GetRandomById(ctx context.Context, req *proto.GetRandom
 	return &resp, nil
 }
 
-func (h *captchaHandler) Verify(ctx context.Context, req *proto.VerifyReq) (*proto.VerifyResp, error) {
-	var resp proto.VerifyResp
+func (h *captchaHandler) Verify(ctx context.Context, req *captchaProto.VerifyReq) (*captchaProto.VerifyResp, error) {
+	var resp captchaProto.VerifyResp
 	if err := validateVerifyReq(req); err != nil {
 		return nil, err
 	}
 	resp.Correct = false
 
-	if req.Type == proto.CaptchaType_RANDOM_BY_ID {
+	if req.Type == captchaProto.CaptchaType_RANDOM_BY_ID {
 		now := time.Now()
 		_, err := h.repo.FindKeyValuePairByKeyAndValueAndExpire(req.Id, req.Code, now)
 		if err != nil {
 			return nil, err
 		}
 		resp.Correct = true
-	} else if req.Type == proto.CaptchaType_IMAGE || req.Type == proto.CaptchaType_VOICE {
+	} else if req.Type == captchaProto.CaptchaType_IMAGE || req.Type == captchaProto.CaptchaType_VOICE {
 		if captcha.VerifyString(req.Id, req.Code) {
 			resp.Correct = true
 		}

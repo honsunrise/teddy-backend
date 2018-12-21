@@ -65,7 +65,7 @@ func (repo *inboxRepository) internalFindInBoxItems(uid string, itemType models.
 	var itemsSorts = make(bson.D, 0, len(sorts))
 	if len(sorts) != 0 {
 		for _, sort := range sorts {
-			if sort.Order == types.ASC {
+			if sort.ASC {
 				itemsSorts = append(itemsSorts, bson.E{Key: sort.Name, Value: 1})
 			} else {
 				itemsSorts = append(itemsSorts, bson.E{Key: sort.Name, Value: -1})

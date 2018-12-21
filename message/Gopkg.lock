@@ -147,19 +147,19 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9c4c16f679be7dc47609803bc3e880713807c6604ef289a302ccb9bb1e7ec46b"
+  digest = "1:02d2a4bd2cb12c9a35a5bf8daf9d430a10f2a3c35a0a08e23b33602b8eddfe8c"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "common/config",
     "common/config/coder/json",
     "common/config/coder/yaml",
     "common/config/source/file",
-    "common/proto",
+    "common/proto/message",
     "common/types",
     "common/utils",
   ]
   pruneopts = "UT"
-  revision = "ea69d7d0f705c8bea11c259a7fedd1c55dc23195"
+  revision = "7fb14fe914edb54cd563f91f4c1098e534227199"
 
 [[projects]]
   branch = "master"
@@ -186,7 +186,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "891ebc4b82d6e74f468c533b06f983c7be918a96"
+  revision = "927f97764cc334a6575f4b7a1584a147864d5723"
 
 [[projects]]
   branch = "master"
@@ -198,14 +198,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ba8cbf57cfd92d5f8592b4aca1a35d92c162363d32aeabd5b12555f8896635e7"
+  digest = "1:d0c37951b9d5107f44e2222ba08311a113bf094a244544915eda6a3f87f12c45"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "4d1cda033e0619309c606fc686de3adcf599539e"
+  revision = "8ff4e546d48be377a38a3ab13ef2dd4dd8dce06a"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -236,7 +236,7 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "bd91e49a0898e27abb88c339b432fa53d7497ac0"
+  revision = "a1fde740824669f161e97af4237fb80b8734444d"
 
 [[projects]]
   digest = "1:03af1505694005143ff6dc5d0e2802c8200ddb618b1d3f7201482f53798b99b4"
@@ -316,7 +316,7 @@
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/common/config",
     "github.com/zhsyourai/teddy-backend/common/config/source/file",
-    "github.com/zhsyourai/teddy-backend/common/proto",
+    "github.com/zhsyourai/teddy-backend/common/proto/message",
     "github.com/zhsyourai/teddy-backend/common/types",
     "github.com/zhsyourai/teddy-backend/common/utils",
     "google.golang.org/grpc",
