@@ -136,8 +136,8 @@ func (h *Content) GetAllTags(ctx *gin.Context) {
 	type tagsResult struct {
 		Tag         string    `json:"tag"`
 		Usage       uint64    `json:"usage"`
-		CreateTime  time.Time `json:"create_time"`
-		LastUseTime time.Time `json:"last_use_time"`
+		CreateTime  time.Time `json:"createTime"`
+		LastUseTime time.Time `json:"lastUseTime"`
 	}
 
 	results := make([]*tagsResult, 0, len(resp.Tags))
@@ -303,9 +303,9 @@ func (h *Content) PublishContent(ctx *gin.Context) {
 		Title          string            `json:"title"`
 		Content        string            `json:"content"`
 		Tags           []string          `json:"tags"`
-		CanReview      bool              `json:"can_review"`
-		CoverResources map[string]string `json:"cover_resources"`
-		ContentTime    time.Time         `json:"content_time"`
+		CanReview      bool              `json:"canReview"`
+		CoverResources map[string]string `json:"coverResources"`
+		ContentTime    time.Time         `json:"contentTime"`
 	}
 	var req publishInfoReq
 	ctx.BindJSON(&req)
@@ -432,8 +432,8 @@ func (h *Content) UpdateContent(ctx *gin.Context) {
 		Title          string            `json:"title"`
 		Content        string            `json:"content"`
 		Tags           []string          `json:"tags"`
-		CanReview      bool              `json:"can_review"`
-		CoverResources map[string]string `json:"cover_resources"`
+		CanReview      bool              `json:"canReview"`
+		CoverResources map[string]string `json:"coverResources"`
 	}
 	var req updateInfoReq
 	ctx.BindJSON(&req)
