@@ -4,8 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
-	"github.com/zhsyourai/teddy-backend/common/errors"
-	"github.com/zhsyourai/teddy-backend/common/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto/captcha"
 	"net/http"
 	"path"
 	"strings"
@@ -48,12 +47,12 @@ func (h *Base) GetCaptchaId(ctx *gin.Context) {
 	// extract the client from the context
 	captchaClient, ok := clients.CaptchaFromContext(ctx)
 	if !ok {
-		log.Error(errors.ErrClientNotFound)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		log.Error(ErrClientNotFound)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
 
-	idResp, err := captchaClient.GetCaptchaId(ctx, &proto.GetCaptchaIdReq{
+	idResp, err := captchaClient.GetCaptchaId(ctx, &captcha.GetCaptchaIdReq{
 		Len: 6,
 	})
 	if err != nil {
@@ -74,8 +73,8 @@ func (h *Base) GetCaptchaData(ctx *gin.Context) {
 	// extract the client from the context
 	captchaClient, ok := clients.CaptchaFromContext(ctx)
 	if !ok {
-		log.Error(errors.ErrClientNotFound)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		log.Error(ErrClientNotFound)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
 
@@ -97,7 +96,7 @@ func (h *Base) GetCaptchaData(ctx *gin.Context) {
 
 	switch ext {
 	case ".png":
-		resp, err := captchaClient.GetImageData(ctx, &proto.GetImageDataReq{
+		resp, err := captchaClient.GetImageData(ctx, &captcha.GetImageDataReq{
 			Id:     id,
 			Width:  240,
 			Height: 80,
@@ -113,7 +112,7 @@ func (h *Base) GetCaptchaData(ctx *gin.Context) {
 		}
 		ctx.Data(http.StatusOK, contentType, resp.Image)
 	case ".wav":
-		resp, err := captchaClient.GetVoiceData(ctx, &proto.GetVoiceDataReq{
+		resp, err := captchaClient.GetVoiceData(ctx, &captcha.GetVoiceDataReq{
 			Id:     id,
 			Lang:   lang,
 			Reload: ctx.Param("reload") != "",
