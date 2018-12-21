@@ -86,43 +86,44 @@ func (h *Base) GetCaptchaData(ctx *gin.Context) {
 		return
 	}
 
-	lang := strings.ToLower(ctx.Param("lang"))
 	// Fill header
 	ctx.Header("Cache-Control", "no-cache, no-store, must-revalidate")
 	ctx.Header("Pragma", "no-cache")
 	ctx.Header("Expires", "0")
 
 	contentType := "application/octet-stream"
-
+	reload := ctx.Query("reload") == "true"
+	download := ctx.Query("download") == "true"
 	switch ext {
 	case ".png":
 		resp, err := captchaClient.GetImageData(ctx, &captcha.GetImageDataReq{
 			Id:     id,
-			Width:  240,
-			Height: 80,
-			Reload: ctx.Param("reload") != "",
+			Width:  280,
+			Height: 93,
+			Reload: reload,
 		})
 		if err != nil {
 			log.Error(err)
 			ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		if ctx.Param("download") != "true" {
+		if !download {
 			contentType = "image/png"
 		}
 		ctx.Data(http.StatusOK, contentType, resp.Image)
 	case ".wav":
+		lang := strings.ToLower(ctx.Query("lang"))
 		resp, err := captchaClient.GetVoiceData(ctx, &captcha.GetVoiceDataReq{
 			Id:     id,
 			Lang:   lang,
-			Reload: ctx.Param("reload") != "",
+			Reload: reload,
 		})
 		if err != nil {
 			log.Error(err)
 			ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		if ctx.Param("download") != "true" {
+		if !download {
 			contentType = "audio/x-wav"
 		}
 		ctx.Data(http.StatusOK, contentType, resp.VoiceWav)

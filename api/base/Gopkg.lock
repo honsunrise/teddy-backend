@@ -18,6 +18,14 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:2b59aca2665ff804f6606c8829eaee133ddd3aefbc841014660d961b0034f888"
+  name = "github.com/gin-contrib/cors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "cf4846e6a636a76237a28d9286f163c132e841bc"
+  version = "v1.2"
+
+[[projects]]
   branch = "master"
   digest = "1:36fe9527deed01d2a317617e59304eb2c4ce9f8a24115bcc5c2e37b3aee5bae4"
   name = "github.com/gin-contrib/sse"
@@ -142,7 +150,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "863a79bd9f11c9fc924610eb74ef20d48204ef1c"
+  revision = "afb5bde67e645a3bcae323e5fa423d50f7fee6d6"
 
 [[projects]]
   branch = "master"
@@ -278,6 +286,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/gin-contrib/cors",
     "github.com/gin-gonic/gin",
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/api/clients",

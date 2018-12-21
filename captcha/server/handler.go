@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"github.com/dchest/captcha"
+	"github.com/mongodb/mongo-go-driver/mongo"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/captcha/models"
 	"github.com/zhsyourai/teddy-backend/captcha/repositories"
@@ -36,57 +37,89 @@ func (h *captchaHandler) cleanTack() {
 }
 
 func (h *captchaHandler) GetCaptchaId(ctx context.Context, req *captchaProto.GetCaptchaIdReq) (*captchaProto.GetCaptchaIdResp, error) {
-	var resp captchaProto.GetCaptchaIdResp
 	if err := validateGetCaptchaIdReq(req); err != nil {
 		return nil, err
 	}
 	id := captcha.NewLen(int(req.Len))
-	resp.Id = id
-	return &resp, nil
+	return &captchaProto.GetCaptchaIdResp{
+		Id: id,
+	}, nil
 }
 
 func (h *captchaHandler) GetImageData(ctx context.Context, req *captchaProto.GetImageDataReq) (*captchaProto.GetImageDataResp, error) {
-	var resp captchaProto.GetImageDataResp
 	if err := validateGetImageDataReq(req); err != nil {
 		return nil, err
+	}
+
+	if req.Reload == true {
+		if !captcha.Reload(req.Id) {
+			return nil, ErrCaptchaNotFount
+		}
 	}
 
 	imgBuf := &bytes.Buffer{}
 
 	if err := captcha.WriteImage(imgBuf, req.Id, int(req.Width), int(req.Height)); err != nil {
-		return nil, err
+		if err == captcha.ErrNotFound {
+			return nil, ErrCaptchaNotFount
+		} else {
+			log.Error(err)
+			return nil, ErrInternal
+		}
 	}
-	resp.Image = imgBuf.Bytes()
 
-	return &resp, nil
+	return &captchaProto.GetImageDataResp{
+		Image: imgBuf.Bytes(),
+	}, nil
 }
 
 func (h *captchaHandler) GetVoiceData(ctx context.Context, req *captchaProto.GetVoiceDataReq) (*captchaProto.GetVoiceDataResp, error) {
-	var resp captchaProto.GetVoiceDataResp
 	if err := validateGetVoiceDataReq(req); err != nil {
 		return nil, err
+	}
+
+	if req.Reload == true {
+		if !captcha.Reload(req.Id) {
+			return nil, ErrCaptchaNotFount
+		}
 	}
 
 	voiceBuf := &bytes.Buffer{}
 
 	if err := captcha.WriteAudio(voiceBuf, req.Id, req.Lang); err != nil {
-		return nil, err
+		if err == captcha.ErrNotFound {
+			return nil, ErrCaptchaNotFount
+		} else {
+			log.Error(err)
+			return nil, ErrInternal
+		}
 	}
-	resp.VoiceWav = voiceBuf.Bytes()
 
-	return &resp, nil
+	return &captchaProto.GetVoiceDataResp{
+		VoiceWav: voiceBuf.Bytes(),
+	}, nil
 }
 
 func (h *captchaHandler) GetRandomById(ctx context.Context, req *captchaProto.GetRandomReq) (*captchaProto.GetRandomResp, error) {
-	log.Infof("Get Random number req %v", req)
 	var resp captchaProto.GetRandomResp
 	if err := validateGetRandomReq(req); err != nil {
 		return nil, err
 	}
 
 	s := ""
-	for i := 0; i < int(req.Len); i++ {
-		s += (string)(rand.Intn(10) + 48)
+	for {
+		for i := 0; i < int(req.Len); i++ {
+			s += (string)(rand.Intn(10) + 48)
+		}
+
+		if _, err := h.repo.FindKeyValuePairByKey(s); err != nil {
+			if err == mongo.ErrNoDocuments {
+				break
+			} else {
+				log.Error(err)
+				return nil, ErrInternal
+			}
+		}
 	}
 
 	err := h.repo.InsertKeyValuePair(&models.KeyValuePair{
@@ -95,7 +128,8 @@ func (h *captchaHandler) GetRandomById(ctx context.Context, req *captchaProto.Ge
 		ExpireTime: time.Now().Add(Expiration),
 	})
 	if err != nil {
-		return nil, err
+		log.Error(err)
+		return nil, ErrInternal
 	}
 	resp.Code = s
 
@@ -103,17 +137,22 @@ func (h *captchaHandler) GetRandomById(ctx context.Context, req *captchaProto.Ge
 }
 
 func (h *captchaHandler) Verify(ctx context.Context, req *captchaProto.VerifyReq) (*captchaProto.VerifyResp, error) {
-	var resp captchaProto.VerifyResp
+	resp := captchaProto.VerifyResp{
+		Correct: false,
+	}
 	if err := validateVerifyReq(req); err != nil {
 		return nil, err
 	}
-	resp.Correct = false
 
 	if req.Type == captchaProto.CaptchaType_RANDOM_BY_ID {
 		now := time.Now()
-		_, err := h.repo.FindKeyValuePairByKeyAndValueAndExpire(req.Id, req.Code, now)
-		if err != nil {
-			return nil, err
+		if _, err := h.repo.FindKeyValuePairByKeyAndValueAndExpire(req.Id, req.Code, now); err != nil {
+			if err == mongo.ErrNoDocuments {
+				return nil, ErrCaptchaNotFount
+			} else {
+				log.Error(err)
+				return nil, ErrInternal
+			}
 		}
 		resp.Correct = true
 	} else if req.Type == captchaProto.CaptchaType_IMAGE || req.Type == captchaProto.CaptchaType_VOICE {

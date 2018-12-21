@@ -237,7 +237,7 @@ func (h *Uaa) Logout(ctx *gin.Context) {
 func (h *Uaa) ChangePassword(ctx *gin.Context) {
 	// parse body
 	type changePasswordReq struct {
-		Username        string `json:"username"`
+		Principal       string `json:"principal"`
 		OldPassword     string `json:"old_password"`
 		NewPassword     string `json:"new_password"`
 		CaptchaId       string `json:"captcha_id"`
@@ -280,7 +280,7 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	_, err = uaaClient.ChangePassword(timeoutCtx, &uaa.ChangePasswordReq{
-		Principal:   body.Username,
+		Principal:   body.Principal,
 		NewPassword: body.NewPassword,
 		OldPassword: body.OldPassword,
 	})
