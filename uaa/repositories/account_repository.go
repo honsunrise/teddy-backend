@@ -44,10 +44,22 @@ func (repo *accountRepository) InsertAccount(account *models.Account) error {
 func (repo *accountRepository) FindOne(principal string) (*models.Account, error) {
 	var account models.Account
 	filter := bson.D{{"$or", bson.A{
-		bson.D{{"_id", principal}},
-		bson.D{{"username", principal}},
-		bson.D{{"email", principal}},
-		bson.D{{"phone", principal}},
+		bson.D{{"_id", bson.D{
+			{"$exists", true},
+			{"$ne", ""},
+			{"$eq", principal}}}},
+		bson.D{{"username", bson.D{
+			{"$exists", true},
+			{"$ne", ""},
+			{"$eq", principal}}}},
+		bson.D{{"email", bson.D{
+			{"$exists", true},
+			{"$ne", ""},
+			{"$eq", principal}}}},
+		bson.D{{"phone", bson.D{
+			{"$exists", true},
+			{"$ne", ""},
+			{"$eq", principal}}}},
 	}}}
 	err := repo.collections.FindOne(repo.ctx, filter).Decode(&account)
 	if err != nil {

@@ -69,31 +69,8 @@ func (h *accountHandler) RegisterByNormal(ctx context.Context, req *uaa.Register
 		return nil, ErrAccountExist
 	}
 
-	_, err = h.repo.FindOne(req.GetEmail())
-	if err != mongo.ErrNoDocuments {
-		return nil, ErrAccountExist
-	}
-
-	_, err = h.repo.FindOne(req.GetPhone())
-	if err != mongo.ErrNoDocuments {
-		return nil, ErrAccountExist
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.GetPassword()), bcrypt.DefaultCost)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	uid, err := h.uidGen.NexID()
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-
 	var account models.Account
-	account.UID = uid
 	account.Username = req.GetUsername()
-	account.Password = hashedPassword
 	account.Roles = req.GetRoles()
 	account.CreateDate = time.Now()
 	account.OAuthUIds = make(map[string]string)
@@ -101,12 +78,34 @@ func (h *accountHandler) RegisterByNormal(ctx context.Context, req *uaa.Register
 	account.Locked = false
 
 	if x, ok := req.GetContact().(*uaa.RegisterNormalReq_Email); ok {
+		_, err = h.repo.FindOne(req.GetEmail())
+		if err != mongo.ErrNoDocuments {
+			return nil, ErrAccountExist
+		}
 		account.Email = x.Email
 	} else if x, ok := req.GetContact().(*uaa.RegisterNormalReq_Phone); ok {
+		_, err = h.repo.FindOne(req.GetPhone())
+		if err != mongo.ErrNoDocuments {
+			return nil, ErrAccountExist
+		}
 		account.Phone = x.Phone
 	} else {
 		panic(errors.New("never happen"))
 	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.GetPassword()), bcrypt.DefaultCost)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	account.Password = hashedPassword
+
+	uid, err := h.uidGen.NexID()
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	account.UID = uid
 
 	err = h.repo.InsertAccount(&account)
 	if err != nil {
