@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
@@ -39,6 +40,7 @@ func main() {
 
 	// Create RESTful server (using Gin)
 	router := gin.Default()
+	router.Use(cors.Default())
 	router.Use(clients.ContentNew(contentSrvAddrFunc))
 	router.Use(clients.CaptchaNew(captchaSrvAddrFunc))
 	content.HandlerNormal(router.Group("/v1/anon/content"))

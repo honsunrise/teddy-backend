@@ -34,6 +34,14 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:2b59aca2665ff804f6606c8829eaee133ddd3aefbc841014660d961b0034f888"
+  name = "github.com/gin-contrib/cors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "cf4846e6a636a76237a28d9286f163c132e841bc"
+  version = "v1.2"
+
+[[projects]]
   branch = "master"
   digest = "1:36fe9527deed01d2a317617e59304eb2c4ce9f8a24115bcc5c2e37b3aee5bae4"
   name = "github.com/gin-contrib/sse"
@@ -179,11 +187,12 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7e71f6d1040a16e42122855c6b4502537f8c3a4396a08459bd263a841f0bf344"
+  digest = "1:3e823553ddb14097e0890edcb4641a6483a9954b5dd262255166bf0c5850f869"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
     "api/gin_jwt",
+    "api/nice_error",
     "common/config",
     "common/config/coder/json",
     "common/config/coder/yaml",
@@ -195,7 +204,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "db2c7c18c142137c4a5bb1b44833047fe8195734"
+  revision = "d81efec840768a6fc0e2975528013c5bb226a1b6"
 
 [[projects]]
   branch = "master"
@@ -219,7 +228,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "e147a9138326bc0e9d4e179541ffd8af41cff8a9"
+  revision = "927f97764cc334a6575f4b7a1584a147864d5723"
 
 [[projects]]
   branch = "master"
@@ -227,18 +236,18 @@
   name = "golang.org/x/sync"
   packages = ["errgroup"]
   pruneopts = "UT"
-  revision = "42b317875d0fa942474b76e1b46a6060d720ae6e"
+  revision = "37e7f081c4d4c64e13b10787722085407fe5d15f"
 
 [[projects]]
   branch = "master"
-  digest = "1:ba2c0719b7ca1fb531afa5aae9bda558846438a075f0e0282d3dffcd887de90d"
+  digest = "1:3d5e79e10549fd9119cbefd614b6d351ef5bd0be2f2b103a4199788e784cbc68"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "7c4c994c65f702f41ed7d6620a2cb34107576a77"
+  revision = "b4a75ba826a64a70990f11a225237acd6ef35c9f"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -269,7 +278,7 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "5a97ab628bfb2f65f6befec18f4bc7bc7f382b77"
+  revision = "bd9b4fb69e2ffd37621a6caa54dcbead29b546f2"
 
 [[projects]]
   digest = "1:9edd250a3c46675d0679d87540b30c9ed253b19bd1fd1af08f4f5fb3c79fc487"
@@ -340,14 +349,19 @@
   analyzer-version = 1
   input-imports = [
     "github.com/dgrijalva/jwt-go",
+    "github.com/gin-contrib/cors",
     "github.com/gin-gonic/gin",
+    "github.com/golang/protobuf/ptypes",
     "github.com/golang/protobuf/ptypes/timestamp",
     "github.com/lestrrat-go/jwx/jwk",
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/api/clients",
     "github.com/zhsyourai/teddy-backend/api/gin_jwt",
+    "github.com/zhsyourai/teddy-backend/api/nice_error",
     "github.com/zhsyourai/teddy-backend/common/config",
     "github.com/zhsyourai/teddy-backend/common/config/source/file",
+    "github.com/zhsyourai/teddy-backend/common/proto/captcha",
+    "github.com/zhsyourai/teddy-backend/common/proto/message",
     "github.com/zhsyourai/teddy-backend/common/proto/uaa",
     "github.com/zhsyourai/teddy-backend/common/types",
     "golang.org/x/sync/errgroup",

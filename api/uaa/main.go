@@ -5,10 +5,12 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
+	"github.com/zhsyourai/teddy-backend/api/nice_error"
 	"github.com/zhsyourai/teddy-backend/api/uaa/handler"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/common/config/source/file"
@@ -68,9 +70,12 @@ func main() {
 
 	// Create RESTful server (using Gin)
 	router := gin.Default()
+	router.Use(cors.Default())
 	router.Use(clients.MessageNew(messageSrvAddrFunc))
 	router.Use(clients.UaaNew(uaaSrvAddrFunc))
 	router.Use(clients.CaptchaNew(captchaSrvAddrFunc))
+	router.Use(nice_error.NewNiceError())
+
 	uaa.HandlerNormal(router.Group("/v1/anon/uaa"))
 	uaa.HandlerAuth(router.Group("/v1/auth/uaa"))
 	uaa.HandlerHealth(router)

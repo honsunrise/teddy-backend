@@ -1,50 +1,48 @@
 package repositories
 
 import (
-	"context"
 	"github.com/mongodb/mongo-go-driver/bson"
+	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/zhsyourai/teddy-backend/common/types"
+	"github.com/zhsyourai/teddy-backend/common/proto/content"
 	"github.com/zhsyourai/teddy-backend/content/models"
 	"time"
 )
 
 type TagRepository interface {
-	Insert(tag *models.Tag) error
-	FindOne(tag string) (*models.Tag, error)
-	FindAll(page uint32, size uint32, sorts []types.Sort) ([]*models.Tag, error)
-	IncUsage(tag string, inc uint64) error
-	UpdateLastUse(tag string, lastUse time.Time) error
-	DeleteOne(tag string) error
-	DeleteAll(tags []string) error
+	Insert(ctx mongo.SessionContext, tag *models.Tag) error
+	FindByTypeAndTag(ctx mongo.SessionContext, tp string, tag string) (*models.Tag, error)
+	FindOne(ctx mongo.SessionContext, id objectid.ObjectID) (*models.Tag, error)
+	FindAll(ctx mongo.SessionContext, tp string, page uint32, size uint32, sorts []*content.Sort) ([]*models.Tag, error)
+	IncUsage(ctx mongo.SessionContext, id objectid.ObjectID, inc int64) error
+	UpdateLastUse(ctx mongo.SessionContext, id objectid.ObjectID, lastUse time.Time) error
+	DeleteOne(ctx mongo.SessionContext, id objectid.ObjectID) error
+	DeleteMany(ctx mongo.SessionContext, ids []objectid.ObjectID) error
 }
 
 func NewTagRepository(client *mongo.Client) (TagRepository, error) {
 	return &tagRepository{
-		ctx:         context.Background(),
-		client:      client,
 		collections: client.Database("teddy").Collection("tag"),
 	}, nil
 }
 
 type tagRepository struct {
-	ctx         context.Context
-	client      *mongo.Client
 	collections *mongo.Collection
 }
 
-func (repo *tagRepository) Insert(tag *models.Tag) error {
-	_, err := repo.collections.InsertOne(repo.ctx, tag)
+func (repo *tagRepository) Insert(ctx mongo.SessionContext, tag *models.Tag) error {
+	tag.ID = objectid.New()
+	_, err := repo.collections.InsertOne(ctx, tag)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (repo *tagRepository) FindOne(tag string) (*models.Tag, error) {
+func (repo *tagRepository) FindByTypeAndTag(ctx mongo.SessionContext, tp string, tag string) (*models.Tag, error) {
 	var tagEntry models.Tag
-	filter := bson.D{{"_id", tag}}
-	result := repo.collections.FindOne(repo.ctx, filter)
+	filter := bson.D{{"type", tp}, {"tag", tag}}
+	result := repo.collections.FindOne(ctx, filter)
 	err := result.Decode(&tagEntry)
 	if err != nil {
 		return nil, err
@@ -52,16 +50,31 @@ func (repo *tagRepository) FindOne(tag string) (*models.Tag, error) {
 	return &tagEntry, nil
 }
 
-func (repo *tagRepository) FindAll(page uint32, size uint32, sorts []types.Sort) ([]*models.Tag, error) {
-	pipeline := mongo.Pipeline{
-		bson.D{{"$skip", int64(size * page)}},
-		bson.D{{"$limit", int64(size)}},
+func (repo *tagRepository) FindOne(ctx mongo.SessionContext, id objectid.ObjectID) (*models.Tag, error) {
+	var tagEntry models.Tag
+	filter := bson.D{{"_id", id}}
+	result := repo.collections.FindOne(ctx, filter)
+	err := result.Decode(&tagEntry)
+	if err != nil {
+		return nil, err
 	}
+	return &tagEntry, nil
+}
+
+func (repo *tagRepository) FindAll(ctx mongo.SessionContext, tp string, page uint32, size uint32, sorts []*content.Sort) ([]*models.Tag, error) {
+	pipeline := mongo.Pipeline{}
+
+	if tp != "" {
+		pipeline = append(pipeline, bson.D{{"$match", bson.D{{"type", tp}}}})
+	}
+
+	pipeline = append(pipeline, bson.D{{"$skip", int64(size * page)}})
+	pipeline = append(pipeline, bson.D{{"$limit", int64(size)}})
 
 	var itemsSorts = make(bson.D, 0, len(sorts))
 	if len(sorts) != 0 {
 		for _, sort := range sorts {
-			if sort.Order == types.ASC {
+			if sort.Asc {
 				itemsSorts = append(itemsSorts, bson.E{Key: sort.Name, Value: 1})
 			} else {
 				itemsSorts = append(itemsSorts, bson.E{Key: sort.Name, Value: -1})
@@ -70,13 +83,13 @@ func (repo *tagRepository) FindAll(page uint32, size uint32, sorts []types.Sort)
 		pipeline = append(pipeline, bson.D{{"$sort", itemsSorts}})
 	}
 
-	cur, err := repo.collections.Aggregate(repo.ctx, pipeline)
+	cur, err := repo.collections.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
 	items := make([]*models.Tag, 0, size)
-	defer cur.Close(repo.ctx)
-	for cur.Next(repo.ctx) {
+	defer cur.Close(ctx)
+	for cur.Next(ctx) {
 		var item models.Tag
 		err := cur.Decode(&item)
 		if err != nil {
@@ -91,42 +104,42 @@ func (repo *tagRepository) FindAll(page uint32, size uint32, sorts []types.Sort)
 	return items, nil
 }
 
-func (repo *tagRepository) IncUsage(tag string, inc uint64) error {
-	filter := bson.D{{"_id", tag}}
+func (repo *tagRepository) IncUsage(ctx mongo.SessionContext, id objectid.ObjectID, inc int64) error {
+	filter := bson.D{{"_id", id}}
 	update := bson.D{{"$inc", bson.D{{Key: "usage", Value: inc}}}}
-	ur, err := repo.collections.UpdateOne(repo.ctx, filter, update)
+	ur, err := repo.collections.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return err
 	} else if ur.ModifiedCount == 0 {
-		return ErrUpdateTag
+		return mongo.ErrNoDocuments
 	}
 	return nil
 }
 
-func (repo *tagRepository) UpdateLastUse(tag string, lastUse time.Time) error {
-	filter := bson.D{{"_id", tag}}
+func (repo *tagRepository) UpdateLastUse(ctx mongo.SessionContext, id objectid.ObjectID, lastUse time.Time) error {
+	filter := bson.D{{"_id", id}}
 	update := bson.D{{"$set", bson.D{{Key: "lastUseTime", Value: lastUse}}}}
-	ur, err := repo.collections.UpdateOne(repo.ctx, filter, update)
+	ur, err := repo.collections.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return err
 	} else if ur.ModifiedCount == 0 {
-		return ErrUpdateTag
+		return mongo.ErrNoDocuments
 	}
 	return nil
 }
 
-func (repo *tagRepository) DeleteOne(tag string) error {
-	filter := bson.D{{"_id", tag}}
-	_, err := repo.collections.DeleteOne(repo.ctx, filter)
+func (repo *tagRepository) DeleteOne(ctx mongo.SessionContext, id objectid.ObjectID) error {
+	filter := bson.D{{"_id", id}}
+	_, err := repo.collections.DeleteOne(ctx, filter)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (repo *tagRepository) DeleteAll(tags []string) error {
-	filter := bson.D{{"_id", bson.D{{"$in", bson.A{tags}}}}}
-	_, err := repo.collections.DeleteOne(repo.ctx, filter)
+func (repo *tagRepository) DeleteMany(ctx mongo.SessionContext, ids []objectid.ObjectID) error {
+	filter := bson.D{{"_id", bson.D{{"$in", ids}}}}
+	_, err := repo.collections.DeleteOne(ctx, filter)
 	if err != nil {
 		return err
 	}

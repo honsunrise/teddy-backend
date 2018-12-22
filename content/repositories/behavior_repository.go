@@ -1,58 +1,49 @@
 package repositories
 
 import (
-	"context"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/zhsyourai/teddy-backend/common/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto/content"
 	"github.com/zhsyourai/teddy-backend/content/models"
 	"time"
 )
 
 type BehaviorRepository interface {
-	Insert(uid string, thumb *models.BehaviorInfoItem) error
-	FindInfoByUser(uid string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.BehaviorInfoItem, error)
-	FindUserByInfo(infoID objectid.ObjectID, page uint32, size uint32, sorts []*proto.Sort) ([]*models.BehaviorUserItem, error)
-	IsExist(uid string, infoID objectid.ObjectID) (bool, error)
-	CountByInfo(infoID objectid.ObjectID) (uint64, error)
-	CountByUser(uid string) (uint64, error)
-	Delete(uid string, infoID objectid.ObjectID) error
+	Insert(ctx mongo.SessionContext, uid string, thumb *models.BehaviorInfoItem) error
+	FindInfoByUser(ctx mongo.SessionContext, uid string, page uint32, size uint32, sorts []*content.Sort) ([]*models.BehaviorInfoItem, error)
+	FindUserByInfo(ctx mongo.SessionContext, infoID objectid.ObjectID, page uint32, size uint32, sorts []*content.Sort) ([]*models.BehaviorUserItem, error)
+	IsExists(ctx mongo.SessionContext, uid string, infoID objectid.ObjectID) (bool, error)
+	CountByInfo(ctx mongo.SessionContext, infoID objectid.ObjectID) (uint64, error)
+	CountByUser(ctx mongo.SessionContext, uid string) (uint64, error)
+	Delete(ctx mongo.SessionContext, uid string, infoID objectid.ObjectID) error
 }
 
 func NewThumbUpRepository(client *mongo.Client) (BehaviorRepository, error) {
 	return &behaviorRepository{
-		ctx:         context.Background(),
-		client:      client,
 		collections: client.Database("teddy").Collection("thumb_up"),
 	}, nil
 }
 
 func NewThumbDownRepository(client *mongo.Client) (BehaviorRepository, error) {
 	return &behaviorRepository{
-		ctx:         context.Background(),
-		client:      client,
 		collections: client.Database("teddy").Collection("thumb_down"),
 	}, nil
 }
 
 func NewFavoriteRepository(client *mongo.Client) (BehaviorRepository, error) {
 	return &behaviorRepository{
-		ctx:         context.Background(),
-		client:      client,
 		collections: client.Database("teddy").Collection("favorite"),
 	}, nil
 }
 
 type behaviorRepository struct {
-	ctx         context.Context
-	client      *mongo.Client
 	collections *mongo.Collection
 }
 
-func (repo *behaviorRepository) Insert(uid string, thumb *models.BehaviorInfoItem) error {
-	filter := bson.D{{"uid", uid}}
-	result := repo.collections.FindOne(repo.ctx, filter)
+func (repo *behaviorRepository) Insert(ctx mongo.SessionContext, uid string, thumb *models.BehaviorInfoItem) error {
+	filter := bson.D{{"uid", uid}, {"$ne", bson.D{{"items", thumb}}}}
+	result := repo.collections.FindOne(ctx, filter)
 	if result.Decode(nil) == mongo.ErrNoDocuments {
 		now := time.Now()
 		f := models.Behavior{
@@ -61,31 +52,33 @@ func (repo *behaviorRepository) Insert(uid string, thumb *models.BehaviorInfoIte
 			LastTime:  now,
 			FirstTime: now,
 			Count:     0,
-			Items:     []models.BehaviorInfoItem{},
+			Items: []*models.BehaviorInfoItem{
+				thumb,
+			},
 		}
-		_, err := repo.collections.InsertOne(repo.ctx, f)
+		_, err := repo.collections.InsertOne(ctx, f)
 		if err != nil {
 			return err
 		}
 	} else {
 		update := bson.D{
-			{"$addToSet", bson.D{{"items", bson.D{{"$each", bson.A{thumb}}}}}},
+			{"$addToSet", bson.D{{"items", bson.D{{"$each", thumb}}}}},
 			{"$inc", bson.D{{"count", 1}}},
 			{"$currentDate", bson.D{{"lastTime", bson.D{{"$type", "timestamp"}}}}},
 		}
-		ur, err := repo.collections.UpdateOne(repo.ctx, filter, update)
+		ur, err := repo.collections.UpdateOne(ctx, filter, update)
 		if err != nil {
 			return err
 		} else if ur.ModifiedCount == 0 {
-			return ErrUpdateInfo
+			return mongo.ErrNoDocuments
 		}
 		return nil
 	}
 	return nil
 }
 
-func (repo *behaviorRepository) FindInfoByUser(uid string,
-	page uint32, size uint32, sorts []*proto.Sort) ([]*models.BehaviorInfoItem, error) {
+func (repo *behaviorRepository) FindInfoByUser(ctx mongo.SessionContext, uid string,
+	page uint32, size uint32, sorts []*content.Sort) ([]*models.BehaviorInfoItem, error) {
 	var cur mongo.Cursor
 	pipeline := mongo.Pipeline{
 		bson.D{{"$unwind", "$items"}},
@@ -110,13 +103,13 @@ func (repo *behaviorRepository) FindInfoByUser(uid string,
 		pipeline = append(pipeline, bson.D{{"$sort", itemsSorts}})
 	}
 
-	cur, err := repo.collections.Aggregate(repo.ctx, pipeline)
+	cur, err := repo.collections.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
-	defer cur.Close(repo.ctx)
+	defer cur.Close(ctx)
 	items := make([]*models.BehaviorInfoItem, 0, size)
-	for cur.Next(repo.ctx) {
+	for cur.Next(ctx) {
 		var item models.BehaviorInfoItem
 		err := cur.Decode(&item)
 		if err != nil {
@@ -131,8 +124,8 @@ func (repo *behaviorRepository) FindInfoByUser(uid string,
 	return items, nil
 }
 
-func (repo *behaviorRepository) FindUserByInfo(infoID objectid.ObjectID,
-	page uint32, size uint32, sorts []*proto.Sort) ([]*models.BehaviorUserItem, error) {
+func (repo *behaviorRepository) FindUserByInfo(ctx mongo.SessionContext, infoID objectid.ObjectID,
+	page uint32, size uint32, sorts []*content.Sort) ([]*models.BehaviorUserItem, error) {
 	var cur mongo.Cursor
 
 	pipeline := mongo.Pipeline{
@@ -158,13 +151,13 @@ func (repo *behaviorRepository) FindUserByInfo(infoID objectid.ObjectID,
 		{"uid", 1},
 	}}})
 
-	cur, err := repo.collections.Aggregate(repo.ctx, pipeline)
+	cur, err := repo.collections.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
-	defer cur.Close(repo.ctx)
+	defer cur.Close(ctx)
 	items := make([]*models.BehaviorUserItem, 0, size)
-	for cur.Next(repo.ctx) {
+	for cur.Next(ctx) {
 		var item models.BehaviorUserItem
 		err := cur.Decode(&item)
 		if err != nil {
@@ -179,9 +172,9 @@ func (repo *behaviorRepository) FindUserByInfo(infoID objectid.ObjectID,
 	return items, nil
 }
 
-func (repo *behaviorRepository) IsExist(uid string, infoID objectid.ObjectID) (bool, error) {
+func (repo *behaviorRepository) IsExists(ctx mongo.SessionContext, uid string, infoID objectid.ObjectID) (bool, error) {
 	filter := bson.D{{"uid", uid}, {"items.infoId", infoID}}
-	result := repo.collections.FindOne(repo.ctx, filter)
+	result := repo.collections.FindOne(ctx, filter)
 	err := result.Decode(nil)
 	if err == mongo.ErrNoDocuments {
 		return false, nil
@@ -191,7 +184,7 @@ func (repo *behaviorRepository) IsExist(uid string, infoID objectid.ObjectID) (b
 	return false, err
 }
 
-func (repo *behaviorRepository) CountByInfo(infoID objectid.ObjectID) (uint64, error) {
+func (repo *behaviorRepository) CountByInfo(ctx mongo.SessionContext, infoID objectid.ObjectID) (uint64, error) {
 	pipeline := mongo.Pipeline{
 		bson.D{{"$unwind", "$items"}},
 		bson.D{{"$match", bson.D{{"items.infoId", infoID}}}},
@@ -201,12 +194,12 @@ func (repo *behaviorRepository) CountByInfo(infoID objectid.ObjectID) (uint64, e
 		}}},
 		bson.D{{"$project", bson.D{{"_id", 0}}}},
 	}
-	cur, err := repo.collections.Aggregate(repo.ctx, pipeline)
+	cur, err := repo.collections.Aggregate(ctx, pipeline)
 	if err != nil {
 		return 0, err
 	}
-	defer cur.Close(repo.ctx)
-	if cur.Next(repo.ctx) {
+	defer cur.Close(ctx)
+	if cur.Next(ctx) {
 		item := make(map[interface{}]interface{})
 		err := cur.Decode(&item)
 		if err != nil {
@@ -214,15 +207,11 @@ func (repo *behaviorRepository) CountByInfo(infoID objectid.ObjectID) (uint64, e
 		}
 		return uint64(item["count"].(int64)), nil
 	} else {
-		err = cur.Err()
-		if err != nil {
-			return 0, err
-		}
-		return 0, ErrThumbCount
+		return 0, cur.Err()
 	}
 }
 
-func (repo *behaviorRepository) CountByUser(uid string) (uint64, error) {
+func (repo *behaviorRepository) CountByUser(ctx mongo.SessionContext, uid string) (uint64, error) {
 	pipeline := mongo.Pipeline{
 		bson.D{{"$match", bson.D{{"uid", uid}}}},
 		bson.D{{"$unwind", "$items"}},
@@ -232,12 +221,12 @@ func (repo *behaviorRepository) CountByUser(uid string) (uint64, error) {
 		}}},
 		bson.D{{"$project", bson.D{{"_id", 0}}}},
 	}
-	cur, err := repo.collections.Aggregate(repo.ctx, pipeline)
+	cur, err := repo.collections.Aggregate(ctx, pipeline)
 	if err != nil {
 		return 0, err
 	}
-	defer cur.Close(repo.ctx)
-	if cur.Next(repo.ctx) {
+	defer cur.Close(ctx)
+	if cur.Next(ctx) {
 		item := make(map[interface{}]interface{})
 		err := cur.Decode(&item)
 		if err != nil {
@@ -245,29 +234,25 @@ func (repo *behaviorRepository) CountByUser(uid string) (uint64, error) {
 		}
 		return uint64(item["count"].(int64)), nil
 	} else {
-		err = cur.Err()
-		if err != nil {
-			return 0, err
-		}
-		return 0, ErrThumbCount
+		return 0, cur.Err()
 	}
 }
 
-func (repo *behaviorRepository) Delete(uid string, infoID objectid.ObjectID) error {
+func (repo *behaviorRepository) Delete(ctx mongo.SessionContext, uid string, infoID objectid.ObjectID) error {
 	filter := bson.D{{"uid", uid}, {"items.infoId", infoID}}
-	result := repo.collections.FindOne(repo.ctx, filter)
-	if result.Decode(nil) == mongo.ErrNoDocuments {
-		return ErrThumbNotExisted
+	result := repo.collections.FindOne(ctx, filter)
+	if err := result.Decode(nil); err != nil {
+		return err
 	} else {
 		update := bson.D{
 			{"$pull", bson.D{{"items", bson.D{{"infoId", infoID}}}}},
 			{"$inc", bson.D{{"count", -1}}},
 		}
-		ur, err := repo.collections.UpdateOne(repo.ctx, filter, update)
+		ur, err := repo.collections.UpdateOne(ctx, filter, update)
 		if err != nil {
 			return err
 		} else if ur.ModifiedCount == 0 {
-			return ErrUpdateThumb
+			return mongo.ErrNoDocuments
 		}
 		return nil
 	}

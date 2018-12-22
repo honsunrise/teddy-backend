@@ -1,99 +1,80 @@
 package repositories
 
 import (
-	"context"
 	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/zhsyourai/teddy-backend/common/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto/content"
 	"github.com/zhsyourai/teddy-backend/content/models"
 )
 
 type InfoRepository interface {
-	Insert(info *models.Info) error
-	IncWatchCount(id objectid.ObjectID, count int64) error
-	FindOne(id objectid.ObjectID) (*models.Info, error)
-	FindAll(page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error)
-	FindByTags(tags []string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error)
-	FindByUser(uid string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error)
-	FindByTitle(title string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error)
-	FindByTitleAndUser(title string, uid string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error)
-	Delete(id objectid.ObjectID) error
-	Update(id objectid.ObjectID, fields map[string]interface{}) error
+	Insert(ctx mongo.SessionContext, info *models.Info) error
+	IncWatchCount(ctx mongo.SessionContext, id objectid.ObjectID, count int64) error
+	FindOne(ctx mongo.SessionContext, id objectid.ObjectID) (*models.Info, error)
+	FindAll(ctx mongo.SessionContext, uid string, tags []*models.TypeAndTag, page uint32, size uint32, sorts []*content.Sort) ([]*models.Info, error)
+	Delete(ctx mongo.SessionContext, id objectid.ObjectID) error
+	Update(ctx mongo.SessionContext, id objectid.ObjectID, fields map[string]interface{}) error
 }
 
 func NewInfoRepository(client *mongo.Client) (InfoRepository, error) {
 	return &infoRepository{
-		ctx:         context.Background(),
-		client:      client,
 		collections: client.Database("teddy").Collection("info"),
 	}, nil
 }
 
 type infoRepository struct {
-	ctx         context.Context
-	client      *mongo.Client
 	collections *mongo.Collection
 }
 
-func (repo *infoRepository) Insert(info *models.Info) error {
-	filter := bson.D{{"title", info.Title}}
-	result := repo.collections.FindOne(repo.ctx, filter)
-	if result.Decode(nil) == mongo.ErrNoDocuments {
-		info.Id = objectid.New()
-		_, err := repo.collections.InsertOne(repo.ctx, info)
-		if err != nil {
-			return err
-		}
-	} else {
-		return ErrTitleExisted
+func (repo *infoRepository) Insert(ctx mongo.SessionContext, info *models.Info) error {
+	info.Id = objectid.New()
+	_, err := repo.collections.InsertOne(ctx, info)
+	if err != nil {
+		return err
 	}
 	return nil
 }
 
-func (repo *infoRepository) IncWatchCount(id objectid.ObjectID, count int64) error {
+func (repo *infoRepository) IncWatchCount(ctx mongo.SessionContext, id objectid.ObjectID, count int64) error {
 	filter := bson.D{{"_id", id}}
 	update := bson.D{{"$inc", bson.D{{Key: "watchCount", Value: count}}}}
-	ur, err := repo.collections.UpdateOne(repo.ctx, filter, update)
+	ur, err := repo.collections.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return err
 	} else if ur.ModifiedCount == 0 {
-		return ErrUpdateTag
+		return mongo.ErrNoDocuments
 	}
 	return nil
 }
 
-func (repo *infoRepository) FindOne(id objectid.ObjectID) (*models.Info, error) {
+func (repo *infoRepository) FindOne(ctx mongo.SessionContext, id objectid.ObjectID) (*models.Info, error) {
 	var info models.Info
 	filter := bson.D{{"_id", id}}
-	err := repo.collections.FindOne(repo.ctx, filter).Decode(&info)
+	err := repo.collections.FindOne(ctx, filter).Decode(&info)
 	if err != nil {
 		return nil, err
 	}
 	return &info, nil
 }
 
-func (repo *infoRepository) internalFindInfo(uid string, title string, tags []string, page uint32,
-	size uint32, sorts []*proto.Sort) ([]*models.Info, error) {
+func (repo *infoRepository) internalFindInfo(ctx mongo.SessionContext, uid string, tags []*models.TypeAndTag, page uint32,
+	size uint32, sorts []*content.Sort) ([]*models.Info, error) {
 	var cur mongo.Cursor
 
 	pipeline := mongo.Pipeline{}
 
-	var dynFilter = make(bson.D, 0, 3)
+	var dynFilter = make(bson.D, 0, 2)
 	if uid != "" {
 		dynFilter = append(dynFilter, bson.E{Key: "uid", Value: uid})
 	}
 	if len(tags) != 0 {
-		dynFilter = append(dynFilter, bson.E{Key: "tags", Value: bson.D{{"$in", bson.A{tags}}}})
-	}
-	if title != "" {
-		dynFilter = append(dynFilter, bson.E{Key: "$text", Value: bson.D{{"$search", title}}})
+		dynFilter = append(dynFilter, bson.E{Key: "tags", Value: bson.D{{"$all", tags}}})
 	}
 	if len(dynFilter) != 0 {
 		pipeline = append(pipeline, bson.D{{"$match", dynFilter}})
 	}
-
 	pipeline = append(pipeline, bson.D{{"$skip", int64(size * page)}})
 	pipeline = append(pipeline, bson.D{{"$limit", int64(size)}})
 
@@ -109,13 +90,13 @@ func (repo *infoRepository) internalFindInfo(uid string, title string, tags []st
 		pipeline = append(pipeline, bson.D{{"$sort", itemsSorts}})
 	}
 
-	cur, err := repo.collections.Aggregate(repo.ctx, pipeline)
+	cur, err := repo.collections.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
-	defer cur.Close(repo.ctx)
+	defer cur.Close(ctx)
 	items := make([]*models.Info, 0, size)
-	for cur.Next(repo.ctx) {
+	for cur.Next(ctx) {
 		var item models.Info
 		err := cur.Decode(&item)
 		if err != nil {
@@ -130,49 +111,34 @@ func (repo *infoRepository) internalFindInfo(uid string, title string, tags []st
 	return items, nil
 }
 
-func (repo *infoRepository) FindAll(page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error) {
-	return repo.internalFindInfo("", "", nil, page, size, sorts)
+func (repo *infoRepository) FindAll(ctx mongo.SessionContext, uid string, tags []*models.TypeAndTag,
+	page uint32, size uint32, sorts []*content.Sort) ([]*models.Info, error) {
+	return repo.internalFindInfo(ctx, uid, tags, page, size, sorts)
 }
 
-func (repo *infoRepository) FindByTags(tags []string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error) {
-	return repo.internalFindInfo("", "", tags, page, size, sorts)
-}
-
-func (repo *infoRepository) FindByUser(uid string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error) {
-	return repo.internalFindInfo(uid, "", nil, page, size, sorts)
-}
-
-func (repo *infoRepository) FindByTitle(title string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error) {
-	return repo.internalFindInfo("", title, nil, page, size, sorts)
-}
-
-func (repo *infoRepository) FindByTitleAndUser(title string, uid string, page uint32, size uint32, sorts []*proto.Sort) ([]*models.Info, error) {
-	return repo.internalFindInfo(uid, title, nil, page, size, sorts)
-}
-
-func (repo *infoRepository) Delete(id objectid.ObjectID) error {
+func (repo *infoRepository) Delete(ctx mongo.SessionContext, id objectid.ObjectID) error {
 	filter := bson.D{{"_id", id}}
-	dr, err := repo.collections.DeleteOne(repo.ctx, filter)
+	dr, err := repo.collections.DeleteOne(ctx, filter)
 	if err != nil {
 		return err
 	} else if dr.DeletedCount == 0 {
-		return ErrDeleteInfo
+		return mongo.ErrNoDocuments
 	}
 	return nil
 }
 
-func (repo *infoRepository) Update(id objectid.ObjectID, fields map[string]interface{}) error {
+func (repo *infoRepository) Update(ctx mongo.SessionContext, id objectid.ObjectID, fields map[string]interface{}) error {
 	filter := bson.D{{"_id", id}}
 	var bsonFields = make(bson.D, 0, len(fields))
 	for k, v := range fields {
 		bsonFields = append(bsonFields, bson.E{Key: fmt.Sprintf("%s", k), Value: v})
 	}
 	update := bson.D{{"$set", bsonFields}}
-	ur, err := repo.collections.UpdateOne(repo.ctx, filter, update)
+	ur, err := repo.collections.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return err
 	} else if ur.ModifiedCount == 0 {
-		return ErrUpdateInfo
+		return mongo.ErrNoDocuments
 	}
 	return nil
 }

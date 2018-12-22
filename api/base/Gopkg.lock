@@ -135,7 +135,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:a71d9c9a9652798079eccf788438582be8b0e93d4b270585cc2f1d16d8e85afe"
+  digest = "1:82bb7e528cc159c10e445855be534aad69a60815472d0f0394190e4d1fbf177a"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
@@ -151,7 +151,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "6bb7691ec18bfcde952a92015a9ec494af928a7c"
+  revision = "d81efec840768a6fc0e2975528013c5bb226a1b6"
 
 [[projects]]
   branch = "master"
@@ -297,6 +297,8 @@
     "github.com/zhsyourai/teddy-backend/common/proto/captcha",
     "github.com/zhsyourai/teddy-backend/common/types",
     "golang.org/x/sync/errgroup",
+    "google.golang.org/grpc/codes",
+    "google.golang.org/grpc/status",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

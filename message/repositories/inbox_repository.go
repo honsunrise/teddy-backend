@@ -59,7 +59,7 @@ func (repo *inboxRepository) internalFindInBoxItems(uid string, itemType models.
 		dynFilter = append(dynFilter, bson.E{Key: "items.type", Value: int64(itemType)})
 	}
 	if len(ids) != 0 {
-		dynFilter = append(dynFilter, bson.E{Key: "items.id", Value: bson.D{{"$in", bson.A{ids}}}})
+		dynFilter = append(dynFilter, bson.E{Key: "items.id", Value: bson.D{{"$in", ids}}})
 	}
 
 	var itemsSorts = make(bson.D, 0, len(sorts))
@@ -157,7 +157,7 @@ func (repo *inboxRepository) DeleteInBoxItems(uid string, ids []string) error {
 		"$pull", bson.D{{
 			"items", bson.D{{
 				"id", bson.D{{
-					"$in", bson.A{ids},
+					"$in", ids,
 				}},
 			}},
 		}},
@@ -173,7 +173,7 @@ func (repo *inboxRepository) UpdateInBoxItems(uid string, ids []string, fields m
 	filter := bson.D{
 		{"uid", uid},
 		{"items", bson.D{
-			{"$elemMatch", bson.D{{"id", bson.A{ids}}}},
+			{"$elemMatch", bson.D{{"id", ids}}},
 		}},
 	}
 

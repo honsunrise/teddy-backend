@@ -41,6 +41,24 @@ func buildSort(sort string) ([]*content.Sort, error) {
 	return sorts, nil
 }
 
+func buildTags(tag string) ([]*content.TagAndType, error) {
+	rawTags := strings.Split(tag, ",")
+	tags := make([]*content.TagAndType, 0, len(rawTags))
+	for _, item := range rawTags {
+		typeAndTag := strings.Split(item, ":")
+		if len(typeAndTag) == 2 {
+			tags = append(tags, &content.TagAndType{
+				Type: typeAndTag[0],
+				Tag:  typeAndTag[1],
+			})
+
+		} else {
+			return nil, ErrTagNotCorrect
+		}
+	}
+	return tags, nil
+}
+
 type Content struct {
 }
 
@@ -64,17 +82,17 @@ func (h *Content) HandlerAuth(root gin.IRoutes) {
 	root.GET("/favorite/user", h.GetUserFavThumb)
 	root.GET("/favorite/id/:id", h.GetInfoFavThumb)
 	root.POST("/favorite/id/:id", h.FavThumb)
-	root.DELETE("/favorite/id/:id", h.DeleteFavoThumb)
+	root.DELETE("/favorite/id/:id", h.DeleteFavThumb)
 
 	root.GET("/thumbUp/user", h.GetUserFavThumb)
 	root.GET("/thumbUp/id/:id", h.GetInfoFavThumb)
 	root.POST("/thumbUp/id/:id", h.FavThumb)
-	root.DELETE("/thumbUp/id/:id", h.DeleteFavoThumb)
+	root.DELETE("/thumbUp/id/:id", h.DeleteFavThumb)
 
 	root.GET("/thumbDown/user", h.GetUserFavThumb)
 	root.GET("/thumbDown/id/:id", h.GetInfoFavThumb)
 	root.POST("/thumbDown/id/:id", h.FavThumb)
-	root.DELETE("/thumbDown/id/:id", h.DeleteFavoThumb)
+	root.DELETE("/thumbDown/id/:id", h.DeleteFavThumb)
 }
 
 func (h *Content) HandlerHealth(root gin.IRoutes) {
@@ -122,6 +140,7 @@ func (h *Content) GetAllTags(ctx *gin.Context) {
 	}
 
 	resp, err := contentClient.GetTags(ctx, &content.GetTagReq{
+		Type:  ctx.Query("type"),
 		Page:  uint32(page),
 		Size:  uint32(size),
 		Sorts: sorts,
@@ -134,6 +153,7 @@ func (h *Content) GetAllTags(ctx *gin.Context) {
 	}
 
 	type tagsResult struct {
+		Type        string    `json:"type"`
 		Tag         string    `json:"tag"`
 		Usage       uint64    `json:"usage"`
 		CreateTime  time.Time `json:"createTime"`
@@ -154,6 +174,7 @@ func (h *Content) GetAllTags(ctx *gin.Context) {
 			continue
 		}
 		results = append(results, &tagsResult{
+			Type:        tag.Type,
 			Tag:         tag.Tag,
 			Usage:       tag.Usage,
 			CreateTime:  createTime,
@@ -186,18 +207,26 @@ func (h *Content) GetAllContents(ctx *gin.Context) {
 	}
 
 	var sorts []*content.Sort
-	if ctx.Query("sort") != "" {
-		sorts, err = buildSort(ctx.Query("sort"))
+	if ctx.Query("sorts") != "" {
+		sorts, err = buildSort(ctx.Query("sorts"))
 		if err != nil {
-			log.Error(ErrOrderNotCorrect)
-			ctx.AbortWithError(http.StatusInternalServerError, ErrOrderNotCorrect)
+			ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 	}
 
+	var tags []*content.TagAndType
+	if ctx.Query("tags") != "" {
+		tags, err = buildTags(ctx.Query("tags"))
+		if err != nil {
+			ctx.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	}
 	resp, err := contentClient.GetInfos(ctx, &content.GetInfosReq{
 		Page:  uint32(page),
 		Size:  uint32(size),
+		Tags:  tags,
 		Sorts: sorts,
 	})
 
@@ -207,10 +236,17 @@ func (h *Content) GetAllContents(ctx *gin.Context) {
 		return
 	}
 
-	type infosResult struct {
+	type infoResultTag struct {
+		Type string `json:"type"`
+		Tag  string `json:"tag"`
+	}
+
+	type infoResult struct {
 		Id             string            `json:"id"`
 		UID            string            `json:"uid"`
+		Author         string            `json:"author"`
 		Title          string            `json:"title"`
+		Summary        string            `json:"summary"`
 		Content        string            `json:"content"`
 		ContentTime    time.Time         `json:"contentTime"`
 		CoverResources map[string]string `json:"coverResources"`
@@ -218,7 +254,7 @@ func (h *Content) GetAllContents(ctx *gin.Context) {
 		LastReviewTime time.Time         `json:"lastReviewTime"`
 		Valid          bool              `json:"valid"`
 		WatchCount     int64             `json:"watchCount"`
-		Tags           []string          `json:"tags"`
+		Tags           []*infoResultTag  `json:"tags"`
 		ThumbUp        int64             `json:"thumbUp"`
 		IsThumbUp      bool              `json:"isThumbUp"`
 		ThumbUpList    []string          `json:"thumbUpList"`
@@ -230,9 +266,9 @@ func (h *Content) GetAllContents(ctx *gin.Context) {
 		FavoriteList   []string          `json:"favoriteList"`
 		LastModifyTime time.Time         `json:"lastModifyTime"`
 		CanReview      bool              `json:"canReview"`
+		Archived       bool              `json:"archived"`
 	}
-
-	results := make([]*infosResult, 0, len(resp.Infos))
+	results := make([]*infoResult, 0, len(resp.Infos))
 	for _, info := range resp.Infos {
 		publishTime, err := ptypes.Timestamp(info.PublishTime)
 		if err != nil {
@@ -254,10 +290,20 @@ func (h *Content) GetAllContents(ctx *gin.Context) {
 			log.Error(err)
 		}
 
-		results = append(results, &infosResult{
+		tags := make([]*infoResultTag, 0, len(info.Tags))
+		for _, v := range info.Tags {
+			tags = append(tags, &infoResultTag{
+				Type: v.Type,
+				Tag:  v.Tag,
+			})
+		}
+
+		results = append(results, &infoResult{
 			Id:             info.InfoID,
 			UID:            info.Uid,
 			Title:          info.Title,
+			Author:         info.Author,
+			Summary:        info.Summary,
 			Content:        info.Content,
 			ContentTime:    contentTime,
 			CoverResources: info.CoverResources,
@@ -265,7 +311,7 @@ func (h *Content) GetAllContents(ctx *gin.Context) {
 			LastReviewTime: lastReviewTime,
 			Valid:          info.Valid,
 			WatchCount:     info.WatchCount,
-			Tags:           info.Tags,
+			Tags:           tags,
 			ThumbUp:        info.ThumbUp,
 			IsThumbUp:      info.IsThumbUp,
 			ThumbUpList:    info.ThumbUpList,
@@ -277,6 +323,7 @@ func (h *Content) GetAllContents(ctx *gin.Context) {
 			FavoriteList:   info.FavoriteList,
 			LastModifyTime: lastModifyTime,
 			CanReview:      info.CanReview,
+			Archived:       info.Archived,
 		})
 	}
 
@@ -299,24 +346,41 @@ func (h *Content) PublishContent(ctx *gin.Context) {
 		return
 	}
 
+	type publishInfoTag struct {
+		Type string `json:"type"`
+		Tag  string `json:"tag"`
+	}
+
 	type publishInfoReq struct {
 		Title          string            `json:"title"`
+		Author         string            `json:"author"`
+		Summary        string            `json:"summary"`
 		Content        string            `json:"content"`
-		Tags           []string          `json:"tags"`
+		Tags           []*publishInfoTag `json:"tags"`
 		CanReview      bool              `json:"canReview"`
 		CoverResources map[string]string `json:"coverResources"`
 		ContentTime    time.Time         `json:"contentTime"`
 	}
 	var req publishInfoReq
-	ctx.BindJSON(&req)
+	ctx.Bind(&req)
+
+	tags := make([]*content.TagAndType, 0, len(req.Tags))
+	for _, v := range req.Tags {
+		tags = append(tags, &content.TagAndType{
+			Type: v.Type,
+			Tag:  v.Tag,
+		})
+	}
 
 	//TODO: Get uid
 	uid := "7791850604"
 	_, err := contentClient.PublishInfo(ctx, &content.PublishInfoReq{
 		Uid:            uid,
+		Author:         req.Author,
+		Summary:        req.Summary,
 		Title:          req.Title,
 		Content:        req.Content,
-		Tags:           req.Tags,
+		Tags:           tags,
 		CanReview:      req.CanReview,
 		CoverResources: req.CoverResources,
 	})
@@ -349,10 +413,17 @@ func (h *Content) GetContentDetail(ctx *gin.Context) {
 		return
 	}
 
-	type infosResult struct {
+	type infoResultTag struct {
+		Type string `json:"type"`
+		Tag  string `json:"tag"`
+	}
+
+	type infoResult struct {
 		Id             string            `json:"id"`
 		UID            string            `json:"uid"`
+		Author         string            `json:"author"`
 		Title          string            `json:"title"`
+		Summary        string            `json:"summary"`
 		Content        string            `json:"content"`
 		ContentTime    time.Time         `json:"contentTime"`
 		CoverResources map[string]string `json:"coverResources"`
@@ -360,7 +431,7 @@ func (h *Content) GetContentDetail(ctx *gin.Context) {
 		LastReviewTime time.Time         `json:"lastReviewTime"`
 		Valid          bool              `json:"valid"`
 		WatchCount     int64             `json:"watchCount"`
-		Tags           []string          `json:"tags"`
+		Tags           []*infoResultTag  `json:"tags"`
 		ThumbUp        int64             `json:"thumbUp"`
 		IsThumbUp      bool              `json:"isThumbUp"`
 		ThumbUpList    []string          `json:"thumbUpList"`
@@ -372,6 +443,7 @@ func (h *Content) GetContentDetail(ctx *gin.Context) {
 		FavoriteList   []string          `json:"favoriteList"`
 		LastModifyTime time.Time         `json:"lastModifyTime"`
 		CanReview      bool              `json:"canReview"`
+		Archived       bool              `json:"archived"`
 	}
 
 	publishTime, err := ptypes.Timestamp(info.PublishTime)
@@ -394,10 +466,20 @@ func (h *Content) GetContentDetail(ctx *gin.Context) {
 		log.Error(err)
 	}
 
-	resp := &infosResult{
+	tags := make([]*infoResultTag, 0, len(info.Tags))
+	for _, v := range info.Tags {
+		tags = append(tags, &infoResultTag{
+			Type: v.Type,
+			Tag:  v.Tag,
+		})
+	}
+
+	resp := &infoResult{
 		Id:             info.InfoID,
 		UID:            info.Uid,
 		Title:          info.Title,
+		Author:         info.Author,
+		Summary:        info.Summary,
 		Content:        info.Content,
 		ContentTime:    contentTime,
 		CoverResources: info.CoverResources,
@@ -405,7 +487,7 @@ func (h *Content) GetContentDetail(ctx *gin.Context) {
 		LastReviewTime: lastReviewTime,
 		Valid:          info.Valid,
 		WatchCount:     info.WatchCount,
-		Tags:           info.Tags,
+		Tags:           tags,
 		ThumbUp:        info.ThumbUp,
 		IsThumbUp:      info.IsThumbUp,
 		ThumbUpList:    info.ThumbUpList,
@@ -417,6 +499,7 @@ func (h *Content) GetContentDetail(ctx *gin.Context) {
 		FavoriteList:   info.FavoriteList,
 		LastModifyTime: lastModifyTime,
 		CanReview:      info.CanReview,
+		Archived:       info.Archived,
 	}
 	ctx.JSON(http.StatusOK, resp)
 }
@@ -428,22 +511,35 @@ func (h *Content) UpdateContent(ctx *gin.Context) {
 		return
 	}
 
+	type updateInfoTag struct {
+		Type string `json:"type"`
+		Tag  string `json:"tag"`
+	}
+
 	type updateInfoReq struct {
 		Title          string            `json:"title"`
 		Content        string            `json:"content"`
-		Tags           []string          `json:"tags"`
+		Tags           []*updateInfoTag  `json:"tags"`
 		CanReview      bool              `json:"canReview"`
 		CoverResources map[string]string `json:"coverResources"`
 	}
 	var req updateInfoReq
-	ctx.BindJSON(&req)
+	ctx.Bind(&req)
+
+	tags := make([]*content.TagAndType, 0, len(req.Tags))
+	for _, v := range req.Tags {
+		tags = append(tags, &content.TagAndType{
+			Type: v.Type,
+			Tag:  v.Tag,
+		})
+	}
 
 	infoID := ctx.Param("id")
 	_, err := contentClient.EditInfo(ctx, &content.EditInfoReq{
 		InfoID:         infoID,
 		Title:          req.Title,
 		Content:        req.Content,
-		Tags:           req.Tags,
+		Tags:           tags,
 		CanReview:      req.CanReview,
 		CoverResources: req.CoverResources,
 	})
@@ -668,7 +764,7 @@ func (h *Content) FavThumb(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (h *Content) DeleteFavoThumb(ctx *gin.Context) {
+func (h *Content) DeleteFavThumb(ctx *gin.Context) {
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)

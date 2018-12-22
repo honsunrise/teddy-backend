@@ -4,7 +4,7 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/config/source/file"
-	"github.com/zhsyourai/teddy-backend/common/utils"
+	"github.com/zhsyourai/teddy-backend/common/proto/content"
 	"github.com/zhsyourai/teddy-backend/content/server"
 	"google.golang.org/grpc"
 	grpcHealth "google.golang.org/grpc/health"
@@ -14,8 +14,6 @@ import (
 	"context"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/common/proto"
-	"github.com/zhsyourai/teddy-backend/content/repositories"
 )
 
 func init() {
@@ -41,36 +39,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	mongodbUri := utils.BuildMongodbURI(false, confType.Databases["mongodb"])
-
 	// New Mongodb client
-	mongodbClient, err := mongo.Connect(context.Background(), mongodbUri)
+	mongodbClient, err := mongo.Connect(context.Background(), confType.Databases["mongodb"])
 	if err != nil {
 		log.Fatal(err)
 	}
-	// New Repository
-	accountRepo, err := repositories.NewInfoRepository(mongodbClient)
-	if err != nil {
-		log.Fatal(err)
-	}
-	favoriteRepo, err := repositories.NewFavoriteRepository(mongodbClient)
-	if err != nil {
-		log.Fatal(err)
-	}
-	tagsRepo, err := repositories.NewTagRepository(mongodbClient)
-	if err != nil {
-		log.Fatal(err)
-	}
-	thumbUpRepo, err := repositories.NewThumbUpRepository(mongodbClient)
-	if err != nil {
-		log.Fatal(err)
-	}
-	thumbDownRepo, err := repositories.NewThumbDownRepository(mongodbClient)
-	if err != nil {
-		log.Fatal(err)
-	}
+
 	// New Handler
-	accountHandler, err := server.NewContentServer(accountRepo, tagsRepo, favoriteRepo, thumbUpRepo, thumbDownRepo)
+	accountHandler, err := server.NewContentServer(mongodbClient)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -81,7 +57,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	proto.RegisterContentServer(grpcServer, accountHandler)
+	content.RegisterContentServer(grpcServer, accountHandler)
 
 	healthSrv := grpcHealth.NewServer()
 	grpc_health_v1.RegisterHealthServer(grpcServer, healthSrv)
