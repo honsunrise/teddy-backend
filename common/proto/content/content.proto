@@ -45,6 +45,11 @@ message Tag {
     google.protobuf.Timestamp lastUseTime = 5;
 }
 
+message TagAndType {
+    string tag = 1;
+    string type = 2;
+}
+
 message Info {
     string uid = 1;
     string infoID = 2;
@@ -56,7 +61,7 @@ message Info {
     google.protobuf.Timestamp lastReviewTime = 9;
     bool valid = 10;
     int64 watchCount = 11;
-    repeated string tags = 12;
+    repeated TagAndType tags = 12;
     int64 thumbUp = 13;
     bool isThumbUp = 14;
     repeated string thumbUpList = 15;
@@ -91,21 +96,25 @@ message GetTagsResp {
 
 message PublishInfoReq {
     string uid = 1;
-    string title = 2;
-    string content = 3;
-    repeated string tags = 4;
-    map<string, string> coverResources = 5;
-    bool canReview = 6;
+    string author = 2;
+    string title = 3;
+    string summary = 4;
+    string content = 5;
+    repeated TagAndType tags = 6;
+    map<string, string> coverResources = 7;
+    bool canReview = 8;
 }
 
 message EditInfoReq {
     string infoID = 1;
     string uid = 2;
-    string title = 3;
-    string content = 4;
-    repeated string tags = 5;
-    map<string, string> coverResources = 6;
-    bool canReview = 7;
+    string author = 3;
+    string title = 4;
+    string summary = 5;
+    string content = 6;
+    repeated TagAndType tags = 7;
+    map<string, string> coverResources = 8;
+    bool canReview = 9;
 }
 
 message GetInfoReq {
@@ -119,7 +128,7 @@ message GetInfosReq {
     repeated Sort sorts = 3;
     string uid = 4;
     string title = 5;
-    repeated string tags = 6;
+    repeated TagAndType tags = 6;
 }
 
 message GetInfosResp {
