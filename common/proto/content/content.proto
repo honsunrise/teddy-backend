@@ -39,9 +39,10 @@ message Sort {
 
 message Tag {
     string tag = 1;
-    uint64 usage = 2;
-    google.protobuf.Timestamp createTime = 3;
-    google.protobuf.Timestamp lastUseTime = 4;
+    string type = 2;
+    uint64 usage = 3;
+    google.protobuf.Timestamp createTime = 4;
+    google.protobuf.Timestamp lastUseTime = 5;
 }
 
 message Info {
@@ -72,8 +73,9 @@ message Info {
 message GetTagReq {
     uint32 page = 1;
     uint32 size = 2;
-    repeated Sort sorts = 3;
-    string uid = 4;
+    string type = 3;
+    repeated Sort sorts = 4;
+    string uid = 5;
 }
 
 message UIDPageReq {
