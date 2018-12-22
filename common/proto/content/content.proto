@@ -51,15 +51,16 @@ message TagAndType {
 }
 
 message Info {
-    string uid = 1;
-    string infoID = 2;
-    string title = 3;
-    string content = 5;
-    google.protobuf.Timestamp contentTime = 6;
-    map<string, string> coverResources = 7;
-    google.protobuf.Timestamp publishTime = 8;
-    google.protobuf.Timestamp lastReviewTime = 9;
-    bool valid = 10;
+    string infoID = 1;
+    string uid = 2;
+    string author = 3;
+    string title = 4;
+    string summary = 5;
+    string content = 6;
+    google.protobuf.Timestamp contentTime = 7;
+    map<string, string> coverResources = 8;
+    google.protobuf.Timestamp publishTime = 9;
+    google.protobuf.Timestamp lastReviewTime = 10;
     int64 watchCount = 11;
     repeated TagAndType tags = 12;
     int64 thumbUp = 13;
@@ -73,6 +74,8 @@ message Info {
     repeated string favoriteList = 21;
     google.protobuf.Timestamp lastModifyTime = 22;
     bool canReview = 23;
+    bool valid = 24;
+    bool archived = 25;
 }
 
 message GetTagReq {
