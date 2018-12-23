@@ -16,6 +16,12 @@ service Content {
     rpc DeleteInfo (InfoIDReq) returns (google.protobuf.Empty) {}
     rpc WatchInfo (InfoIDReq) returns (google.protobuf.Empty) {}
 
+    rpc GetSegments(GetSegmentsReq) returns (GetSegmentsResp) {}
+    rpc GetSegment(GetSegmentReq) returns (Segment) {}
+    rpc PublishSegment(PublishSegmentReq) returns (google.protobuf.Empty) {}
+    rpc EditSegment(EditSegmentReq) returns (google.protobuf.Empty) {}
+    rpc DeleteSegment(InfoIDAndNoReq) returns (google.protobuf.Empty) {}
+
     rpc ThumbUp (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
     rpc DeleteThumbUp (InfoIDAndUIDReq) returns (google.protobuf.Empty) {}
     rpc GetUserThumbUp (UIDPageReq) returns (InfoIDsResp) {}
@@ -80,6 +86,14 @@ message Info {
     int64 SegmentCount = 27;
 }
 
+message Segment {
+    string id = 1;
+    string infoID = 2;
+    int64 no = 3;
+    repeated string labels = 4;
+    map<string, string> content = 5;
+}
+
 message GetTagReq {
     uint32 page = 1;
     uint32 size = 2;
@@ -104,7 +118,7 @@ message PublishInfoReq {
     string author = 2;
     string title = 3;
     string summary = 4;
-    string content = 5;
+    string country = 5;
     repeated TagAndType tags = 6;
     map<string, string> coverResources = 7;
     bool canReview = 8;
@@ -116,10 +130,47 @@ message EditInfoReq {
     string author = 3;
     string title = 4;
     string summary = 5;
-    string content = 6;
+    string country = 6;
     repeated TagAndType tags = 7;
     map<string, string> coverResources = 8;
     bool canReview = 9;
+}
+
+message GetSegmentsReq {
+    uint32 page = 1;
+    uint32 size = 2;
+    string infoID = 3;
+    repeated string labels = 4;
+    repeated Sort sorts = 5;
+}
+
+message GetSegmentsResp {
+    repeated Segment segments = 1;
+}
+
+message GetSegmentReq {
+    string infoID = 1;
+    int64 no = 2;
+}
+
+message PublishSegmentReq {
+    string infoID = 1;
+    int64 no = 2;
+    repeated string labels = 3;
+    map<string, string> content = 4;
+}
+
+message EditSegmentReq {
+    string segID = 1;
+    string infoID = 2;
+    int64 no = 3;
+    repeated string labels = 4;
+    map<string, string> content = 5;
+}
+
+message InfoIDAndNoReq {
+    string infoID = 1;
+    int64 no = 2;
 }
 
 message GetInfoReq {
