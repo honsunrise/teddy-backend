@@ -56,7 +56,7 @@ message Info {
     string author = 3;
     string title = 4;
     string summary = 5;
-    string content = 6;
+    string country = 6;
     google.protobuf.Timestamp contentTime = 7;
     map<string, string> coverResources = 8;
     google.protobuf.Timestamp publishTime = 9;
@@ -76,6 +76,8 @@ message Info {
     bool canReview = 23;
     bool valid = 24;
     bool archived = 25;
+    int64 LatestSegmentNo = 26;
+    int64 SegmentCount = 27;
 }
 
 message GetTagReq {
