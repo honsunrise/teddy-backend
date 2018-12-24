@@ -116,9 +116,8 @@ message Segment {
     string id = 1;
     string infoID = 2;
     int64 no = 3;
-    int64 subNo = 4;
-    repeated string labels = 5;
-    map<string, string> content = 6;
+    repeated string labels = 4;
+    map<string, string> content = 5;
 }
 
 message GetTagReq {
@@ -187,15 +186,13 @@ message Segments {
 message GetSegmentReq {
     string infoID = 1;
     int64 no = 2;
-    int64 subNo = 3;
 }
 
 message PublishSegmentReq {
     string infoID = 1;
     int64 no = 2;
-    int64 subNo = 3;
-    repeated string labels = 4;
-    map<string, string> content = 5;
+    repeated string labels = 3;
+    map<string, string> content = 4;
 }
 
 message EditSegmentReq {
@@ -205,15 +202,13 @@ message EditSegmentReq {
 
     string infoID = 4;
     int64 no = 5;
-    int64 subNo = 6;
-    repeated string labels = 7;
-    map<string, string> content = 8;
+    repeated string labels = 6;
+    map<string, string> content = 7;
 }
 
 message InfoIDAndNoAndSubNoReq {
     string infoID = 1;
     int64 no = 2;
-    int64 subNo = 3;
 }
 
 message GetInfoReq {
