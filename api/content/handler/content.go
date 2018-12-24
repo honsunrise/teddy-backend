@@ -68,31 +68,40 @@ func NewContentHandler() (*Content, error) {
 
 func (h *Content) HandlerNormal(root gin.IRoutes) {
 	root.GET("/tags", h.GetAllTags)
-	root.GET("/all", h.GetAllContents)
+
+	root.GET("/info", h.GetAllInfos)
+	root.GET("/info/:id", h.GetInfoDetail)
+	root.POST("/info/:id/watch", h.WatchInfo)
+
+	root.GET("/info/:id/segment", h.GetAllSegments)
+	root.GET("/info/:id/segment/:segID", h.GetSegmentDetail)
+
 	root.GET("/search", h.Search)
-	root.GET("/id/:id", h.GetContentDetail)
-	root.POST("/id/:id/watch", h.WatchContent)
 }
 
 func (h *Content) HandlerAuth(root gin.IRoutes) {
-	root.POST("/publish", h.PublishContent)
-	root.POST("/id/:id", h.UpdateContent)
-	root.DELETE("/id/:id", h.DeleteContent)
+	root.POST("/info", h.PublishInfo)
+	root.POST("/info/:id", h.UpdateInfo)
+	root.DELETE("/info/:id", h.DeleteInfo)
+
+	root.POST("/info/:id/segment", h.PublishSegment)
+	root.POST("/info/:id/segment/:segID", h.UpdateSegment)
+	root.DELETE("/info/:id/segment/:segID", h.DeleteSegment)
 
 	root.GET("/favorite/user", h.GetUserFavThumb)
-	root.GET("/favorite/id/:id", h.GetInfoFavThumb)
-	root.POST("/favorite/id/:id", h.FavThumb)
-	root.DELETE("/favorite/id/:id", h.DeleteFavThumb)
+	root.GET("/favorite/info/:id", h.GetInfoFavThumb)
+	root.POST("/favorite/info/:id", h.FavThumb)
+	root.DELETE("/favorite/info/:id", h.DeleteFavThumb)
 
 	root.GET("/thumbUp/user", h.GetUserFavThumb)
-	root.GET("/thumbUp/id/:id", h.GetInfoFavThumb)
-	root.POST("/thumbUp/id/:id", h.FavThumb)
-	root.DELETE("/thumbUp/id/:id", h.DeleteFavThumb)
+	root.GET("/thumbUp/info/:id", h.GetInfoFavThumb)
+	root.POST("/thumbUp/info/:id", h.FavThumb)
+	root.DELETE("/thumbUp/info/:id", h.DeleteFavThumb)
 
 	root.GET("/thumbDown/user", h.GetUserFavThumb)
-	root.GET("/thumbDown/id/:id", h.GetInfoFavThumb)
-	root.POST("/thumbDown/id/:id", h.FavThumb)
-	root.DELETE("/thumbDown/id/:id", h.DeleteFavThumb)
+	root.GET("/thumbDown/info/:id", h.GetInfoFavThumb)
+	root.POST("/thumbDown/info/:id", h.FavThumb)
+	root.DELETE("/thumbDown/info/:id", h.DeleteFavThumb)
 }
 
 func (h *Content) HandlerHealth(root gin.IRoutes) {
@@ -100,6 +109,15 @@ func (h *Content) HandlerHealth(root gin.IRoutes) {
 }
 
 func (h *Content) ReturnOK(ctx *gin.Context) {
+	type okResp struct {
+		Status string `json:"status"`
+	}
+	var jsonResp okResp
+	jsonResp.Status = "OK"
+	ctx.JSON(http.StatusOK, &jsonResp)
+}
+
+func (h *Content) Search(ctx *gin.Context) {
 	type okResp struct {
 		Status string `json:"status"`
 	}
@@ -185,7 +203,7 @@ func (h *Content) GetAllTags(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, results)
 }
 
-func (h *Content) GetAllContents(ctx *gin.Context) {
+func (h *Content) GetAllInfos(ctx *gin.Context) {
 	// extract the client from the context
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
@@ -242,31 +260,33 @@ func (h *Content) GetAllContents(ctx *gin.Context) {
 	}
 
 	type infoResult struct {
-		Id             string            `json:"id"`
-		UID            string            `json:"uid"`
-		Author         string            `json:"author"`
-		Title          string            `json:"title"`
-		Summary        string            `json:"summary"`
-		Content        string            `json:"content"`
-		ContentTime    time.Time         `json:"contentTime"`
-		CoverResources map[string]string `json:"coverResources"`
-		PublishTime    time.Time         `json:"publishTime"`
-		LastReviewTime time.Time         `json:"lastReviewTime"`
-		Valid          bool              `json:"valid"`
-		WatchCount     int64             `json:"watchCount"`
-		Tags           []*infoResultTag  `json:"tags"`
-		ThumbUp        int64             `json:"thumbUp"`
-		IsThumbUp      bool              `json:"isThumbUp"`
-		ThumbUpList    []string          `json:"thumbUpList"`
-		ThumbDown      int64             `json:"thumbDown"`
-		IsThumbDown    bool              `json:"isThumbDown"`
-		ThumbDownList  []string          `json:"thumbDownList"`
-		Favorites      int64             `json:"favorites"`
-		IsFavorite     bool              `json:"isFavorite"`
-		FavoriteList   []string          `json:"favoriteList"`
-		LastModifyTime time.Time         `json:"lastModifyTime"`
-		CanReview      bool              `json:"canReview"`
-		Archived       bool              `json:"archived"`
+		Id              string            `json:"id"`
+		UID             string            `json:"uid"`
+		Author          string            `json:"author"`
+		Title           string            `json:"title"`
+		Summary         string            `json:"summary"`
+		Country         string            `json:"country"`
+		ContentTime     time.Time         `json:"contentTime"`
+		CoverResources  map[string]string `json:"coverResources"`
+		PublishTime     time.Time         `json:"publishTime"`
+		LastReviewTime  time.Time         `json:"lastReviewTime"`
+		Valid           bool              `json:"valid"`
+		WatchCount      int64             `json:"watchCount"`
+		Tags            []*infoResultTag  `json:"tags"`
+		ThumbUp         int64             `json:"thumbUp"`
+		IsThumbUp       bool              `json:"isThumbUp"`
+		ThumbUpList     []string          `json:"thumbUpList"`
+		ThumbDown       int64             `json:"thumbDown"`
+		IsThumbDown     bool              `json:"isThumbDown"`
+		ThumbDownList   []string          `json:"thumbDownList"`
+		Favorites       int64             `json:"favorites"`
+		IsFavorite      bool              `json:"isFavorite"`
+		FavoriteList    []string          `json:"favoriteList"`
+		LastModifyTime  time.Time         `json:"lastModifyTime"`
+		CanReview       bool              `json:"canReview"`
+		Archived        bool              `json:"archived"`
+		LatestSegmentNo int64             `json:"latestSegmentNo"`
+		SegmentCount    int64             `json:"segmentCount"`
 	}
 	results := make([]*infoResult, 0, len(resp.Infos))
 	for _, info := range resp.Infos {
@@ -299,47 +319,40 @@ func (h *Content) GetAllContents(ctx *gin.Context) {
 		}
 
 		results = append(results, &infoResult{
-			Id:             info.InfoID,
-			UID:            info.Uid,
-			Title:          info.Title,
-			Author:         info.Author,
-			Summary:        info.Summary,
-			Content:        info.Content,
-			ContentTime:    contentTime,
-			CoverResources: info.CoverResources,
-			PublishTime:    publishTime,
-			LastReviewTime: lastReviewTime,
-			Valid:          info.Valid,
-			WatchCount:     info.WatchCount,
-			Tags:           tags,
-			ThumbUp:        info.ThumbUp,
-			IsThumbUp:      info.IsThumbUp,
-			ThumbUpList:    info.ThumbUpList,
-			ThumbDown:      info.ThumbDown,
-			IsThumbDown:    info.IsThumbDown,
-			ThumbDownList:  info.ThumbDownList,
-			Favorites:      info.Favorites,
-			IsFavorite:     info.IsFavorite,
-			FavoriteList:   info.FavoriteList,
-			LastModifyTime: lastModifyTime,
-			CanReview:      info.CanReview,
-			Archived:       info.Archived,
+			Id:              info.InfoID,
+			UID:             info.Uid,
+			Title:           info.Title,
+			Author:          info.Author,
+			Summary:         info.Summary,
+			Country:         info.Country,
+			ContentTime:     contentTime,
+			CoverResources:  info.CoverResources,
+			PublishTime:     publishTime,
+			LastReviewTime:  lastReviewTime,
+			Valid:           info.Valid,
+			WatchCount:      info.WatchCount,
+			Tags:            tags,
+			ThumbUp:         info.ThumbUp,
+			IsThumbUp:       info.IsThumbUp,
+			ThumbUpList:     info.ThumbUpList,
+			ThumbDown:       info.ThumbDown,
+			IsThumbDown:     info.IsThumbDown,
+			ThumbDownList:   info.ThumbDownList,
+			Favorites:       info.Favorites,
+			IsFavorite:      info.IsFavorite,
+			FavoriteList:    info.FavoriteList,
+			LastModifyTime:  lastModifyTime,
+			CanReview:       info.CanReview,
+			Archived:        info.Archived,
+			LatestSegmentNo: info.LatestSegmentNo,
+			SegmentCount:    info.SegmentCount,
 		})
 	}
 
 	ctx.JSON(http.StatusOK, results)
 }
 
-func (h *Content) Search(ctx *gin.Context) {
-	type okResp struct {
-		Status string `json:"status"`
-	}
-	var jsonResp okResp
-	jsonResp.Status = "OK"
-	ctx.JSON(http.StatusOK, &jsonResp)
-}
-
-func (h *Content) PublishContent(ctx *gin.Context) {
+func (h *Content) PublishInfo(ctx *gin.Context) {
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
@@ -355,7 +368,7 @@ func (h *Content) PublishContent(ctx *gin.Context) {
 		Title          string            `json:"title"`
 		Author         string            `json:"author"`
 		Summary        string            `json:"summary"`
-		Content        string            `json:"content"`
+		Country        string            `json:"country"`
 		Tags           []*publishInfoTag `json:"tags"`
 		CanReview      bool              `json:"canReview"`
 		CoverResources map[string]string `json:"coverResources"`
@@ -379,7 +392,7 @@ func (h *Content) PublishContent(ctx *gin.Context) {
 		Author:         req.Author,
 		Summary:        req.Summary,
 		Title:          req.Title,
-		Content:        req.Content,
+		Country:        req.Country,
 		Tags:           tags,
 		CanReview:      req.CanReview,
 		CoverResources: req.CoverResources,
@@ -394,7 +407,7 @@ func (h *Content) PublishContent(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (h *Content) GetContentDetail(ctx *gin.Context) {
+func (h *Content) GetInfoDetail(ctx *gin.Context) {
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
@@ -419,31 +432,33 @@ func (h *Content) GetContentDetail(ctx *gin.Context) {
 	}
 
 	type infoResult struct {
-		Id             string            `json:"id"`
-		UID            string            `json:"uid"`
-		Author         string            `json:"author"`
-		Title          string            `json:"title"`
-		Summary        string            `json:"summary"`
-		Content        string            `json:"content"`
-		ContentTime    time.Time         `json:"contentTime"`
-		CoverResources map[string]string `json:"coverResources"`
-		PublishTime    time.Time         `json:"publishTime"`
-		LastReviewTime time.Time         `json:"lastReviewTime"`
-		Valid          bool              `json:"valid"`
-		WatchCount     int64             `json:"watchCount"`
-		Tags           []*infoResultTag  `json:"tags"`
-		ThumbUp        int64             `json:"thumbUp"`
-		IsThumbUp      bool              `json:"isThumbUp"`
-		ThumbUpList    []string          `json:"thumbUpList"`
-		ThumbDown      int64             `json:"thumbDown"`
-		IsThumbDown    bool              `json:"isThumbDown"`
-		ThumbDownList  []string          `json:"thumbDownList"`
-		Favorites      int64             `json:"favorites"`
-		IsFavorite     bool              `json:"isFavorite"`
-		FavoriteList   []string          `json:"favoriteList"`
-		LastModifyTime time.Time         `json:"lastModifyTime"`
-		CanReview      bool              `json:"canReview"`
-		Archived       bool              `json:"archived"`
+		Id              string            `json:"id"`
+		UID             string            `json:"uid"`
+		Author          string            `json:"author"`
+		Title           string            `json:"title"`
+		Summary         string            `json:"summary"`
+		Country         string            `json:"country"`
+		ContentTime     time.Time         `json:"contentTime"`
+		CoverResources  map[string]string `json:"coverResources"`
+		PublishTime     time.Time         `json:"publishTime"`
+		LastReviewTime  time.Time         `json:"lastReviewTime"`
+		Valid           bool              `json:"valid"`
+		WatchCount      int64             `json:"watchCount"`
+		Tags            []*infoResultTag  `json:"tags"`
+		ThumbUp         int64             `json:"thumbUp"`
+		IsThumbUp       bool              `json:"isThumbUp"`
+		ThumbUpList     []string          `json:"thumbUpList"`
+		ThumbDown       int64             `json:"thumbDown"`
+		IsThumbDown     bool              `json:"isThumbDown"`
+		ThumbDownList   []string          `json:"thumbDownList"`
+		Favorites       int64             `json:"favorites"`
+		IsFavorite      bool              `json:"isFavorite"`
+		FavoriteList    []string          `json:"favoriteList"`
+		LastModifyTime  time.Time         `json:"lastModifyTime"`
+		CanReview       bool              `json:"canReview"`
+		Archived        bool              `json:"archived"`
+		LatestSegmentNo int64             `json:"latestSegmentNo"`
+		SegmentCount    int64             `json:"segmentCount"`
 	}
 
 	publishTime, err := ptypes.Timestamp(info.PublishTime)
@@ -475,36 +490,38 @@ func (h *Content) GetContentDetail(ctx *gin.Context) {
 	}
 
 	resp := &infoResult{
-		Id:             info.InfoID,
-		UID:            info.Uid,
-		Title:          info.Title,
-		Author:         info.Author,
-		Summary:        info.Summary,
-		Content:        info.Content,
-		ContentTime:    contentTime,
-		CoverResources: info.CoverResources,
-		PublishTime:    publishTime,
-		LastReviewTime: lastReviewTime,
-		Valid:          info.Valid,
-		WatchCount:     info.WatchCount,
-		Tags:           tags,
-		ThumbUp:        info.ThumbUp,
-		IsThumbUp:      info.IsThumbUp,
-		ThumbUpList:    info.ThumbUpList,
-		ThumbDown:      info.ThumbDown,
-		IsThumbDown:    info.IsThumbDown,
-		ThumbDownList:  info.ThumbDownList,
-		Favorites:      info.Favorites,
-		IsFavorite:     info.IsFavorite,
-		FavoriteList:   info.FavoriteList,
-		LastModifyTime: lastModifyTime,
-		CanReview:      info.CanReview,
-		Archived:       info.Archived,
+		Id:              info.InfoID,
+		UID:             info.Uid,
+		Title:           info.Title,
+		Author:          info.Author,
+		Summary:         info.Summary,
+		Country:         info.Country,
+		ContentTime:     contentTime,
+		CoverResources:  info.CoverResources,
+		PublishTime:     publishTime,
+		LastReviewTime:  lastReviewTime,
+		Valid:           info.Valid,
+		WatchCount:      info.WatchCount,
+		Tags:            tags,
+		ThumbUp:         info.ThumbUp,
+		IsThumbUp:       info.IsThumbUp,
+		ThumbUpList:     info.ThumbUpList,
+		ThumbDown:       info.ThumbDown,
+		IsThumbDown:     info.IsThumbDown,
+		ThumbDownList:   info.ThumbDownList,
+		Favorites:       info.Favorites,
+		IsFavorite:      info.IsFavorite,
+		FavoriteList:    info.FavoriteList,
+		LastModifyTime:  lastModifyTime,
+		CanReview:       info.CanReview,
+		Archived:        info.Archived,
+		LatestSegmentNo: info.LatestSegmentNo,
+		SegmentCount:    info.SegmentCount,
 	}
 	ctx.JSON(http.StatusOK, resp)
 }
 
-func (h *Content) UpdateContent(ctx *gin.Context) {
+func (h *Content) UpdateInfo(ctx *gin.Context) {
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
@@ -518,7 +535,7 @@ func (h *Content) UpdateContent(ctx *gin.Context) {
 
 	type updateInfoReq struct {
 		Title          string            `json:"title"`
-		Content        string            `json:"content"`
+		Country        string            `json:"country"`
 		Tags           []*updateInfoTag  `json:"tags"`
 		CanReview      bool              `json:"canReview"`
 		CoverResources map[string]string `json:"coverResources"`
@@ -538,7 +555,7 @@ func (h *Content) UpdateContent(ctx *gin.Context) {
 	_, err := contentClient.EditInfo(ctx, &content.EditInfoReq{
 		InfoID:         infoID,
 		Title:          req.Title,
-		Content:        req.Content,
+		Country:        req.Country,
 		Tags:           tags,
 		CanReview:      req.CanReview,
 		CoverResources: req.CoverResources,
@@ -553,7 +570,7 @@ func (h *Content) UpdateContent(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (h *Content) DeleteContent(ctx *gin.Context) {
+func (h *Content) DeleteInfo(ctx *gin.Context) {
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
@@ -575,7 +592,7 @@ func (h *Content) DeleteContent(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (h *Content) WatchContent(ctx *gin.Context) {
+func (h *Content) WatchInfo(ctx *gin.Context) {
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
@@ -791,6 +808,207 @@ func (h *Content) DeleteFavThumb(ctx *gin.Context) {
 			Uid:    uid,
 		})
 	}
+
+	if err != nil {
+		log.Error(err)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+func (h *Content) GetAllSegments(ctx *gin.Context) {
+	// extract the client from the context
+	contentClient, ok := clients.ContentFromContext(ctx)
+	if !ok {
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		return
+	}
+	page, err := strconv.ParseUint(ctx.Query("page"), 10, 32)
+	if err != nil && err.(*strconv.NumError).Num != "" {
+		log.Error(ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		return
+	}
+
+	size, err := strconv.ParseUint(ctx.Query("size"), 10, 32)
+	if err != nil && err.(*strconv.NumError).Num != "" {
+		log.Error(ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		return
+	}
+
+	var sorts []*content.Sort
+	if ctx.Query("sorts") != "" {
+		sorts, err = buildSort(ctx.Query("sorts"))
+		if err != nil {
+			ctx.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	}
+
+	var labels []string
+	if ctx.Query("labels") != "" {
+		labels = strings.Split(ctx.Query("labels"), ",")
+	}
+
+	infoID := ctx.Param("id")
+	resp, err := contentClient.GetSegments(ctx, &content.GetSegmentsReq{
+		InfoID: infoID,
+		Labels: labels,
+		Page:   uint32(page),
+		Size:   uint32(size),
+		Sorts:  sorts,
+	})
+
+	if err != nil {
+		log.Error(err)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	type segmentResult struct {
+		ID      string            `json:"id"`
+		InfoID  string            `json:"infoID"`
+		No      int64             `json:"no"`
+		Labels  []string          `json:"labels"`
+		Content map[string]string `json:"content"`
+	}
+	results := make([]*segmentResult, 0, len(resp.Segments))
+	for _, seg := range resp.Segments {
+		results = append(results, &segmentResult{
+			ID:      seg.Id,
+			InfoID:  seg.InfoID,
+			No:      seg.No,
+			Labels:  seg.Labels,
+			Content: seg.Content,
+		})
+	}
+
+	ctx.JSON(http.StatusOK, results)
+}
+
+func (h *Content) GetSegmentDetail(ctx *gin.Context) {
+	contentClient, ok := clients.ContentFromContext(ctx)
+	if !ok {
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		return
+	}
+
+	infoID := ctx.Param("id")
+	segID := ctx.Param("segID")
+
+	seg, err := contentClient.GetSegment(ctx, &content.GetSegmentReq{
+		InfoID: infoID,
+		SegID:  segID,
+	})
+
+	if err != nil {
+		log.Error(err)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	type segmentResult struct {
+		ID      string            `json:"id"`
+		InfoID  string            `json:"infoID"`
+		No      int64             `json:"no"`
+		Labels  []string          `json:"labels"`
+		Content map[string]string `json:"content"`
+	}
+
+	resp := &segmentResult{
+		ID:      seg.Id,
+		InfoID:  seg.InfoID,
+		No:      seg.No,
+		Labels:  seg.Labels,
+		Content: seg.Content,
+	}
+	ctx.JSON(http.StatusOK, resp)
+}
+
+func (h *Content) PublishSegment(ctx *gin.Context) {
+	contentClient, ok := clients.ContentFromContext(ctx)
+	if !ok {
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		return
+	}
+
+	type publishSegmentReq struct {
+		InfoID  string            `json:"infoID"`
+		No      int64             `json:"no"`
+		Labels  []string          `json:"labels"`
+		Content map[string]string `json:"content"`
+	}
+	var req publishSegmentReq
+	ctx.Bind(&req)
+
+	_, err := contentClient.PublishSegment(ctx, &content.PublishSegmentReq{
+		InfoID:  req.InfoID,
+		No:      req.No,
+		Labels:  req.Labels,
+		Content: req.Content,
+	})
+
+	if err != nil {
+		log.Error(err)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+func (h *Content) UpdateSegment(ctx *gin.Context) {
+	contentClient, ok := clients.ContentFromContext(ctx)
+	if !ok {
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		return
+	}
+
+	type updateSegmentReq struct {
+		No      int64             `json:"no"`
+		Labels  []string          `json:"labels"`
+		Content map[string]string `json:"content"`
+	}
+	var req updateSegmentReq
+	ctx.Bind(&req)
+
+	infoID := ctx.Param("id")
+	segID := ctx.Param("segID")
+
+	_, err := contentClient.EditSegment(ctx, &content.EditSegmentReq{
+		InfoID:  infoID,
+		SegID:   segID,
+		No:      req.No,
+		Labels:  req.Labels,
+		Content: req.Content,
+	})
+
+	if err != nil {
+		log.Error(err)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+func (h *Content) DeleteSegment(ctx *gin.Context) {
+	contentClient, ok := clients.ContentFromContext(ctx)
+	if !ok {
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		return
+	}
+
+	infoID := ctx.Param("id")
+	segID := ctx.Param("segID")
+
+	_, err := contentClient.DeleteSegment(ctx, &content.InfoIDAndSegIDReq{
+		InfoID: infoID,
+		SegID:  segID,
+	})
 
 	if err != nil {
 		log.Error(err)
