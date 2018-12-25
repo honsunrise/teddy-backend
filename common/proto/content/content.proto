@@ -25,7 +25,7 @@ service Content {
 
     rpc GetSegments (GetSegmentsReq) returns (Segments) {
     }
-    rpc GetSegment (GetSegmentReq) returns (Segment) {
+    rpc GetSegment (InfoIDAndSegIDReq) returns (Segment) {
     }
     rpc PublishSegment (PublishSegmentReq) returns (google.protobuf.Empty) {
     }
@@ -170,11 +170,6 @@ message GetSegmentsReq {
 
 message Segments {
     repeated Segment segments = 1;
-}
-
-message GetSegmentReq {
-    string infoID = 1;
-    string segID = 2;
 }
 
 message PublishSegmentReq {
