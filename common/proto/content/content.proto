@@ -106,7 +106,7 @@ message Info {
     bool canReview = 23;
     bool valid = 24;
     bool archived = 25;
-    int64 LatestSegmentNo = 26;
+    string LatestSegmentID = 26;
     int64 SegmentCount = 27;
 }
 
