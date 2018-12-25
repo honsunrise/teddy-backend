@@ -25,13 +25,13 @@ service Content {
 
     rpc GetSegments (GetSegmentsReq) returns (Segments) {
     }
-    rpc GetSegment (InfoIDAndSegIDReq) returns (Segment) {
+    rpc GetSegment (InfoIDAndUIDAndSegIDReq) returns (Segment) {
     }
     rpc PublishSegment (PublishSegmentReq) returns (google.protobuf.Empty) {
     }
     rpc EditSegment (EditSegmentReq) returns (google.protobuf.Empty) {
     }
-    rpc DeleteSegment (InfoIDAndSegIDReq) returns (google.protobuf.Empty) {
+    rpc DeleteSegment (InfoIDAndUIDAndSegIDReq) returns (google.protobuf.Empty) {
     }
 
     rpc ThumbUp (InfoIDAndUIDReq) returns (google.protobuf.Empty) {
@@ -164,6 +164,7 @@ message GetSegmentsReq {
     uint32 page = 1;
     uint32 size = 2;
     string infoID = 3;
+    string uid = 4;
     repeated string labels = 5;
     repeated Sort sorts = 6;
 }
@@ -174,24 +175,27 @@ message Segments {
 
 message PublishSegmentReq {
     string infoID = 1;
-    int64 no = 2;
-    string title = 3;
-    repeated string labels = 4;
-    map<string, string> content = 5;
-}
-
-message EditSegmentReq {
-    string infoID = 1;
-    string segID = 2;
+    string uid = 2;
     int64 no = 3;
     string title = 4;
     repeated string labels = 5;
     map<string, string> content = 6;
 }
 
-message InfoIDAndSegIDReq {
+message EditSegmentReq {
     string infoID = 1;
-    string segID = 2;
+    string uid = 2;
+    string segID = 3;
+    int64 no = 4;
+    string title = 5;
+    repeated string labels = 6;
+    map<string, string> content = 7;
+}
+
+message InfoIDAndUIDAndSegIDReq {
+    string infoID = 1;
+    string uid = 2;
+    string segID = 3;
 }
 
 message GetInfoReq {
