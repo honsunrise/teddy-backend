@@ -175,8 +175,9 @@ message Segments {
 message PublishSegmentReq {
     string infoID = 1;
     int64 no = 2;
-    repeated string labels = 3;
-    map<string, string> content = 4;
+    string title = 3;
+    repeated string labels = 4;
+    map<string, string> content = 5;
 }
 
 message EditSegmentReq {
