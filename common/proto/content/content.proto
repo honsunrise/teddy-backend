@@ -184,8 +184,9 @@ message EditSegmentReq {
     string infoID = 1;
     string segID = 2;
     int64 no = 3;
-    repeated string labels = 4;
-    map<string, string> content = 5;
+    string title = 4;
+    repeated string labels = 5;
+    map<string, string> content = 6;
 }
 
 message InfoIDAndSegIDReq {
