@@ -139,7 +139,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3160eca768d517bb8068e7d4f7c8e22315c2fd5bc7abd2c3120eccd03b2fa221"
+  digest = "1:baa2afc9c8f3aa888233caefc1297d596feb318df4daba9946f2c4c870bf9d64"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "common/config",
@@ -148,10 +148,9 @@
     "common/config/source/file",
     "common/proto/content",
     "common/types",
-    "common/utils",
   ]
   pruneopts = "UT"
-  revision = "528131078acfc98e0fa3db82546f022513433b22"
+  revision = "e40408131d7013910b0d8cf70783fc7d1d606ad9"
 
 [[projects]]
   branch = "master"
@@ -295,11 +294,12 @@
     "github.com/zhsyourai/teddy-backend/common/config/source/file",
     "github.com/zhsyourai/teddy-backend/common/proto/content",
     "github.com/zhsyourai/teddy-backend/common/types",
-    "github.com/zhsyourai/teddy-backend/common/utils",
     "golang.org/x/net/context",
     "google.golang.org/grpc",
+    "google.golang.org/grpc/codes",
     "google.golang.org/grpc/health",
     "google.golang.org/grpc/health/grpc_health_v1",
+    "google.golang.org/grpc/status",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

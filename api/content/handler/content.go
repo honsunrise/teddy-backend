@@ -579,7 +579,7 @@ func (h *Content) DeleteInfo(ctx *gin.Context) {
 
 	infoID := ctx.Param("id")
 
-	_, err := contentClient.DeleteInfo(ctx, &content.InfoIDReq{
+	_, err := contentClient.DeleteInfo(ctx, &content.InfoIDAndUIDReq{
 		InfoID: infoID,
 	})
 
@@ -601,7 +601,7 @@ func (h *Content) WatchInfo(ctx *gin.Context) {
 
 	infoID := ctx.Param("id")
 
-	_, err := contentClient.WatchInfo(ctx, &content.InfoIDReq{
+	_, err := contentClient.WatchInfo(ctx, &content.InfoIDAndUIDReq{
 		InfoID: infoID,
 	})
 
@@ -872,6 +872,7 @@ func (h *Content) GetAllSegments(ctx *gin.Context) {
 		ID      string            `json:"id"`
 		InfoID  string            `json:"infoID"`
 		No      int64             `json:"no"`
+		Title   string            `json:"title"`
 		Labels  []string          `json:"labels"`
 		Content map[string]string `json:"content"`
 	}
@@ -881,6 +882,7 @@ func (h *Content) GetAllSegments(ctx *gin.Context) {
 			ID:      seg.Id,
 			InfoID:  seg.InfoID,
 			No:      seg.No,
+			Title:   seg.Title,
 			Labels:  seg.Labels,
 			Content: seg.Content,
 		})
@@ -899,7 +901,7 @@ func (h *Content) GetSegmentDetail(ctx *gin.Context) {
 	infoID := ctx.Param("id")
 	segID := ctx.Param("segID")
 
-	seg, err := contentClient.GetSegment(ctx, &content.GetSegmentReq{
+	seg, err := contentClient.GetSegment(ctx, &content.InfoIDAndUIDAndSegIDReq{
 		InfoID: infoID,
 		SegID:  segID,
 	})
@@ -914,6 +916,7 @@ func (h *Content) GetSegmentDetail(ctx *gin.Context) {
 		ID      string            `json:"id"`
 		InfoID  string            `json:"infoID"`
 		No      int64             `json:"no"`
+		Title   string            `json:"title"`
 		Labels  []string          `json:"labels"`
 		Content map[string]string `json:"content"`
 	}
@@ -922,6 +925,7 @@ func (h *Content) GetSegmentDetail(ctx *gin.Context) {
 		ID:      seg.Id,
 		InfoID:  seg.InfoID,
 		No:      seg.No,
+		Title:   seg.Title,
 		Labels:  seg.Labels,
 		Content: seg.Content,
 	}
@@ -1005,7 +1009,7 @@ func (h *Content) DeleteSegment(ctx *gin.Context) {
 	infoID := ctx.Param("id")
 	segID := ctx.Param("segID")
 
-	_, err := contentClient.DeleteSegment(ctx, &content.InfoIDAndSegIDReq{
+	_, err := contentClient.DeleteSegment(ctx, &content.InfoIDAndUIDAndSegIDReq{
 		InfoID: infoID,
 		SegID:  segID,
 	})

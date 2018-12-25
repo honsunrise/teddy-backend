@@ -15,7 +15,7 @@ func validatePublishInfoReq(req *content.PublishInfoReq) error {
 
 	} else if len(req.CoverResources) < 1 {
 
-	} else if req.Content == "" {
+	} else if req.Country == "" {
 
 	}
 	return nil
@@ -41,13 +41,26 @@ func validateInfoIDAndUIDReq(req *content.InfoIDAndUIDReq) error {
 	return nil
 }
 
-func validateInfoIDReq(req *content.InfoIDReq) error {
-	return nil
-}
 func validateUIDPageReq(req *content.UIDPageReq) error {
 	return nil
 }
 
 func validateInfoIDPageReq(req *content.InfoIDPageReq) error {
+	return nil
+}
+
+func validateGetSegmentsReq(req *content.GetSegmentsReq) error {
+	return nil
+}
+
+func validatePublishSegmentReq(req *content.PublishSegmentReq) error {
+	return nil
+}
+
+func validateEditSegmentReq(req *content.EditSegmentReq) error {
+	return nil
+}
+
+func validateInfoIDAndUIDAndSegIDReq(req *content.InfoIDAndUIDAndSegIDReq) error {
 	return nil
 }

@@ -29,7 +29,7 @@ type infoRepository struct {
 }
 
 func (repo *infoRepository) Insert(ctx mongo.SessionContext, info *models.Info) error {
-	info.Id = objectid.New()
+	info.ID = objectid.New()
 	_, err := repo.collections.InsertOne(ctx, info)
 	if err != nil {
 		return err

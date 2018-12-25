@@ -23,6 +23,10 @@ func NewContentServer(client *mongo.Client) (content.ContentServer, error) {
 	if err != nil {
 		return nil, err
 	}
+	segmentRepo, err := repositories.NewSegmentRepository(client)
+	if err != nil {
+		return nil, err
+	}
 	tagRepo, err := repositories.NewTagRepository(client)
 	if err != nil {
 		return nil, err
@@ -38,6 +42,7 @@ func NewContentServer(client *mongo.Client) (content.ContentServer, error) {
 	instance := &contentHandler{
 		client:        client,
 		infoRepo:      infoRepo,
+		segRepo:       segmentRepo,
 		tagRepo:       tagRepo,
 		favoriteRepo:  favoriteRepo,
 		thumbDownRepo: thumbDownRepo,
@@ -49,10 +54,292 @@ func NewContentServer(client *mongo.Client) (content.ContentServer, error) {
 type contentHandler struct {
 	client        *mongo.Client
 	infoRepo      repositories.InfoRepository
+	segRepo       repositories.SegmentRepository
 	tagRepo       repositories.TagRepository
 	favoriteRepo  repositories.BehaviorRepository
 	thumbUpRepo   repositories.BehaviorRepository
 	thumbDownRepo repositories.BehaviorRepository
+}
+
+func (h *contentHandler) GetSegments(ctx context.Context, req *content.GetSegmentsReq) (*content.Segments, error) {
+	var resp content.Segments
+	if err := validateGetSegmentsReq(req); err != nil {
+		return nil, err
+	}
+
+	infoID, err := objectid.FromHex(req.InfoID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = h.client.UseSession(ctx, func(sessionContext mongo.SessionContext) error {
+		var err error
+		segments, err := h.segRepo.FindAll(sessionContext, infoID, req.Labels, req.Page, req.Size, req.Sorts)
+
+		if err != nil {
+			return err
+		}
+
+		result := make([]*content.Segment, 0, len(segments))
+		for _, segment := range segments {
+			pbSegment := &content.Segment{}
+			copyFromSegmentToPBSegment(segment, pbSegment)
+			result = append(result, pbSegment)
+		}
+		resp.Segments = result
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+func (h *contentHandler) GetSegment(ctx context.Context, req *content.InfoIDAndUIDAndSegIDReq) (*content.Segment, error) {
+	var resp content.Segment
+	if err := validateInfoIDAndUIDAndSegIDReq(req); err != nil {
+		return nil, err
+	}
+
+	infoID, err := objectid.FromHex(req.InfoID)
+	if err != nil {
+		return nil, err
+	}
+
+	segID, err := objectid.FromHex(req.SegID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = h.client.UseSession(ctx, func(sessionContext mongo.SessionContext) error {
+		var err error
+		segment, err := h.segRepo.FindOne(sessionContext, segID)
+		if err == mongo.ErrNoDocuments {
+			return ErrSegmentNotExists
+		} else if err != nil {
+			return ErrInternal
+		}
+
+		if segment.InfoID != infoID {
+			return ErrSegmentNotExists
+		}
+
+		copyFromSegmentToPBSegment(segment, &resp)
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+func (h *contentHandler) PublishSegment(ctx context.Context, req *content.PublishSegmentReq) (*empty.Empty, error) {
+	var resp empty.Empty
+	if err := validatePublishSegmentReq(req); err != nil {
+		return nil, err
+	}
+
+	infoID, err := objectid.FromHex(req.InfoID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = h.client.UseSession(ctx, func(sessionContext mongo.SessionContext) error {
+		var err error
+		err = sessionContext.StartTransaction()
+		if err != nil {
+			return err
+		}
+
+		defer func() {
+			if err == nil {
+				err = sessionContext.CommitTransaction(sessionContext)
+			} else {
+				err = sessionContext.AbortTransaction(context.Background())
+			}
+		}()
+
+		info, err := h.infoRepo.FindOne(sessionContext, infoID)
+		if err != nil {
+			log.Errorf("info can't find error %v", err)
+			return err
+		}
+
+		if info.UID != req.Uid {
+			return ErrInfoNotExists
+		}
+
+		_, err = h.segRepo.FindByInfoIDAndNoAndTitleAndLabels(sessionContext, info.ID, req.No, req.Title, req.Labels)
+		if err != mongo.ErrNoDocuments {
+			log.Errorf("check segment error %v", err)
+			return ErrInternal
+		} else if err == nil {
+			return ErrSegmentExists
+		}
+
+		segment := models.Segment{
+			ID:      objectid.New(),
+			InfoID:  infoID,
+			No:      req.No,
+			Title:   req.Title,
+			Labels:  req.Labels,
+			Content: req.Content,
+		}
+
+		err = h.segRepo.Insert(sessionContext, &segment)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+func (h *contentHandler) EditSegment(ctx context.Context, req *content.EditSegmentReq) (*empty.Empty, error) {
+	var resp empty.Empty
+	if err := validateEditSegmentReq(req); err != nil {
+		return nil, err
+	}
+
+	segID, err := objectid.FromHex(req.SegID)
+	if err != nil {
+		return nil, err
+	}
+
+	infoID, err := objectid.FromHex(req.InfoID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = h.client.UseSession(ctx, func(sessionContext mongo.SessionContext) error {
+		var err error
+		err = sessionContext.StartTransaction()
+		if err != nil {
+			return err
+		}
+
+		defer func() {
+			if err == nil {
+				err = sessionContext.CommitTransaction(sessionContext)
+			} else {
+				err = sessionContext.AbortTransaction(context.Background())
+			}
+		}()
+
+		segment, err := h.segRepo.FindOne(sessionContext, segID)
+		if err != nil {
+			log.Errorf("find segment error %v", err)
+			return err
+		}
+
+		info, err := h.infoRepo.FindOne(sessionContext, infoID)
+		if err != nil {
+			return err
+		}
+
+		if segment.InfoID != info.ID {
+			return ErrSegmentNotExists
+		}
+
+		if info.UID != req.Uid {
+			return ErrSegmentNotExists
+		}
+
+		if req.No >= 0 {
+			segment.No = req.No
+		}
+
+		if req.Title != "" {
+			segment.Title = req.Title
+		}
+
+		if len(req.Labels) != 0 {
+			segment.Labels = req.Labels
+		}
+
+		if len(req.Content) != 0 {
+			segment.Content = req.Content
+		}
+
+		_, err = h.segRepo.FindByInfoIDAndNoAndTitleAndLabels(sessionContext, infoID, req.No, req.Title, req.Labels)
+		if err != mongo.ErrNoDocuments {
+			log.Errorf("check segment error %v", err)
+			return ErrInternal
+		} else if err == nil {
+			return ErrSegmentExists
+		}
+
+		err = h.segRepo.Update(sessionContext, segment.ID, map[string]interface{}{
+			"no":      segment.No,
+			"title":   segment.Title,
+			"labels":  segment.Labels,
+			"content": segment.Content,
+		})
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+func (h *contentHandler) DeleteSegment(ctx context.Context, req *content.InfoIDAndUIDAndSegIDReq) (*empty.Empty, error) {
+	var resp empty.Empty
+	if err := validateInfoIDAndUIDAndSegIDReq(req); err != nil {
+		return nil, err
+	}
+
+	infoID, err := objectid.FromHex(req.InfoID)
+	if err != nil {
+		return nil, ErrInternal
+	}
+
+	segID, err := objectid.FromHex(req.SegID)
+	if err != nil {
+		return nil, ErrInternal
+	}
+
+	err = h.client.UseSession(ctx, func(sessionContext mongo.SessionContext) error {
+		var err error
+		segment, err := h.segRepo.FindOne(sessionContext, segID)
+		if err != nil {
+			return err
+		}
+
+		info, err := h.infoRepo.FindOne(sessionContext, infoID)
+		if err != nil {
+			return err
+		}
+
+		if segment.InfoID != info.ID {
+			return ErrSegmentNotExists
+		}
+
+		if info.UID != req.Uid {
+			return ErrSegmentNotExists
+		}
+
+		err = h.segRepo.DeleteOne(sessionContext, segment.ID)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
 func (h *contentHandler) GetTags(ctx context.Context, req *content.GetTagReq) (*content.GetTagsResp, error) {
@@ -129,22 +416,24 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *content.PublishIn
 		}
 
 		info := models.Info{
-			Id:             objectid.New(),
-			UID:            req.Uid,
-			Title:          req.Title,
-			Content:        req.Content,
-			CoverResources: req.CoverResources,
-			PublishTime:    now,
-			LastReviewTime: time.Now(),
-			Valid:          true,
-			WatchCount:     0,
-			Tags:           tags,
-			ThumbUp:        0,
-			ThumbDown:      0,
-			Favorites:      0,
-			LastModifyTime: now,
-			CanReview:      req.CanReview,
-			Archived:       false,
+			ID:               objectid.New(),
+			UID:              req.Uid,
+			Title:            req.Title,
+			Country:          req.Country,
+			CoverResources:   req.CoverResources,
+			PublishTime:      now,
+			LastReviewTime:   time.Now(),
+			Valid:            true,
+			WatchCount:       0,
+			Tags:             tags,
+			ThumbUp:          0,
+			ThumbDown:        0,
+			Favorites:        0,
+			LatestModifyTime: now,
+			CanReview:        req.CanReview,
+			Archived:         false,
+			LatestSegmentNo:  -1,
+			SegmentCount:     0,
 		}
 
 		err = h.infoRepo.Insert(sessionContext, &info)
@@ -219,6 +508,11 @@ func (h *contentHandler) EditInfo(ctx context.Context, req *content.EditInfoReq)
 			return err
 		}
 
+		if curInfo.UID != req.Uid {
+			err = ErrInfoNotExists
+			return err
+		}
+
 		curTagIDs := make([]objectid.ObjectID, 0, len(curInfo.Tags))
 		for _, v := range curInfo.Tags {
 			result, err := h.tagRepo.FindByTypeAndTag(sessionContext, v.Type, v.Tag)
@@ -267,7 +561,7 @@ func (h *contentHandler) EditInfo(ctx context.Context, req *content.EditInfoReq)
 			"title":          req.Title,
 			"author":         req.Author,
 			"summary":        req.Summary,
-			"content":        req.Content,
+			"country":        req.Country,
 			"coverResources": req.CoverResources,
 			"canReview":      req.CanReview,
 			"tags":           tags,
@@ -286,22 +580,22 @@ func (h *contentHandler) EditInfo(ctx context.Context, req *content.EditInfoReq)
 }
 
 func (h *contentHandler) fillInfo(sessionContext mongo.SessionContext, uid string, info *models.Info) (*content.Info, error) {
-	isThumbUp, err := h.thumbUpRepo.IsExists(sessionContext, uid, info.Id)
+	isThumbUp, err := h.thumbUpRepo.IsExists(sessionContext, uid, info.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	isThumbDown, err := h.thumbDownRepo.IsExists(sessionContext, uid, info.Id)
+	isThumbDown, err := h.thumbDownRepo.IsExists(sessionContext, uid, info.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	isFavorite, err := h.favoriteRepo.IsExists(sessionContext, uid, info.Id)
+	isFavorite, err := h.favoriteRepo.IsExists(sessionContext, uid, info.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	tmpList, err := h.thumbUpRepo.FindUserByInfo(sessionContext, info.Id, 0, 10, []*content.Sort{
+	tmpList, err := h.thumbUpRepo.FindUserByInfo(sessionContext, info.ID, 0, 10, []*content.Sort{
 		&content.Sort{
 			Name: "time",
 			Asc:  false,
@@ -315,7 +609,7 @@ func (h *contentHandler) fillInfo(sessionContext mongo.SessionContext, uid strin
 		thumbUpList = append(thumbUpList, v.UID)
 	}
 
-	tmpList, err = h.thumbDownRepo.FindUserByInfo(sessionContext, info.Id, 0, 10, []*content.Sort{
+	tmpList, err = h.thumbDownRepo.FindUserByInfo(sessionContext, info.ID, 0, 10, []*content.Sort{
 		&content.Sort{
 			Name: "time",
 			Asc:  false,
@@ -329,7 +623,7 @@ func (h *contentHandler) fillInfo(sessionContext mongo.SessionContext, uid strin
 		thumbDownList = append(thumbDownList, v.UID)
 	}
 
-	tmpList, err = h.favoriteRepo.FindUserByInfo(sessionContext, info.Id, 0, 10, []*content.Sort{
+	tmpList, err = h.favoriteRepo.FindUserByInfo(sessionContext, info.ID, 0, 10, []*content.Sort{
 		&content.Sort{
 			Name: "time",
 			Asc:  false,
@@ -352,10 +646,12 @@ func (h *contentHandler) fillInfo(sessionContext mongo.SessionContext, uid strin
 	}
 
 	resp := &content.Info{
-		InfoID:  info.Id.Hex(),
+		InfoID:  info.ID.Hex(),
 		Uid:     info.UID,
 		Title:   info.Title,
-		Content: info.Content,
+		Author:  info.Author,
+		Summary: info.Summary,
+		Country: info.Country,
 		ContentTime: &timestamp.Timestamp{
 			Seconds: info.ContentTime.Unix(),
 			Nanos:   int32(info.ContentTime.Nanosecond()),
@@ -382,10 +678,13 @@ func (h *contentHandler) fillInfo(sessionContext mongo.SessionContext, uid strin
 		IsFavorite:    isFavorite,
 		FavoriteList:  favoriteList,
 		LastModifyTime: &timestamp.Timestamp{
-			Seconds: info.LastModifyTime.Unix(),
-			Nanos:   int32(info.LastModifyTime.Nanosecond()),
+			Seconds: info.LatestModifyTime.Unix(),
+			Nanos:   int32(info.LatestModifyTime.Nanosecond()),
 		},
-		CanReview: info.CanReview,
+		CanReview:       info.CanReview,
+		Archived:        info.Archived,
+		LatestSegmentNo: info.LatestSegmentNo,
+		SegmentCount:    info.SegmentCount,
 	}
 	return resp, nil
 }
@@ -468,9 +767,9 @@ func (h *contentHandler) GetInfos(ctx context.Context, req *content.GetInfosReq)
 	return &resp, nil
 }
 
-func (h *contentHandler) DeleteInfo(ctx context.Context, req *content.InfoIDReq) (*empty.Empty, error) {
+func (h *contentHandler) DeleteInfo(ctx context.Context, req *content.InfoIDAndUIDReq) (*empty.Empty, error) {
 	var resp empty.Empty
-	if err := validateInfoIDReq(req); err != nil {
+	if err := validateInfoIDAndUIDReq(req); err != nil {
 		return nil, err
 	}
 
@@ -478,6 +777,16 @@ func (h *contentHandler) DeleteInfo(ctx context.Context, req *content.InfoIDReq)
 		var err error
 		infoID, err := objectid.FromHex(req.InfoID)
 		if err != nil {
+			return err
+		}
+
+		info, err := h.infoRepo.FindOne(sessionContext, infoID)
+		if err != nil {
+			return err
+		}
+
+		if info.UID != req.Uid {
+			err = ErrInfoNotExists
 			return err
 		}
 
@@ -495,9 +804,9 @@ func (h *contentHandler) DeleteInfo(ctx context.Context, req *content.InfoIDReq)
 	return &resp, nil
 }
 
-func (h *contentHandler) WatchInfo(ctx context.Context, req *content.InfoIDReq) (*empty.Empty, error) {
+func (h *contentHandler) WatchInfo(ctx context.Context, req *content.InfoIDAndUIDReq) (*empty.Empty, error) {
 	var resp empty.Empty
-	if err := validateInfoIDReq(req); err != nil {
+	if err := validateInfoIDAndUIDReq(req); err != nil {
 		return nil, err
 	}
 

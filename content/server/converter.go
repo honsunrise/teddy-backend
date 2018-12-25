@@ -26,3 +26,16 @@ func copyFromTagToPBTag(tag *models.Tag, pbtag *content.Tag) error {
 	pbtag.LastUseTime = tmp
 	return nil
 }
+
+func copyFromSegmentToPBSegment(tag *models.Segment, pbtag *content.Segment) error {
+	if tag == nil || pbtag == nil {
+		return nil
+	}
+	pbtag.Id = tag.ID.Hex()
+	pbtag.InfoID = tag.InfoID.Hex()
+	pbtag.No = tag.No
+	pbtag.Title = tag.Title
+	pbtag.Labels = tag.Labels
+	pbtag.Content = tag.Content
+	return nil
+}
