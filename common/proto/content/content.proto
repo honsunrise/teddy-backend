@@ -18,9 +18,9 @@ service Content {
     }
     rpc GetInfos (GetInfosReq) returns (GetInfosResp) {
     }
-    rpc DeleteInfo (InfoIDReq) returns (google.protobuf.Empty) {
+    rpc DeleteInfo (InfoIDAndUIDReq) returns (google.protobuf.Empty) {
     }
-    rpc WatchInfo (InfoIDReq) returns (google.protobuf.Empty) {
+    rpc WatchInfo (InfoIDAndUIDReq) returns (google.protobuf.Empty) {
     }
 
     rpc GetSegments (GetSegmentsReq) returns (Segments) {
@@ -215,10 +215,6 @@ message GetInfosReq {
 
 message GetInfosResp {
     repeated Info infos = 1;
-}
-
-message InfoIDReq {
-    string infoID = 1;
 }
 
 message InfoIDAndUIDReq {
