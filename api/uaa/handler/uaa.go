@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	"crypto"
+	"encoding/base64"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/ptypes"
@@ -382,5 +384,13 @@ func (h *Uaa) JWKsJSON(ctx *gin.Context) {
 		ctx.Error(err)
 		return
 	}
-	ctx.JSON(http.StatusOK, key)
+	thumbPrint, err := key.Thumbprint(crypto.SHA256)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+	key.Set(jwk.KeyIDKey, base64.URLEncoding.EncodeToString(thumbPrint))
+	ctx.JSON(http.StatusOK, gin.H{
+		"keys": []*jwk.Key{&key},
+	})
 }
