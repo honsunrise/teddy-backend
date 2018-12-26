@@ -40,6 +40,13 @@ func main() {
 
 	// Create RESTful server (using Gin)
 	router := gin.Default()
+	router.Use(func(ctx *gin.Context) {
+		// Process request
+		path := ctx.Request.URL.Path
+		ctx.Next()
+
+		log.Infof("PATH %s HEADERS %v", path, ctx.Request.Header)
+	})
 	router.Use(cors.Default())
 	router.Use(clients.ContentNew(contentSrvAddrFunc))
 	router.Use(clients.CaptchaNew(captchaSrvAddrFunc))

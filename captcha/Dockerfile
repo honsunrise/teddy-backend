@@ -21,7 +21,7 @@ RUN GOPATH=$(go env GOPATH) && \
     set -x && \
     protoc --proto_path=${GOPATH}/src:./vendor \
         --go_out=plugins=grpc:./vendor \
-        ./vendor/github.com/zhsyourai/teddy-backend/common/proto/captcha.proto
+        ./vendor/github.com/zhsyourai/teddy-backend/common/proto/captcha/captcha.proto
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o main .
 
 # Stage 2 (to create a downsized "container executable")
