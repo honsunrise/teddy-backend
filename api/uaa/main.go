@@ -44,7 +44,7 @@ func main() {
 		log.Fatal(err)
 	}
 	// New jwt generator and extractor
-	const SigningAlgorithm = "RS512"
+	const SigningAlgorithm = "RS256"
 	// Load Jwt PublicKey
 	block, _ := pem.Decode(certPEM)
 	if block == nil {
@@ -57,7 +57,7 @@ func main() {
 	key := parseResult.(*rsa.PrivateKey)
 
 	jwtGenerator, err := gin_jwt.NewGinJwtGenerator(gin_jwt.GeneratorConfig{
-		Issuer:           "com.teddy.uaa",
+		Issuer:           "uaa@teddy.com",
 		SigningAlgorithm: SigningAlgorithm,
 		KeyFunc: func() interface{} {
 			return key
