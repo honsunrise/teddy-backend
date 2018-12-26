@@ -6,8 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/prometheus/common/log"
 	"github.com/zhsyourai/teddy-backend/api/clients"
-	"github.com/zhsyourai/teddy-backend/common/errors"
-	"github.com/zhsyourai/teddy-backend/common/proto"
+	"github.com/zhsyourai/teddy-backend/common/proto/message"
 	"github.com/zhsyourai/teddy-backend/common/types"
 	"net/http"
 	"time"
@@ -54,8 +53,8 @@ func (h *Message) PostInbox(ctx *gin.Context) {
 	// extract the client from the context
 	_, ok := clients.MessageFromContext(ctx)
 	if !ok {
-		log.Error(errors.ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		log.Error(ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
 }
@@ -72,11 +71,11 @@ func (h *Message) Inbox(ctx *gin.Context) {
 
 	messageClient, ok := clients.MessageFromContext(ctx)
 	if !ok {
-		log.Error(errors.ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		log.Error(ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
-	inboxResp, err := messageClient.GetInBox(ctx, &proto.GetInBoxReq{
+	inboxResp, err := messageClient.GetInBox(ctx, &message.GetInBoxReq{
 		Page: paging.Page,
 		Size: paging.Size,
 		Uid:  uidStr,
@@ -113,8 +112,8 @@ func (h *Message) Inbox(ctx *gin.Context) {
 func (h *Message) DeleteInbox(ctx *gin.Context) {
 	_, ok := clients.MessageFromContext(ctx)
 	if !ok {
-		log.Error(errors.ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		log.Error(ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
 }
@@ -122,8 +121,8 @@ func (h *Message) DeleteInbox(ctx *gin.Context) {
 func (h *Message) MarkInboxRead(ctx *gin.Context) {
 	_, ok := clients.MessageFromContext(ctx)
 	if !ok {
-		log.Error(errors.ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		log.Error(ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
 }
@@ -147,12 +146,12 @@ func (h *Message) Notify(ctx *gin.Context) {
 	// extract the client from the context
 	messageClient, ok := clients.MessageFromContext(ctx)
 	if !ok {
-		log.Error(errors.ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, errors.ErrClientNotFound)
+		log.Error(ErrCaptchaNotCorrect)
+		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
 
-	notifyStream, err := messageClient.GetNotify(ctx, &proto.GetNotifyReq{})
+	notifyStream, err := messageClient.GetNotify(ctx, &message.GetNotifyReq{})
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return

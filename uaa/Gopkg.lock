@@ -139,7 +139,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3b3040699bdb2ec6cf4eddc70ca02f6d12067336b5056bb5618e690ea5f80c09"
+  digest = "1:04f84ea3a5921c86f478c9ad7d1fdb768e0d5955d1a5d84f6b5cac17616202bf"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "common/config",
@@ -148,10 +148,9 @@
     "common/config/source/file",
     "common/proto/uaa",
     "common/types",
-    "common/utils",
   ]
   pruneopts = "UT"
-  revision = "a193c52d92ed945b29cb0757cdcaa56b43048812"
+  revision = "a8349da502cf55cbb39191529958c14ea0ea019f"
 
 [[projects]]
   branch = "master"
@@ -180,26 +179,26 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "e147a9138326bc0e9d4e179541ffd8af41cff8a9"
+  revision = "927f97764cc334a6575f4b7a1584a147864d5723"
 
 [[projects]]
   branch = "master"
-  digest = "1:5e4d81c50cffcb124b899e4f3eabec3930c73532f0096c27f94476728ba03028"
+  digest = "1:75515eedc0dc2cb0b40372008b616fa2841d831c63eedd403285ff286c593295"
   name = "golang.org/x/sync"
   packages = ["semaphore"]
   pruneopts = "UT"
-  revision = "42b317875d0fa942474b76e1b46a6060d720ae6e"
+  revision = "37e7f081c4d4c64e13b10787722085407fe5d15f"
 
 [[projects]]
   branch = "master"
-  digest = "1:ba2c0719b7ca1fb531afa5aae9bda558846438a075f0e0282d3dffcd887de90d"
+  digest = "1:3d5e79e10549fd9119cbefd614b6d351ef5bd0be2f2b103a4199788e784cbc68"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "7c4c994c65f702f41ed7d6620a2cb34107576a77"
+  revision = "b4a75ba826a64a70990f11a225237acd6ef35c9f"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -230,7 +229,7 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "5a97ab628bfb2f65f6befec18f4bc7bc7f382b77"
+  revision = "bd9b4fb69e2ffd37621a6caa54dcbead29b546f2"
 
 [[projects]]
   digest = "1:03af1505694005143ff6dc5d0e2802c8200ddb618b1d3f7201482f53798b99b4"
@@ -295,7 +294,6 @@
     "github.com/zhsyourai/teddy-backend/common/config/source/file",
     "github.com/zhsyourai/teddy-backend/common/proto/uaa",
     "github.com/zhsyourai/teddy-backend/common/types",
-    "github.com/zhsyourai/teddy-backend/common/utils",
     "golang.org/x/crypto/bcrypt",
     "google.golang.org/grpc",
     "google.golang.org/grpc/health",

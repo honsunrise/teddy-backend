@@ -142,7 +142,7 @@
   name = "github.com/prometheus/common"
   packages = ["log"]
   pruneopts = "UT"
-  revision = "4724e9255275ce38f7179b2478abeae4e28c904f"
+  revision = "67670fe90761d7ff18ec1d640135e53b9198328f"
 
 [[projects]]
   digest = "1:69b1cc331fca23d702bd72f860c6a647afd0aa9fcbc1d0659b1365e26546dd70"
@@ -162,7 +162,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:cf8e2642c9ef535de2b3266a6c194cbcd7868da7bf8ce19c997759915174a1e3"
+  digest = "1:3e5c9b12b280bdbf1d7ac77c8c74b881a8b66d227f303f488b3658797c5d0b00"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
@@ -170,12 +170,14 @@
     "common/config/coder/json",
     "common/config/coder/yaml",
     "common/config/source/file",
-    "common/errors",
-    "common/proto",
+    "common/proto/captcha",
+    "common/proto/content",
+    "common/proto/message",
+    "common/proto/uaa",
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "60ea25af04ae53da2f0d0172d5070f50f5bf7d17"
+  revision = "a8349da502cf55cbb39191529958c14ea0ea019f"
 
 [[projects]]
   branch = "master"
@@ -187,7 +189,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7a2e3d6819e7a97a877f8604e737901c6941e76d56ae98a51a1ca2f13de351fb"
+  digest = "1:89a0cb976397aa9157a45bb2b896d0bcd07ee095ac975e0f03c53250c402265e"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -199,7 +201,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "610586996380ceef02dd726cc09df7e00a3f8e56"
+  revision = "927f97764cc334a6575f4b7a1584a147864d5723"
 
 [[projects]]
   branch = "master"
@@ -207,11 +209,11 @@
   name = "golang.org/x/sync"
   packages = ["errgroup"]
   pruneopts = "UT"
-  revision = "42b317875d0fa942474b76e1b46a6060d720ae6e"
+  revision = "37e7f081c4d4c64e13b10787722085407fe5d15f"
 
 [[projects]]
   branch = "master"
-  digest = "1:0c6fb22a3020b2a1f7dd05bb22bd3c84dd30e4b9b3c6b26edfda163a61afc007"
+  digest = "1:a8b1900d94a9d18b13087127110d3ba80db6063a0d7957ebf5599ab3fcf4d895"
   name = "golang.org/x/sys"
   packages = [
     "unix",
@@ -220,7 +222,7 @@
     "windows/svc/eventlog",
   ]
   pruneopts = "UT"
-  revision = "586ba8c9bb141bbbea1ffb47b201443fd43385dd"
+  revision = "b4a75ba826a64a70990f11a225237acd6ef35c9f"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -251,7 +253,7 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "bd91e49a0898e27abb88c339b432fa53d7497ac0"
+  revision = "bd9b4fb69e2ffd37621a6caa54dcbead29b546f2"
 
 [[projects]]
   digest = "1:9edd250a3c46675d0679d87540b30c9ed253b19bd1fd1af08f4f5fb3c79fc487"
@@ -328,8 +330,7 @@
     "github.com/zhsyourai/teddy-backend/api/clients",
     "github.com/zhsyourai/teddy-backend/common/config",
     "github.com/zhsyourai/teddy-backend/common/config/source/file",
-    "github.com/zhsyourai/teddy-backend/common/errors",
-    "github.com/zhsyourai/teddy-backend/common/proto",
+    "github.com/zhsyourai/teddy-backend/common/proto/message",
     "github.com/zhsyourai/teddy-backend/common/types",
     "golang.org/x/sync/errgroup",
   ]

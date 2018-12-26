@@ -135,7 +135,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:82bb7e528cc159c10e445855be534aad69a60815472d0f0394190e4d1fbf177a"
+  digest = "1:605cec396faf0fad185c9333f64c6272e3a33e710b348263e93aceeb161887e4"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
@@ -151,7 +151,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "d81efec840768a6fc0e2975528013c5bb226a1b6"
+  revision = "a8349da502cf55cbb39191529958c14ea0ea019f"
 
 [[projects]]
   branch = "master"

@@ -40,7 +40,7 @@ func main() {
 
 	// Create RESTful server (using Gin)
 	router := gin.Default()
-	router.Use(clients.MessageNew())
+	router.Use(clients.MessageNew(messageSrvAddrFunc))
 	message.HandlerNormal(router.Group("/v1/anon/message"))
 	message.HandlerAuth(router.Group("/v1/auth/message"))
 	message.HandlerHealth(router)
