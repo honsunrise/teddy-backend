@@ -135,7 +135,8 @@ message UIDPageReq {
 }
 
 message GetTagsResp {
-    repeated Tag tags = 1;
+    uint64 totalCount = 1;
+    repeated Tag tags = 2;
 }
 
 message PublishInfoReq {
@@ -171,7 +172,8 @@ message GetSegmentsReq {
 }
 
 message Segments {
-    repeated Segment segments = 1;
+    uint64 totalCount = 1;
+    repeated Segment segments = 2;
 }
 
 message PublishSegmentReq {
@@ -214,7 +216,8 @@ message GetInfosReq {
 }
 
 message GetInfosResp {
-    repeated Info infos = 1;
+    uint64 totalCount = 1;
+    repeated Info infos = 2;
 }
 
 message InfoIDAndUIDReq {
