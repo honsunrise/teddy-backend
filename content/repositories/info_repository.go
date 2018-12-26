@@ -13,7 +13,8 @@ type InfoRepository interface {
 	Insert(ctx mongo.SessionContext, info *models.Info) error
 	IncWatchCount(ctx mongo.SessionContext, id objectid.ObjectID, count int64) error
 	FindOne(ctx mongo.SessionContext, id objectid.ObjectID) (*models.Info, error)
-	FindAll(ctx mongo.SessionContext, uid string, tags []*models.TypeAndTag, page uint32, size uint32, sorts []*content.Sort) ([]*models.Info, error)
+	FindAll(ctx mongo.SessionContext, uid string, tags []*models.TypeAndTag,
+		page uint32, size uint32, sorts []*content.Sort) ([]*models.Info, uint64, error)
 	Delete(ctx mongo.SessionContext, id objectid.ObjectID) error
 	Update(ctx mongo.SessionContext, id objectid.ObjectID, fields map[string]interface{}) error
 }
@@ -59,11 +60,12 @@ func (repo *infoRepository) FindOne(ctx mongo.SessionContext, id objectid.Object
 	return &info, nil
 }
 
-func (repo *infoRepository) internalFindInfo(ctx mongo.SessionContext, uid string, tags []*models.TypeAndTag, page uint32,
-	size uint32, sorts []*content.Sort) ([]*models.Info, error) {
+func (repo *infoRepository) internalFindInfo(ctx mongo.SessionContext, uid string, tags []*models.TypeAndTag,
+	page uint32, size uint32, sorts []*content.Sort) ([]*models.Info, uint64, error) {
 	var cur mongo.Cursor
 
 	pipeline := mongo.Pipeline{}
+	countPipeline := mongo.Pipeline{}
 
 	var dynFilter = make(bson.D, 0, 2)
 	if uid != "" {
@@ -74,10 +76,33 @@ func (repo *infoRepository) internalFindInfo(ctx mongo.SessionContext, uid strin
 	}
 	if len(dynFilter) != 0 {
 		pipeline = append(pipeline, bson.D{{"$match", dynFilter}})
+		countPipeline = append(countPipeline, bson.D{{"$match", dynFilter}})
 	}
+
+	countPipeline = append(countPipeline, bson.D{{"$count", "count"}})
+	cur, err := repo.collections.Aggregate(ctx, countPipeline)
+	if err != nil {
+		return nil, 0, err
+	}
+	elem := struct {
+		Count uint64 `bson:"count"`
+	}{}
+	defer cur.Close(ctx)
+	for cur.Next(ctx) {
+		err := cur.Decode(&elem)
+		if err != nil {
+			return nil, 0, err
+		}
+		break
+	}
+	err = cur.Err()
+	if err != nil {
+		return nil, 0, err
+	}
+	totalCount := elem.Count
+
 	pipeline = append(pipeline, bson.D{{"$skip", int64(size * page)}})
 	pipeline = append(pipeline, bson.D{{"$limit", int64(size)}})
-
 	var itemsSorts = make(bson.D, 0, len(sorts))
 	if len(sorts) != 0 {
 		for _, sort := range sorts {
@@ -89,10 +114,9 @@ func (repo *infoRepository) internalFindInfo(ctx mongo.SessionContext, uid strin
 		}
 		pipeline = append(pipeline, bson.D{{"$sort", itemsSorts}})
 	}
-
-	cur, err := repo.collections.Aggregate(ctx, pipeline)
+	cur, err = repo.collections.Aggregate(ctx, pipeline)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer cur.Close(ctx)
 	items := make([]*models.Info, 0, size)
@@ -100,19 +124,19 @@ func (repo *infoRepository) internalFindInfo(ctx mongo.SessionContext, uid strin
 		var item models.Info
 		err := cur.Decode(&item)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		items = append(items, &item)
 	}
 	err = cur.Err()
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return items, nil
+	return items, uint64(totalCount), nil
 }
 
 func (repo *infoRepository) FindAll(ctx mongo.SessionContext, uid string, tags []*models.TypeAndTag,
-	page uint32, size uint32, sorts []*content.Sort) ([]*models.Info, error) {
+	page uint32, size uint32, sorts []*content.Sort) ([]*models.Info, uint64, error) {
 	return repo.internalFindInfo(ctx, uid, tags, page, size, sorts)
 }
 

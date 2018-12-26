@@ -78,7 +78,7 @@ func (h *contentHandler) GetSegments(ctx context.Context, req *content.GetSegmen
 
 	err = h.client.UseSession(ctx, func(sessionContext mongo.SessionContext) error {
 		var err error
-		segments, err := h.segRepo.FindAll(sessionContext, infoID, req.Labels, req.Page, req.Size, req.Sorts)
+		segments, totalCount, err := h.segRepo.FindAll(sessionContext, infoID, req.Labels, req.Page, req.Size, req.Sorts)
 
 		if err != nil {
 			return err
@@ -99,6 +99,7 @@ func (h *contentHandler) GetSegments(ctx context.Context, req *content.GetSegmen
 			result = append(result, pbSegment)
 		}
 		resp.Segments = result
+		resp.TotalCount = totalCount
 		return nil
 	})
 
@@ -362,7 +363,7 @@ func (h *contentHandler) GetTags(ctx context.Context, req *content.GetTagReq) (*
 
 	err := h.client.UseSession(ctx, func(sessionContext mongo.SessionContext) error {
 		var err error
-		tags, err := h.tagRepo.FindAll(sessionContext, req.Type, req.Page, req.Size, req.Sorts)
+		tags, totalCount, err := h.tagRepo.FindAll(sessionContext, req.Type, req.Page, req.Size, req.Sorts)
 
 		if err != nil {
 			return err
@@ -375,6 +376,7 @@ func (h *contentHandler) GetTags(ctx context.Context, req *content.GetTagReq) (*
 			result = append(result, pbTag)
 		}
 		resp.Tags = result
+		resp.TotalCount = totalCount
 		return nil
 	})
 
@@ -752,8 +754,9 @@ func (h *contentHandler) GetInfos(ctx context.Context, req *content.GetInfosReq)
 		}
 
 		var infos []*models.Info
+		var totalCount uint64
 		if req.Title == "" {
-			infos, err = h.infoRepo.FindAll(sessionContext, req.Uid, tags, req.Page, req.Size, req.Sorts)
+			infos, totalCount, err = h.infoRepo.FindAll(sessionContext, req.Uid, tags, req.Page, req.Size, req.Sorts)
 		} else {
 			//TODO: search use elasticsearch
 		}
@@ -770,6 +773,7 @@ func (h *contentHandler) GetInfos(ctx context.Context, req *content.GetInfosReq)
 			pInfos = append(pInfos, pInfo)
 		}
 		resp.Infos = pInfos
+		resp.TotalCount = totalCount
 		return nil
 	})
 

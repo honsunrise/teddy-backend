@@ -15,7 +15,7 @@ type SegmentRepository interface {
 		infoID objectid.ObjectID, no int64, title string, labels []string) (*models.Segment, error)
 	FindOne(ctx mongo.SessionContext, id objectid.ObjectID) (*models.Segment, error)
 	FindAll(ctx mongo.SessionContext, infoID objectid.ObjectID,
-		labels []string, page, size uint32, sorts []*content.Sort) ([]*models.Segment, error)
+		labels []string, page, size uint32, sorts []*content.Sort) ([]*models.Segment, uint64, error)
 
 	DeleteByInfoID(ctx mongo.SessionContext, infoID objectid.ObjectID) error
 	DeleteOne(ctx mongo.SessionContext, id objectid.ObjectID) error
@@ -60,8 +60,9 @@ func (repo *segmentRepository) FindOne(ctx mongo.SessionContext, id objectid.Obj
 }
 
 func (repo *segmentRepository) FindAll(ctx mongo.SessionContext,
-	infoID objectid.ObjectID, labels []string, page, size uint32, sorts []*content.Sort) ([]*models.Segment, error) {
+	infoID objectid.ObjectID, labels []string, page, size uint32, sorts []*content.Sort) ([]*models.Segment, uint64, error) {
 	pipeline := mongo.Pipeline{}
+	countPipeline := mongo.Pipeline{}
 
 	var dynFilter = make(bson.D, 0, 1)
 	dynFilter = append(dynFilter, bson.E{Key: "infoID", Value: infoID})
@@ -70,8 +71,31 @@ func (repo *segmentRepository) FindAll(ctx mongo.SessionContext,
 		dynFilter = append(dynFilter,
 			bson.E{Key: "labels", Value: bson.D{{"$all", labels}}})
 	}
-
 	pipeline = append(pipeline, bson.D{{"$match", dynFilter}})
+	countPipeline = append(countPipeline, bson.D{{"$count", "count"}})
+
+	cur, err := repo.collections.Aggregate(ctx, countPipeline)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	elem := struct {
+		Count uint64 `bson:"count"`
+	}{}
+	defer cur.Close(ctx)
+	for cur.Next(ctx) {
+		err := cur.Decode(&elem)
+		if err != nil {
+			return nil, 0, err
+		}
+		break
+	}
+	err = cur.Err()
+	if err != nil {
+		return nil, 0, err
+	}
+
+	totalCount := elem.Count
 
 	var itemsSorts = make(bson.D, 0, len(sorts))
 	if len(sorts) != 0 {
@@ -88,9 +112,9 @@ func (repo *segmentRepository) FindAll(ctx mongo.SessionContext,
 	pipeline = append(pipeline, bson.D{{"$skip", int64(size * page)}})
 	pipeline = append(pipeline, bson.D{{"$limit", int64(size)}})
 
-	cur, err := repo.collections.Aggregate(ctx, pipeline)
+	cur, err = repo.collections.Aggregate(ctx, pipeline)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	items := make([]*models.Segment, 0, size)
 	defer cur.Close(ctx)
@@ -98,15 +122,15 @@ func (repo *segmentRepository) FindAll(ctx mongo.SessionContext,
 		var item models.Segment
 		err := cur.Decode(&item)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		items = append(items, &item)
 	}
 	err = cur.Err()
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return items, nil
+	return items, uint64(totalCount), nil
 }
 
 func (repo *segmentRepository) DeleteByInfoID(ctx mongo.SessionContext, infoID objectid.ObjectID) error {

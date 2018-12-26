@@ -202,7 +202,10 @@ func (h *Content) GetAllTags(ctx *gin.Context) {
 		})
 	}
 
-	ctx.JSON(http.StatusOK, results)
+	ctx.JSON(http.StatusOK, gin.H{
+		"total_count": resp.TotalCount,
+		"items":       results,
+	})
 }
 
 func (h *Content) GetAllInfos(ctx *gin.Context) {
@@ -351,7 +354,10 @@ func (h *Content) GetAllInfos(ctx *gin.Context) {
 		})
 	}
 
-	ctx.JSON(http.StatusOK, results)
+	ctx.JSON(http.StatusOK, gin.H{
+		"total_count": resp.TotalCount,
+		"items":       results,
+	})
 }
 
 func (h *Content) PublishInfo(ctx *gin.Context) {
@@ -886,7 +892,10 @@ func (h *Content) GetAllSegments(ctx *gin.Context) {
 		})
 	}
 
-	ctx.JSON(http.StatusOK, results)
+	ctx.JSON(http.StatusOK, gin.H{
+		"total_count": resp.TotalCount,
+		"items":       results,
+	})
 }
 
 func (h *Content) GetSegmentDetail(ctx *gin.Context) {

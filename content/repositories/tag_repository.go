@@ -13,7 +13,8 @@ type TagRepository interface {
 	Insert(ctx mongo.SessionContext, tag *models.Tag) error
 	FindByTypeAndTag(ctx mongo.SessionContext, tp string, tag string) (*models.Tag, error)
 	FindOne(ctx mongo.SessionContext, id objectid.ObjectID) (*models.Tag, error)
-	FindAll(ctx mongo.SessionContext, tp string, page uint32, size uint32, sorts []*content.Sort) ([]*models.Tag, error)
+	FindAll(ctx mongo.SessionContext, tp string,
+		page uint32, size uint32, sorts []*content.Sort) ([]*models.Tag, uint64, error)
 	IncUsage(ctx mongo.SessionContext, id objectid.ObjectID, inc int64) error
 	UpdateLastUse(ctx mongo.SessionContext, id objectid.ObjectID, lastUse time.Time) error
 	DeleteOne(ctx mongo.SessionContext, id objectid.ObjectID) error
@@ -61,12 +62,37 @@ func (repo *tagRepository) FindOne(ctx mongo.SessionContext, id objectid.ObjectI
 	return &tagEntry, nil
 }
 
-func (repo *tagRepository) FindAll(ctx mongo.SessionContext, tp string, page uint32, size uint32, sorts []*content.Sort) ([]*models.Tag, error) {
+func (repo *tagRepository) FindAll(ctx mongo.SessionContext, tp string,
+	page uint32, size uint32, sorts []*content.Sort) ([]*models.Tag, uint64, error) {
 	pipeline := mongo.Pipeline{}
+	countPipeline := mongo.Pipeline{}
 
 	if tp != "" {
 		pipeline = append(pipeline, bson.D{{"$match", bson.D{{"type", tp}}}})
+		countPipeline = append(countPipeline, bson.D{{"$count", "count"}})
 	}
+
+	countPipeline = append(countPipeline, bson.D{{"$count", "count"}})
+	cur, err := repo.collections.Aggregate(ctx, countPipeline)
+	if err != nil {
+		return nil, 0, err
+	}
+	elem := struct {
+		Count uint64 `bson:"count"`
+	}{}
+	defer cur.Close(ctx)
+	for cur.Next(ctx) {
+		err := cur.Decode(&elem)
+		if err != nil {
+			return nil, 0, err
+		}
+		break
+	}
+	err = cur.Err()
+	if err != nil {
+		return nil, 0, err
+	}
+	totalCount := elem.Count
 
 	pipeline = append(pipeline, bson.D{{"$skip", int64(size * page)}})
 	pipeline = append(pipeline, bson.D{{"$limit", int64(size)}})
@@ -83,9 +109,9 @@ func (repo *tagRepository) FindAll(ctx mongo.SessionContext, tp string, page uin
 		pipeline = append(pipeline, bson.D{{"$sort", itemsSorts}})
 	}
 
-	cur, err := repo.collections.Aggregate(ctx, pipeline)
+	cur, err = repo.collections.Aggregate(ctx, pipeline)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	items := make([]*models.Tag, 0, size)
 	defer cur.Close(ctx)
@@ -93,15 +119,15 @@ func (repo *tagRepository) FindAll(ctx mongo.SessionContext, tp string, page uin
 		var item models.Tag
 		err := cur.Decode(&item)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		items = append(items, &item)
 	}
 	err = cur.Err()
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return items, nil
+	return items, totalCount, nil
 }
 
 func (repo *tagRepository) IncUsage(ctx mongo.SessionContext, id objectid.ObjectID, inc int64) error {

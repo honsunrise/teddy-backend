@@ -124,7 +124,10 @@ func (repo *inboxRepository) FindInBoxUnreadCount(uid string) (int64, error) {
 		bson.D{{"$count", "count"}},
 	}
 
-	repo.collections.Aggregate(repo.ctx, pipeline)
+	cur, err := repo.collections.Aggregate(repo.ctx, pipeline)
+	if err != nil {
+		return 0, err
+	}
 	elem := make(map[string]interface{})
 	defer cur.Close(repo.ctx)
 	for cur.Next(repo.ctx) {
@@ -134,7 +137,7 @@ func (repo *inboxRepository) FindInBoxUnreadCount(uid string) (int64, error) {
 		}
 		break
 	}
-	err := cur.Err()
+	err = cur.Err()
 	if err != nil {
 		return 0, err
 	}
