@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+const uid = "5187196715"
+
 func buildSort(sort string) ([]*content.Sort, error) {
 	rawSorts := strings.Split(sort, ",")
 	sorts := make([]*content.Sort, 0, len(rawSorts))
@@ -285,7 +287,7 @@ func (h *Content) GetAllInfos(ctx *gin.Context) {
 		LastModifyTime  time.Time         `json:"lastModifyTime"`
 		CanReview       bool              `json:"canReview"`
 		Archived        bool              `json:"archived"`
-		LatestSegmentNo int64             `json:"latestSegmentNo"`
+		LatestSegmentID string            `json:"latestSegmentID"`
 		SegmentCount    int64             `json:"segmentCount"`
 	}
 	results := make([]*infoResult, 0, len(resp.Infos))
@@ -344,7 +346,7 @@ func (h *Content) GetAllInfos(ctx *gin.Context) {
 			LastModifyTime:  lastModifyTime,
 			CanReview:       info.CanReview,
 			Archived:        info.Archived,
-			LatestSegmentNo: info.LatestSegmentNo,
+			LatestSegmentID: info.LatestSegmentID,
 			SegmentCount:    info.SegmentCount,
 		})
 	}
@@ -386,7 +388,6 @@ func (h *Content) PublishInfo(ctx *gin.Context) {
 	}
 
 	//TODO: Get uid
-	uid := "7791850604"
 	_, err := contentClient.PublishInfo(ctx, &content.PublishInfoReq{
 		Uid:            uid,
 		Author:         req.Author,
@@ -457,7 +458,7 @@ func (h *Content) GetInfoDetail(ctx *gin.Context) {
 		LastModifyTime  time.Time         `json:"lastModifyTime"`
 		CanReview       bool              `json:"canReview"`
 		Archived        bool              `json:"archived"`
-		LatestSegmentNo int64             `json:"latestSegmentNo"`
+		LatestSegmentID string            `json:"latestSegmentID"`
 		SegmentCount    int64             `json:"segmentCount"`
 	}
 
@@ -515,7 +516,7 @@ func (h *Content) GetInfoDetail(ctx *gin.Context) {
 		LastModifyTime:  lastModifyTime,
 		CanReview:       info.CanReview,
 		Archived:        info.Archived,
-		LatestSegmentNo: info.LatestSegmentNo,
+		LatestSegmentID: info.LatestSegmentID,
 		SegmentCount:    info.SegmentCount,
 	}
 	ctx.JSON(http.StatusOK, resp)
@@ -646,7 +647,6 @@ func (h *Content) GetUserFavThumb(ctx *gin.Context) {
 	}
 
 	// TODO: get uid
-	var uid string
 	var resp *content.InfoIDsResp
 	if strings.Contains(ctx.Request.RequestURI, "favorite") {
 		resp, err = contentClient.GetUserFavorite(ctx, &content.UIDPageReq{
@@ -752,7 +752,6 @@ func (h *Content) FavThumb(ctx *gin.Context) {
 	}
 
 	//TODO: fill uid
-	uid := "7791850604"
 	var err error
 	infoID := ctx.Param("id")
 	if strings.Contains(ctx.Request.RequestURI, "favorite") {
@@ -789,7 +788,6 @@ func (h *Content) DeleteFavThumb(ctx *gin.Context) {
 	}
 
 	//TODO: fill uid
-	var uid string
 	var err error
 	infoID := ctx.Param("id")
 	if strings.Contains(ctx.Request.RequestURI, "favorite") {

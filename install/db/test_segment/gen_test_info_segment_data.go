@@ -20,11 +20,8 @@ db.segment.insert({
     "no": %d,
 	"labels": %s,
     "content": {
-		"image1":"/xxx/xxx/xxx.jpg",
-		"image1":"/xxx/xxx/xxx.jpg",
-		"image1":"/xxx/xxx/xxx.jpg",
-		"image1":"/xxx/xxx/xxx.jpg",
-		"image1":"/xxx/xxx/xxx.jpg"
+		"image2":"/5c1f824eb034c620bf7b0d15/5c21cdf0c1fb2bb20d6a8a7c/88e93d1f8f3aa55c52384b7a5c7fb7cd.jpg",
+		"image1":"/5c1f824eb034c620bf7b0d15/5c21cdf0c1fb2bb20d6a8a7c/c7135d5883d6e1104d2bc075e4947339.jpg"
 	},
     watchCount: 0
 });

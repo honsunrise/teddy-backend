@@ -42,7 +42,7 @@ type behaviorRepository struct {
 }
 
 func (repo *behaviorRepository) Insert(ctx mongo.SessionContext, uid string, thumb *models.BehaviorInfoItem) error {
-	filter := bson.D{{"uid", uid}, {"$ne", bson.D{{"items", thumb}}}}
+	filter := bson.D{{"uid", uid}, {"items", bson.D{{"$ne", thumb}}}}
 	result := repo.collections.FindOne(ctx, filter)
 	if result.Decode(nil) == mongo.ErrNoDocuments {
 		now := time.Now()
@@ -62,7 +62,7 @@ func (repo *behaviorRepository) Insert(ctx mongo.SessionContext, uid string, thu
 		}
 	} else {
 		update := bson.D{
-			{"$addToSet", bson.D{{"items", bson.D{{"$each", thumb}}}}},
+			{"$addToSet", bson.D{{"items", bson.D{{"$each", bson.A{thumb}}}}}},
 			{"$inc", bson.D{{"count", 1}}},
 			{"$currentDate", bson.D{{"lastTime", bson.D{{"$type", "timestamp"}}}}},
 		}

@@ -30,6 +30,6 @@ type Info struct {
 	ThumbDown        int64             `bson:"thumbDown"`
 	Favorites        int64             `bson:"favorites"`
 	Archived         bool              `bson:"archived"`
-	LatestSegmentNo  int64             `bson:"latestSegmentNo"`
+	LatestSegmentID  objectid.ObjectID `bson:"latestSegmentID"`
 	SegmentCount     int64             `bson:"segmentCount"`
 }

@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/minio/minio-go"
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	log "github.com/sirupsen/logrus"
@@ -10,10 +11,11 @@ import (
 	"github.com/zhsyourai/teddy-backend/content/models"
 	"github.com/zhsyourai/teddy-backend/content/repositories"
 	"golang.org/x/net/context"
+	"net/url"
 	"time"
 )
 
-func NewContentServer(client *mongo.Client) (content.ContentServer, error) {
+func NewContentServer(client *mongo.Client, minioClient *minio.Client) (content.ContentServer, error) {
 	// New Repository
 	infoRepo, err := repositories.NewInfoRepository(client)
 	if err != nil {
@@ -40,6 +42,7 @@ func NewContentServer(client *mongo.Client) (content.ContentServer, error) {
 		return nil, err
 	}
 	instance := &contentHandler{
+		minioClient:   minioClient,
 		client:        client,
 		infoRepo:      infoRepo,
 		segRepo:       segmentRepo,
@@ -53,6 +56,7 @@ func NewContentServer(client *mongo.Client) (content.ContentServer, error) {
 
 type contentHandler struct {
 	client        *mongo.Client
+	minioClient   *minio.Client
 	infoRepo      repositories.InfoRepository
 	segRepo       repositories.SegmentRepository
 	tagRepo       repositories.TagRepository
@@ -84,6 +88,14 @@ func (h *contentHandler) GetSegments(ctx context.Context, req *content.GetSegmen
 		for _, segment := range segments {
 			pbSegment := &content.Segment{}
 			copyFromSegmentToPBSegment(segment, pbSegment)
+			for k, v := range pbSegment.Content {
+				var result *url.URL
+				result, err = h.minioClient.PresignedGetObject("teddy", v, 30*time.Minute, nil)
+				if err == nil {
+					pbSegment.Content[k] = result.String()
+				}
+			}
+
 			result = append(result, pbSegment)
 		}
 		resp.Segments = result
@@ -432,7 +444,7 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *content.PublishIn
 			LatestModifyTime: now,
 			CanReview:        req.CanReview,
 			Archived:         false,
-			LatestSegmentNo:  -1,
+			LatestSegmentID:  objectid.NilObjectID,
 			SegmentCount:     0,
 		}
 
@@ -683,7 +695,7 @@ func (h *contentHandler) fillInfo(sessionContext mongo.SessionContext, uid strin
 		},
 		CanReview:       info.CanReview,
 		Archived:        info.Archived,
-		LatestSegmentNo: info.LatestSegmentNo,
+		LatestSegmentID: info.LatestSegmentID.Hex(),
 		SegmentCount:    info.SegmentCount,
 	}
 	return resp, nil

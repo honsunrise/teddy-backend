@@ -43,7 +43,7 @@ db.info.insert({
     "thumbDown": 0,
     "favorites": 0,
     "archived": false,
-    "latestSegmentNo": -1,
+    "latestSegmentID": objectid.ObjectID("000000000000000000000000"),
     "segmentCount": 0
 });
 

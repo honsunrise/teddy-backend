@@ -4,7 +4,6 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/config/source/file"
-	"github.com/zhsyourai/teddy-backend/common/utils"
 	"github.com/zhsyourai/teddy-backend/uaa/components"
 	"google.golang.org/grpc"
 	grpcHealth "google.golang.org/grpc/health"
@@ -41,11 +40,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Load config
-	mongodbUri := utils.BuildMongodbURI(false, confType.Databases["mongodb"])
 
 	// New Mongodb client
-	mongodbClient, err := mongo.Connect(context.Background(), mongodbUri)
+	mongodbClient, err := mongo.Connect(context.Background(), confType.Databases["mongodb"])
 	if err != nil {
 		log.Fatal(err)
 	}

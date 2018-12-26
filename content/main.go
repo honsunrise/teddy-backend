@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"github.com/minio/minio-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/config/source/file"
 	"github.com/zhsyourai/teddy-backend/common/proto/content"
@@ -45,8 +47,19 @@ func main() {
 		log.Fatal(err)
 	}
 
+	minioConfig := confType.ObjectStore["minio"]
+	if minioConfig == nil {
+		log.Fatal(errors.New("missing minio config"))
+	}
+
+	// Initialize minio client object.
+	minioClient, err := minio.New(minioConfig.Endpoint, minioConfig.AccessKey, minioConfig.SecretKey, false)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// New Handler
-	accountHandler, err := server.NewContentServer(mongodbClient)
+	accountHandler, err := server.NewContentServer(mongodbClient, minioClient)
 	if err != nil {
 		log.Fatal(err)
 	}
