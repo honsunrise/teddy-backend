@@ -89,7 +89,7 @@ func (g *JwtGenerator) GenerateJwt(timeout time.Duration, subject string, audien
 			NotBefore: jwt.NewNumericDate(now),
 		}).
 		Claims(claims).
-		FullSerialize()
+		CompactSerialize()
 	if err != nil {
 		return "", err
 	} else {
