@@ -21,7 +21,7 @@ type GeneratorConfig struct {
 
 type JwtGenerator struct {
 	config GeneratorConfig
-	jwks   string
+	jwks   []byte
 	signer jose.Signer
 }
 
@@ -64,12 +64,12 @@ func NewGinJwtGenerator(config GeneratorConfig) (*JwtGenerator, error) {
 
 	return &JwtGenerator{
 		config: config,
-		jwks:   string(jwksResult),
+		jwks:   jwksResult,
 		signer: signer,
 	}, nil
 }
 
-func (g *JwtGenerator) GetJwk() string {
+func (g *JwtGenerator) GetJwks() []byte {
 	return g.jwks
 }
 
