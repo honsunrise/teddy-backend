@@ -139,6 +139,13 @@ func (h *contentHandler) GetSegment(ctx context.Context, req *content.InfoIDAndU
 		}
 
 		copyFromSegmentToPBSegment(segment, &resp)
+		for k, v := range resp.Content {
+			var result *url.URL
+			result, err = h.minioClient.PresignedGetObject("teddy", v, 30*time.Minute, nil)
+			if err == nil {
+				resp.Content[k] = result.String()
+			}
+		}
 		return nil
 	})
 
@@ -622,7 +629,7 @@ func (h *contentHandler) fillInfo(sessionContext mongo.SessionContext, uid strin
 	}
 
 	tmpList, err := h.thumbUpRepo.FindUserByInfo(sessionContext, info.ID, 0, 10, []*content.Sort{
-		&content.Sort{
+		{
 			Name: "time",
 			Asc:  false,
 		},
@@ -636,7 +643,7 @@ func (h *contentHandler) fillInfo(sessionContext mongo.SessionContext, uid strin
 	}
 
 	tmpList, err = h.thumbDownRepo.FindUserByInfo(sessionContext, info.ID, 0, 10, []*content.Sort{
-		&content.Sort{
+		{
 			Name: "time",
 			Asc:  false,
 		},
@@ -650,7 +657,7 @@ func (h *contentHandler) fillInfo(sessionContext mongo.SessionContext, uid strin
 	}
 
 	tmpList, err = h.favoriteRepo.FindUserByInfo(sessionContext, info.ID, 0, 10, []*content.Sort{
-		&content.Sort{
+		{
 			Name: "time",
 			Asc:  false,
 		},
@@ -768,7 +775,7 @@ func (h *contentHandler) GetInfos(ctx context.Context, req *content.GetInfosReq)
 		var infos []*models.Info
 		var totalCount uint64
 		if req.Title == "" {
-			infos, totalCount, err = h.infoRepo.FindAll(sessionContext, req.Uid, tags, req.Page, req.Size, req.Sorts)
+			infos, totalCount, err = h.infoRepo.FindAll(sessionContext, "", tags, req.Page, req.Size, req.Sorts)
 		} else {
 			//TODO: search use elasticsearch
 		}
