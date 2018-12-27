@@ -166,6 +166,7 @@ func (m *JwtMiddleware) extractToken(ctx *gin.Context) (map[string]interface{}, 
 				for _, a := range aud {
 					if a == v {
 						find = true
+						break
 					}
 				}
 				if !find {
@@ -178,11 +179,11 @@ func (m *JwtMiddleware) extractToken(ctx *gin.Context) (map[string]interface{}, 
 	}
 
 	now := m.nowFunc()
-	if nbf, ok := c["nbf"].(int64); !ok || now.Add(DefaultLeeway).Before(time.Unix(nbf, 0)) {
+	if nbf, ok := c["nbf"].(float64); !ok || now.Add(DefaultLeeway).Before(time.Unix(int64(nbf), 0)) {
 		return nil, ErrTokenInvalid
 	}
 
-	if exp, ok := c["exp"].(int64); !ok || now.Add(-DefaultLeeway).After(time.Unix(exp, 0)) {
+	if exp, ok := c["exp"].(float64); !ok || now.Add(-DefaultLeeway).After(time.Unix(int64(exp), 0)) {
 		return nil, ErrTokenInvalid
 	}
 
