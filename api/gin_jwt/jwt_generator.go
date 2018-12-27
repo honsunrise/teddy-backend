@@ -12,8 +12,6 @@ import (
 type GeneratorConfig struct {
 	Issuer string
 
-	Subject string
-
 	SigningAlgorithm jose.SignatureAlgorithm
 
 	KeyFunc func() interface{}
@@ -75,14 +73,14 @@ func (g *JwtGenerator) GetJwk() string {
 	return g.jwks
 }
 
-func (g *JwtGenerator) GenerateJwt(timeout time.Duration, audience []string,
+func (g *JwtGenerator) GenerateJwt(timeout time.Duration, subject string, audience []string,
 	claims map[string]interface{}) (string, error) {
 	now := g.config.NowFunc()
 	expire := now.Add(timeout)
 	tokenString, err := jwt.Signed(g.signer).
 		Claims(jwt.Claims{
 			ID:        uuid.Must(uuid.NewRandom()).String(),
-			Subject:   g.config.Subject,
+			Subject:   subject,
 			Issuer:    g.config.Issuer,
 			Audience:  audience,
 			Expiry:    jwt.NewNumericDate(expire),
