@@ -2,6 +2,7 @@ package gin_jwt
 
 import (
 	"crypto"
+	"encoding/base64"
 	"encoding/json"
 	"github.com/google/uuid"
 	"gopkg.in/square/go-jose.v2"
@@ -51,7 +52,7 @@ func NewGinJwtGenerator(config GeneratorConfig) (*JwtGenerator, error) {
 	if err != nil {
 		return nil, err
 	}
-	jwk.KeyID = string(thumbprint)
+	jwk.KeyID = base64.URLEncoding.EncodeToString(thumbprint)
 
 	jwks := jose.JSONWebKeySet{
 		Keys: []jose.JSONWebKey{jwk.Public()},
