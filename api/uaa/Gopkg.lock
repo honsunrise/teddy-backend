@@ -2,14 +2,6 @@
 
 
 [[projects]]
-  digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
-  name = "github.com/davecgh/go-spew"
-  packages = ["spew"]
-  pruneopts = "UT"
-  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
-  version = "v1.1.1"
-
-[[projects]]
   digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
   name = "github.com/dgrijalva/jwt-go"
   packages = ["."]
@@ -110,26 +102,6 @@
   version = "v1.0.1"
 
 [[projects]]
-  branch = "master"
-  digest = "1:cb2cab2aae49bf008ba60556f4af9ba87b190e265be57d78b37f10eb0768491a"
-  name = "github.com/lestrrat-go/jwx"
-  packages = [
-    "internal/base64",
-    "jwa",
-    "jwk",
-  ]
-  pruneopts = "UT"
-  revision = "0d477e6a1f0ec69634840308e3873fe71d928dd0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:992a4e430ab23874d31778dc2a17ba41e7733a9cfd151d1ee8476b46a828e7f5"
-  name = "github.com/lestrrat-go/pdebug"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "39f9a71bcabe9432cbdfe4d3d33f41988acd2ce6"
-
-[[projects]]
   digest = "1:0981502f9816113c9c8c4ac301583841855c8cf4da8c72f696b3ebedf6d0e4e5"
   name = "github.com/mattn/go-isatty"
   packages = ["."]
@@ -162,14 +134,6 @@
   version = "1.0.1"
 
 [[projects]]
-  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
-  name = "github.com/pkg/errors"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
-  version = "v0.8.0"
-
-[[projects]]
   digest = "1:69b1cc331fca23d702bd72f860c6a647afd0aa9fcbc1d0659b1365e26546dd70"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
@@ -187,7 +151,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3e823553ddb14097e0890edcb4641a6483a9954b5dd262255166bf0c5850f869"
+  digest = "1:dfacd22bed80a7d7c150b6671730b99dea3ca35d007aee0aa47b221fc95a79e4"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
@@ -204,13 +168,18 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "d81efec840768a6fc0e2975528013c5bb226a1b6"
+  revision = "f82b91e05636d01b80fd367f7e7def1f9588d2c8"
 
 [[projects]]
   branch = "master"
-  digest = "1:38f553aff0273ad6f367cb0a0f8b6eecbaef8dc6cb8b50e57b6a81c1d5b1e332"
+  digest = "1:b06f45abbe7431aec373695c6cf9770a051fa4ac81ad31b3fa73ddf3bb76bb27"
   name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
+  packages = [
+    "ed25519",
+    "ed25519/internal/edwards25519",
+    "pbkdf2",
+    "ssh/terminal",
+  ]
   pruneopts = "UT"
   revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
 
@@ -321,20 +290,25 @@
   version = "v1.17.0"
 
 [[projects]]
-  digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
-  name = "gopkg.in/dgrijalva/jwt-go.v3"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
-  version = "v3.2.0"
-
-[[projects]]
   digest = "1:cbc72c4c4886a918d6ab4b95e347ffe259846260f99ebdd8a198c2331cf2b2e9"
   name = "gopkg.in/go-playground/validator.v8"
   packages = ["."]
   pruneopts = "UT"
   revision = "5f1438d3fca68893a817e4a66806cea46a9e4ebf"
   version = "v8.18.2"
+
+[[projects]]
+  digest = "1:550221cdc42e1ad44a1942d01c4135c30f6808b61dbad3c52d325e01d8e7cc07"
+  name = "gopkg.in/square/go-jose.v2"
+  packages = [
+    ".",
+    "cipher",
+    "json",
+    "jwt",
+  ]
+  pruneopts = "UT"
+  revision = "72415094398e2f013bf50b76fd6de36df47938ea"
+  version = "v2.2.1"
 
 [[projects]]
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
@@ -353,7 +327,6 @@
     "github.com/gin-gonic/gin",
     "github.com/golang/protobuf/ptypes",
     "github.com/golang/protobuf/ptypes/timestamp",
-    "github.com/lestrrat-go/jwx/jwk",
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/api/clients",
     "github.com/zhsyourai/teddy-backend/api/gin_jwt",

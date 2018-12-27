@@ -63,21 +63,45 @@ func main() {
 			return key
 		},
 	})
-	uaa, err := handler.NewUaaHandler(jwtGenerator)
+	if err != nil {
+		log.Fatal(err)
+	}
+	jwtMiddleware, err := gin_jwt.NewGinJwtMiddleware(gin_jwt.MiddlewareConfig{
+		Realm:            "uaa.teddy.com",
+		Issuer:           "uaa@teddy.com",
+		SigningAlgorithm: SigningAlgorithm,
+		KeyFunc: func() interface{} {
+			return key.Public()
+		},
+		Audience: []string{
+			"uaa",
+		},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	uaa, err := handler.NewUaaHandler(jwtMiddleware, jwtGenerator)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Create RESTful server (using Gin)
 	router := gin.Default()
+	router.Use(func(ctx *gin.Context) {
+		// Process request
+		path := ctx.Request.URL.Path
+		ctx.Next()
+
+		log.Infof("PATH %s HEADERS %v", path, ctx.Request.Header)
+	})
 	router.Use(cors.Default())
 	router.Use(clients.MessageNew(messageSrvAddrFunc))
 	router.Use(clients.UaaNew(uaaSrvAddrFunc))
 	router.Use(clients.CaptchaNew(captchaSrvAddrFunc))
 	router.Use(nice_error.NewNiceError())
 
-	uaa.HandlerNormal(router.Group("/v1/anon/uaa"))
-	uaa.HandlerAuth(router.Group("/v1/auth/uaa"))
+	uaa.HandlerNormal(router.Group("/v1/anon/uaa").Use(jwtMiddleware.Handler(true)))
+	uaa.HandlerAuth(router.Group("/v1/auth/uaa").Use(jwtMiddleware.Handler(false)))
 	uaa.HandlerHealth(router)
 
 	// For normal request

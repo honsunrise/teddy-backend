@@ -4,6 +4,8 @@ import (
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"github.com/mongodb/mongo-go-driver/mongo"
+	"github.com/mongodb/mongo-go-driver/options"
+	"github.com/mongodb/mongo-go-driver/x/bsonx"
 	"github.com/zhsyourai/teddy-backend/common/proto/content"
 	"github.com/zhsyourai/teddy-backend/content/models"
 	"time"
@@ -42,8 +44,7 @@ type behaviorRepository struct {
 }
 
 func (repo *behaviorRepository) Insert(ctx mongo.SessionContext, uid string, thumb *models.BehaviorInfoItem) error {
-	filter := bson.D{{"uid", uid}, {"items", bson.D{{"$ne", thumb}}}}
-	result := repo.collections.FindOne(ctx, filter)
+	result := repo.collections.FindOne(ctx, bson.D{{"uid", uid}})
 	if result.Decode(nil) == mongo.ErrNoDocuments {
 		now := time.Now()
 		f := models.Behavior{
@@ -51,7 +52,7 @@ func (repo *behaviorRepository) Insert(ctx mongo.SessionContext, uid string, thu
 			UID:       uid,
 			LastTime:  now,
 			FirstTime: now,
-			Count:     0,
+			Count:     1,
 			Items: []*models.BehaviorInfoItem{
 				thumb,
 			},
@@ -61,6 +62,7 @@ func (repo *behaviorRepository) Insert(ctx mongo.SessionContext, uid string, thu
 			return err
 		}
 	} else {
+		filter := bson.D{{"uid", uid}, {"items", bson.D{{"$ne", thumb}}}}
 		update := bson.D{
 			{"$addToSet", bson.D{{"items", bson.D{{"$each", bson.A{thumb}}}}}},
 			{"$inc", bson.D{{"count", 1}}},
@@ -189,7 +191,7 @@ func (repo *behaviorRepository) CountByInfo(ctx mongo.SessionContext, infoID obj
 		bson.D{{"$unwind", "$items"}},
 		bson.D{{"$match", bson.D{{"items.infoId", infoID}}}},
 		bson.D{{"$group", bson.D{
-			{"_id", nil},
+			{"_id", bsonx.Null()},
 			{"count", bson.D{{"$sum", 1}}},
 		}}},
 		bson.D{{"$project", bson.D{{"_id", 0}}}},
@@ -200,7 +202,7 @@ func (repo *behaviorRepository) CountByInfo(ctx mongo.SessionContext, infoID obj
 	}
 	defer cur.Close(ctx)
 	if cur.Next(ctx) {
-		item := make(map[interface{}]interface{})
+		item := make(map[string]interface{})
 		err := cur.Decode(&item)
 		if err != nil {
 			return 0, err
@@ -212,29 +214,14 @@ func (repo *behaviorRepository) CountByInfo(ctx mongo.SessionContext, infoID obj
 }
 
 func (repo *behaviorRepository) CountByUser(ctx mongo.SessionContext, uid string) (uint64, error) {
-	pipeline := mongo.Pipeline{
-		bson.D{{"$match", bson.D{{"uid", uid}}}},
-		bson.D{{"$unwind", "$items"}},
-		bson.D{{"$group", bson.D{
-			{"_id", nil},
-			{"count", bson.D{{"$sum", 1}}},
-		}}},
-		bson.D{{"$project", bson.D{{"_id", 0}}}},
-	}
-	cur, err := repo.collections.Aggregate(ctx, pipeline)
-	if err != nil {
+	behavior := models.Behavior{}
+	filter := bson.D{{"uid", uid}}
+	result := repo.collections.FindOne(ctx, filter,
+		options.FindOne().SetProjection(bson.D{{"count", true}}))
+	if err := result.Decode(&behavior); err != nil {
 		return 0, err
-	}
-	defer cur.Close(ctx)
-	if cur.Next(ctx) {
-		item := make(map[interface{}]interface{})
-		err := cur.Decode(&item)
-		if err != nil {
-			return 0, err
-		}
-		return uint64(item["count"].(int64)), nil
 	} else {
-		return 0, cur.Err()
+		return behavior.Count, nil
 	}
 }
 

@@ -440,9 +440,6 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *content.PublishIn
 			Valid:            true,
 			WatchCount:       0,
 			Tags:             tags,
-			ThumbUp:          0,
-			ThumbDown:        0,
-			Favorites:        0,
 			LatestModifyTime: now,
 			CanReview:        req.CanReview,
 			Archived:         false,
@@ -609,6 +606,21 @@ func (h *contentHandler) fillInfo(sessionContext mongo.SessionContext, uid strin
 		return nil, err
 	}
 
+	thumbUps, err := h.thumbUpRepo.CountByInfo(sessionContext, info.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	thumbDowns, err := h.thumbDownRepo.CountByInfo(sessionContext, info.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	favorites, err := h.favoriteRepo.CountByInfo(sessionContext, info.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	tmpList, err := h.thumbUpRepo.FindUserByInfo(sessionContext, info.ID, 0, 10, []*content.Sort{
 		&content.Sort{
 			Name: "time",
@@ -682,13 +694,13 @@ func (h *contentHandler) fillInfo(sessionContext mongo.SessionContext, uid strin
 		Valid:         info.Valid,
 		WatchCount:    info.WatchCount,
 		Tags:          tagList,
-		ThumbUp:       info.ThumbUp,
+		ThumbUps:      thumbUps,
 		IsThumbUp:     isThumbUp,
 		ThumbUpList:   thumbUpList,
-		ThumbDown:     info.ThumbDown,
+		ThumbDowns:    thumbDowns,
 		IsThumbDown:   isThumbDown,
 		ThumbDownList: thumbDownList,
-		Favorites:     info.Favorites,
+		Favorites:     favorites,
 		IsFavorite:    isFavorite,
 		FavoriteList:  favoriteList,
 		LastModifyTime: &timestamp.Timestamp{
@@ -862,7 +874,18 @@ func (h *contentHandler) _behaviorInsert(ctx context.Context,
 
 	err = h.client.UseSession(ctx, func(sessionContext mongo.SessionContext) error {
 		var err error
-		isExist, err := checkRepo.IsExists(sessionContext, req.Uid, infoID)
+		if checkRepo != nil {
+			isExist, err := checkRepo.IsExists(sessionContext, req.Uid, infoID)
+			if err != nil {
+				return err
+			}
+
+			if isExist {
+				return ErrBehaviorExists
+			}
+		}
+
+		isExist, err := repo.IsExists(sessionContext, req.Uid, infoID)
 		if err != nil {
 			return err
 		}
@@ -1023,7 +1046,7 @@ func (h *contentHandler) DeleteThumbDown(ctx context.Context, req *content.InfoI
 }
 
 func (h *contentHandler) Favorite(ctx context.Context, req *content.InfoIDAndUIDReq) (*empty.Empty, error) {
-	return h._behaviorInsert(ctx, h.favoriteRepo, h.favoriteRepo, req)
+	return h._behaviorInsert(ctx, nil, h.favoriteRepo, req)
 }
 
 func (h *contentHandler) GetUserFavorite(ctx context.Context, req *content.UIDPageReq) (*content.InfoIDsResp, error) {

@@ -22,14 +22,11 @@ type Info struct {
 	PublishTime      time.Time         `bson:"publishTime"`
 	LastReviewTime   time.Time         `bson:"lastReviewTime"`
 	Valid            bool              `bson:"valid"`
-	WatchCount       int64             `bson:"watchCount"`
+	WatchCount       uint64            `bson:"watchCount"`
 	Tags             []*TypeAndTag     `bson:"tags"`
 	LatestModifyTime time.Time         `bson:"lastModifyTime"`
 	CanReview        bool              `bson:"canReview"`
-	ThumbUp          int64             `bson:"thumbUp"`
-	ThumbDown        int64             `bson:"thumbDown"`
-	Favorites        int64             `bson:"favorites"`
 	Archived         bool              `bson:"archived"`
 	LatestSegmentID  objectid.ObjectID `bson:"latestSegmentID"`
-	SegmentCount     int64             `bson:"segmentCount"`
+	SegmentCount     uint64            `bson:"segmentCount"`
 }

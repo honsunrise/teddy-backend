@@ -62,6 +62,14 @@
   version = "v1.2.0"
 
 [[projects]]
+  digest = "1:236d7e1bdb50d8f68559af37dbcf9d142d56b431c9b2176d41e2a009b664cda8"
+  name = "github.com/google/uuid"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "9b3b1e0f5f99ae461456d768e7d301a7acdaa2d8"
+  version = "v1.1.0"
+
+[[projects]]
   digest = "1:8eb1de8112c9924d59bf1d3e5c26f5eaa2bfc2a5fcbb92dc1c2e4546d695f277"
   name = "github.com/imdario/mergo"
   packages = ["."]
@@ -135,10 +143,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:605cec396faf0fad185c9333f64c6272e3a33e710b348263e93aceeb161887e4"
+  digest = "1:736a28ee0e271f4930aa731907185a1be88601b256106f3f784bde2f015262fc"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
+    "api/gin_jwt",
     "api/nice_error",
     "common/config",
     "common/config/coder/json",
@@ -151,13 +160,18 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "a8349da502cf55cbb39191529958c14ea0ea019f"
+  revision = "599d90c375ac02b5cf245e2db20cb56dc661ca2e"
 
 [[projects]]
   branch = "master"
-  digest = "1:38f553aff0273ad6f367cb0a0f8b6eecbaef8dc6cb8b50e57b6a81c1d5b1e332"
+  digest = "1:b06f45abbe7431aec373695c6cf9770a051fa4ac81ad31b3fa73ddf3bb76bb27"
   name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
+  packages = [
+    "ed25519",
+    "ed25519/internal/edwards25519",
+    "pbkdf2",
+    "ssh/terminal",
+  ]
   pruneopts = "UT"
   revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
 
@@ -276,6 +290,19 @@
   version = "v8.18.2"
 
 [[projects]]
+  digest = "1:550221cdc42e1ad44a1942d01c4135c30f6808b61dbad3c52d325e01d8e7cc07"
+  name = "gopkg.in/square/go-jose.v2"
+  packages = [
+    ".",
+    "cipher",
+    "json",
+    "jwt",
+  ]
+  pruneopts = "UT"
+  revision = "72415094398e2f013bf50b76fd6de36df47938ea"
+  version = "v2.2.1"
+
+[[projects]]
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
@@ -291,6 +318,7 @@
     "github.com/gin-gonic/gin",
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/api/clients",
+    "github.com/zhsyourai/teddy-backend/api/gin_jwt",
     "github.com/zhsyourai/teddy-backend/api/nice_error",
     "github.com/zhsyourai/teddy-backend/common/config",
     "github.com/zhsyourai/teddy-backend/common/config/source/file",

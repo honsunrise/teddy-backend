@@ -5,14 +5,13 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
+	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
 	"github.com/zhsyourai/teddy-backend/common/proto/content"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 )
-
-const uid = "5187196715"
 
 func buildSort(sort string) ([]*content.Sort, error) {
 	rawSorts := strings.Split(sort, ",")
@@ -62,10 +61,13 @@ func buildTags(tag string) ([]*content.TagAndType, error) {
 }
 
 type Content struct {
+	middleware *gin_jwt.JwtMiddleware
 }
 
-func NewContentHandler() (*Content, error) {
-	return &Content{}, nil
+func NewContentHandler(middleware *gin_jwt.JwtMiddleware) (*Content, error) {
+	return &Content{
+		middleware: middleware,
+	}, nil
 }
 
 func (h *Content) HandlerNormal(root gin.IRoutes) {
@@ -73,7 +75,6 @@ func (h *Content) HandlerNormal(root gin.IRoutes) {
 
 	root.GET("/info", h.GetAllInfos)
 	root.GET("/info/:id", h.GetInfoDetail)
-	root.POST("/info/:id/watch", h.WatchInfo)
 
 	root.GET("/info/:id/segment", h.GetAllSegments)
 	root.GET("/info/:id/segment/:segID", h.GetSegmentDetail)
@@ -129,6 +130,11 @@ func (h *Content) Search(ctx *gin.Context) {
 }
 
 func (h *Content) GetAllTags(ctx *gin.Context) {
+	principal := ""
+	authPayload, err := h.middleware.ExtractToken(ctx)
+	if err != gin_jwt.ErrContextNotHaveToken {
+		principal = authPayload["sub"].(string)
+	}
 	// extract the client from the context
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
@@ -160,6 +166,7 @@ func (h *Content) GetAllTags(ctx *gin.Context) {
 	}
 
 	resp, err := contentClient.GetTags(ctx, &content.GetTagReq{
+		Uid:   principal,
 		Type:  ctx.Query("type"),
 		Page:  uint32(page),
 		Size:  uint32(size),
@@ -209,6 +216,11 @@ func (h *Content) GetAllTags(ctx *gin.Context) {
 }
 
 func (h *Content) GetAllInfos(ctx *gin.Context) {
+	principal := ""
+	authPayload, err := h.middleware.ExtractToken(ctx)
+	if err != gin_jwt.ErrContextNotHaveToken {
+		principal = authPayload["sub"].(string)
+	}
 	// extract the client from the context
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
@@ -247,6 +259,7 @@ func (h *Content) GetAllInfos(ctx *gin.Context) {
 		}
 	}
 	resp, err := contentClient.GetInfos(ctx, &content.GetInfosReq{
+		Uid:   principal,
 		Page:  uint32(page),
 		Size:  uint32(size),
 		Tags:  tags,
@@ -276,22 +289,22 @@ func (h *Content) GetAllInfos(ctx *gin.Context) {
 		PublishTime     time.Time         `json:"publishTime"`
 		LastReviewTime  time.Time         `json:"lastReviewTime"`
 		Valid           bool              `json:"valid"`
-		WatchCount      int64             `json:"watchCount"`
+		WatchCount      uint64            `json:"watchCount"`
 		Tags            []*infoResultTag  `json:"tags"`
-		ThumbUp         int64             `json:"thumbUp"`
+		ThumbUp         uint64            `json:"thumbUps"`
 		IsThumbUp       bool              `json:"isThumbUp"`
 		ThumbUpList     []string          `json:"thumbUpList"`
-		ThumbDown       int64             `json:"thumbDown"`
+		ThumbDown       uint64            `json:"thumbDowns"`
 		IsThumbDown     bool              `json:"isThumbDown"`
 		ThumbDownList   []string          `json:"thumbDownList"`
-		Favorites       int64             `json:"favorites"`
+		Favorites       uint64            `json:"favorites"`
 		IsFavorite      bool              `json:"isFavorite"`
 		FavoriteList    []string          `json:"favoriteList"`
 		LastModifyTime  time.Time         `json:"lastModifyTime"`
 		CanReview       bool              `json:"canReview"`
 		Archived        bool              `json:"archived"`
 		LatestSegmentID string            `json:"latestSegmentID"`
-		SegmentCount    int64             `json:"segmentCount"`
+		SegmentCount    uint64            `json:"segmentCount"`
 	}
 	results := make([]*infoResult, 0, len(resp.Infos))
 	for _, info := range resp.Infos {
@@ -337,10 +350,10 @@ func (h *Content) GetAllInfos(ctx *gin.Context) {
 			Valid:           info.Valid,
 			WatchCount:      info.WatchCount,
 			Tags:            tags,
-			ThumbUp:         info.ThumbUp,
+			ThumbUp:         info.ThumbUps,
 			IsThumbUp:       info.IsThumbUp,
 			ThumbUpList:     info.ThumbUpList,
-			ThumbDown:       info.ThumbDown,
+			ThumbDown:       info.ThumbDowns,
 			IsThumbDown:     info.IsThumbDown,
 			ThumbDownList:   info.ThumbDownList,
 			Favorites:       info.Favorites,
@@ -361,6 +374,13 @@ func (h *Content) GetAllInfos(ctx *gin.Context) {
 }
 
 func (h *Content) PublishInfo(ctx *gin.Context) {
+	authPayload, err := h.middleware.ExtractToken(ctx)
+	if err == gin_jwt.ErrContextNotHaveToken {
+		ctx.Error(err)
+		return
+	}
+	principal := authPayload["sub"].(string)
+
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
@@ -393,9 +413,8 @@ func (h *Content) PublishInfo(ctx *gin.Context) {
 		})
 	}
 
-	//TODO: Get uid
-	_, err := contentClient.PublishInfo(ctx, &content.PublishInfoReq{
-		Uid:            uid,
+	_, err = contentClient.PublishInfo(ctx, &content.PublishInfoReq{
+		Uid:            principal,
 		Author:         req.Author,
 		Summary:        req.Summary,
 		Title:          req.Title,
@@ -415,6 +434,12 @@ func (h *Content) PublishInfo(ctx *gin.Context) {
 }
 
 func (h *Content) GetInfoDetail(ctx *gin.Context) {
+	principal := ""
+	authPayload, err := h.middleware.ExtractToken(ctx)
+	if err != gin_jwt.ErrContextNotHaveToken {
+		principal = authPayload["sub"].(string)
+	}
+
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
@@ -424,7 +449,7 @@ func (h *Content) GetInfoDetail(ctx *gin.Context) {
 	infoID := ctx.Param("id")
 	info, err := contentClient.GetInfo(ctx, &content.GetInfoReq{
 		InfoID: infoID,
-		Uid:    "7791850604",
+		Uid:    principal,
 	})
 
 	if err != nil {
@@ -450,22 +475,22 @@ func (h *Content) GetInfoDetail(ctx *gin.Context) {
 		PublishTime     time.Time         `json:"publishTime"`
 		LastReviewTime  time.Time         `json:"lastReviewTime"`
 		Valid           bool              `json:"valid"`
-		WatchCount      int64             `json:"watchCount"`
+		WatchCount      uint64            `json:"watchCount"`
 		Tags            []*infoResultTag  `json:"tags"`
-		ThumbUp         int64             `json:"thumbUp"`
+		ThumbUp         uint64            `json:"thumbUps"`
 		IsThumbUp       bool              `json:"isThumbUp"`
 		ThumbUpList     []string          `json:"thumbUpList"`
-		ThumbDown       int64             `json:"thumbDown"`
+		ThumbDown       uint64            `json:"thumbDowns"`
 		IsThumbDown     bool              `json:"isThumbDown"`
 		ThumbDownList   []string          `json:"thumbDownList"`
-		Favorites       int64             `json:"favorites"`
+		Favorites       uint64            `json:"favorites"`
 		IsFavorite      bool              `json:"isFavorite"`
 		FavoriteList    []string          `json:"favoriteList"`
 		LastModifyTime  time.Time         `json:"lastModifyTime"`
 		CanReview       bool              `json:"canReview"`
 		Archived        bool              `json:"archived"`
 		LatestSegmentID string            `json:"latestSegmentID"`
-		SegmentCount    int64             `json:"segmentCount"`
+		SegmentCount    uint64            `json:"segmentCount"`
 	}
 
 	publishTime, err := ptypes.Timestamp(info.PublishTime)
@@ -510,10 +535,10 @@ func (h *Content) GetInfoDetail(ctx *gin.Context) {
 		Valid:           info.Valid,
 		WatchCount:      info.WatchCount,
 		Tags:            tags,
-		ThumbUp:         info.ThumbUp,
+		ThumbUp:         info.ThumbUps,
 		IsThumbUp:       info.IsThumbUp,
 		ThumbUpList:     info.ThumbUpList,
-		ThumbDown:       info.ThumbDown,
+		ThumbDown:       info.ThumbDowns,
 		IsThumbDown:     info.IsThumbDown,
 		ThumbDownList:   info.ThumbDownList,
 		Favorites:       info.Favorites,
@@ -529,6 +554,13 @@ func (h *Content) GetInfoDetail(ctx *gin.Context) {
 }
 
 func (h *Content) UpdateInfo(ctx *gin.Context) {
+	authPayload, err := h.middleware.ExtractToken(ctx)
+	if err == gin_jwt.ErrContextNotHaveToken {
+		ctx.Error(err)
+		return
+	}
+	principal := authPayload["sub"].(string)
+
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
@@ -559,7 +591,8 @@ func (h *Content) UpdateInfo(ctx *gin.Context) {
 	}
 
 	infoID := ctx.Param("id")
-	_, err := contentClient.EditInfo(ctx, &content.EditInfoReq{
+	_, err = contentClient.EditInfo(ctx, &content.EditInfoReq{
+		Uid:            principal,
 		InfoID:         infoID,
 		Title:          req.Title,
 		Country:        req.Country,
@@ -578,6 +611,13 @@ func (h *Content) UpdateInfo(ctx *gin.Context) {
 }
 
 func (h *Content) DeleteInfo(ctx *gin.Context) {
+	authPayload, err := h.middleware.ExtractToken(ctx)
+	if err == gin_jwt.ErrContextNotHaveToken {
+		ctx.Error(err)
+		return
+	}
+	principal := authPayload["sub"].(string)
+
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
@@ -586,29 +626,8 @@ func (h *Content) DeleteInfo(ctx *gin.Context) {
 
 	infoID := ctx.Param("id")
 
-	_, err := contentClient.DeleteInfo(ctx, &content.InfoIDAndUIDReq{
-		InfoID: infoID,
-	})
-
-	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	ctx.Status(http.StatusOK)
-}
-
-func (h *Content) WatchInfo(ctx *gin.Context) {
-	contentClient, ok := clients.ContentFromContext(ctx)
-	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
-		return
-	}
-
-	infoID := ctx.Param("id")
-
-	_, err := contentClient.WatchInfo(ctx, &content.InfoIDAndUIDReq{
+	_, err = contentClient.DeleteInfo(ctx, &content.InfoIDAndUIDReq{
+		Uid:    principal,
 		InfoID: infoID,
 	})
 
@@ -623,6 +642,13 @@ func (h *Content) WatchInfo(ctx *gin.Context) {
 
 // For favorite
 func (h *Content) GetUserFavThumb(ctx *gin.Context) {
+	authPayload, err := h.middleware.ExtractToken(ctx)
+	if err == gin_jwt.ErrContextNotHaveToken {
+		ctx.Error(err)
+		return
+	}
+	principal := authPayload["sub"].(string)
+
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
@@ -659,21 +685,21 @@ func (h *Content) GetUserFavThumb(ctx *gin.Context) {
 			Page:  uint32(page),
 			Size:  uint32(size),
 			Sorts: sorts,
-			Uid:   uid,
+			Uid:   principal,
 		})
 	} else if strings.Contains(ctx.Request.RequestURI, "thumbUp") {
 		resp, err = contentClient.GetUserThumbUp(ctx, &content.UIDPageReq{
 			Page:  uint32(page),
 			Size:  uint32(size),
 			Sorts: sorts,
-			Uid:   uid,
+			Uid:   principal,
 		})
 	} else {
 		resp, err = contentClient.GetUserThumbDown(ctx, &content.UIDPageReq{
 			Page:  uint32(page),
 			Size:  uint32(size),
 			Sorts: sorts,
-			Uid:   uid,
+			Uid:   principal,
 		})
 	}
 
@@ -687,6 +713,12 @@ func (h *Content) GetUserFavThumb(ctx *gin.Context) {
 }
 
 func (h *Content) GetInfoFavThumb(ctx *gin.Context) {
+	//principal := ""
+	//authPayload, err := h.middleware.ExtractToken(ctx)
+	//if err != gin_jwt.ErrContextNotHaveToken {
+	//	principal = authPayload["sub"].(string)
+	//}
+
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
@@ -751,29 +783,34 @@ func (h *Content) GetInfoFavThumb(ctx *gin.Context) {
 }
 
 func (h *Content) FavThumb(ctx *gin.Context) {
+	authPayload, err := h.middleware.ExtractToken(ctx)
+	if err == gin_jwt.ErrContextNotHaveToken {
+		ctx.Error(err)
+		return
+	}
+	principal := authPayload["sub"].(string)
+
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
 
-	//TODO: fill uid
-	var err error
 	infoID := ctx.Param("id")
 	if strings.Contains(ctx.Request.RequestURI, "favorite") {
 		_, err = contentClient.Favorite(ctx, &content.InfoIDAndUIDReq{
 			InfoID: infoID,
-			Uid:    uid,
+			Uid:    principal,
 		})
 	} else if strings.Contains(ctx.Request.RequestURI, "thumbUp") {
 		_, err = contentClient.ThumbUp(ctx, &content.InfoIDAndUIDReq{
 			InfoID: infoID,
-			Uid:    uid,
+			Uid:    principal,
 		})
 	} else {
 		_, err = contentClient.ThumbDown(ctx, &content.InfoIDAndUIDReq{
 			InfoID: infoID,
-			Uid:    uid,
+			Uid:    principal,
 		})
 	}
 
@@ -787,29 +824,34 @@ func (h *Content) FavThumb(ctx *gin.Context) {
 }
 
 func (h *Content) DeleteFavThumb(ctx *gin.Context) {
+	authPayload, err := h.middleware.ExtractToken(ctx)
+	if err == gin_jwt.ErrContextNotHaveToken {
+		ctx.Error(err)
+		return
+	}
+	principal := authPayload["sub"].(string)
+
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
 
-	//TODO: fill uid
-	var err error
 	infoID := ctx.Param("id")
 	if strings.Contains(ctx.Request.RequestURI, "favorite") {
 		_, err = contentClient.DeleteFavorite(ctx, &content.InfoIDAndUIDReq{
 			InfoID: infoID,
-			Uid:    uid,
+			Uid:    principal,
 		})
 	} else if strings.Contains(ctx.Request.RequestURI, "thumbUp") {
 		_, err = contentClient.DeleteThumbUp(ctx, &content.InfoIDAndUIDReq{
 			InfoID: infoID,
-			Uid:    uid,
+			Uid:    principal,
 		})
 	} else {
-		_, err = contentClient.DeleteThumbUp(ctx, &content.InfoIDAndUIDReq{
+		_, err = contentClient.DeleteThumbDown(ctx, &content.InfoIDAndUIDReq{
 			InfoID: infoID,
-			Uid:    uid,
+			Uid:    principal,
 		})
 	}
 
@@ -823,6 +865,12 @@ func (h *Content) DeleteFavThumb(ctx *gin.Context) {
 }
 
 func (h *Content) GetAllSegments(ctx *gin.Context) {
+	principal := ""
+	authPayload, err := h.middleware.ExtractToken(ctx)
+	if err != gin_jwt.ErrContextNotHaveToken {
+		principal = authPayload["sub"].(string)
+	}
+
 	// extract the client from the context
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
@@ -859,6 +907,7 @@ func (h *Content) GetAllSegments(ctx *gin.Context) {
 
 	infoID := ctx.Param("id")
 	resp, err := contentClient.GetSegments(ctx, &content.GetSegmentsReq{
+		Uid:    principal,
 		InfoID: infoID,
 		Labels: labels,
 		Page:   uint32(page),
@@ -899,6 +948,12 @@ func (h *Content) GetAllSegments(ctx *gin.Context) {
 }
 
 func (h *Content) GetSegmentDetail(ctx *gin.Context) {
+	principal := ""
+	authPayload, err := h.middleware.ExtractToken(ctx)
+	if err != gin_jwt.ErrContextNotHaveToken {
+		principal = authPayload["sub"].(string)
+	}
+
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
@@ -909,6 +964,7 @@ func (h *Content) GetSegmentDetail(ctx *gin.Context) {
 	segID := ctx.Param("segID")
 
 	seg, err := contentClient.GetSegment(ctx, &content.InfoIDAndUIDAndSegIDReq{
+		Uid:    principal,
 		InfoID: infoID,
 		SegID:  segID,
 	})
@@ -940,6 +996,13 @@ func (h *Content) GetSegmentDetail(ctx *gin.Context) {
 }
 
 func (h *Content) PublishSegment(ctx *gin.Context) {
+	authPayload, err := h.middleware.ExtractToken(ctx)
+	if err == gin_jwt.ErrContextNotHaveToken {
+		ctx.Error(err)
+		return
+	}
+	principal := authPayload["sub"].(string)
+
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
@@ -955,7 +1018,8 @@ func (h *Content) PublishSegment(ctx *gin.Context) {
 	var req publishSegmentReq
 	ctx.Bind(&req)
 
-	_, err := contentClient.PublishSegment(ctx, &content.PublishSegmentReq{
+	_, err = contentClient.PublishSegment(ctx, &content.PublishSegmentReq{
+		Uid:     principal,
 		InfoID:  req.InfoID,
 		No:      req.No,
 		Labels:  req.Labels,
@@ -972,6 +1036,13 @@ func (h *Content) PublishSegment(ctx *gin.Context) {
 }
 
 func (h *Content) UpdateSegment(ctx *gin.Context) {
+	authPayload, err := h.middleware.ExtractToken(ctx)
+	if err == gin_jwt.ErrContextNotHaveToken {
+		ctx.Error(err)
+		return
+	}
+	principal := authPayload["sub"].(string)
+
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
@@ -989,7 +1060,8 @@ func (h *Content) UpdateSegment(ctx *gin.Context) {
 	infoID := ctx.Param("id")
 	segID := ctx.Param("segID")
 
-	_, err := contentClient.EditSegment(ctx, &content.EditSegmentReq{
+	_, err = contentClient.EditSegment(ctx, &content.EditSegmentReq{
+		Uid:     principal,
 		InfoID:  infoID,
 		SegID:   segID,
 		No:      req.No,
@@ -1007,6 +1079,13 @@ func (h *Content) UpdateSegment(ctx *gin.Context) {
 }
 
 func (h *Content) DeleteSegment(ctx *gin.Context) {
+	authPayload, err := h.middleware.ExtractToken(ctx)
+	if err == gin_jwt.ErrContextNotHaveToken {
+		ctx.Error(err)
+		return
+	}
+	principal := authPayload["sub"].(string)
+
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
 		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
@@ -1016,7 +1095,8 @@ func (h *Content) DeleteSegment(ctx *gin.Context) {
 	infoID := ctx.Param("id")
 	segID := ctx.Param("segID")
 
-	_, err := contentClient.DeleteSegment(ctx, &content.InfoIDAndUIDAndSegIDReq{
+	_, err = contentClient.DeleteSegment(ctx, &content.InfoIDAndUIDAndSegIDReq{
+		Uid:    principal,
 		InfoID: infoID,
 		SegID:  segID,
 	})

@@ -2,13 +2,10 @@ package handler
 
 import (
 	"context"
-	"crypto"
-	"encoding/base64"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
-	"github.com/lestrrat-go/jwx/jwk"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
@@ -21,11 +18,13 @@ import (
 
 type Uaa struct {
 	generator *gin_jwt.JwtGenerator
+	middle    *gin_jwt.JwtMiddleware
 }
 
-func NewUaaHandler(generator *gin_jwt.JwtGenerator) (*Uaa, error) {
+func NewUaaHandler(middle *gin_jwt.JwtMiddleware, generator *gin_jwt.JwtGenerator) (*Uaa, error) {
 	instance := &Uaa{
 		generator: generator,
+		middle:    middle,
 	}
 	return instance, nil
 }
@@ -33,7 +32,6 @@ func NewUaaHandler(generator *gin_jwt.JwtGenerator) (*Uaa, error) {
 func (h *Uaa) HandlerNormal(root gin.IRoutes) {
 	root.POST("/register", h.Register)
 	root.POST("/login", h.Login)
-	root.POST("/changePassword", h.ChangePassword)
 	root.POST("/sendEmailCaptcha", h.SendEmailCaptcha)
 	root.POST("/resetPassword", h.ResetPassword)
 	root.GET("/jwks.json", h.JWKsJSON)
@@ -42,7 +40,6 @@ func (h *Uaa) HandlerNormal(root gin.IRoutes) {
 func (h *Uaa) HandlerAuth(root gin.IRoutes) {
 	root.Any("/logout", h.Logout)
 	root.POST("/changePassword", h.ChangePassword)
-	root.POST("/resetPassword", h.ResetPassword)
 }
 
 func (h *Uaa) HandlerHealth(root gin.IRoutes) {
@@ -187,8 +184,7 @@ func (h *Uaa) Login(ctx *gin.Context) {
 		return
 	}
 
-	token, err := h.generator.GenerateJwt(24*time.Hour, 72*time.Hour, jwt.MapClaims{
-		"uid":      response.Uid,
+	token, err := h.generator.GenerateJwt(24*time.Hour, response.Uid, []string{"uaa", "content", "message"}, jwt.MapClaims{
 		"username": response.Username,
 		"roles":    response.Roles,
 	})
@@ -209,16 +205,23 @@ func (h *Uaa) Logout(ctx *gin.Context) {
 }
 
 func (h *Uaa) ChangePassword(ctx *gin.Context) {
+	authPayload, err := h.middle.ExtractToken(ctx)
+	if err == gin_jwt.ErrContextNotHaveToken {
+		ctx.Error(err)
+		return
+	}
+	principal := authPayload["sub"].(string)
+	// roles := authPayload["roles"].([]string)
+
 	// parse body
 	type changePasswordReq struct {
-		Principal       string `json:"principal"`
 		OldPassword     string `json:"old_password"`
 		NewPassword     string `json:"new_password"`
 		CaptchaId       string `json:"captcha_id"`
 		CaptchaSolution string `json:"captcha_solution"`
 	}
 	var body changePasswordReq
-	err := ctx.Bind(&body)
+	err = ctx.Bind(&body)
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -257,7 +260,7 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 	timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	_, err = uaaClient.ChangePassword(timeoutCtx, &uaa.ChangePasswordReq{
-		Principal:   body.Principal,
+		Principal:   principal,
 		NewPassword: body.NewPassword,
 		OldPassword: body.OldPassword,
 	})
@@ -374,23 +377,5 @@ func (h *Uaa) ResetPassword(ctx *gin.Context) {
 }
 
 func (h *Uaa) JWKsJSON(ctx *gin.Context) {
-	privKey, err := h.generator.GetJwtPublishKey()
-	if err != nil {
-		ctx.Error(err)
-		return
-	}
-	key, err := jwk.New(privKey)
-	if err != nil {
-		ctx.Error(err)
-		return
-	}
-	thumbPrint, err := key.Thumbprint(crypto.SHA256)
-	if err != nil {
-		ctx.Error(err)
-		return
-	}
-	key.Set(jwk.KeyIDKey, base64.URLEncoding.EncodeToString(thumbPrint))
-	ctx.JSON(http.StatusOK, gin.H{
-		"keys": []*jwk.Key{&key},
-	})
+	ctx.Data(http.StatusOK, "application/json; charset=utf-8", h.generator.GetJwks())
 }
