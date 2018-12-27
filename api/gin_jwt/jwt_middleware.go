@@ -13,37 +13,32 @@ const DefaultContextKey = "_JWT_TOKEN_KEY_"
 const DefaultLeeway = 1.0 * time.Minute
 
 type MiddlewareConfig struct {
-	Realm string
-
+	Realm            string
 	SigningAlgorithm jose.SignatureAlgorithm
-
-	KeyFunc func() interface{}
-
-	NowFunc func() time.Time
-
-	ErrorHandler func(ctx *gin.Context, err error)
-
-	TokenLookup string
-
-	ContextKey string
-
-	Audience []string
-	Issuer   string
-	Subject  string
-	ID       string
-	Time     time.Time
+	KeyFunc          func() interface{}
+	NowFunc          func() time.Time
+	ErrorHandler     func(ctx *gin.Context, err error)
+	TokenLookup      string
+	ContextKey       string
+	IsOptional       bool
+	Audience         []string
+	Issuer           string
+	Subject          string
+	ID               string
+	Time             time.Time
 }
 
 type JwtMiddleware struct {
-	config   MiddlewareConfig
-	key      interface{}
-	priKey   interface{}
-	nowFunc  func() time.Time
-	audience []string
-	issuer   string
-	subject  string
-	id       string
-	time     time.Time
+	config     MiddlewareConfig
+	key        interface{}
+	priKey     interface{}
+	nowFunc    func() time.Time
+	audience   []string
+	isOptional bool
+	issuer     string
+	subject    string
+	id         string
+	time       time.Time
 }
 
 func NewGinJwtMiddleware(config MiddlewareConfig) (*JwtMiddleware, error) {
@@ -79,26 +74,29 @@ func NewGinJwtMiddleware(config MiddlewareConfig) (*JwtMiddleware, error) {
 	}
 
 	return &JwtMiddleware{
-		config:   config,
-		key:      config.KeyFunc(),
-		nowFunc:  config.NowFunc,
-		audience: config.Audience,
-		issuer:   config.Issuer,
-		subject:  config.Subject,
-		id:       config.ID,
-		time:     config.Time,
+		config:     config,
+		key:        config.KeyFunc(),
+		nowFunc:    config.NowFunc,
+		audience:   config.Audience,
+		issuer:     config.Issuer,
+		subject:    config.Subject,
+		isOptional: config.IsOptional,
+		id:         config.ID,
+		time:       config.Time,
 	}, nil
 }
 
 func (m *JwtMiddleware) Handler(ctx *gin.Context) {
 	token, err := m.extractToken(ctx)
 
-	if err != nil {
+	if !m.isOptional && err != nil {
 		m.config.ErrorHandler(ctx, err)
 		return
 	}
 
-	ctx.Set(m.config.ContextKey, token)
+	if err == nil {
+		ctx.Set(m.config.ContextKey, token)
+	}
 
 	ctx.Next()
 }
