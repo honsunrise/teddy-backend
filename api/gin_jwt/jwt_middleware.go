@@ -154,7 +154,13 @@ func (m *JwtMiddleware) extractToken(ctx *gin.Context) (map[string]interface{}, 
 	}
 
 	if len(m.audience) != 0 {
-		if aud, ok := c["aud"].([]string); ok {
+		if tmp, ok := c["aud"].([]interface{}); ok {
+			aud := make([]string, len(tmp))
+			for i, v := range tmp {
+				if aud[i], ok = v.(string); !ok {
+					return nil, ErrTokenInvalid
+				}
+			}
 			for _, v := range m.audience {
 				find := false
 				for _, a := range aud {
