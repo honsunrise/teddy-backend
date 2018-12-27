@@ -91,15 +91,15 @@ message Info {
     map<string, string> coverResources = 8;
     google.protobuf.Timestamp publishTime = 9;
     google.protobuf.Timestamp lastReviewTime = 10;
-    int64 watchCount = 11;
+    uint64 watchCount = 11;
     repeated TagAndType tags = 12;
-    int64 thumbUp = 13;
+    uint64 thumbUps = 13;
     bool isThumbUp = 14;
     repeated string thumbUpList = 15;
-    int64 thumbDown = 16;
+    uint64 thumbDowns = 16;
     bool isThumbDown = 17;
     repeated string thumbDownList = 18;
-    int64 favorites = 19;
+    uint64 favorites = 19;
     bool isFavorite = 20;
     repeated string favoriteList = 21;
     google.protobuf.Timestamp lastModifyTime = 22;
@@ -107,7 +107,7 @@ message Info {
     bool valid = 24;
     bool archived = 25;
     string LatestSegmentID = 26;
-    int64 SegmentCount = 27;
+    uint64 SegmentCount = 27;
 }
 
 message Segment {
