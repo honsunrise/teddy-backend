@@ -436,11 +436,20 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *content.PublishIn
 			}
 		}
 
+		if exists, err := h.infoRepo.ExistsByTitleAndAuthorAndCountry(sessionContext,
+			req.Title, req.Author, req.Country); err != nil {
+			return err
+		} else if exists {
+			return ErrInfoExists
+		}
+
 		info := models.Info{
 			ID:               objectid.New(),
 			UID:              req.Uid,
 			Title:            req.Title,
+			Author:           req.Author,
 			Country:          req.Country,
+			Summary:          req.Summary,
 			CoverResources:   req.CoverResources,
 			PublishTime:      now,
 			LastReviewTime:   time.Now(),

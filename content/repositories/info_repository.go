@@ -12,6 +12,7 @@ import (
 type InfoRepository interface {
 	Insert(ctx mongo.SessionContext, info *models.Info) error
 	IncWatchCount(ctx mongo.SessionContext, id objectid.ObjectID, count int64) error
+	ExistsByTitleAndAuthorAndCountry(ctx mongo.SessionContext, title, author, country string) (bool, error)
 	FindOne(ctx mongo.SessionContext, id objectid.ObjectID) (*models.Info, error)
 	FindAll(ctx mongo.SessionContext, uid string, tags []*models.TypeAndTag,
 		page uint32, size uint32, sorts []*content.Sort) ([]*models.Info, uint64, error)
@@ -27,6 +28,22 @@ func NewInfoRepository(client *mongo.Client) (InfoRepository, error) {
 
 type infoRepository struct {
 	collections *mongo.Collection
+}
+
+func (repo *infoRepository) ExistsByTitleAndAuthorAndCountry(ctx mongo.SessionContext,
+	title, author, country string) (bool, error) {
+	filter := bson.D{
+		{"title", title},
+		{"author", author},
+		{"country", country},
+	}
+	err := repo.collections.FindOne(ctx, filter).Decode(nil)
+	if err == mongo.ErrNoDocuments {
+		return false, nil
+	} else if err == nil {
+		return true, nil
+	}
+	return false, err
 }
 
 func (repo *infoRepository) Insert(ctx mongo.SessionContext, info *models.Info) error {
