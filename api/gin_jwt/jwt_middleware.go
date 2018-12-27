@@ -24,7 +24,6 @@ type MiddlewareConfig struct {
 	Issuer           string
 	Subject          string
 	ID               string
-	Time             time.Time
 }
 
 type JwtMiddleware struct {
@@ -36,7 +35,6 @@ type JwtMiddleware struct {
 	issuer   string
 	subject  string
 	id       string
-	time     time.Time
 }
 
 func NewGinJwtMiddleware(config MiddlewareConfig) (*JwtMiddleware, error) {
@@ -79,7 +77,6 @@ func NewGinJwtMiddleware(config MiddlewareConfig) (*JwtMiddleware, error) {
 		issuer:   config.Issuer,
 		subject:  config.Subject,
 		id:       config.ID,
-		time:     config.Time,
 	}, nil
 }
 
@@ -174,16 +171,14 @@ func (m *JwtMiddleware) extractToken(ctx *gin.Context) (map[string]interface{}, 
 		}
 	}
 
-	if !m.time.IsZero() {
-		if nbf, ok := c["nbf"].(int64); !ok || m.time.Add(DefaultLeeway).Before(time.Unix(nbf, 0)) {
-			return nil, ErrTokenInvalid
-		}
+	now := m.nowFunc()
+	if nbf, ok := c["nbf"].(int64); !ok || now.Add(DefaultLeeway).Before(time.Unix(nbf, 0)) {
+		return nil, ErrTokenInvalid
 	}
 
-	if !m.time.IsZero() {
-		if exp, ok := c["exp"].(int64); !ok || m.time.Add(-DefaultLeeway).After(time.Unix(exp, 0)) {
-			return nil, ErrTokenInvalid
-		}
+	if exp, ok := c["exp"].(int64); !ok || now.Add(-DefaultLeeway).After(time.Unix(exp, 0)) {
+		return nil, ErrTokenInvalid
 	}
+
 	return c, nil
 }
