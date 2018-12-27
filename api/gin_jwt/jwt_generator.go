@@ -2,17 +2,19 @@ package gin_jwt
 
 import (
 	"crypto"
-	"crypto/ecdsa"
-	"crypto/rsa"
+	"encoding/json"
 	"github.com/google/uuid"
-	"gopkg.in/dgrijalva/jwt-go.v3"
+	"gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2/jwt"
 	"time"
 )
 
 type GeneratorConfig struct {
 	Issuer string
 
-	SigningAlgorithm string
+	Subject string
+
+	SigningAlgorithm jose.SignatureAlgorithm
 
 	KeyFunc func() interface{}
 
@@ -21,7 +23,8 @@ type GeneratorConfig struct {
 
 type JwtGenerator struct {
 	config GeneratorConfig
-	key    interface{}
+	jwks   string
+	signer jose.Signer
 }
 
 func NewGinJwtGenerator(config GeneratorConfig) (*JwtGenerator, error) {
@@ -37,70 +40,60 @@ func NewGinJwtGenerator(config GeneratorConfig) (*JwtGenerator, error) {
 		config.NowFunc = time.Now
 	}
 
-	var realKey interface{}
-	switch config.SigningAlgorithm {
-	case "RS256", "RS384", "RS512":
-		if pubKey, ok := config.KeyFunc().(*rsa.PrivateKey); ok {
-			realKey = pubKey
-		} else {
-			return nil, ErrInvalidKey
-		}
-	case "EC256", "EC384", "EC512":
-		if pubKey, ok := config.KeyFunc().(*ecdsa.PrivateKey); ok {
-			realKey = pubKey
-		} else {
-			return nil, ErrInvalidKey
-		}
-	case "HS256", "HS384", "HS512":
-		if key, ok := config.KeyFunc().([]byte); ok {
-			realKey = key
-		} else {
-			return nil, ErrInvalidKey
-		}
-	default:
-		return nil, ErrNotSupportSigningAlgorithm
+	signer, err := jose.NewSigner(jose.SigningKey{Algorithm: config.SigningAlgorithm, Key: config.KeyFunc()}, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	jwk := jose.JSONWebKey{
+		Key: config.KeyFunc(),
+	}
+
+	thumbprint, err := jwk.Thumbprint(crypto.SHA256)
+	if err != nil {
+		return nil, err
+	}
+	jwk.KeyID = string(thumbprint)
+
+	jwks := jose.JSONWebKeySet{
+		Keys: []jose.JSONWebKey{jwk.Public()},
+	}
+
+	jwksResult, err := json.Marshal(jwks)
+	if err != nil {
+		return nil, err
 	}
 
 	return &JwtGenerator{
 		config: config,
-		key:    realKey,
+		jwks:   string(jwksResult),
+		signer: signer,
 	}, nil
 }
 
-func (g *JwtGenerator) GenerateJwt(timeout time.Duration,
-	refresh time.Duration, claims map[string]interface{}) (string, error) {
+func (g *JwtGenerator) GetJwk() string {
+	return g.jwks
+}
+
+func (g *JwtGenerator) GenerateJwt(timeout time.Duration, audience []string,
+	claims map[string]interface{}) (string, error) {
 	now := g.config.NowFunc()
 	expire := now.Add(timeout)
-	finalClaims := jwt.MapClaims{
-		"exp": expire.Unix(),
-		"jti": uuid.Must(uuid.NewRandom()).String(),
-		"iat": now.Unix(),
-		"iss": g.config.Issuer,
-		"nbf": now.Unix(),
-	}
-
-	for key := range claims {
-		finalClaims[key] = claims[key]
-	}
-
-	// Create the token
-	token := jwt.NewWithClaims(jwt.GetSigningMethod(g.config.SigningAlgorithm), finalClaims)
-
-	tokenString, err := token.SignedString(g.key)
+	tokenString, err := jwt.Signed(g.signer).
+		Claims(jwt.Claims{
+			ID:        uuid.Must(uuid.NewRandom()).String(),
+			Subject:   g.config.Subject,
+			Issuer:    g.config.Issuer,
+			Audience:  audience,
+			Expiry:    jwt.NewNumericDate(expire),
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
+		}).
+		Claims(claims).
+		FullSerialize()
 	if err != nil {
 		return "", err
 	} else {
 		return tokenString, nil
-	}
-}
-
-func (g *JwtGenerator) GetJwtPublishKey() (crypto.PublicKey, error) {
-	switch g.key.(type) {
-	case *rsa.PrivateKey:
-		return g.key.(*rsa.PrivateKey).Public(), nil
-	case *ecdsa.PrivateKey:
-		return g.key.(*ecdsa.PrivateKey).Public(), nil
-	default:
-		return nil, ErrInvalidKey
 	}
 }
