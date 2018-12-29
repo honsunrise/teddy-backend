@@ -12,7 +12,7 @@ service Content {
 
     rpc PublishInfo (PublishInfoReq) returns (google.protobuf.Empty) {}
     rpc EditInfo (EditInfoReq) returns (google.protobuf.Empty) {}
-    rpc GetInfo (InfoOneReq) returns (Info) {}
+    rpc GetInfo (GetInfoReq) returns (Info) {}
     rpc GetInfos (GetInfosReq) returns (GetInfosResp) {}
     rpc DeleteInfo (InfoOneReq) returns (google.protobuf.Empty) {}
     rpc WatchInfo (InfoOneReq) returns (google.protobuf.Empty) {}
@@ -136,13 +136,14 @@ message PublishInfoReq {
 
 message EditInfoReq {
     string infoID = 1;
-    string author = 2;
-    string title = 3;
-    string summary = 4;
-    string country = 5;
-    repeated TagAndType tags = 6;
-    map<string, string> coverResources = 7;
-    bool canReview = 8;
+    string uid = 2;
+    string author = 3;
+    string title = 4;
+    string summary = 5;
+    string country = 6;
+    repeated TagAndType tags = 7;
+    map<string, string> coverResources = 8;
+    bool canReview = 9;
 }
 
 message GetSegmentsReq {
@@ -201,12 +202,18 @@ message ContentOneReq {
     string contID = 4;
 }
 
+message GetInfoReq {
+    string uid = 1;
+    string infoID = 2;
+}
+
 message GetInfosReq {
-    uint32 page = 1;
-    uint32 size = 2;
-    repeated Sort sorts = 3;
-    string title = 4;
-    repeated TagAndType tags = 5;
+    string uid = 1;
+    uint32 page = 2;
+    uint32 size = 3;
+    repeated Sort sorts = 4;
+    string title = 5;
+    repeated TagAndType tags = 6;
 }
 
 message GetInfosResp {
