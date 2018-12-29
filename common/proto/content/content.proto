@@ -23,7 +23,7 @@ service Content {
     rpc EditSegment (EditSegmentReq) returns (google.protobuf.Empty) {}
     rpc DeleteSegment (SegmentOneReq) returns (google.protobuf.Empty) {}
 
-    rpc PublishContent (InsertContentReq) returns (google.protobuf.Empty) {}
+    rpc InsertContent (InsertContentReq) returns (google.protobuf.Empty) {}
     rpc EditContent (EditContentReq) returns (google.protobuf.Empty) {}
     rpc DeleteContent (ContentOneReq) returns (google.protobuf.Empty) {}
 
