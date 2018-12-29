@@ -118,8 +118,6 @@ func (repo *infoRepository) internalFindInfo(ctx mongo.SessionContext, uid strin
 	}
 	totalCount := elem.Count
 
-	pipeline = append(pipeline, bson.D{{"$skip", int64(size * page)}})
-	pipeline = append(pipeline, bson.D{{"$limit", int64(size)}})
 	var itemsSorts = make(bson.D, 0, len(sorts))
 	if len(sorts) != 0 {
 		for _, sort := range sorts {
@@ -131,6 +129,8 @@ func (repo *infoRepository) internalFindInfo(ctx mongo.SessionContext, uid strin
 		}
 		pipeline = append(pipeline, bson.D{{"$sort", itemsSorts}})
 	}
+	pipeline = append(pipeline, bson.D{{"$skip", int64(size * page)}})
+	pipeline = append(pipeline, bson.D{{"$limit", int64(size)}})
 	cur, err = repo.collections.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, 0, err

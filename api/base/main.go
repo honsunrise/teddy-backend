@@ -55,7 +55,13 @@ func main() {
 
 	// Create RESTful server (using Gin)
 	router := gin.Default()
-	router.Use(cors.Default())
+	router.Use(cors.New(cors.Config{
+		AllowMethods:     []string{"GET", "POST", "PUT", "HEAD", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+		AllowAllOrigins:  true,
+		MaxAge:           24 * time.Hour,
+	}))
 	router.Use(clients.CaptchaNew(captchaSrvAddrFunc))
 	router.Use(nice_error.NewNiceError())
 	base.HandlerNormal(router.Group("/v1/anon/base").Use(jwtMiddleware.Handler(true)))

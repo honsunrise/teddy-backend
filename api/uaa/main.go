@@ -94,7 +94,13 @@ func main() {
 
 		log.Infof("PATH %s HEADERS %v", path, ctx.Request.Header)
 	})
-	router.Use(cors.Default())
+	router.Use(cors.New(cors.Config{
+		AllowMethods:     []string{"GET", "POST", "PUT", "HEAD", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+		AllowAllOrigins:  true,
+		MaxAge:           24 * time.Hour,
+	}))
 	router.Use(clients.MessageNew(messageSrvAddrFunc))
 	router.Use(clients.UaaNew(uaaSrvAddrFunc))
 	router.Use(clients.CaptchaNew(captchaSrvAddrFunc))

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-contrib/cors"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/api/message/handler"
@@ -40,6 +41,13 @@ func main() {
 
 	// Create RESTful server (using Gin)
 	router := gin.Default()
+	router.Use(cors.New(cors.Config{
+		AllowMethods:     []string{"GET", "POST", "PUT", "HEAD", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+		AllowAllOrigins:  true,
+		MaxAge:           24 * time.Hour,
+	}))
 	router.Use(clients.MessageNew(messageSrvAddrFunc))
 	message.HandlerNormal(router.Group("/v1/anon/message"))
 	message.HandlerAuth(router.Group("/v1/auth/message"))

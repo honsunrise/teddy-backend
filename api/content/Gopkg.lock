@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  digest = "1:6f9339c912bbdda81302633ad7e99a28dfa5a639c864061f1929510a9a64aa74"
+  name = "github.com/dustin/go-humanize"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "9f541cc9db5d55bce703bd99987c9d5cb8eea45e"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:abeb38ade3f32a92943e5be54f55ed6d6e3b6602761d74b4aab4c9dd45c18abd"
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
@@ -45,6 +53,14 @@
   pruneopts = "UT"
   revision = "b869fe1415e4b9eb52f247441830d502aece2d4d"
   version = "v1.3.0"
+
+[[projects]]
+  digest = "1:c914c5f07b45352e70e55d147661667b45e69f01e4ba94ddd260d62a4c0b1aa9"
+  name = "github.com/go-ini/ini"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a9da9309fb4822643ceebb765f80025c35ac19a1"
+  version = "v1.40.0"
 
 [[projects]]
   digest = "1:5ac24c0ad5dc117fb2b6d90d205c876ec599c09cccb702a36586680e09cb20b5"
@@ -102,6 +118,29 @@
   version = "v0.0.4"
 
 [[projects]]
+  digest = "1:ce1c41ebdf4761c8c1336e967b822568534342bf836ad56fee476b102653cec3"
+  name = "github.com/minio/minio-go"
+  packages = [
+    ".",
+    "pkg/credentials",
+    "pkg/encrypt",
+    "pkg/s3signer",
+    "pkg/s3utils",
+    "pkg/set",
+  ]
+  pruneopts = "UT"
+  revision = "39381cf62425050629c7264228fc2f9e0c6616f6"
+  version = "v6.0.11"
+
+[[projects]]
+  digest = "1:78bbb1ba5b7c3f2ed0ea1eab57bdd3859aec7e177811563edc41198a760b06af"
+  name = "github.com/mitchellh/go-homedir"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ae18d6b8b3205b561c79e8e5f69bff09736185f4"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:53bc4cd4914cd7cd52139990d5170d6dc99067ae31c56530621b18b35fc30318"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
@@ -143,7 +182,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4bd14cfef16692891639a8a95bea25a4f2fd607f8769206abe745fac3a098128"
+  digest = "1:13d5240b65cfc7a5894963c84655fc2531bd43efb6bf87df47822461736f9787"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
@@ -159,13 +198,15 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "274b29d6f15f6438bb44fb2cce4c7273b196fc80"
+  revision = "2fb05d9d1bf8bbafbe2a4fbd3693fc678395dbba"
 
 [[projects]]
   branch = "master"
-  digest = "1:b06f45abbe7431aec373695c6cf9770a051fa4ac81ad31b3fa73ddf3bb76bb27"
+  digest = "1:6196b76cc185c4e43faac856e2358ef2e45756fb5cb8ca087fc5e29ab30bc091"
   name = "golang.org/x/crypto"
   packages = [
+    "argon2",
+    "blake2b",
     "ed25519",
     "ed25519/internal/edwards25519",
     "pbkdf2",
@@ -200,14 +241,15 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3d5e79e10549fd9119cbefd614b6d351ef5bd0be2f2b103a4199788e784cbc68"
+  digest = "1:aa9c91c18e69320666ef54b345fbd9fc110452c24fb3361497d1b619dd696521"
   name = "golang.org/x/sys"
   packages = [
+    "cpu",
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "b4a75ba826a64a70990f11a225237acd6ef35c9f"
+  revision = "9a3f9b0469bbc6b8802087ae5c0af9f61502de01"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -316,6 +358,7 @@
     "github.com/gin-contrib/cors",
     "github.com/gin-gonic/gin",
     "github.com/golang/protobuf/ptypes",
+    "github.com/minio/minio-go",
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/api/clients",
     "github.com/zhsyourai/teddy-backend/api/gin_jwt",

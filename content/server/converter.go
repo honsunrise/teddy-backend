@@ -36,6 +36,19 @@ func copyFromSegmentToPBSegment(tag *models.Segment, pbtag *content.Segment) err
 	pbtag.No = tag.No
 	pbtag.Title = tag.Title
 	pbtag.Labels = tag.Labels
-	pbtag.Content = tag.Content
+	return nil
+}
+
+func copyFromValueToPBValue(value *models.Value, pbValue *content.Value) error {
+	if value == nil || pbValue == nil {
+		return nil
+	}
+	pbValue.Id = value.ID
+	tmp, err := ptypes.TimestampProto(value.Time)
+	if err != nil {
+		return err
+	}
+	pbValue.Time = tmp
+	pbValue.Value = value.Value
 	return nil
 }

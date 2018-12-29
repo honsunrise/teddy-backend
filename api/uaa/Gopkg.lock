@@ -151,7 +151,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:dfacd22bed80a7d7c150b6671730b99dea3ca35d007aee0aa47b221fc95a79e4"
+  digest = "1:5438f09bd1f184dd42cb5ebda6e5f4740d9a99ffc71f785d27c7bafaac3c4924"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
@@ -168,7 +168,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "f82b91e05636d01b80fd367f7e7def1f9588d2c8"
+  revision = "2fb05d9d1bf8bbafbe2a4fbd3693fc678395dbba"
 
 [[projects]]
   branch = "master"
@@ -209,14 +209,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3d5e79e10549fd9119cbefd614b6d351ef5bd0be2f2b103a4199788e784cbc68"
+  digest = "1:10405139b45e3a97a3842c93984710e30466eb933545f219ad3f5e45246973b4"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "b4a75ba826a64a70990f11a225237acd6ef35c9f"
+  revision = "9a3f9b0469bbc6b8802087ae5c0af9f61502de01"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"

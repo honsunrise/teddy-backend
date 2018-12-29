@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/minio/minio-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/api/content/handler"
@@ -28,8 +30,16 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	confSecret, err := config.NewConfig(file.NewSource(file.WithFormat(config.Yaml), file.WithPath("secret/config.yaml")))
+	if err != nil {
+		log.Fatal(err)
+	}
 	var confType Config
 	err = conf.Scan(&confType)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = confSecret.Scan(&confType)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -47,14 +57,31 @@ func main() {
 		log.Fatal(err)
 	}
 
-	content, err := handler.NewContentHandler(jwtMiddleware)
+	minioConfig := confType.ObjectStore["minio"]
+	if minioConfig == nil {
+		log.Fatal(errors.New("missing minio config"))
+	}
+
+	// Initialize minio client object.
+	minioClient, err := minio.New(minioConfig.Endpoint, minioConfig.AccessKey, minioConfig.SecretKey, false)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	content, err := handler.NewContentHandler(jwtMiddleware, minioClient, minioConfig.Bucket)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Create RESTful server (using Gin)
 	router := gin.Default()
-	router.Use(cors.Default())
+	router.Use(cors.New(cors.Config{
+		AllowMethods:     []string{"GET", "POST", "PUT", "HEAD", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+		AllowAllOrigins:  true,
+		MaxAge:           24 * time.Hour,
+	}))
 	router.Use(clients.ContentNew(contentSrvAddrFunc))
 	router.Use(clients.CaptchaNew(captchaSrvAddrFunc))
 	content.HandlerNormal(router.Group("/v1/anon/content").Use(jwtMiddleware.Handler(true)))

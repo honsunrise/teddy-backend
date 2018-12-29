@@ -29,15 +29,19 @@ func validateEditInfoReq(req *content.EditInfoReq) error {
 	return nil
 }
 
-func validateGetInfoReq(req *content.GetInfoReq) error {
-	return nil
-}
-
 func validateGetInfosReq(req *content.GetInfosReq) error {
 	return nil
 }
 
-func validateInfoIDAndUIDReq(req *content.InfoIDAndUIDReq) error {
+func validateInfoOneReq(req *content.InfoOneReq) error {
+	return nil
+}
+
+func validateGetInfoReq(req *content.GetInfoReq) error {
+	return nil
+}
+
+func validateInfoIDWithUIDReq(req *content.InfoIDWithUIDReq) error {
 	return nil
 }
 
@@ -53,7 +57,15 @@ func validateGetSegmentsReq(req *content.GetSegmentsReq) error {
 	return nil
 }
 
+func validateGetValuesReq(req *content.GetValuesReq) error {
+	return nil
+}
+
 func validatePublishSegmentReq(req *content.PublishSegmentReq) error {
+	return nil
+}
+
+func validateInsertValueReq(req *content.InsertValueReq) error {
 	return nil
 }
 
@@ -61,6 +73,14 @@ func validateEditSegmentReq(req *content.EditSegmentReq) error {
 	return nil
 }
 
-func validateInfoIDAndUIDAndSegIDReq(req *content.InfoIDAndUIDAndSegIDReq) error {
+func validateEditValueReq(req *content.EditValueReq) error {
+	return nil
+}
+
+func validateSegmentOneReq(req *content.SegmentOneReq) error {
+	return nil
+}
+
+func validateValueOneReq(req *content.ValueOneReq) error {
 	return nil
 }
