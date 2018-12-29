@@ -23,9 +23,9 @@ service Content {
     rpc EditSegment (EditSegmentReq) returns (google.protobuf.Empty) {}
     rpc DeleteSegment (SegmentOneReq) returns (google.protobuf.Empty) {}
 
-    rpc InsertContent (InsertContentReq) returns (google.protobuf.Empty) {}
-    rpc EditContent (EditContentReq) returns (google.protobuf.Empty) {}
-    rpc DeleteContent (ContentOneReq) returns (google.protobuf.Empty) {}
+    rpc InsertValue (InsertValueReq) returns (google.protobuf.Empty) {}
+    rpc EditValue (EditValueReq) returns (google.protobuf.Empty) {}
+    rpc DeleteValue (ValueOneReq) returns (google.protobuf.Empty) {}
 
     rpc ThumbUp (InfoIDWithUIDReq) returns (google.protobuf.Empty) {}
     rpc DeleteThumbUp (InfoIDWithUIDReq) returns (google.protobuf.Empty) {}
@@ -181,14 +181,14 @@ message SegmentOneReq {
     string segID = 2;
 }
 
-message InsertContentReq {
+message InsertValueReq {
     string infoID = 1;
     string segID = 3;
     google.protobuf.Timestamp time = 4;
     string value = 5;
 }
 
-message EditContentReq {
+message EditValueReq {
     string infoID = 1;
     string segID = 3;
     string contID = 4;
@@ -196,7 +196,7 @@ message EditContentReq {
     string value = 6;
 }
 
-message ContentOneReq {
+message ValueOneReq {
     string infoID = 1;
     string segID = 3;
     string contID = 4;
