@@ -8,58 +8,39 @@ import "github.com/golang/protobuf/ptypes/empty/empty.proto";
 import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
 
 service Content {
-    rpc GetTags (GetTagReq) returns (GetTagsResp) {
-    }
-    rpc PublishInfo (PublishInfoReq) returns (google.protobuf.Empty) {
-    }
-    rpc EditInfo (EditInfoReq) returns (google.protobuf.Empty) {
-    }
-    rpc GetInfo (GetInfoReq) returns (Info) {
-    }
-    rpc GetInfos (GetInfosReq) returns (GetInfosResp) {
-    }
-    rpc DeleteInfo (InfoIDAndUIDReq) returns (google.protobuf.Empty) {
-    }
-    rpc WatchInfo (InfoIDAndUIDReq) returns (google.protobuf.Empty) {
-    }
+    rpc GetTags (GetTagReq) returns (GetTagsResp) {}
 
-    rpc GetSegments (GetSegmentsReq) returns (Segments) {
-    }
-    rpc GetSegment (InfoIDAndUIDAndSegIDReq) returns (Segment) {
-    }
-    rpc PublishSegment (PublishSegmentReq) returns (google.protobuf.Empty) {
-    }
-    rpc EditSegment (EditSegmentReq) returns (google.protobuf.Empty) {
-    }
-    rpc DeleteSegment (InfoIDAndUIDAndSegIDReq) returns (google.protobuf.Empty) {
-    }
+    rpc PublishInfo (PublishInfoReq) returns (google.protobuf.Empty) {}
+    rpc EditInfo (EditInfoReq) returns (google.protobuf.Empty) {}
+    rpc GetInfo (InfoOneReq) returns (Info) {}
+    rpc GetInfos (GetInfosReq) returns (GetInfosResp) {}
+    rpc DeleteInfo (InfoOneReq) returns (google.protobuf.Empty) {}
+    rpc WatchInfo (InfoOneReq) returns (google.protobuf.Empty) {}
 
-    rpc ThumbUp (InfoIDAndUIDReq) returns (google.protobuf.Empty) {
-    }
-    rpc DeleteThumbUp (InfoIDAndUIDReq) returns (google.protobuf.Empty) {
-    }
-    rpc GetUserThumbUp (UIDPageReq) returns (InfoIDsResp) {
-    }
-    rpc GetInfoThumbUp (InfoIDPageReq) returns (UserIDsResp) {
-    }
+    rpc GetSegments (GetSegmentsReq) returns (Segments) {}
+    rpc GetSegment (SegmentOneReq) returns (Segment) {}
+    rpc PublishSegment (PublishSegmentReq) returns (google.protobuf.Empty) {}
+    rpc EditSegment (EditSegmentReq) returns (google.protobuf.Empty) {}
+    rpc DeleteSegment (SegmentOneReq) returns (google.protobuf.Empty) {}
 
-    rpc ThumbDown (InfoIDAndUIDReq) returns (google.protobuf.Empty) {
-    }
-    rpc DeleteThumbDown (InfoIDAndUIDReq) returns (google.protobuf.Empty) {
-    }
-    rpc GetUserThumbDown (UIDPageReq) returns (InfoIDsResp) {
-    }
-    rpc GetInfoThumbDown (InfoIDPageReq) returns (UserIDsResp) {
-    }
+    rpc PublishContent (InsertContentReq) returns (google.protobuf.Empty) {}
+    rpc EditContent (EditContentReq) returns (google.protobuf.Empty) {}
+    rpc DeleteContent (ContentOneReq) returns (google.protobuf.Empty) {}
 
-    rpc Favorite (InfoIDAndUIDReq) returns (google.protobuf.Empty) {
-    }
-    rpc DeleteFavorite (InfoIDAndUIDReq) returns (google.protobuf.Empty) {
-    }
-    rpc GetUserFavorite (UIDPageReq) returns (InfoIDsResp) {
-    }
-    rpc GetInfoFavorite (InfoIDPageReq) returns (UserIDsResp) {
-    }
+    rpc ThumbUp (InfoOneReq) returns (google.protobuf.Empty) {}
+    rpc DeleteThumbUp (InfoOneReq) returns (google.protobuf.Empty) {}
+    rpc GetUserThumbUp (UIDPageReq) returns (InfoIDsResp) {}
+    rpc GetInfoThumbUp (InfoIDPageReq) returns (UserIDsResp) {}
+
+    rpc ThumbDown (InfoOneReq) returns (google.protobuf.Empty) {}
+    rpc DeleteThumbDown (InfoOneReq) returns (google.protobuf.Empty) {}
+    rpc GetUserThumbDown (UIDPageReq) returns (InfoIDsResp) {}
+    rpc GetInfoThumbDown (InfoIDPageReq) returns (UserIDsResp) {}
+
+    rpc Favorite (InfoOneReq) returns (google.protobuf.Empty) {}
+    rpc DeleteFavorite (InfoOneReq) returns (google.protobuf.Empty) {}
+    rpc GetUserFavorite (UIDPageReq) returns (InfoIDsResp) {}
+    rpc GetInfoFavorite (InfoIDPageReq) returns (UserIDsResp) {}
 }
 
 message Sort {
@@ -124,7 +105,6 @@ message GetTagReq {
     uint32 size = 2;
     string type = 3;
     repeated Sort sorts = 4;
-    string uid = 5;
 }
 
 message UIDPageReq {
@@ -152,23 +132,21 @@ message PublishInfoReq {
 
 message EditInfoReq {
     string infoID = 1;
-    string uid = 2;
-    string author = 3;
-    string title = 4;
-    string summary = 5;
-    string country = 6;
-    repeated TagAndType tags = 7;
-    map<string, string> coverResources = 8;
-    bool canReview = 9;
+    string author = 2;
+    string title = 3;
+    string summary = 4;
+    string country = 5;
+    repeated TagAndType tags = 6;
+    map<string, string> coverResources = 7;
+    bool canReview = 8;
 }
 
 message GetSegmentsReq {
     uint32 page = 1;
     uint32 size = 2;
     string infoID = 3;
-    string uid = 4;
-    repeated string labels = 5;
-    repeated Sort sorts = 6;
+    repeated string labels = 4;
+    repeated Sort sorts = 5;
 }
 
 message Segments {
@@ -178,41 +156,53 @@ message Segments {
 
 message PublishSegmentReq {
     string infoID = 1;
-    string uid = 2;
+    int64 no = 2;
+    string title = 3;
+    repeated string labels = 4;
+    map<string, string> content = 5;
+}
+
+message EditSegmentReq {
+    string infoID = 1;
+    string segID = 2;
     int64 no = 3;
     string title = 4;
     repeated string labels = 5;
     map<string, string> content = 6;
 }
 
-message EditSegmentReq {
+message SegmentOneReq {
     string infoID = 1;
-    string uid = 2;
-    string segID = 3;
-    int64 no = 4;
-    string title = 5;
-    repeated string labels = 6;
-    map<string, string> content = 7;
+    string segID = 2;
 }
 
-message InfoIDAndUIDAndSegIDReq {
+message InsertContentReq {
     string infoID = 1;
-    string uid = 2;
     string segID = 3;
+    google.protobuf.Timestamp time = 4;
+    string value = 5;
 }
 
-message GetInfoReq {
+message EditContentReq {
     string infoID = 1;
-    string uid = 2;
+    string segID = 3;
+    string contID = 4;
+    google.protobuf.Timestamp time = 5;
+    string value = 6;
+}
+
+message ContentOneReq {
+    string infoID = 1;
+    string segID = 3;
+    string contID = 4;
 }
 
 message GetInfosReq {
     uint32 page = 1;
     uint32 size = 2;
     repeated Sort sorts = 3;
-    string uid = 4;
-    string title = 5;
-    repeated TagAndType tags = 6;
+    string title = 4;
+    repeated TagAndType tags = 5;
 }
 
 message GetInfosResp {
@@ -220,9 +210,8 @@ message GetInfosResp {
     repeated Info infos = 2;
 }
 
-message InfoIDAndUIDReq {
-    string uid = 1;
-    string infoID = 2;
+message InfoOneReq {
+    string infoID = 1;
 }
 
 message InfoIDPageReq {
@@ -247,5 +236,5 @@ message InfoIDWithTime {
 }
 
 message InfoIDsResp {
-    repeated InfoIDWithTime ids = 1;
+    repeated InfoIDWithTime items = 1;
 }

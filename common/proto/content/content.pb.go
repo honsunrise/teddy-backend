@@ -37,7 +37,7 @@ func (m *Sort) Reset()         { *m = Sort{} }
 func (m *Sort) String() string { return proto.CompactTextString(m) }
 func (*Sort) ProtoMessage()    {}
 func (*Sort) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{0}
+	return fileDescriptor_content_991762cde0399d04, []int{0}
 }
 func (m *Sort) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Sort.Unmarshal(m, b)
@@ -86,7 +86,7 @@ func (m *Tag) Reset()         { *m = Tag{} }
 func (m *Tag) String() string { return proto.CompactTextString(m) }
 func (*Tag) ProtoMessage()    {}
 func (*Tag) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{1}
+	return fileDescriptor_content_991762cde0399d04, []int{1}
 }
 func (m *Tag) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Tag.Unmarshal(m, b)
@@ -153,7 +153,7 @@ func (m *TagAndType) Reset()         { *m = TagAndType{} }
 func (m *TagAndType) String() string { return proto.CompactTextString(m) }
 func (*TagAndType) ProtoMessage()    {}
 func (*TagAndType) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{2}
+	return fileDescriptor_content_991762cde0399d04, []int{2}
 }
 func (m *TagAndType) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_TagAndType.Unmarshal(m, b)
@@ -224,7 +224,7 @@ func (m *Info) Reset()         { *m = Info{} }
 func (m *Info) String() string { return proto.CompactTextString(m) }
 func (*Info) ProtoMessage()    {}
 func (*Info) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{3}
+	return fileDescriptor_content_991762cde0399d04, []int{3}
 }
 func (m *Info) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Info.Unmarshal(m, b)
@@ -449,7 +449,7 @@ func (m *Segment) Reset()         { *m = Segment{} }
 func (m *Segment) String() string { return proto.CompactTextString(m) }
 func (*Segment) ProtoMessage()    {}
 func (*Segment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{4}
+	return fileDescriptor_content_991762cde0399d04, []int{4}
 }
 func (m *Segment) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Segment.Unmarshal(m, b)
@@ -516,7 +516,6 @@ type GetTagReq struct {
 	Size                 uint32   `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
 	Type                 string   `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
 	Sorts                []*Sort  `protobuf:"bytes,4,rep,name=sorts,proto3" json:"sorts,omitempty"`
-	Uid                  string   `protobuf:"bytes,5,opt,name=uid,proto3" json:"uid,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -526,7 +525,7 @@ func (m *GetTagReq) Reset()         { *m = GetTagReq{} }
 func (m *GetTagReq) String() string { return proto.CompactTextString(m) }
 func (*GetTagReq) ProtoMessage()    {}
 func (*GetTagReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{5}
+	return fileDescriptor_content_991762cde0399d04, []int{5}
 }
 func (m *GetTagReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetTagReq.Unmarshal(m, b)
@@ -574,13 +573,6 @@ func (m *GetTagReq) GetSorts() []*Sort {
 	return nil
 }
 
-func (m *GetTagReq) GetUid() string {
-	if m != nil {
-		return m.Uid
-	}
-	return ""
-}
-
 type UIDPageReq struct {
 	Page                 uint32   `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	Size                 uint32   `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
@@ -595,7 +587,7 @@ func (m *UIDPageReq) Reset()         { *m = UIDPageReq{} }
 func (m *UIDPageReq) String() string { return proto.CompactTextString(m) }
 func (*UIDPageReq) ProtoMessage()    {}
 func (*UIDPageReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{6}
+	return fileDescriptor_content_991762cde0399d04, []int{6}
 }
 func (m *UIDPageReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UIDPageReq.Unmarshal(m, b)
@@ -655,7 +647,7 @@ func (m *GetTagsResp) Reset()         { *m = GetTagsResp{} }
 func (m *GetTagsResp) String() string { return proto.CompactTextString(m) }
 func (*GetTagsResp) ProtoMessage()    {}
 func (*GetTagsResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{7}
+	return fileDescriptor_content_991762cde0399d04, []int{7}
 }
 func (m *GetTagsResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetTagsResp.Unmarshal(m, b)
@@ -707,7 +699,7 @@ func (m *PublishInfoReq) Reset()         { *m = PublishInfoReq{} }
 func (m *PublishInfoReq) String() string { return proto.CompactTextString(m) }
 func (*PublishInfoReq) ProtoMessage()    {}
 func (*PublishInfoReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{8}
+	return fileDescriptor_content_991762cde0399d04, []int{8}
 }
 func (m *PublishInfoReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PublishInfoReq.Unmarshal(m, b)
@@ -785,14 +777,13 @@ func (m *PublishInfoReq) GetCanReview() bool {
 
 type EditInfoReq struct {
 	InfoID               string            `protobuf:"bytes,1,opt,name=infoID,proto3" json:"infoID,omitempty"`
-	Uid                  string            `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
-	Author               string            `protobuf:"bytes,3,opt,name=author,proto3" json:"author,omitempty"`
-	Title                string            `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
-	Summary              string            `protobuf:"bytes,5,opt,name=summary,proto3" json:"summary,omitempty"`
-	Country              string            `protobuf:"bytes,6,opt,name=country,proto3" json:"country,omitempty"`
-	Tags                 []*TagAndType     `protobuf:"bytes,7,rep,name=tags,proto3" json:"tags,omitempty"`
-	CoverResources       map[string]string `protobuf:"bytes,8,rep,name=coverResources,proto3" json:"coverResources,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	CanReview            bool              `protobuf:"varint,9,opt,name=canReview,proto3" json:"canReview,omitempty"`
+	Author               string            `protobuf:"bytes,2,opt,name=author,proto3" json:"author,omitempty"`
+	Title                string            `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
+	Summary              string            `protobuf:"bytes,4,opt,name=summary,proto3" json:"summary,omitempty"`
+	Country              string            `protobuf:"bytes,5,opt,name=country,proto3" json:"country,omitempty"`
+	Tags                 []*TagAndType     `protobuf:"bytes,6,rep,name=tags,proto3" json:"tags,omitempty"`
+	CoverResources       map[string]string `protobuf:"bytes,7,rep,name=coverResources,proto3" json:"coverResources,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	CanReview            bool              `protobuf:"varint,8,opt,name=canReview,proto3" json:"canReview,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -802,7 +793,7 @@ func (m *EditInfoReq) Reset()         { *m = EditInfoReq{} }
 func (m *EditInfoReq) String() string { return proto.CompactTextString(m) }
 func (*EditInfoReq) ProtoMessage()    {}
 func (*EditInfoReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{9}
+	return fileDescriptor_content_991762cde0399d04, []int{9}
 }
 func (m *EditInfoReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EditInfoReq.Unmarshal(m, b)
@@ -825,13 +816,6 @@ var xxx_messageInfo_EditInfoReq proto.InternalMessageInfo
 func (m *EditInfoReq) GetInfoID() string {
 	if m != nil {
 		return m.InfoID
-	}
-	return ""
-}
-
-func (m *EditInfoReq) GetUid() string {
-	if m != nil {
-		return m.Uid
 	}
 	return ""
 }
@@ -889,9 +873,8 @@ type GetSegmentsReq struct {
 	Page                 uint32   `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	Size                 uint32   `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
 	InfoID               string   `protobuf:"bytes,3,opt,name=infoID,proto3" json:"infoID,omitempty"`
-	Uid                  string   `protobuf:"bytes,4,opt,name=uid,proto3" json:"uid,omitempty"`
-	Labels               []string `protobuf:"bytes,5,rep,name=labels,proto3" json:"labels,omitempty"`
-	Sorts                []*Sort  `protobuf:"bytes,6,rep,name=sorts,proto3" json:"sorts,omitempty"`
+	Labels               []string `protobuf:"bytes,4,rep,name=labels,proto3" json:"labels,omitempty"`
+	Sorts                []*Sort  `protobuf:"bytes,5,rep,name=sorts,proto3" json:"sorts,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -901,7 +884,7 @@ func (m *GetSegmentsReq) Reset()         { *m = GetSegmentsReq{} }
 func (m *GetSegmentsReq) String() string { return proto.CompactTextString(m) }
 func (*GetSegmentsReq) ProtoMessage()    {}
 func (*GetSegmentsReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{10}
+	return fileDescriptor_content_991762cde0399d04, []int{10}
 }
 func (m *GetSegmentsReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetSegmentsReq.Unmarshal(m, b)
@@ -942,13 +925,6 @@ func (m *GetSegmentsReq) GetInfoID() string {
 	return ""
 }
 
-func (m *GetSegmentsReq) GetUid() string {
-	if m != nil {
-		return m.Uid
-	}
-	return ""
-}
-
 func (m *GetSegmentsReq) GetLabels() []string {
 	if m != nil {
 		return m.Labels
@@ -975,7 +951,7 @@ func (m *Segments) Reset()         { *m = Segments{} }
 func (m *Segments) String() string { return proto.CompactTextString(m) }
 func (*Segments) ProtoMessage()    {}
 func (*Segments) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{11}
+	return fileDescriptor_content_991762cde0399d04, []int{11}
 }
 func (m *Segments) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Segments.Unmarshal(m, b)
@@ -1011,11 +987,10 @@ func (m *Segments) GetSegments() []*Segment {
 
 type PublishSegmentReq struct {
 	InfoID               string            `protobuf:"bytes,1,opt,name=infoID,proto3" json:"infoID,omitempty"`
-	Uid                  string            `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
-	No                   int64             `protobuf:"varint,3,opt,name=no,proto3" json:"no,omitempty"`
-	Title                string            `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
-	Labels               []string          `protobuf:"bytes,5,rep,name=labels,proto3" json:"labels,omitempty"`
-	Content              map[string]string `protobuf:"bytes,6,rep,name=content,proto3" json:"content,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	No                   int64             `protobuf:"varint,2,opt,name=no,proto3" json:"no,omitempty"`
+	Title                string            `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
+	Labels               []string          `protobuf:"bytes,4,rep,name=labels,proto3" json:"labels,omitempty"`
+	Content              map[string]string `protobuf:"bytes,5,rep,name=content,proto3" json:"content,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -1025,7 +1000,7 @@ func (m *PublishSegmentReq) Reset()         { *m = PublishSegmentReq{} }
 func (m *PublishSegmentReq) String() string { return proto.CompactTextString(m) }
 func (*PublishSegmentReq) ProtoMessage()    {}
 func (*PublishSegmentReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{12}
+	return fileDescriptor_content_991762cde0399d04, []int{12}
 }
 func (m *PublishSegmentReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PublishSegmentReq.Unmarshal(m, b)
@@ -1048,13 +1023,6 @@ var xxx_messageInfo_PublishSegmentReq proto.InternalMessageInfo
 func (m *PublishSegmentReq) GetInfoID() string {
 	if m != nil {
 		return m.InfoID
-	}
-	return ""
-}
-
-func (m *PublishSegmentReq) GetUid() string {
-	if m != nil {
-		return m.Uid
 	}
 	return ""
 }
@@ -1089,12 +1057,11 @@ func (m *PublishSegmentReq) GetContent() map[string]string {
 
 type EditSegmentReq struct {
 	InfoID               string            `protobuf:"bytes,1,opt,name=infoID,proto3" json:"infoID,omitempty"`
-	Uid                  string            `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
-	SegID                string            `protobuf:"bytes,3,opt,name=segID,proto3" json:"segID,omitempty"`
-	No                   int64             `protobuf:"varint,4,opt,name=no,proto3" json:"no,omitempty"`
-	Title                string            `protobuf:"bytes,5,opt,name=title,proto3" json:"title,omitempty"`
-	Labels               []string          `protobuf:"bytes,6,rep,name=labels,proto3" json:"labels,omitempty"`
-	Content              map[string]string `protobuf:"bytes,7,rep,name=content,proto3" json:"content,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	SegID                string            `protobuf:"bytes,2,opt,name=segID,proto3" json:"segID,omitempty"`
+	No                   int64             `protobuf:"varint,3,opt,name=no,proto3" json:"no,omitempty"`
+	Title                string            `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
+	Labels               []string          `protobuf:"bytes,5,rep,name=labels,proto3" json:"labels,omitempty"`
+	Content              map[string]string `protobuf:"bytes,6,rep,name=content,proto3" json:"content,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -1104,7 +1071,7 @@ func (m *EditSegmentReq) Reset()         { *m = EditSegmentReq{} }
 func (m *EditSegmentReq) String() string { return proto.CompactTextString(m) }
 func (*EditSegmentReq) ProtoMessage()    {}
 func (*EditSegmentReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{13}
+	return fileDescriptor_content_991762cde0399d04, []int{13}
 }
 func (m *EditSegmentReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EditSegmentReq.Unmarshal(m, b)
@@ -1127,13 +1094,6 @@ var xxx_messageInfo_EditSegmentReq proto.InternalMessageInfo
 func (m *EditSegmentReq) GetInfoID() string {
 	if m != nil {
 		return m.InfoID
-	}
-	return ""
-}
-
-func (m *EditSegmentReq) GetUid() string {
-	if m != nil {
-		return m.Uid
 	}
 	return ""
 }
@@ -1173,102 +1133,234 @@ func (m *EditSegmentReq) GetContent() map[string]string {
 	return nil
 }
 
-type InfoIDAndUIDAndSegIDReq struct {
+type SegmentOneReq struct {
 	InfoID               string   `protobuf:"bytes,1,opt,name=infoID,proto3" json:"infoID,omitempty"`
-	Uid                  string   `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
-	SegID                string   `protobuf:"bytes,3,opt,name=segID,proto3" json:"segID,omitempty"`
+	SegID                string   `protobuf:"bytes,2,opt,name=segID,proto3" json:"segID,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *InfoIDAndUIDAndSegIDReq) Reset()         { *m = InfoIDAndUIDAndSegIDReq{} }
-func (m *InfoIDAndUIDAndSegIDReq) String() string { return proto.CompactTextString(m) }
-func (*InfoIDAndUIDAndSegIDReq) ProtoMessage()    {}
-func (*InfoIDAndUIDAndSegIDReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{14}
+func (m *SegmentOneReq) Reset()         { *m = SegmentOneReq{} }
+func (m *SegmentOneReq) String() string { return proto.CompactTextString(m) }
+func (*SegmentOneReq) ProtoMessage()    {}
+func (*SegmentOneReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_content_991762cde0399d04, []int{14}
 }
-func (m *InfoIDAndUIDAndSegIDReq) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_InfoIDAndUIDAndSegIDReq.Unmarshal(m, b)
+func (m *SegmentOneReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SegmentOneReq.Unmarshal(m, b)
 }
-func (m *InfoIDAndUIDAndSegIDReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_InfoIDAndUIDAndSegIDReq.Marshal(b, m, deterministic)
+func (m *SegmentOneReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SegmentOneReq.Marshal(b, m, deterministic)
 }
-func (dst *InfoIDAndUIDAndSegIDReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_InfoIDAndUIDAndSegIDReq.Merge(dst, src)
+func (dst *SegmentOneReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SegmentOneReq.Merge(dst, src)
 }
-func (m *InfoIDAndUIDAndSegIDReq) XXX_Size() int {
-	return xxx_messageInfo_InfoIDAndUIDAndSegIDReq.Size(m)
+func (m *SegmentOneReq) XXX_Size() int {
+	return xxx_messageInfo_SegmentOneReq.Size(m)
 }
-func (m *InfoIDAndUIDAndSegIDReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_InfoIDAndUIDAndSegIDReq.DiscardUnknown(m)
+func (m *SegmentOneReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_SegmentOneReq.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_InfoIDAndUIDAndSegIDReq proto.InternalMessageInfo
+var xxx_messageInfo_SegmentOneReq proto.InternalMessageInfo
 
-func (m *InfoIDAndUIDAndSegIDReq) GetInfoID() string {
+func (m *SegmentOneReq) GetInfoID() string {
 	if m != nil {
 		return m.InfoID
 	}
 	return ""
 }
 
-func (m *InfoIDAndUIDAndSegIDReq) GetUid() string {
-	if m != nil {
-		return m.Uid
-	}
-	return ""
-}
-
-func (m *InfoIDAndUIDAndSegIDReq) GetSegID() string {
+func (m *SegmentOneReq) GetSegID() string {
 	if m != nil {
 		return m.SegID
 	}
 	return ""
 }
 
-type GetInfoReq struct {
-	InfoID               string   `protobuf:"bytes,1,opt,name=infoID,proto3" json:"infoID,omitempty"`
-	Uid                  string   `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+type InsertContentReq struct {
+	InfoID               string               `protobuf:"bytes,1,opt,name=infoID,proto3" json:"infoID,omitempty"`
+	SegID                string               `protobuf:"bytes,3,opt,name=segID,proto3" json:"segID,omitempty"`
+	Time                 *timestamp.Timestamp `protobuf:"bytes,4,opt,name=time,proto3" json:"time,omitempty"`
+	Value                string               `protobuf:"bytes,5,opt,name=value,proto3" json:"value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
 }
 
-func (m *GetInfoReq) Reset()         { *m = GetInfoReq{} }
-func (m *GetInfoReq) String() string { return proto.CompactTextString(m) }
-func (*GetInfoReq) ProtoMessage()    {}
-func (*GetInfoReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{15}
+func (m *InsertContentReq) Reset()         { *m = InsertContentReq{} }
+func (m *InsertContentReq) String() string { return proto.CompactTextString(m) }
+func (*InsertContentReq) ProtoMessage()    {}
+func (*InsertContentReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_content_991762cde0399d04, []int{15}
 }
-func (m *GetInfoReq) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetInfoReq.Unmarshal(m, b)
+func (m *InsertContentReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_InsertContentReq.Unmarshal(m, b)
 }
-func (m *GetInfoReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetInfoReq.Marshal(b, m, deterministic)
+func (m *InsertContentReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_InsertContentReq.Marshal(b, m, deterministic)
 }
-func (dst *GetInfoReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetInfoReq.Merge(dst, src)
+func (dst *InsertContentReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InsertContentReq.Merge(dst, src)
 }
-func (m *GetInfoReq) XXX_Size() int {
-	return xxx_messageInfo_GetInfoReq.Size(m)
+func (m *InsertContentReq) XXX_Size() int {
+	return xxx_messageInfo_InsertContentReq.Size(m)
 }
-func (m *GetInfoReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetInfoReq.DiscardUnknown(m)
+func (m *InsertContentReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_InsertContentReq.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_GetInfoReq proto.InternalMessageInfo
+var xxx_messageInfo_InsertContentReq proto.InternalMessageInfo
 
-func (m *GetInfoReq) GetInfoID() string {
+func (m *InsertContentReq) GetInfoID() string {
 	if m != nil {
 		return m.InfoID
 	}
 	return ""
 }
 
-func (m *GetInfoReq) GetUid() string {
+func (m *InsertContentReq) GetSegID() string {
 	if m != nil {
-		return m.Uid
+		return m.SegID
+	}
+	return ""
+}
+
+func (m *InsertContentReq) GetTime() *timestamp.Timestamp {
+	if m != nil {
+		return m.Time
+	}
+	return nil
+}
+
+func (m *InsertContentReq) GetValue() string {
+	if m != nil {
+		return m.Value
+	}
+	return ""
+}
+
+type EditContentReq struct {
+	InfoID               string               `protobuf:"bytes,1,opt,name=infoID,proto3" json:"infoID,omitempty"`
+	SegID                string               `protobuf:"bytes,3,opt,name=segID,proto3" json:"segID,omitempty"`
+	ContID               string               `protobuf:"bytes,4,opt,name=contID,proto3" json:"contID,omitempty"`
+	Time                 *timestamp.Timestamp `protobuf:"bytes,5,opt,name=time,proto3" json:"time,omitempty"`
+	Value                string               `protobuf:"bytes,6,opt,name=value,proto3" json:"value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
+}
+
+func (m *EditContentReq) Reset()         { *m = EditContentReq{} }
+func (m *EditContentReq) String() string { return proto.CompactTextString(m) }
+func (*EditContentReq) ProtoMessage()    {}
+func (*EditContentReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_content_991762cde0399d04, []int{16}
+}
+func (m *EditContentReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_EditContentReq.Unmarshal(m, b)
+}
+func (m *EditContentReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_EditContentReq.Marshal(b, m, deterministic)
+}
+func (dst *EditContentReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EditContentReq.Merge(dst, src)
+}
+func (m *EditContentReq) XXX_Size() int {
+	return xxx_messageInfo_EditContentReq.Size(m)
+}
+func (m *EditContentReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_EditContentReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EditContentReq proto.InternalMessageInfo
+
+func (m *EditContentReq) GetInfoID() string {
+	if m != nil {
+		return m.InfoID
+	}
+	return ""
+}
+
+func (m *EditContentReq) GetSegID() string {
+	if m != nil {
+		return m.SegID
+	}
+	return ""
+}
+
+func (m *EditContentReq) GetContID() string {
+	if m != nil {
+		return m.ContID
+	}
+	return ""
+}
+
+func (m *EditContentReq) GetTime() *timestamp.Timestamp {
+	if m != nil {
+		return m.Time
+	}
+	return nil
+}
+
+func (m *EditContentReq) GetValue() string {
+	if m != nil {
+		return m.Value
+	}
+	return ""
+}
+
+type ContentOneReq struct {
+	InfoID               string   `protobuf:"bytes,1,opt,name=infoID,proto3" json:"infoID,omitempty"`
+	SegID                string   `protobuf:"bytes,3,opt,name=segID,proto3" json:"segID,omitempty"`
+	ContID               string   `protobuf:"bytes,4,opt,name=contID,proto3" json:"contID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ContentOneReq) Reset()         { *m = ContentOneReq{} }
+func (m *ContentOneReq) String() string { return proto.CompactTextString(m) }
+func (*ContentOneReq) ProtoMessage()    {}
+func (*ContentOneReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_content_991762cde0399d04, []int{17}
+}
+func (m *ContentOneReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ContentOneReq.Unmarshal(m, b)
+}
+func (m *ContentOneReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ContentOneReq.Marshal(b, m, deterministic)
+}
+func (dst *ContentOneReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ContentOneReq.Merge(dst, src)
+}
+func (m *ContentOneReq) XXX_Size() int {
+	return xxx_messageInfo_ContentOneReq.Size(m)
+}
+func (m *ContentOneReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_ContentOneReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ContentOneReq proto.InternalMessageInfo
+
+func (m *ContentOneReq) GetInfoID() string {
+	if m != nil {
+		return m.InfoID
+	}
+	return ""
+}
+
+func (m *ContentOneReq) GetSegID() string {
+	if m != nil {
+		return m.SegID
+	}
+	return ""
+}
+
+func (m *ContentOneReq) GetContID() string {
+	if m != nil {
+		return m.ContID
 	}
 	return ""
 }
@@ -1277,9 +1369,8 @@ type GetInfosReq struct {
 	Page                 uint32        `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	Size                 uint32        `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
 	Sorts                []*Sort       `protobuf:"bytes,3,rep,name=sorts,proto3" json:"sorts,omitempty"`
-	Uid                  string        `protobuf:"bytes,4,opt,name=uid,proto3" json:"uid,omitempty"`
-	Title                string        `protobuf:"bytes,5,opt,name=title,proto3" json:"title,omitempty"`
-	Tags                 []*TagAndType `protobuf:"bytes,6,rep,name=tags,proto3" json:"tags,omitempty"`
+	Title                string        `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
+	Tags                 []*TagAndType `protobuf:"bytes,5,rep,name=tags,proto3" json:"tags,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
@@ -1289,7 +1380,7 @@ func (m *GetInfosReq) Reset()         { *m = GetInfosReq{} }
 func (m *GetInfosReq) String() string { return proto.CompactTextString(m) }
 func (*GetInfosReq) ProtoMessage()    {}
 func (*GetInfosReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{16}
+	return fileDescriptor_content_991762cde0399d04, []int{18}
 }
 func (m *GetInfosReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetInfosReq.Unmarshal(m, b)
@@ -1330,13 +1421,6 @@ func (m *GetInfosReq) GetSorts() []*Sort {
 	return nil
 }
 
-func (m *GetInfosReq) GetUid() string {
-	if m != nil {
-		return m.Uid
-	}
-	return ""
-}
-
 func (m *GetInfosReq) GetTitle() string {
 	if m != nil {
 		return m.Title
@@ -1363,7 +1447,7 @@ func (m *GetInfosResp) Reset()         { *m = GetInfosResp{} }
 func (m *GetInfosResp) String() string { return proto.CompactTextString(m) }
 func (*GetInfosResp) ProtoMessage()    {}
 func (*GetInfosResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{17}
+	return fileDescriptor_content_991762cde0399d04, []int{19}
 }
 func (m *GetInfosResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetInfosResp.Unmarshal(m, b)
@@ -1397,46 +1481,38 @@ func (m *GetInfosResp) GetInfos() []*Info {
 	return nil
 }
 
-type InfoIDAndUIDReq struct {
-	Uid                  string   `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	InfoID               string   `protobuf:"bytes,2,opt,name=infoID,proto3" json:"infoID,omitempty"`
+type InfoOneReq struct {
+	InfoID               string   `protobuf:"bytes,1,opt,name=infoID,proto3" json:"infoID,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *InfoIDAndUIDReq) Reset()         { *m = InfoIDAndUIDReq{} }
-func (m *InfoIDAndUIDReq) String() string { return proto.CompactTextString(m) }
-func (*InfoIDAndUIDReq) ProtoMessage()    {}
-func (*InfoIDAndUIDReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{18}
+func (m *InfoOneReq) Reset()         { *m = InfoOneReq{} }
+func (m *InfoOneReq) String() string { return proto.CompactTextString(m) }
+func (*InfoOneReq) ProtoMessage()    {}
+func (*InfoOneReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_content_991762cde0399d04, []int{20}
 }
-func (m *InfoIDAndUIDReq) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_InfoIDAndUIDReq.Unmarshal(m, b)
+func (m *InfoOneReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_InfoOneReq.Unmarshal(m, b)
 }
-func (m *InfoIDAndUIDReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_InfoIDAndUIDReq.Marshal(b, m, deterministic)
+func (m *InfoOneReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_InfoOneReq.Marshal(b, m, deterministic)
 }
-func (dst *InfoIDAndUIDReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_InfoIDAndUIDReq.Merge(dst, src)
+func (dst *InfoOneReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InfoOneReq.Merge(dst, src)
 }
-func (m *InfoIDAndUIDReq) XXX_Size() int {
-	return xxx_messageInfo_InfoIDAndUIDReq.Size(m)
+func (m *InfoOneReq) XXX_Size() int {
+	return xxx_messageInfo_InfoOneReq.Size(m)
 }
-func (m *InfoIDAndUIDReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_InfoIDAndUIDReq.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_InfoIDAndUIDReq proto.InternalMessageInfo
-
-func (m *InfoIDAndUIDReq) GetUid() string {
-	if m != nil {
-		return m.Uid
-	}
-	return ""
+func (m *InfoOneReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_InfoOneReq.DiscardUnknown(m)
 }
 
-func (m *InfoIDAndUIDReq) GetInfoID() string {
+var xxx_messageInfo_InfoOneReq proto.InternalMessageInfo
+
+func (m *InfoOneReq) GetInfoID() string {
 	if m != nil {
 		return m.InfoID
 	}
@@ -1457,7 +1533,7 @@ func (m *InfoIDPageReq) Reset()         { *m = InfoIDPageReq{} }
 func (m *InfoIDPageReq) String() string { return proto.CompactTextString(m) }
 func (*InfoIDPageReq) ProtoMessage()    {}
 func (*InfoIDPageReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{19}
+	return fileDescriptor_content_991762cde0399d04, []int{21}
 }
 func (m *InfoIDPageReq) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_InfoIDPageReq.Unmarshal(m, b)
@@ -1517,7 +1593,7 @@ func (m *UIDWithTime) Reset()         { *m = UIDWithTime{} }
 func (m *UIDWithTime) String() string { return proto.CompactTextString(m) }
 func (*UIDWithTime) ProtoMessage()    {}
 func (*UIDWithTime) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{20}
+	return fileDescriptor_content_991762cde0399d04, []int{22}
 }
 func (m *UIDWithTime) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UIDWithTime.Unmarshal(m, b)
@@ -1562,7 +1638,7 @@ func (m *UserIDsResp) Reset()         { *m = UserIDsResp{} }
 func (m *UserIDsResp) String() string { return proto.CompactTextString(m) }
 func (*UserIDsResp) ProtoMessage()    {}
 func (*UserIDsResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{21}
+	return fileDescriptor_content_991762cde0399d04, []int{23}
 }
 func (m *UserIDsResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UserIDsResp.Unmarshal(m, b)
@@ -1601,7 +1677,7 @@ func (m *InfoIDWithTime) Reset()         { *m = InfoIDWithTime{} }
 func (m *InfoIDWithTime) String() string { return proto.CompactTextString(m) }
 func (*InfoIDWithTime) ProtoMessage()    {}
 func (*InfoIDWithTime) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{22}
+	return fileDescriptor_content_991762cde0399d04, []int{24}
 }
 func (m *InfoIDWithTime) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_InfoIDWithTime.Unmarshal(m, b)
@@ -1636,7 +1712,7 @@ func (m *InfoIDWithTime) GetTime() *timestamp.Timestamp {
 }
 
 type InfoIDsResp struct {
-	Ids                  []*InfoIDWithTime `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"`
+	Items                []*InfoIDWithTime `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -1646,7 +1722,7 @@ func (m *InfoIDsResp) Reset()         { *m = InfoIDsResp{} }
 func (m *InfoIDsResp) String() string { return proto.CompactTextString(m) }
 func (*InfoIDsResp) ProtoMessage()    {}
 func (*InfoIDsResp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_content_9550acadfe790b11, []int{23}
+	return fileDescriptor_content_991762cde0399d04, []int{25}
 }
 func (m *InfoIDsResp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_InfoIDsResp.Unmarshal(m, b)
@@ -1666,9 +1742,9 @@ func (m *InfoIDsResp) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_InfoIDsResp proto.InternalMessageInfo
 
-func (m *InfoIDsResp) GetIds() []*InfoIDWithTime {
+func (m *InfoIDsResp) GetItems() []*InfoIDWithTime {
 	if m != nil {
-		return m.Ids
+		return m.Items
 	}
 	return nil
 }
@@ -1694,11 +1770,13 @@ func init() {
 	proto.RegisterMapType((map[string]string)(nil), "teddy.srv.content.PublishSegmentReq.ContentEntry")
 	proto.RegisterType((*EditSegmentReq)(nil), "teddy.srv.content.EditSegmentReq")
 	proto.RegisterMapType((map[string]string)(nil), "teddy.srv.content.EditSegmentReq.ContentEntry")
-	proto.RegisterType((*InfoIDAndUIDAndSegIDReq)(nil), "teddy.srv.content.InfoIDAndUIDAndSegIDReq")
-	proto.RegisterType((*GetInfoReq)(nil), "teddy.srv.content.GetInfoReq")
+	proto.RegisterType((*SegmentOneReq)(nil), "teddy.srv.content.SegmentOneReq")
+	proto.RegisterType((*InsertContentReq)(nil), "teddy.srv.content.InsertContentReq")
+	proto.RegisterType((*EditContentReq)(nil), "teddy.srv.content.EditContentReq")
+	proto.RegisterType((*ContentOneReq)(nil), "teddy.srv.content.ContentOneReq")
 	proto.RegisterType((*GetInfosReq)(nil), "teddy.srv.content.GetInfosReq")
 	proto.RegisterType((*GetInfosResp)(nil), "teddy.srv.content.GetInfosResp")
-	proto.RegisterType((*InfoIDAndUIDReq)(nil), "teddy.srv.content.InfoIDAndUIDReq")
+	proto.RegisterType((*InfoOneReq)(nil), "teddy.srv.content.InfoOneReq")
 	proto.RegisterType((*InfoIDPageReq)(nil), "teddy.srv.content.InfoIDPageReq")
 	proto.RegisterType((*UIDWithTime)(nil), "teddy.srv.content.UIDWithTime")
 	proto.RegisterType((*UserIDsResp)(nil), "teddy.srv.content.UserIDsResp")
@@ -1721,25 +1799,28 @@ type ContentClient interface {
 	GetTags(ctx context.Context, in *GetTagReq, opts ...grpc.CallOption) (*GetTagsResp, error)
 	PublishInfo(ctx context.Context, in *PublishInfoReq, opts ...grpc.CallOption) (*empty.Empty, error)
 	EditInfo(ctx context.Context, in *EditInfoReq, opts ...grpc.CallOption) (*empty.Empty, error)
-	GetInfo(ctx context.Context, in *GetInfoReq, opts ...grpc.CallOption) (*Info, error)
+	GetInfo(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*Info, error)
 	GetInfos(ctx context.Context, in *GetInfosReq, opts ...grpc.CallOption) (*GetInfosResp, error)
-	DeleteInfo(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error)
-	WatchInfo(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	DeleteInfo(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	WatchInfo(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetSegments(ctx context.Context, in *GetSegmentsReq, opts ...grpc.CallOption) (*Segments, error)
-	GetSegment(ctx context.Context, in *InfoIDAndUIDAndSegIDReq, opts ...grpc.CallOption) (*Segment, error)
+	GetSegment(ctx context.Context, in *SegmentOneReq, opts ...grpc.CallOption) (*Segment, error)
 	PublishSegment(ctx context.Context, in *PublishSegmentReq, opts ...grpc.CallOption) (*empty.Empty, error)
 	EditSegment(ctx context.Context, in *EditSegmentReq, opts ...grpc.CallOption) (*empty.Empty, error)
-	DeleteSegment(ctx context.Context, in *InfoIDAndUIDAndSegIDReq, opts ...grpc.CallOption) (*empty.Empty, error)
-	ThumbUp(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error)
-	DeleteThumbUp(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	DeleteSegment(ctx context.Context, in *SegmentOneReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	PublishContent(ctx context.Context, in *InsertContentReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	EditContent(ctx context.Context, in *EditContentReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	DeleteContent(ctx context.Context, in *ContentOneReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	ThumbUp(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	DeleteThumbUp(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetUserThumbUp(ctx context.Context, in *UIDPageReq, opts ...grpc.CallOption) (*InfoIDsResp, error)
 	GetInfoThumbUp(ctx context.Context, in *InfoIDPageReq, opts ...grpc.CallOption) (*UserIDsResp, error)
-	ThumbDown(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error)
-	DeleteThumbDown(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	ThumbDown(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	DeleteThumbDown(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetUserThumbDown(ctx context.Context, in *UIDPageReq, opts ...grpc.CallOption) (*InfoIDsResp, error)
 	GetInfoThumbDown(ctx context.Context, in *InfoIDPageReq, opts ...grpc.CallOption) (*UserIDsResp, error)
-	Favorite(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error)
-	DeleteFavorite(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	Favorite(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error)
+	DeleteFavorite(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetUserFavorite(ctx context.Context, in *UIDPageReq, opts ...grpc.CallOption) (*InfoIDsResp, error)
 	GetInfoFavorite(ctx context.Context, in *InfoIDPageReq, opts ...grpc.CallOption) (*UserIDsResp, error)
 }
@@ -1779,7 +1860,7 @@ func (c *contentClient) EditInfo(ctx context.Context, in *EditInfoReq, opts ...g
 	return out, nil
 }
 
-func (c *contentClient) GetInfo(ctx context.Context, in *GetInfoReq, opts ...grpc.CallOption) (*Info, error) {
+func (c *contentClient) GetInfo(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*Info, error) {
 	out := new(Info)
 	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/GetInfo", in, out, opts...)
 	if err != nil {
@@ -1797,7 +1878,7 @@ func (c *contentClient) GetInfos(ctx context.Context, in *GetInfosReq, opts ...g
 	return out, nil
 }
 
-func (c *contentClient) DeleteInfo(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *contentClient) DeleteInfo(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/DeleteInfo", in, out, opts...)
 	if err != nil {
@@ -1806,7 +1887,7 @@ func (c *contentClient) DeleteInfo(ctx context.Context, in *InfoIDAndUIDReq, opt
 	return out, nil
 }
 
-func (c *contentClient) WatchInfo(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *contentClient) WatchInfo(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/WatchInfo", in, out, opts...)
 	if err != nil {
@@ -1824,7 +1905,7 @@ func (c *contentClient) GetSegments(ctx context.Context, in *GetSegmentsReq, opt
 	return out, nil
 }
 
-func (c *contentClient) GetSegment(ctx context.Context, in *InfoIDAndUIDAndSegIDReq, opts ...grpc.CallOption) (*Segment, error) {
+func (c *contentClient) GetSegment(ctx context.Context, in *SegmentOneReq, opts ...grpc.CallOption) (*Segment, error) {
 	out := new(Segment)
 	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/GetSegment", in, out, opts...)
 	if err != nil {
@@ -1851,7 +1932,7 @@ func (c *contentClient) EditSegment(ctx context.Context, in *EditSegmentReq, opt
 	return out, nil
 }
 
-func (c *contentClient) DeleteSegment(ctx context.Context, in *InfoIDAndUIDAndSegIDReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *contentClient) DeleteSegment(ctx context.Context, in *SegmentOneReq, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/DeleteSegment", in, out, opts...)
 	if err != nil {
@@ -1860,7 +1941,34 @@ func (c *contentClient) DeleteSegment(ctx context.Context, in *InfoIDAndUIDAndSe
 	return out, nil
 }
 
-func (c *contentClient) ThumbUp(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *contentClient) PublishContent(ctx context.Context, in *InsertContentReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/PublishContent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) EditContent(ctx context.Context, in *EditContentReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/EditContent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) DeleteContent(ctx context.Context, in *ContentOneReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/DeleteContent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *contentClient) ThumbUp(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/ThumbUp", in, out, opts...)
 	if err != nil {
@@ -1869,7 +1977,7 @@ func (c *contentClient) ThumbUp(ctx context.Context, in *InfoIDAndUIDReq, opts .
 	return out, nil
 }
 
-func (c *contentClient) DeleteThumbUp(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *contentClient) DeleteThumbUp(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/DeleteThumbUp", in, out, opts...)
 	if err != nil {
@@ -1896,7 +2004,7 @@ func (c *contentClient) GetInfoThumbUp(ctx context.Context, in *InfoIDPageReq, o
 	return out, nil
 }
 
-func (c *contentClient) ThumbDown(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *contentClient) ThumbDown(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/ThumbDown", in, out, opts...)
 	if err != nil {
@@ -1905,7 +2013,7 @@ func (c *contentClient) ThumbDown(ctx context.Context, in *InfoIDAndUIDReq, opts
 	return out, nil
 }
 
-func (c *contentClient) DeleteThumbDown(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *contentClient) DeleteThumbDown(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/DeleteThumbDown", in, out, opts...)
 	if err != nil {
@@ -1932,7 +2040,7 @@ func (c *contentClient) GetInfoThumbDown(ctx context.Context, in *InfoIDPageReq,
 	return out, nil
 }
 
-func (c *contentClient) Favorite(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *contentClient) Favorite(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/Favorite", in, out, opts...)
 	if err != nil {
@@ -1941,7 +2049,7 @@ func (c *contentClient) Favorite(ctx context.Context, in *InfoIDAndUIDReq, opts 
 	return out, nil
 }
 
-func (c *contentClient) DeleteFavorite(ctx context.Context, in *InfoIDAndUIDReq, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *contentClient) DeleteFavorite(ctx context.Context, in *InfoOneReq, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/DeleteFavorite", in, out, opts...)
 	if err != nil {
@@ -1973,25 +2081,28 @@ type ContentServer interface {
 	GetTags(context.Context, *GetTagReq) (*GetTagsResp, error)
 	PublishInfo(context.Context, *PublishInfoReq) (*empty.Empty, error)
 	EditInfo(context.Context, *EditInfoReq) (*empty.Empty, error)
-	GetInfo(context.Context, *GetInfoReq) (*Info, error)
+	GetInfo(context.Context, *InfoOneReq) (*Info, error)
 	GetInfos(context.Context, *GetInfosReq) (*GetInfosResp, error)
-	DeleteInfo(context.Context, *InfoIDAndUIDReq) (*empty.Empty, error)
-	WatchInfo(context.Context, *InfoIDAndUIDReq) (*empty.Empty, error)
+	DeleteInfo(context.Context, *InfoOneReq) (*empty.Empty, error)
+	WatchInfo(context.Context, *InfoOneReq) (*empty.Empty, error)
 	GetSegments(context.Context, *GetSegmentsReq) (*Segments, error)
-	GetSegment(context.Context, *InfoIDAndUIDAndSegIDReq) (*Segment, error)
+	GetSegment(context.Context, *SegmentOneReq) (*Segment, error)
 	PublishSegment(context.Context, *PublishSegmentReq) (*empty.Empty, error)
 	EditSegment(context.Context, *EditSegmentReq) (*empty.Empty, error)
-	DeleteSegment(context.Context, *InfoIDAndUIDAndSegIDReq) (*empty.Empty, error)
-	ThumbUp(context.Context, *InfoIDAndUIDReq) (*empty.Empty, error)
-	DeleteThumbUp(context.Context, *InfoIDAndUIDReq) (*empty.Empty, error)
+	DeleteSegment(context.Context, *SegmentOneReq) (*empty.Empty, error)
+	PublishContent(context.Context, *InsertContentReq) (*empty.Empty, error)
+	EditContent(context.Context, *EditContentReq) (*empty.Empty, error)
+	DeleteContent(context.Context, *ContentOneReq) (*empty.Empty, error)
+	ThumbUp(context.Context, *InfoOneReq) (*empty.Empty, error)
+	DeleteThumbUp(context.Context, *InfoOneReq) (*empty.Empty, error)
 	GetUserThumbUp(context.Context, *UIDPageReq) (*InfoIDsResp, error)
 	GetInfoThumbUp(context.Context, *InfoIDPageReq) (*UserIDsResp, error)
-	ThumbDown(context.Context, *InfoIDAndUIDReq) (*empty.Empty, error)
-	DeleteThumbDown(context.Context, *InfoIDAndUIDReq) (*empty.Empty, error)
+	ThumbDown(context.Context, *InfoOneReq) (*empty.Empty, error)
+	DeleteThumbDown(context.Context, *InfoOneReq) (*empty.Empty, error)
 	GetUserThumbDown(context.Context, *UIDPageReq) (*InfoIDsResp, error)
 	GetInfoThumbDown(context.Context, *InfoIDPageReq) (*UserIDsResp, error)
-	Favorite(context.Context, *InfoIDAndUIDReq) (*empty.Empty, error)
-	DeleteFavorite(context.Context, *InfoIDAndUIDReq) (*empty.Empty, error)
+	Favorite(context.Context, *InfoOneReq) (*empty.Empty, error)
+	DeleteFavorite(context.Context, *InfoOneReq) (*empty.Empty, error)
 	GetUserFavorite(context.Context, *UIDPageReq) (*InfoIDsResp, error)
 	GetInfoFavorite(context.Context, *InfoIDPageReq) (*UserIDsResp, error)
 }
@@ -2055,7 +2166,7 @@ func _Content_EditInfo_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 func _Content_GetInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetInfoReq)
+	in := new(InfoOneReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2067,7 +2178,7 @@ func _Content_GetInfo_Handler(srv interface{}, ctx context.Context, dec func(int
 		FullMethod: "/teddy.srv.content.Content/GetInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServer).GetInfo(ctx, req.(*GetInfoReq))
+		return srv.(ContentServer).GetInfo(ctx, req.(*InfoOneReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2091,7 +2202,7 @@ func _Content_GetInfos_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 func _Content_DeleteInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InfoIDAndUIDReq)
+	in := new(InfoOneReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2103,13 +2214,13 @@ func _Content_DeleteInfo_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: "/teddy.srv.content.Content/DeleteInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServer).DeleteInfo(ctx, req.(*InfoIDAndUIDReq))
+		return srv.(ContentServer).DeleteInfo(ctx, req.(*InfoOneReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Content_WatchInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InfoIDAndUIDReq)
+	in := new(InfoOneReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2121,7 +2232,7 @@ func _Content_WatchInfo_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: "/teddy.srv.content.Content/WatchInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServer).WatchInfo(ctx, req.(*InfoIDAndUIDReq))
+		return srv.(ContentServer).WatchInfo(ctx, req.(*InfoOneReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2145,7 +2256,7 @@ func _Content_GetSegments_Handler(srv interface{}, ctx context.Context, dec func
 }
 
 func _Content_GetSegment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InfoIDAndUIDAndSegIDReq)
+	in := new(SegmentOneReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2157,7 +2268,7 @@ func _Content_GetSegment_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: "/teddy.srv.content.Content/GetSegment",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServer).GetSegment(ctx, req.(*InfoIDAndUIDAndSegIDReq))
+		return srv.(ContentServer).GetSegment(ctx, req.(*SegmentOneReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2199,7 +2310,7 @@ func _Content_EditSegment_Handler(srv interface{}, ctx context.Context, dec func
 }
 
 func _Content_DeleteSegment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InfoIDAndUIDAndSegIDReq)
+	in := new(SegmentOneReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2211,13 +2322,67 @@ func _Content_DeleteSegment_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: "/teddy.srv.content.Content/DeleteSegment",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServer).DeleteSegment(ctx, req.(*InfoIDAndUIDAndSegIDReq))
+		return srv.(ContentServer).DeleteSegment(ctx, req.(*SegmentOneReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_PublishContent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InsertContentReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).PublishContent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/teddy.srv.content.Content/PublishContent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).PublishContent(ctx, req.(*InsertContentReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_EditContent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EditContentReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).EditContent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/teddy.srv.content.Content/EditContent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).EditContent(ctx, req.(*EditContentReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Content_DeleteContent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ContentOneReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ContentServer).DeleteContent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/teddy.srv.content.Content/DeleteContent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ContentServer).DeleteContent(ctx, req.(*ContentOneReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Content_ThumbUp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InfoIDAndUIDReq)
+	in := new(InfoOneReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2229,13 +2394,13 @@ func _Content_ThumbUp_Handler(srv interface{}, ctx context.Context, dec func(int
 		FullMethod: "/teddy.srv.content.Content/ThumbUp",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServer).ThumbUp(ctx, req.(*InfoIDAndUIDReq))
+		return srv.(ContentServer).ThumbUp(ctx, req.(*InfoOneReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Content_DeleteThumbUp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InfoIDAndUIDReq)
+	in := new(InfoOneReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2247,7 +2412,7 @@ func _Content_DeleteThumbUp_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: "/teddy.srv.content.Content/DeleteThumbUp",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServer).DeleteThumbUp(ctx, req.(*InfoIDAndUIDReq))
+		return srv.(ContentServer).DeleteThumbUp(ctx, req.(*InfoOneReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2289,7 +2454,7 @@ func _Content_GetInfoThumbUp_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _Content_ThumbDown_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InfoIDAndUIDReq)
+	in := new(InfoOneReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2301,13 +2466,13 @@ func _Content_ThumbDown_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: "/teddy.srv.content.Content/ThumbDown",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServer).ThumbDown(ctx, req.(*InfoIDAndUIDReq))
+		return srv.(ContentServer).ThumbDown(ctx, req.(*InfoOneReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Content_DeleteThumbDown_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InfoIDAndUIDReq)
+	in := new(InfoOneReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2319,7 +2484,7 @@ func _Content_DeleteThumbDown_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: "/teddy.srv.content.Content/DeleteThumbDown",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServer).DeleteThumbDown(ctx, req.(*InfoIDAndUIDReq))
+		return srv.(ContentServer).DeleteThumbDown(ctx, req.(*InfoOneReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2361,7 +2526,7 @@ func _Content_GetInfoThumbDown_Handler(srv interface{}, ctx context.Context, dec
 }
 
 func _Content_Favorite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InfoIDAndUIDReq)
+	in := new(InfoOneReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2373,13 +2538,13 @@ func _Content_Favorite_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: "/teddy.srv.content.Content/Favorite",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServer).Favorite(ctx, req.(*InfoIDAndUIDReq))
+		return srv.(ContentServer).Favorite(ctx, req.(*InfoOneReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Content_DeleteFavorite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InfoIDAndUIDReq)
+	in := new(InfoOneReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -2391,7 +2556,7 @@ func _Content_DeleteFavorite_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: "/teddy.srv.content.Content/DeleteFavorite",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContentServer).DeleteFavorite(ctx, req.(*InfoIDAndUIDReq))
+		return srv.(ContentServer).DeleteFavorite(ctx, req.(*InfoOneReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2485,6 +2650,18 @@ var _Content_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Content_DeleteSegment_Handler,
 		},
 		{
+			MethodName: "PublishContent",
+			Handler:    _Content_PublishContent_Handler,
+		},
+		{
+			MethodName: "EditContent",
+			Handler:    _Content_EditContent_Handler,
+		},
+		{
+			MethodName: "DeleteContent",
+			Handler:    _Content_DeleteContent_Handler,
+		},
+		{
 			MethodName: "ThumbUp",
 			Handler:    _Content_ThumbUp_Handler,
 		},
@@ -2538,111 +2715,115 @@ var _Content_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("github.com/zhsyourai/teddy-backend/common/proto/content/content.proto", fileDescriptor_content_9550acadfe790b11)
+	proto.RegisterFile("github.com/zhsyourai/teddy-backend/common/proto/content/content.proto", fileDescriptor_content_991762cde0399d04)
 }
 
-var fileDescriptor_content_9550acadfe790b11 = []byte{
-	// 1628 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x58, 0xcd, 0x73, 0x13, 0xc7,
-	0x12, 0xb7, 0x56, 0xdf, 0x2d, 0x5b, 0x86, 0x81, 0x67, 0xef, 0x13, 0xe0, 0x67, 0x6f, 0x51, 0xf5,
-	0x5c, 0xbc, 0x87, 0x54, 0x98, 0x84, 0x4a, 0x41, 0x2e, 0xc6, 0x72, 0x8c, 0x08, 0x04, 0xb2, 0x96,
-	0x20, 0x50, 0xc5, 0x61, 0x25, 0x8d, 0x57, 0x5b, 0x68, 0x77, 0x95, 0x9d, 0x91, 0x29, 0x71, 0xc8,
-	0x29, 0x87, 0xe4, 0x9e, 0x7f, 0x22, 0x7f, 0x43, 0x0e, 0x39, 0xe5, 0xdf, 0xc9, 0x35, 0xb7, 0x54,
-	0x6a, 0xbe, 0x56, 0x2b, 0x7b, 0x57, 0x1f, 0x58, 0xa4, 0x72, 0xb1, 0xa7, 0x67, 0xba, 0x7b, 0xfa,
-	0x63, 0xfa, 0xd7, 0xbd, 0x82, 0x43, 0xdb, 0xa1, 0xbd, 0x61, 0xbb, 0xda, 0xf1, 0xdd, 0xda, 0xfb,
-	0x1e, 0x19, 0xf9, 0xc3, 0xc0, 0x72, 0x6a, 0x14, 0x77, 0xbb, 0xa3, 0xdb, 0x6d, 0xab, 0xf3, 0x16,
-	0x7b, 0xdd, 0x5a, 0xc7, 0x77, 0x5d, 0xdf, 0xab, 0x0d, 0x02, 0x9f, 0xfa, 0xb5, 0x8e, 0xef, 0x51,
-	0xec, 0x51, 0xf5, 0xbf, 0xca, 0x77, 0xd1, 0x65, 0x2e, 0x51, 0x25, 0xc1, 0x69, 0x55, 0x1e, 0x54,
-	0xee, 0x46, 0x34, 0xdb, 0x7e, 0xdf, 0xf2, 0x6c, 0xa1, 0xa1, 0x3d, 0x3c, 0xa9, 0x0d, 0xe8, 0x68,
-	0x80, 0x49, 0x0d, 0xbb, 0x03, 0x3a, 0x12, 0x7f, 0x85, 0x9e, 0xca, 0x83, 0xd9, 0x42, 0xd4, 0x71,
-	0x31, 0xa1, 0x96, 0x3b, 0x18, 0xaf, 0x84, 0xb0, 0xf1, 0x7f, 0xc8, 0x1c, 0xfb, 0x01, 0x45, 0x08,
-	0x32, 0x9e, 0xe5, 0x62, 0x3d, 0xb5, 0x9d, 0xda, 0x2d, 0x9a, 0x7c, 0x8d, 0x2e, 0x41, 0xda, 0x22,
-	0x1d, 0x5d, 0xdb, 0x4e, 0xed, 0x16, 0x4c, 0xb6, 0x34, 0x7e, 0x49, 0x41, 0xba, 0x69, 0xd9, 0xec,
-	0x84, 0x5a, 0xb6, 0x64, 0x66, 0x4b, 0x26, 0xcf, 0xae, 0xe2, 0xcc, 0x45, 0x93, 0xaf, 0xd1, 0x55,
-	0xc8, 0x0e, 0x89, 0x65, 0x63, 0x3d, 0xbd, 0x9d, 0xda, 0xcd, 0x98, 0x82, 0x40, 0xf7, 0x01, 0x3a,
-	0x01, 0xb6, 0x28, 0x6e, 0x3a, 0x2e, 0xd6, 0x33, 0xdb, 0xa9, 0xdd, 0xd2, 0x5e, 0xa5, 0x6a, 0xfb,
-	0xbe, 0xdd, 0xc7, 0x55, 0x65, 0x78, 0xb5, 0xa9, 0xec, 0x34, 0x23, 0xdc, 0xe8, 0x73, 0x28, 0xf5,
-	0x2d, 0x42, 0x5b, 0x44, 0x08, 0x67, 0x67, 0x0a, 0x47, 0xd9, 0x8d, 0x3d, 0x80, 0xa6, 0x65, 0xef,
-	0x7b, 0xdd, 0x26, 0xb3, 0x6e, 0x2e, 0x1f, 0x8c, 0xdf, 0x0a, 0x90, 0x69, 0x78, 0x27, 0x3e, 0xda,
-	0x80, 0x9c, 0xe3, 0x9d, 0xf8, 0x8d, 0xba, 0x94, 0x90, 0x14, 0x53, 0x33, 0x74, 0xba, 0x52, 0x86,
-	0x2d, 0x19, 0xa7, 0x35, 0xa4, 0x3d, 0x3f, 0xe0, 0x7e, 0x17, 0x4d, 0x49, 0xb1, 0x70, 0x50, 0x87,
-	0xf6, 0x85, 0xcf, 0x45, 0x53, 0x10, 0x48, 0x87, 0x3c, 0x19, 0xba, 0xae, 0x15, 0x8c, 0xb8, 0x3b,
-	0x45, 0x53, 0x91, 0xec, 0xa4, 0xe3, 0x0f, 0x3d, 0x1a, 0x8c, 0xf4, 0x9c, 0x38, 0x91, 0x24, 0x0b,
-	0x83, 0x7c, 0x31, 0x3c, 0x0c, 0xf9, 0xd9, 0x61, 0x88, 0xb0, 0xa3, 0x63, 0x28, 0x77, 0xfc, 0x53,
-	0x1c, 0x98, 0x98, 0xf8, 0xc3, 0xa0, 0x83, 0x89, 0x5e, 0xd8, 0x4e, 0xef, 0x96, 0xf6, 0xfe, 0x57,
-	0x3d, 0xf7, 0x20, 0xab, 0xcc, 0xf5, 0xea, 0xc1, 0x04, 0xf7, 0x21, 0x33, 0xc1, 0x3c, 0xa3, 0x82,
-	0x99, 0x34, 0x18, 0xb6, 0xfb, 0x0e, 0xe9, 0x71, 0x93, 0x8a, 0xb3, 0x4d, 0x8a, 0xb0, 0xa3, 0x87,
-	0x50, 0x66, 0x89, 0x32, 0xf1, 0xa9, 0x83, 0xdf, 0x71, 0x05, 0x30, 0x53, 0xc1, 0x19, 0x09, 0xb4,
-	0x05, 0xf0, 0xce, 0xa2, 0x9d, 0xde, 0x01, 0x0b, 0x92, 0x5e, 0xe2, 0x4f, 0x2e, 0xb2, 0x83, 0xee,
-	0x40, 0x86, 0x5a, 0x36, 0xd1, 0x57, 0xb9, 0xb3, 0x37, 0x62, 0x9c, 0x1d, 0x3f, 0x0e, 0x93, 0xb3,
-	0xa2, 0x0a, 0x14, 0x68, 0x6f, 0xe8, 0xb6, 0x5b, 0x03, 0xa2, 0xaf, 0x71, 0x85, 0x21, 0x8d, 0xae,
-	0x43, 0xd1, 0x21, 0x4d, 0x41, 0xe9, 0x65, 0x5e, 0x22, 0xe3, 0x0d, 0xb4, 0x0d, 0x25, 0xc9, 0xf9,
-	0xc4, 0x21, 0x54, 0x5f, 0xdf, 0x4e, 0xef, 0x16, 0xcd, 0xe8, 0x16, 0x33, 0x97, 0x93, 0x75, 0xff,
-	0x9d, 0x47, 0xf4, 0x4b, 0xc2, 0xdc, 0xf1, 0x0e, 0xd3, 0x20, 0xd5, 0x31, 0x5a, 0xbf, 0xcc, 0x6f,
-	0x88, 0x6e, 0xa1, 0x9b, 0xb0, 0x16, 0xf2, 0xf3, 0x5b, 0x10, 0xbf, 0x65, 0x72, 0x93, 0xd9, 0x79,
-	0x62, 0x9d, 0xfa, 0x81, 0x43, 0x31, 0xd1, 0xaf, 0xf0, 0x6b, 0xc6, 0x1b, 0xcc, 0x0a, 0x87, 0x7c,
-	0x21, 0x49, 0xfd, 0x2a, 0xbf, 0x24, 0xb2, 0x83, 0x0c, 0x58, 0x55, 0xcc, 0xfc, 0x8a, 0x7f, 0xf1,
-	0x2b, 0x26, 0xf6, 0x54, 0xf2, 0x9e, 0xfa, 0x5d, 0xe7, 0x64, 0xc4, 0x93, 0xb7, 0x31, 0x5f, 0xf2,
-	0xc6, 0x12, 0xcc, 0xca, 0x8e, 0xe5, 0x89, 0x6c, 0xea, 0x9b, 0x22, 0x9a, 0xe1, 0x06, 0xab, 0x9c,
-	0x53, 0xab, 0xef, 0x74, 0x75, 0x9d, 0x9f, 0x08, 0x82, 0x65, 0xc7, 0x0a, 0x3a, 0x3d, 0xe7, 0x14,
-	0x77, 0xf5, 0x7f, 0xf3, 0x83, 0x90, 0x46, 0xbb, 0xb0, 0xfe, 0xc4, 0xa2, 0x98, 0xd0, 0x63, 0x6c,
-	0xbb, 0xd8, 0xa3, 0x8d, 0xba, 0x5e, 0xe1, 0x35, 0x74, 0x76, 0x9b, 0x79, 0x28, 0x09, 0xf1, 0x70,
-	0xae, 0xf1, 0x10, 0x4d, 0xec, 0x55, 0xf6, 0xe1, 0x4a, 0x4c, 0x0d, 0xb0, 0xd2, 0x7f, 0x8b, 0x47,
-	0x0a, 0x41, 0xde, 0xe2, 0x91, 0x34, 0x74, 0xa8, 0x20, 0x44, 0x10, 0xf7, 0xb5, 0xcf, 0x52, 0xc6,
-	0xef, 0x29, 0xc8, 0x4b, 0x9d, 0xa8, 0x0c, 0x9a, 0xd3, 0x95, 0x62, 0x9a, 0x00, 0x0c, 0x09, 0x2d,
-	0xda, 0x04, 0xb4, 0x94, 0x41, 0xf3, 0x7c, 0x0e, 0x22, 0x69, 0x53, 0xf3, 0xfc, 0x04, 0x00, 0xd9,
-	0x80, 0x5c, 0xdf, 0x6a, 0xe3, 0x3e, 0xd1, 0xb3, 0x3c, 0x39, 0x92, 0x42, 0xfb, 0x0c, 0x3e, 0xf8,
-	0xc3, 0xd6, 0x73, 0xfc, 0xc9, 0xff, 0x37, 0xe6, 0xc9, 0x4b, 0x93, 0xaa, 0x07, 0x82, 0x16, 0xb5,
-	0xad, 0xe4, 0x2a, 0xf7, 0x61, 0x35, 0x7a, 0xb0, 0x90, 0xc3, 0x3f, 0xa4, 0xa0, 0x78, 0x84, 0x69,
-	0xd3, 0xb2, 0x4d, 0xfc, 0x2d, 0x83, 0xd6, 0x01, 0xeb, 0x04, 0x4c, 0x74, 0xcd, 0xe4, 0x6b, 0xb6,
-	0x47, 0x9c, 0xf7, 0x42, 0x74, 0xcd, 0xe4, 0xeb, 0x10, 0x82, 0xd3, 0x91, 0x36, 0x72, 0x1b, 0xb2,
-	0xc4, 0x0f, 0x28, 0xd1, 0x33, 0xdc, 0x8d, 0xcd, 0x38, 0x37, 0xfc, 0x80, 0x9a, 0x82, 0x4b, 0x01,
-	0x72, 0x36, 0x04, 0x64, 0x63, 0x08, 0xd0, 0x6a, 0xd4, 0x9f, 0x5b, 0x36, 0x5e, 0xc4, 0x94, 0xf0,
-	0xda, 0xf4, 0x22, 0xd7, 0x66, 0xc6, 0xd7, 0xbe, 0x82, 0x92, 0x08, 0x00, 0x31, 0x31, 0x19, 0xf0,
-	0x82, 0xf7, 0xa9, 0xd5, 0x17, 0xcf, 0x2c, 0x25, 0x0b, 0x3e, 0xdc, 0x41, 0xb7, 0x24, 0x3e, 0x69,
-	0xfc, 0xba, 0x8d, 0x78, 0x7c, 0x12, 0xc0, 0x64, 0xfc, 0xa1, 0x41, 0xf9, 0xb9, 0xc0, 0x4f, 0x86,
-	0xd0, 0xcc, 0x2d, 0x79, 0x7f, 0x2a, 0xae, 0x0f, 0x69, 0xf1, 0x7d, 0x28, 0x9d, 0xd0, 0x87, 0x32,
-	0x89, 0x7d, 0x28, 0x3b, 0xd9, 0x87, 0x14, 0xa4, 0xe6, 0xe6, 0x87, 0xd4, 0x37, 0xe7, 0x9a, 0x4f,
-	0x9e, 0x0b, 0x7f, 0x1a, 0x23, 0x3c, 0xe9, 0xe1, 0x5c, 0x6d, 0x68, 0x02, 0x47, 0x0a, 0x67, 0x70,
-	0x64, 0x19, 0x75, 0xfc, 0x63, 0x1a, 0x4a, 0x87, 0x5d, 0x87, 0xaa, 0xb0, 0xff, 0x93, 0xc6, 0x02,
-	0x95, 0x8e, 0xfc, 0xfc, 0xe9, 0x78, 0x9d, 0x30, 0x0b, 0xec, 0xc5, 0x08, 0x47, 0xdc, 0x5e, 0x3c,
-	0x17, 0xc5, 0x8f, 0x90, 0x8b, 0x9f, 0x53, 0x50, 0x3e, 0xc2, 0x0a, 0xcb, 0xc9, 0x22, 0xc5, 0x3d,
-	0x4e, 0x5b, 0x3a, 0x2e, 0x6d, 0x99, 0x89, 0xb4, 0xc5, 0xc2, 0x6b, 0x08, 0x0f, 0xb9, 0x79, 0xe0,
-	0xc1, 0x68, 0x43, 0x41, 0xd9, 0x39, 0x13, 0x09, 0xee, 0x41, 0x81, 0x48, 0x5e, 0x89, 0x06, 0x95,
-	0x64, 0xe8, 0x36, 0x43, 0x5e, 0xe3, 0x7b, 0x0d, 0x2e, 0xcb, 0x9a, 0x51, 0x87, 0x0b, 0xbd, 0xd0,
-	0x8b, 0xf5, 0x9b, 0x2f, 0xcf, 0xf6, 0x9b, 0x3b, 0xc9, 0x25, 0x3d, 0x36, 0xef, 0x23, 0x74, 0x9e,
-	0x9f, 0x34, 0x28, 0xb3, 0xb7, 0xfa, 0x41, 0x31, 0xb8, 0x0a, 0x59, 0x82, 0xed, 0xf0, 0x5d, 0x08,
-	0x42, 0x46, 0x26, 0x73, 0x3e, 0x32, 0xd9, 0xf8, 0xc8, 0xe4, 0x26, 0x22, 0xf3, 0x68, 0x1c, 0x19,
-	0x51, 0x9a, 0xd5, 0x84, 0xea, 0xfa, 0xa8, 0x61, 0x79, 0x05, 0x9b, 0x0d, 0xee, 0xf5, 0xbe, 0xd7,
-	0x6d, 0xf1, 0xbf, 0xc7, 0xcc, 0xb7, 0x25, 0x84, 0xc7, 0xb8, 0x07, 0x70, 0x84, 0x17, 0x87, 0x44,
-	0xe3, 0xd7, 0x14, 0x6f, 0x91, 0x4c, 0x90, 0xfc, 0x9d, 0xad, 0x39, 0x21, 0x7f, 0x8b, 0xb7, 0x33,
-	0xe3, 0x0d, 0xac, 0x8e, 0x1d, 0x98, 0xa3, 0xc9, 0xdf, 0x86, 0x2c, 0x8b, 0x86, 0xaa, 0xeb, 0xcd,
-	0x84, 0x4f, 0x2e, 0x53, 0x70, 0x19, 0x0f, 0x60, 0x3d, 0x9a, 0xb3, 0xc4, 0x3e, 0x1f, 0x37, 0x3e,
-	0x1a, 0xdf, 0xc1, 0x9a, 0x10, 0x56, 0x93, 0x4f, 0x52, 0x62, 0x54, 0xd8, 0xb5, 0x98, 0xb0, 0xa7,
-	0xe3, 0xc2, 0x3e, 0xd7, 0x20, 0x66, 0x3c, 0x83, 0x52, 0xab, 0x51, 0x7f, 0xe9, 0x50, 0xf1, 0x8d,
-	0x77, 0xde, 0xf0, 0x2a, 0x64, 0x28, 0xfb, 0x5c, 0xd0, 0x66, 0x7e, 0x2e, 0x70, 0x3e, 0xe3, 0x00,
-	0x4a, 0x2d, 0x82, 0x83, 0x46, 0x5d, 0xc4, 0xfa, 0x13, 0xc8, 0x3a, 0x14, 0xbb, 0x44, 0x4f, 0x71,
-	0x73, 0xb6, 0x62, 0xcc, 0x89, 0xdc, 0x6f, 0x0a, 0x66, 0xe3, 0x1b, 0x28, 0x8b, 0xa8, 0x84, 0x86,
-	0xa9, 0xb0, 0x74, 0x27, 0xc2, 0xb2, 0xb8, 0x79, 0x0f, 0xa1, 0x24, 0x34, 0x0b, 0xf3, 0xee, 0x42,
-	0xda, 0xe9, 0x2a, 0xe3, 0x76, 0x12, 0x12, 0x1d, 0xb1, 0x8f, 0x71, 0xef, 0xfd, 0x59, 0x86, 0xbc,
-	0xac, 0x70, 0xd4, 0x80, 0xbc, 0x9c, 0x1f, 0xd1, 0xf5, 0x18, 0xf1, 0x70, 0xb8, 0xae, 0x6c, 0x25,
-	0x9e, 0x72, 0x4b, 0x8c, 0x15, 0xf4, 0x18, 0x4a, 0x91, 0x61, 0x0a, 0xed, 0xcc, 0x1c, 0xb6, 0x2a,
-	0x1b, 0xe7, 0xdc, 0x3d, 0x74, 0x07, 0x74, 0x64, 0xac, 0xa0, 0x3a, 0x14, 0xd4, 0x24, 0x80, 0xb6,
-	0xa6, 0x8f, 0x09, 0x53, 0xb4, 0x1c, 0x70, 0xe7, 0xb8, 0x92, 0x1b, 0xf1, 0xe6, 0x2b, 0x1d, 0x49,
-	0x35, 0x62, 0xac, 0xa0, 0xa7, 0x50, 0x50, 0xd5, 0x87, 0xb6, 0x92, 0xb5, 0x30, 0x6c, 0xa9, 0xfc,
-	0x67, 0xea, 0xb9, 0x8c, 0x12, 0xd4, 0x71, 0x1f, 0x53, 0xcc, 0xcd, 0x32, 0x12, 0x53, 0x16, 0x16,
-	0xe3, 0x14, 0xff, 0x1a, 0x50, 0x7c, 0x69, 0xd1, 0x4e, 0x6f, 0x09, 0xaa, 0x9e, 0x71, 0x90, 0x0c,
-	0xa7, 0x87, 0x9d, 0x78, 0x47, 0x22, 0x53, 0x50, 0xe5, 0x5a, 0xf2, 0xb8, 0x40, 0x8c, 0x15, 0xf4,
-	0x82, 0xc3, 0xb5, 0xfa, 0x1a, 0xbd, 0x35, 0xc3, 0xb8, 0x48, 0xa3, 0xa8, 0x4c, 0x99, 0x43, 0x8c,
-	0x15, 0xf4, 0x3c, 0xfc, 0x28, 0x51, 0xba, 0x6f, 0xce, 0x33, 0x02, 0x4c, 0x71, 0xfd, 0xb1, 0x18,
-	0xb6, 0x95, 0xba, 0x9d, 0x99, 0x7d, 0x73, 0x8a, 0xae, 0x16, 0xac, 0x89, 0xec, 0x7e, 0x88, 0xe3,
-	0xc9, 0x6a, 0x8f, 0x20, 0xaf, 0x7e, 0xf4, 0xb9, 0x58, 0x9a, 0x9f, 0x2a, 0xfb, 0x96, 0xa3, 0xee,
-	0x6b, 0x3e, 0x1b, 0x33, 0xbc, 0x54, 0xfa, 0x6e, 0xc4, 0x03, 0xa4, 0xec, 0x0e, 0xb1, 0x28, 0x12,
-	0xc1, 0x33, 0x63, 0x05, 0x35, 0xb9, 0x4a, 0xb6, 0x17, 0xfe, 0xcc, 0x95, 0x28, 0x33, 0x4d, 0x6b,
-	0x04, 0xc4, 0x45, 0xa5, 0x8c, 0x7f, 0xd3, 0xba, 0x68, 0xa5, 0xac, 0x47, 0x42, 0xb8, 0x04, 0x85,
-	0xc7, 0x70, 0x29, 0x1a, 0x44, 0xae, 0xf1, 0xc2, 0x61, 0x7c, 0xc1, 0x95, 0x86, 0x61, 0xe4, 0x4a,
-	0x97, 0x11, 0xc8, 0x47, 0x50, 0x18, 0xff, 0x6e, 0x77, 0x21, 0xb7, 0xbf, 0x82, 0xb2, 0x88, 0xe3,
-	0x92, 0xf4, 0x99, 0xb0, 0x2e, 0xc3, 0x18, 0x2a, 0xbc, 0x70, 0x14, 0x5b, 0x5c, 0x27, 0xdb, 0x0b,
-	0x75, 0x2e, 0x21, 0x88, 0x0f, 0x8b, 0xaf, 0xd5, 0xb0, 0xdd, 0xce, 0x71, 0x3f, 0xee, 0xfe, 0x15,
-	0x00, 0x00, 0xff, 0xff, 0x01, 0x2b, 0x77, 0x5a, 0xef, 0x19, 0x00, 0x00,
+var fileDescriptor_content_991762cde0399d04 = []byte{
+	// 1681 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x58, 0x4b, 0x6f, 0xdb, 0xc6,
+	0x16, 0x36, 0xa9, 0x87, 0xa5, 0x23, 0x4b, 0x76, 0x26, 0xb9, 0x0e, 0xaf, 0x92, 0xf8, 0xca, 0xbc,
+	0x01, 0xae, 0x71, 0xdb, 0xc8, 0x88, 0xd3, 0x17, 0xd2, 0x76, 0x91, 0x58, 0x4e, 0xa2, 0x3c, 0x90,
+	0x94, 0x96, 0x9b, 0x36, 0x40, 0x16, 0x94, 0x34, 0x96, 0x88, 0x48, 0xa4, 0xca, 0x19, 0x29, 0x50,
+	0x16, 0x5d, 0x74, 0xd1, 0xbf, 0xd0, 0x4d, 0x7f, 0x42, 0xfb, 0x0b, 0xba, 0xee, 0xdf, 0xe9, 0xa2,
+	0x9b, 0x6c, 0x8b, 0x79, 0x51, 0x94, 0x4d, 0x52, 0x94, 0x9d, 0x00, 0xd9, 0xd8, 0x3c, 0xc3, 0x73,
+	0xbe, 0x39, 0xe7, 0x9b, 0x39, 0x0f, 0x0a, 0x0e, 0x7a, 0x0e, 0xed, 0x8f, 0xdb, 0xf5, 0x8e, 0x37,
+	0xdc, 0x7d, 0xd3, 0x27, 0x53, 0x6f, 0xec, 0xdb, 0xce, 0x2e, 0xc5, 0xdd, 0xee, 0xf4, 0x46, 0xdb,
+	0xee, 0xbc, 0xc2, 0x6e, 0x77, 0xb7, 0xe3, 0x0d, 0x87, 0x9e, 0xbb, 0x3b, 0xf2, 0x3d, 0xea, 0xed,
+	0x76, 0x3c, 0x97, 0x62, 0x97, 0xaa, 0xff, 0x75, 0xbe, 0x8a, 0x2e, 0x70, 0x8b, 0x3a, 0xf1, 0x27,
+	0x75, 0xf9, 0xa2, 0x7a, 0x2b, 0x84, 0xdc, 0xf3, 0x06, 0xb6, 0xdb, 0x13, 0x08, 0xed, 0xf1, 0xf1,
+	0xee, 0x88, 0x4e, 0x47, 0x98, 0xec, 0xe2, 0xe1, 0x88, 0x4e, 0xc5, 0x5f, 0x81, 0x53, 0xfd, 0x72,
+	0xb1, 0x11, 0x75, 0x86, 0x98, 0x50, 0x7b, 0x38, 0x9a, 0x3d, 0x09, 0x63, 0xf3, 0x63, 0xc8, 0x1e,
+	0x7a, 0x3e, 0x45, 0x08, 0xb2, 0xae, 0x3d, 0xc4, 0x86, 0x56, 0xd3, 0x76, 0x8a, 0x16, 0x7f, 0x46,
+	0x1b, 0x90, 0xb1, 0x49, 0xc7, 0xd0, 0x6b, 0xda, 0x4e, 0xc1, 0x62, 0x8f, 0xe6, 0x1f, 0x1a, 0x64,
+	0x5a, 0x76, 0x8f, 0xbd, 0xa1, 0x76, 0x4f, 0x2a, 0xb3, 0x47, 0x66, 0xcf, 0xb6, 0xe2, 0xca, 0x45,
+	0x8b, 0x3f, 0xa3, 0x4b, 0x90, 0x1b, 0x13, 0xbb, 0x87, 0x8d, 0x4c, 0x4d, 0xdb, 0xc9, 0x5a, 0x42,
+	0x40, 0xb7, 0x01, 0x3a, 0x3e, 0xb6, 0x29, 0x6e, 0x39, 0x43, 0x6c, 0x64, 0x6b, 0xda, 0x4e, 0x69,
+	0xaf, 0x5a, 0xef, 0x79, 0x5e, 0x6f, 0x80, 0xeb, 0xca, 0xf1, 0x7a, 0x4b, 0xf9, 0x69, 0x85, 0xb4,
+	0xd1, 0x57, 0x50, 0x1a, 0xd8, 0x84, 0x1e, 0x11, 0x61, 0x9c, 0x5b, 0x68, 0x1c, 0x56, 0x37, 0xf7,
+	0x00, 0x5a, 0x76, 0xef, 0x8e, 0xdb, 0x6d, 0x31, 0xef, 0x52, 0xc5, 0x60, 0xfe, 0x59, 0x80, 0x6c,
+	0xd3, 0x3d, 0xf6, 0xd0, 0x26, 0xe4, 0x1d, 0xf7, 0xd8, 0x6b, 0x36, 0xa4, 0x85, 0x94, 0x18, 0xcc,
+	0xd8, 0xe9, 0x4a, 0x1b, 0xf6, 0xc8, 0x34, 0xed, 0x31, 0xed, 0x7b, 0x3e, 0x8f, 0xbb, 0x68, 0x49,
+	0x89, 0xd1, 0x41, 0x1d, 0x3a, 0x10, 0x31, 0x17, 0x2d, 0x21, 0x20, 0x03, 0x56, 0xc9, 0x78, 0x38,
+	0xb4, 0xfd, 0x29, 0x0f, 0xa7, 0x68, 0x29, 0x91, 0xbd, 0xe9, 0x78, 0x63, 0x97, 0xfa, 0x53, 0x23,
+	0x2f, 0xde, 0x48, 0x91, 0xd1, 0x20, 0x6f, 0x0c, 0xa7, 0x61, 0x75, 0x31, 0x0d, 0x21, 0x75, 0x74,
+	0x08, 0x95, 0x8e, 0x37, 0xc1, 0xbe, 0x85, 0x89, 0x37, 0xf6, 0x3b, 0x98, 0x18, 0x85, 0x5a, 0x66,
+	0xa7, 0xb4, 0xf7, 0x51, 0xfd, 0xd4, 0x85, 0xac, 0xb3, 0xd0, 0xeb, 0xfb, 0x73, 0xda, 0x07, 0xcc,
+	0x05, 0xeb, 0x04, 0x04, 0x73, 0x69, 0x34, 0x6e, 0x0f, 0x1c, 0xd2, 0xe7, 0x2e, 0x15, 0x17, 0xbb,
+	0x14, 0x52, 0x47, 0x77, 0xa1, 0xc2, 0x0e, 0xca, 0xc2, 0x13, 0x07, 0xbf, 0xe6, 0x00, 0xb0, 0x10,
+	0xe0, 0x84, 0x05, 0xda, 0x02, 0x78, 0x6d, 0xd3, 0x4e, 0x7f, 0x9f, 0x91, 0x64, 0x94, 0xf8, 0x95,
+	0x0b, 0xad, 0xa0, 0x9b, 0x90, 0xa5, 0x76, 0x8f, 0x18, 0x6b, 0x3c, 0xd8, 0x6b, 0x11, 0xc1, 0xce,
+	0x2e, 0x87, 0xc5, 0x55, 0x51, 0x15, 0x0a, 0xb4, 0x3f, 0x1e, 0xb6, 0x8f, 0x46, 0xc4, 0x28, 0x73,
+	0xc0, 0x40, 0x46, 0x57, 0xa1, 0xe8, 0x90, 0x96, 0x90, 0x8c, 0x0a, 0x4f, 0x91, 0xd9, 0x02, 0xaa,
+	0x41, 0x49, 0x6a, 0x3e, 0x76, 0x08, 0x35, 0xd6, 0x6b, 0x99, 0x9d, 0xa2, 0x15, 0x5e, 0x62, 0xee,
+	0x72, 0xb1, 0xe1, 0xbd, 0x76, 0x89, 0xb1, 0x21, 0xdc, 0x9d, 0xad, 0x30, 0x04, 0x09, 0xc7, 0x64,
+	0xe3, 0x02, 0xdf, 0x21, 0xbc, 0x84, 0xae, 0x43, 0x39, 0xd0, 0xe7, 0xbb, 0x20, 0xbe, 0xcb, 0xfc,
+	0x22, 0xf3, 0xf3, 0xd8, 0x9e, 0x78, 0xbe, 0x43, 0x31, 0x31, 0x2e, 0xf2, 0x6d, 0x66, 0x0b, 0xcc,
+	0x0b, 0x87, 0xdc, 0x93, 0xa2, 0x71, 0x89, 0x6f, 0x12, 0x5a, 0x41, 0x26, 0xac, 0x29, 0x65, 0xbe,
+	0xc5, 0xbf, 0xf8, 0x16, 0x73, 0x6b, 0xea, 0xf0, 0x9e, 0x78, 0x5d, 0xe7, 0x78, 0xca, 0x0f, 0x6f,
+	0x33, 0xdd, 0xe1, 0xcd, 0x2c, 0x98, 0x97, 0x1d, 0xdb, 0x15, 0xa7, 0x69, 0x5c, 0x16, 0x6c, 0x06,
+	0x0b, 0x2c, 0x73, 0x26, 0xf6, 0xc0, 0xe9, 0x1a, 0x06, 0x7f, 0x23, 0x04, 0x76, 0x3a, 0xb6, 0xdf,
+	0xe9, 0x3b, 0x13, 0xdc, 0x35, 0xfe, 0xcd, 0x5f, 0x04, 0x32, 0xda, 0x81, 0xf5, 0xc7, 0x36, 0xc5,
+	0x84, 0x1e, 0xe2, 0xde, 0x10, 0xbb, 0xb4, 0xd9, 0x30, 0xaa, 0x3c, 0x87, 0x4e, 0x2e, 0xb3, 0x08,
+	0xa5, 0x20, 0x2e, 0xce, 0x15, 0x4e, 0xd1, 0xdc, 0x5a, 0xf5, 0x0e, 0x5c, 0x8c, 0xc8, 0x01, 0x96,
+	0xfa, 0xaf, 0xf0, 0x54, 0x55, 0x90, 0x57, 0x78, 0x2a, 0x1d, 0x1d, 0xab, 0x12, 0x22, 0x84, 0xdb,
+	0xfa, 0x17, 0x9a, 0xf9, 0x97, 0x06, 0xab, 0x12, 0x13, 0x55, 0x40, 0x77, 0xba, 0xd2, 0x4c, 0x17,
+	0x05, 0x43, 0x96, 0x16, 0x7d, 0xae, 0xb4, 0x54, 0x40, 0x77, 0x3d, 0x5e, 0x44, 0x32, 0x96, 0xee,
+	0x7a, 0x31, 0x05, 0x64, 0x13, 0xf2, 0x03, 0xbb, 0x8d, 0x07, 0xc4, 0xc8, 0xf1, 0xc3, 0x91, 0x12,
+	0xba, 0xc3, 0xca, 0x07, 0xbf, 0xd8, 0x46, 0x9e, 0x5f, 0xf9, 0xff, 0x45, 0x5c, 0x79, 0xe9, 0x52,
+	0x7d, 0x5f, 0xc8, 0x22, 0xb7, 0x95, 0x5d, 0xf5, 0x36, 0xac, 0x85, 0x5f, 0x2c, 0x15, 0xf0, 0x04,
+	0x8a, 0xf7, 0x31, 0x6d, 0xd9, 0x3d, 0x0b, 0xff, 0xc0, 0x2a, 0xeb, 0x88, 0x35, 0x02, 0x66, 0x59,
+	0xb6, 0xf8, 0x33, 0x5b, 0x23, 0xce, 0x1b, 0x61, 0x59, 0xb6, 0xf8, 0x73, 0x50, 0x81, 0x33, 0xa1,
+	0x2e, 0x72, 0x03, 0x72, 0xc4, 0xf3, 0x29, 0x31, 0xb2, 0x3c, 0x8a, 0xcb, 0x51, 0x51, 0x78, 0x3e,
+	0xb5, 0x84, 0x96, 0x39, 0x06, 0x38, 0x6a, 0x36, 0x9e, 0xd9, 0x3d, 0xbc, 0xcc, 0xc6, 0xc1, 0x26,
+	0x99, 0x34, 0x9b, 0xa8, 0xa2, 0x9f, 0x0d, 0x8a, 0xbe, 0xf9, 0x3d, 0x94, 0x44, 0xb8, 0xc4, 0xc2,
+	0x64, 0xc4, 0xb3, 0xdb, 0xa3, 0xf6, 0x40, 0xdc, 0x29, 0x4d, 0x66, 0x77, 0xb0, 0x82, 0xfe, 0x2f,
+	0x8b, 0x91, 0xce, 0xb7, 0xdb, 0x8c, 0x2e, 0x46, 0xa2, 0x0a, 0x99, 0x6f, 0x75, 0xa8, 0x3c, 0x13,
+	0xc5, 0x92, 0x95, 0x63, 0x16, 0x96, 0xdc, 0x5f, 0x8b, 0x6a, 0x3a, 0x7a, 0x74, 0xd3, 0xc9, 0xc4,
+	0x34, 0x9d, 0x6c, 0x6c, 0xd3, 0xc9, 0xcd, 0x37, 0x1d, 0x55, 0x3f, 0xf3, 0xe9, 0xeb, 0xe7, 0xcb,
+	0x53, 0x9d, 0x66, 0x95, 0x1b, 0x7f, 0x1a, 0x61, 0x3c, 0x1f, 0x61, 0xaa, 0x9e, 0x33, 0x57, 0x34,
+	0x0a, 0x27, 0x8a, 0xc6, 0xbb, 0x48, 0xda, 0xb7, 0x3a, 0x94, 0x0e, 0xba, 0x0e, 0x55, 0xb4, 0xc7,
+	0xcd, 0x00, 0x1f, 0x24, 0xf9, 0x2f, 0x62, 0xc8, 0xdf, 0x8b, 0x30, 0x0e, 0x05, 0xf9, 0x61, 0x30,
+	0xff, 0x8b, 0x06, 0x95, 0xfb, 0x58, 0x95, 0x69, 0xb2, 0x4c, 0x2a, 0xcf, 0x0e, 0x29, 0x73, 0xf2,
+	0x90, 0x64, 0x9d, 0xcc, 0xce, 0xd5, 0xc9, 0x20, 0xf5, 0x73, 0xa9, 0xea, 0x4b, 0x1b, 0x0a, 0xca,
+	0xab, 0x85, 0x59, 0xfe, 0x19, 0x14, 0x88, 0xd4, 0x95, 0x99, 0x5e, 0x8d, 0xaf, 0xc1, 0x56, 0xa0,
+	0x6b, 0xfe, 0xad, 0xc1, 0x05, 0x99, 0x0f, 0xea, 0x65, 0xc2, 0xed, 0x13, 0x6d, 0x42, 0x3f, 0xdd,
+	0x26, 0x32, 0xd1, 0x6d, 0x62, 0x3e, 0xfc, 0x47, 0xb3, 0x36, 0x21, 0x08, 0xb8, 0x19, 0x9f, 0x9c,
+	0x33, 0x67, 0xde, 0x43, 0xc3, 0xf8, 0x49, 0x87, 0x0a, 0xbb, 0x87, 0x29, 0x22, 0xbe, 0x04, 0x39,
+	0x82, 0x7b, 0x41, 0xbf, 0x14, 0xc2, 0x39, 0xdb, 0xe5, 0x83, 0x93, 0xed, 0xb2, 0x1e, 0x93, 0x27,
+	0xef, 0x95, 0x84, 0xaf, 0xa1, 0x2c, 0xf1, 0x9f, 0xba, 0x78, 0x69, 0x0a, 0xcc, 0x9f, 0x35, 0xd8,
+	0x68, 0xba, 0x04, 0xfb, 0x54, 0x7a, 0x90, 0x0a, 0x22, 0x13, 0x66, 0xb1, 0x0e, 0x59, 0x9a, 0xee,
+	0xc3, 0x8c, 0xeb, 0xcd, 0x62, 0xc9, 0x85, 0x62, 0x31, 0x7f, 0xd5, 0xc4, 0x61, 0x9e, 0xd9, 0x8d,
+	0x4d, 0xc8, 0x33, 0x3e, 0x9b, 0x0d, 0x79, 0x7a, 0x52, 0x0a, 0xdc, 0xcb, 0x2d, 0xeb, 0x5e, 0x3e,
+	0xec, 0xde, 0x11, 0x94, 0xa5, 0x67, 0x69, 0x69, 0x4e, 0xe3, 0x9c, 0xf9, 0xbb, 0xc6, 0xa7, 0x00,
+	0x56, 0x49, 0xc9, 0x7b, 0x9c, 0x3e, 0xa2, 0x2f, 0xb6, 0x6a, 0x11, 0xb9, 0xd4, 0x2d, 0xc2, 0x7c,
+	0x09, 0x6b, 0x33, 0x77, 0x53, 0x4c, 0x2d, 0x37, 0x20, 0xc7, 0x78, 0x51, 0xc5, 0xec, 0x72, 0xcc,
+	0x07, 0xa3, 0x25, 0xb4, 0xcc, 0xeb, 0x00, 0x4c, 0x4c, 0xa6, 0xd8, 0xfc, 0x11, 0xca, 0x4d, 0xfe,
+	0xa4, 0x66, 0xb6, 0xb8, 0xb3, 0x50, 0x6c, 0xea, 0x11, 0x6c, 0x66, 0xa2, 0xd8, 0x4c, 0x37, 0x30,
+	0x3e, 0x85, 0xd2, 0x51, 0xb3, 0xf1, 0xdc, 0xa1, 0xe2, 0x53, 0xf4, 0xf4, 0x68, 0xa5, 0xae, 0x9c,
+	0x9e, 0xee, 0xca, 0x99, 0xfb, 0x50, 0x3a, 0x22, 0xd8, 0x6f, 0x36, 0x04, 0xa9, 0x9f, 0x40, 0xce,
+	0xa1, 0x78, 0x48, 0x0c, 0x8d, 0xbb, 0xb3, 0x15, 0xe1, 0x4e, 0x68, 0x7f, 0x4b, 0x28, 0x9b, 0xdf,
+	0x41, 0x45, 0xb0, 0x12, 0x38, 0xa6, 0x68, 0xe9, 0xce, 0xd1, 0xb2, 0xbc, 0x7b, 0xf7, 0xa0, 0x24,
+	0x90, 0x85, 0x7b, 0x9f, 0xcf, 0xbb, 0xb7, 0x1d, 0x73, 0xa6, 0xa7, 0x3c, 0xdc, 0xfb, 0x6d, 0x03,
+	0x56, 0x65, 0x12, 0xa1, 0x26, 0xac, 0xca, 0xe9, 0x17, 0x5d, 0x8d, 0x00, 0x08, 0x3e, 0x04, 0xaa,
+	0x5b, 0xb1, 0x6f, 0xb9, 0x37, 0xe6, 0x0a, 0x7a, 0x08, 0xa5, 0xd0, 0x28, 0x88, 0xb6, 0x17, 0x8e,
+	0x8a, 0xd5, 0xcd, 0x53, 0x21, 0x1f, 0x0c, 0x47, 0x74, 0x6a, 0xae, 0xa0, 0x06, 0x14, 0xd4, 0x64,
+	0x83, 0xb6, 0x92, 0xc7, 0x9e, 0x04, 0x94, 0x7d, 0x1e, 0x1c, 0x07, 0xb9, 0x16, 0xc3, 0x8e, 0xb8,
+	0xe2, 0xd5, 0xb8, 0x84, 0x30, 0x57, 0xd0, 0x13, 0x28, 0xa8, 0x54, 0x43, 0x31, 0x24, 0xa8, 0xb2,
+	0x51, 0xfd, 0x4f, 0xe2, 0x7b, 0xce, 0xd2, 0x01, 0x40, 0x03, 0x0f, 0x30, 0xc5, 0x69, 0xdc, 0x4a,
+	0x22, 0xa8, 0xf8, 0xdc, 0xa6, 0x9d, 0xfe, 0xf9, 0x50, 0x9e, 0xf2, 0xaa, 0x17, 0x4c, 0x45, 0xdb,
+	0xd1, 0xee, 0x87, 0x66, 0xb9, 0xea, 0x95, 0xf8, 0x31, 0x88, 0x98, 0x2b, 0xe8, 0x31, 0xc0, 0xcc,
+	0x00, 0xd5, 0xe2, 0x95, 0xa5, 0x6b, 0x09, 0x53, 0x95, 0xb9, 0x82, 0x9e, 0x05, 0x9f, 0x4f, 0x0a,
+	0xf1, 0x7a, 0x9a, 0x11, 0x27, 0x21, 0xe0, 0x87, 0xe2, 0xb3, 0x40, 0xc1, 0x6d, 0x2f, 0x9c, 0x14,
+	0x12, 0xb0, 0x1e, 0x41, 0x59, 0x9c, 0x64, 0xfa, 0x70, 0x93, 0x4e, 0x42, 0x85, 0xaa, 0x32, 0xf3,
+	0xbf, 0x91, 0x87, 0x3a, 0x3f, 0x21, 0x2c, 0x8e, 0x54, 0xa1, 0xc5, 0x45, 0x9a, 0x0a, 0x2b, 0x88,
+	0x54, 0xa1, 0x45, 0x45, 0x3a, 0xd7, 0x96, 0x13, 0xc0, 0xee, 0xc2, 0xaa, 0xfa, 0xad, 0xed, 0xcc,
+	0xf7, 0xf6, 0x81, 0x72, 0xe8, 0xdc, 0x48, 0xdf, 0xf0, 0xaf, 0x15, 0x56, 0xf5, 0x93, 0xa0, 0x66,
+	0xbf, 0x4b, 0x44, 0xd6, 0xc1, 0x50, 0x55, 0x36, 0x57, 0x50, 0x8b, 0x43, 0xb2, 0xb5, 0xe0, 0x37,
+	0xc5, 0x58, 0x9b, 0x24, 0xd4, 0x50, 0x2b, 0x12, 0x09, 0x3f, 0xfb, 0x01, 0xf1, 0xcc, 0xe1, 0x3e,
+	0x84, 0xf5, 0x10, 0x71, 0xe7, 0xc3, 0x3a, 0x84, 0x8d, 0x30, 0x75, 0xb1, 0x60, 0x4b, 0x91, 0xf7,
+	0x2d, 0x07, 0x0d, 0xc8, 0xe3, 0xa0, 0xef, 0x82, 0xbe, 0x7d, 0x28, 0x04, 0x3f, 0x8d, 0x9e, 0x39,
+	0xe2, 0x26, 0x54, 0x04, 0x7b, 0xe7, 0x87, 0xb2, 0x60, 0x5d, 0x92, 0x97, 0x88, 0xb5, 0x14, 0x77,
+	0x47, 0x1c, 0x93, 0xad, 0x05, 0x98, 0xef, 0x80, 0xba, 0xbb, 0xc5, 0x17, 0xea, 0x03, 0xa9, 0x9d,
+	0xe7, 0x71, 0xdc, 0xfa, 0x27, 0x00, 0x00, 0xff, 0xff, 0x0a, 0xdd, 0x93, 0x3e, 0x48, 0x1b, 0x00,
+	0x00,
 }
