@@ -135,6 +135,9 @@ func (m *JwtMiddleware) extractToken(ctx *gin.Context) (map[string]interface{}, 
 	token = tmpParts[1]
 
 	parsedToken, err := jwt.ParseSigned(token)
+	if err != nil {
+		return nil, err
+	}
 	c := make(map[string]interface{})
 	err = parsedToken.Claims(m.key, &c)
 	if err != nil {
