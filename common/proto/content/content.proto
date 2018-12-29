@@ -94,7 +94,7 @@ message Info {
 message Segment {
     string id = 1;
     string infoID = 2;
-    int64 no = 3;
+    uint64 no = 3;
     string title = 4;
     repeated string labels = 5;
     map<string, string> content = 6;
