@@ -1193,8 +1193,9 @@ func (h *Content) PublishSegment(ctx *gin.Context) {
 	}
 
 	type publishSegmentReq struct {
-		No     uint64   `json:"no"`
-		Labels []string `json:"labels"`
+		No     uint64   `form:"no" binding:"required"`
+		Labels []string `form:"labels" binding:"required"`
+		Title  string   `form:"title" binding:"required"`
 	}
 	var req publishSegmentReq
 	err = ctx.Bind(&req)
@@ -1205,10 +1206,10 @@ func (h *Content) PublishSegment(ctx *gin.Context) {
 	}
 
 	_, err = contentClient.PublishSegment(ctx, &content.PublishSegmentReq{
-		InfoID:  infoID,
-		No:      req.No,
-		Labels:  req.Labels,
-		Content: nil,
+		InfoID: infoID,
+		No:     req.No,
+		Labels: req.Labels,
+		Title:  req.Title,
 	})
 
 	if err != nil {

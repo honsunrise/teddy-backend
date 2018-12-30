@@ -39,7 +39,7 @@ func main() {
 		Realm:            "uaa.teddy.com",
 		Issuer:           "uaa@teddy.com",
 		SigningAlgorithm: "RS256",
-		KeyFunc:          gin_jwt.RemoteFetchFunc("http://api-uaa:8083/v1/anon/jwks.json", 24*time.Hour),
+		KeyFunc:          gin_jwt.RemoteFetchFunc("http://api-uaa:8083/v1/anon/uaa/jwks.json", 24*time.Hour),
 		Audience: []string{
 			"base",
 		},

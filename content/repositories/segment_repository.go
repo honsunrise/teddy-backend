@@ -36,7 +36,19 @@ type segmentRepository struct {
 
 func (repo *segmentRepository) FindByInfoIDAndNoAndTitleAndLabels(ctx mongo.SessionContext,
 	infoID objectid.ObjectID, no uint64, title string, labels []string) (*models.Segment, error) {
-	panic("implement me")
+	var segment models.Segment
+	filter := bson.D{
+		{"infoID", infoID},
+		{"title", title},
+		{"labels", bson.D{{"$all", labels}}},
+		{"no", no},
+	}
+	result := repo.collections.FindOne(ctx, filter)
+	err := result.Decode(&segment)
+	if err != nil {
+		return nil, err
+	}
+	return &segment, nil
 }
 
 func (repo *segmentRepository) Insert(ctx mongo.SessionContext, segment *models.Segment) error {
@@ -72,7 +84,9 @@ func (repo *segmentRepository) FindAll(ctx mongo.SessionContext,
 			bson.E{Key: "labels", Value: bson.D{{"$all", labels}}})
 	}
 	pipeline = append(pipeline, bson.D{{"$match", dynFilter}})
-	countPipeline = append(countPipeline, bson.D{{"$count", "count"}})
+	countPipeline = append(countPipeline,
+		bson.D{{"$match", dynFilter}},
+		bson.D{{"$count", "count"}})
 
 	cur, err := repo.collections.Aggregate(ctx, countPipeline)
 	if err != nil {

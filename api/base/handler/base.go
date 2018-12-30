@@ -30,9 +30,7 @@ func (h *Base) HandlerNormal(root gin.IRoutes) {
 }
 
 func (h *Base) HandlerAuth(root gin.IRoutes) {
-	root.PUT("/profile/:id")
-	root.GET("/profile/:id/detail")
-	root.POST("/profile/:id/avatar")
+	root.POST("/profile/:id")
 }
 
 func (h *Base) HandlerHealth(root gin.IRoutes) {

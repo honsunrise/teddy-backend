@@ -383,6 +383,8 @@ func (h *contentHandler) PublishSegment(ctx context.Context, req *content.Publis
 			No:     req.No,
 			Title:  req.Title,
 			Labels: req.Labels,
+			Count:  0,
+			Values: []models.Value{},
 		}
 
 		err = h.segRepo.Insert(sessionContext, &segment)
