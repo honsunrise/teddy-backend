@@ -188,8 +188,8 @@ message SegmentOneReq {
 }
 
 message GetValuesReq {
-    uint32 page = 1;
-    uint32 size = 2;
+    uint64 page = 1;
+    uint64 size = 2;
     string infoID = 3;
     string segID = 4;
     repeated Sort sorts = 5;
