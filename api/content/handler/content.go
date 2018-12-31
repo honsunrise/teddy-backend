@@ -1,77 +1,27 @@
 package handler
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
+	"bytes"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/minio/minio-go"
-	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
 	"github.com/zhsyourai/teddy-backend/common/proto/content"
-	"io"
-	"mime/multipart"
 	"net/http"
-	"net/url"
-	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 )
 
-func buildSort(sort string) ([]*content.Sort, error) {
-	rawSorts := strings.Split(sort, ",")
-	sorts := make([]*content.Sort, 0, len(rawSorts))
-	for _, item := range rawSorts {
-		nameAndOrder := strings.Split(item, ":")
-		if len(nameAndOrder) == 1 {
-			sorts = append(sorts, &content.Sort{
-				Name: nameAndOrder[0],
-				Asc:  false,
-			})
-		} else if len(nameAndOrder) == 2 {
-			if strings.ToUpper(nameAndOrder[1]) == "ASC" {
-				sorts = append(sorts, &content.Sort{
-					Name: nameAndOrder[0],
-					Asc:  true,
-				})
-			} else if strings.ToUpper(nameAndOrder[1]) == "DESC" {
-				sorts = append(sorts, &content.Sort{
-					Name: nameAndOrder[0],
-					Asc:  false,
-				})
-			} else {
-				return nil, ErrOrderNotCorrect
-			}
-		}
-	}
-	return sorts, nil
-}
-
-func buildTags(tag string) ([]*content.TagAndType, error) {
-	rawTags := strings.Split(tag, ",")
-	tags := make([]*content.TagAndType, 0, len(rawTags))
-	for _, item := range rawTags {
-		typeAndTag := strings.Split(item, ":")
-		if len(typeAndTag) == 2 {
-			tags = append(tags, &content.TagAndType{
-				Type: typeAndTag[0],
-				Tag:  typeAndTag[1],
-			})
-
-		} else {
-			return nil, ErrTagNotCorrect
-		}
-	}
-	return tags, nil
-}
+const jsonContentType = "application/json; charset=utf-8"
 
 type Content struct {
 	middleware  *gin_jwt.JwtMiddleware
 	minioClient *minio.Client
 	minioBucket string
+	marshaler   *jsonpb.Marshaler
 }
 
 func NewContentHandler(middleware *gin_jwt.JwtMiddleware,
@@ -80,6 +30,10 @@ func NewContentHandler(middleware *gin_jwt.JwtMiddleware,
 		middleware:  middleware,
 		minioClient: minioClient,
 		minioBucket: bucket,
+		marshaler: &jsonpb.Marshaler{
+			EnumsAsInts:  false,
+			EmitDefaults: true,
+		},
 	}, nil
 }
 
@@ -91,6 +45,8 @@ func (h *Content) HandlerNormal(root gin.IRoutes) {
 
 	root.GET("/info/:id/segment", h.GetAllSegments)
 	root.GET("/info/:id/segment/:segID", h.GetSegmentDetail)
+
+	root.GET("/info/:id/segment/:segID/value", h.GetAllValues)
 
 	root.GET("/search", h.Search)
 }
@@ -123,40 +79,6 @@ func (h *Content) HandlerAuth(root gin.IRoutes) {
 	root.DELETE("/thumbDown/info/:id", h.DeleteFavThumb)
 }
 
-func (h *Content) uploadFile(file *multipart.FileHeader) (string, error) {
-	filename := filepath.Base(file.Filename)
-	ext := filepath.Ext(file.Filename)
-
-	src, err := file.Open()
-	if err != nil {
-		return "", err
-	}
-	defer src.Close()
-
-	hash := sha256.New()
-	if _, err := io.Copy(hash, src); err != nil {
-		return "", err
-	}
-	src.Seek(0, io.SeekStart)
-	_, err = hash.Write([]byte(filename))
-	if err != nil {
-		return "", err
-	}
-
-	objectName := hex.EncodeToString(hash.Sum(nil)) + ext
-
-	putLen, err := h.minioClient.PutObject(h.minioBucket, objectName, src, -1,
-		minio.PutObjectOptions{ContentType: file.Header["Content-Type"][0]})
-	if err != nil {
-		return "", err
-	}
-
-	if putLen != file.Size {
-		return "", err
-	}
-	return objectName, err
-}
-
 func (h *Content) HandlerHealth(root gin.IRoutes) {
 	root.Any("/", h.ReturnOK)
 }
@@ -180,83 +102,36 @@ func (h *Content) Search(ctx *gin.Context) {
 }
 
 func (h *Content) GetAllTags(ctx *gin.Context) {
-	// extract the client from the context
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
-		return
-	}
-	page, err := strconv.ParseUint(ctx.DefaultQuery("page", "0"), 10, 32)
-	if err != nil && err.(*strconv.NumError).Num != "" {
-		log.Error(ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
-	size, err := strconv.ParseUint(ctx.DefaultQuery("size", "10"), 10, 32)
-	if err != nil && err.(*strconv.NumError).Num != "" {
-		log.Error(ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+	page, size, sorts, err := extractPageSizeSort(ctx)
+	if err != nil {
+		ctx.Error(err)
 		return
-	}
-
-	var sorts []*content.Sort
-	if ctx.Query("sort") != "" {
-		sorts, err = buildSort(ctx.Query("sort"))
-		if err != nil {
-			log.Error(ErrOrderNotCorrect)
-			ctx.AbortWithError(http.StatusInternalServerError, ErrOrderNotCorrect)
-			return
-		}
 	}
 
 	resp, err := contentClient.GetTags(ctx, &content.GetTagReq{
 		Type:  ctx.Query("type"),
-		Page:  uint32(page),
-		Size:  uint32(size),
+		Page:  page,
+		Size:  size,
 		Sorts: sorts,
 	})
-
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
-	type tagsResult struct {
-		Type        string    `json:"type"`
-		Tag         string    `json:"tag"`
-		Usage       uint64    `json:"usage"`
-		CreateTime  time.Time `json:"createTime"`
-		LastUseTime time.Time `json:"lastUseTime"`
+	var buf bytes.Buffer
+	if err = h.marshaler.Marshal(&buf, resp); err != nil {
+		ctx.Error(err)
+		return
 	}
 
-	results := make([]*tagsResult, 0, len(resp.Tags))
-	for _, tag := range resp.Tags {
-		createTime, err := ptypes.Timestamp(tag.CreateTime)
-		if err != nil {
-			log.Error(err)
-			continue
-		}
-
-		lastUseTime, err := ptypes.Timestamp(tag.LastUseTime)
-		if err != nil {
-			log.Error(err)
-			continue
-		}
-		results = append(results, &tagsResult{
-			Type:        tag.Type,
-			Tag:         tag.Tag,
-			Usage:       tag.Usage,
-			CreateTime:  createTime,
-			LastUseTime: lastUseTime,
-		})
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"total_count": resp.TotalCount,
-		"items":       results,
-	})
+	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
 }
 
 func (h *Content) GetAllInfos(ctx *gin.Context) {
@@ -268,161 +143,43 @@ func (h *Content) GetAllInfos(ctx *gin.Context) {
 	// extract the client from the context
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
-		return
-	}
-	page, err := strconv.ParseUint(ctx.DefaultQuery("page", "0"), 10, 32)
-	if err != nil && err.(*strconv.NumError).Num != "" {
-		log.Error(ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
-	size, err := strconv.ParseUint(ctx.DefaultQuery("size", "10"), 10, 32)
-	if err != nil && err.(*strconv.NumError).Num != "" {
-		log.Error(ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+	page, size, sorts, err := extractPageSizeSort(ctx)
+	if err != nil {
+		ctx.Error(err)
 		return
-	}
-
-	var sorts []*content.Sort
-	if ctx.Query("sorts") != "" {
-		sorts, err = buildSort(ctx.Query("sorts"))
-		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
 	}
 
 	var tags []*content.TagAndType
 	if ctx.Query("tags") != "" {
 		tags, err = buildTags(ctx.Query("tags"))
 		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
+			ctx.Error(err)
 			return
 		}
 	}
 	resp, err := contentClient.GetInfos(ctx, &content.GetInfosReq{
 		Uid:   principal,
-		Page:  uint32(page),
-		Size:  uint32(size),
+		Page:  page,
+		Size:  size,
 		Tags:  tags,
 		Sorts: sorts,
 	})
-
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
-	type infoResultTag struct {
-		Type string `json:"type"`
-		Tag  string `json:"tag"`
+	var buf bytes.Buffer
+	if err = h.marshaler.Marshal(&buf, resp); err != nil {
+		ctx.Error(err)
+		return
 	}
 
-	type infoResult struct {
-		Id              string            `json:"id"`
-		UID             string            `json:"uid"`
-		Author          string            `json:"author"`
-		Title           string            `json:"title"`
-		Summary         string            `json:"summary"`
-		Country         string            `json:"country"`
-		ContentTime     time.Time         `json:"contentTime"`
-		CoverResources  map[string]string `json:"coverResources"`
-		PublishTime     time.Time         `json:"publishTime"`
-		LastReviewTime  time.Time         `json:"lastReviewTime"`
-		Valid           bool              `json:"valid"`
-		WatchCount      uint64            `json:"watchCount"`
-		Tags            []*infoResultTag  `json:"tags"`
-		ThumbUp         uint64            `json:"thumbUps"`
-		IsThumbUp       bool              `json:"isThumbUp"`
-		ThumbUpList     []string          `json:"thumbUpList"`
-		ThumbDown       uint64            `json:"thumbDowns"`
-		IsThumbDown     bool              `json:"isThumbDown"`
-		ThumbDownList   []string          `json:"thumbDownList"`
-		Favorites       uint64            `json:"favorites"`
-		IsFavorite      bool              `json:"isFavorite"`
-		FavoriteList    []string          `json:"favoriteList"`
-		LastModifyTime  time.Time         `json:"lastModifyTime"`
-		CanReview       bool              `json:"canReview"`
-		Archived        bool              `json:"archived"`
-		LatestSegmentID string            `json:"latestSegmentID"`
-		SegmentCount    uint64            `json:"segmentCount"`
-	}
-	results := make([]*infoResult, 0, len(resp.Infos))
-	for _, info := range resp.Infos {
-		publishTime, err := ptypes.Timestamp(info.PublishTime)
-		if err != nil {
-			log.Error(err)
-		}
-
-		lastReviewTime, err := ptypes.Timestamp(info.LastReviewTime)
-		if err != nil {
-			log.Error(err)
-		}
-
-		lastModifyTime, err := ptypes.Timestamp(info.LastModifyTime)
-		if err != nil {
-			log.Error(err)
-		}
-
-		contentTime, err := ptypes.Timestamp(info.ContentTime)
-		if err != nil {
-			log.Error(err)
-		}
-
-		tags := make([]*infoResultTag, 0, len(info.Tags))
-		for _, v := range info.Tags {
-			tags = append(tags, &infoResultTag{
-				Type: v.Type,
-				Tag:  v.Tag,
-			})
-		}
-
-		for k, v := range info.CoverResources {
-			var result *url.URL
-			result, err = h.minioClient.PresignedGetObject(h.minioBucket, v, 30*time.Minute, nil)
-			if err == nil {
-				info.CoverResources[k] = result.String()
-			}
-		}
-
-		results = append(results, &infoResult{
-			Id:              info.InfoID,
-			UID:             info.Uid,
-			Title:           info.Title,
-			Author:          info.Author,
-			Summary:         info.Summary,
-			Country:         info.Country,
-			ContentTime:     contentTime,
-			CoverResources:  info.CoverResources,
-			PublishTime:     publishTime,
-			LastReviewTime:  lastReviewTime,
-			Valid:           info.Valid,
-			WatchCount:      info.WatchCount,
-			Tags:            tags,
-			ThumbUp:         info.ThumbUps,
-			IsThumbUp:       info.IsThumbUp,
-			ThumbUpList:     info.ThumbUpList,
-			ThumbDown:       info.ThumbDowns,
-			IsThumbDown:     info.IsThumbDown,
-			ThumbDownList:   info.ThumbDownList,
-			Favorites:       info.Favorites,
-			IsFavorite:      info.IsFavorite,
-			FavoriteList:    info.FavoriteList,
-			LastModifyTime:  lastModifyTime,
-			CanReview:       info.CanReview,
-			Archived:        info.Archived,
-			LatestSegmentID: info.LatestSegmentID,
-			SegmentCount:    info.SegmentCount,
-		})
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"total_count": resp.TotalCount,
-		"items":       results,
-	})
+	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
 }
 
 func (h *Content) PublishInfo(ctx *gin.Context) {
@@ -435,7 +192,7 @@ func (h *Content) PublishInfo(ctx *gin.Context) {
 
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
@@ -468,7 +225,7 @@ func (h *Content) PublishInfo(ctx *gin.Context) {
 
 	coverResources := make(map[string]string)
 	for i, cover := range covers {
-		objectName, err := h.uploadFile(cover)
+		objectName, err := uploadFile(cover, h.minioClient, h.minioBucket)
 		if err != nil {
 			ctx.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
 			return
@@ -497,8 +254,7 @@ func (h *Content) PublishInfo(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -514,123 +270,26 @@ func (h *Content) GetInfoDetail(ctx *gin.Context) {
 
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
 	infoID := ctx.Param("id")
-	info, err := contentClient.GetInfo(ctx, &content.GetInfoReq{
+	resp, err := contentClient.GetInfo(ctx, &content.GetInfoReq{
 		InfoID: infoID,
 		Uid:    principal,
 	})
-
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
-	type infoResultTag struct {
-		Type string `json:"type"`
-		Tag  string `json:"tag"`
+	var buf bytes.Buffer
+	if err = h.marshaler.Marshal(&buf, resp); err != nil {
+		ctx.Error(err)
+		return
 	}
-
-	type infoResult struct {
-		Id              string            `json:"id"`
-		UID             string            `json:"uid"`
-		Author          string            `json:"author"`
-		Title           string            `json:"title"`
-		Summary         string            `json:"summary"`
-		Country         string            `json:"country"`
-		ContentTime     time.Time         `json:"contentTime"`
-		CoverResources  map[string]string `json:"coverResources"`
-		PublishTime     time.Time         `json:"publishTime"`
-		LastReviewTime  time.Time         `json:"lastReviewTime"`
-		Valid           bool              `json:"valid"`
-		WatchCount      uint64            `json:"watchCount"`
-		Tags            []*infoResultTag  `json:"tags"`
-		ThumbUp         uint64            `json:"thumbUps"`
-		IsThumbUp       bool              `json:"isThumbUp"`
-		ThumbUpList     []string          `json:"thumbUpList"`
-		ThumbDown       uint64            `json:"thumbDowns"`
-		IsThumbDown     bool              `json:"isThumbDown"`
-		ThumbDownList   []string          `json:"thumbDownList"`
-		Favorites       uint64            `json:"favorites"`
-		IsFavorite      bool              `json:"isFavorite"`
-		FavoriteList    []string          `json:"favoriteList"`
-		LastModifyTime  time.Time         `json:"lastModifyTime"`
-		CanReview       bool              `json:"canReview"`
-		Archived        bool              `json:"archived"`
-		LatestSegmentID string            `json:"latestSegmentID"`
-		SegmentCount    uint64            `json:"segmentCount"`
-	}
-
-	publishTime, err := ptypes.Timestamp(info.PublishTime)
-	if err != nil {
-		log.Error(err)
-	}
-
-	lastReviewTime, err := ptypes.Timestamp(info.LastReviewTime)
-	if err != nil {
-		log.Error(err)
-	}
-
-	lastModifyTime, err := ptypes.Timestamp(info.LastModifyTime)
-	if err != nil {
-		log.Error(err)
-	}
-
-	contentTime, err := ptypes.Timestamp(info.ContentTime)
-	if err != nil {
-		log.Error(err)
-	}
-
-	tags := make([]*infoResultTag, 0, len(info.Tags))
-	for _, v := range info.Tags {
-		tags = append(tags, &infoResultTag{
-			Type: v.Type,
-			Tag:  v.Tag,
-		})
-	}
-
-	for k, v := range info.CoverResources {
-		var result *url.URL
-		result, err = h.minioClient.PresignedGetObject(h.minioBucket, v, 30*time.Minute, nil)
-		if err == nil {
-			info.CoverResources[k] = result.String()
-		}
-	}
-
-	resp := &infoResult{
-		Id:              info.InfoID,
-		UID:             info.Uid,
-		Title:           info.Title,
-		Author:          info.Author,
-		Summary:         info.Summary,
-		Country:         info.Country,
-		ContentTime:     contentTime,
-		CoverResources:  info.CoverResources,
-		PublishTime:     publishTime,
-		LastReviewTime:  lastReviewTime,
-		Valid:           info.Valid,
-		WatchCount:      info.WatchCount,
-		Tags:            tags,
-		ThumbUp:         info.ThumbUps,
-		IsThumbUp:       info.IsThumbUp,
-		ThumbUpList:     info.ThumbUpList,
-		ThumbDown:       info.ThumbDowns,
-		IsThumbDown:     info.IsThumbDown,
-		ThumbDownList:   info.ThumbDownList,
-		Favorites:       info.Favorites,
-		IsFavorite:      info.IsFavorite,
-		FavoriteList:    info.FavoriteList,
-		LastModifyTime:  lastModifyTime,
-		CanReview:       info.CanReview,
-		Archived:        info.Archived,
-		LatestSegmentID: info.LatestSegmentID,
-		SegmentCount:    info.SegmentCount,
-	}
-	ctx.JSON(http.StatusOK, resp)
+	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
 }
 
 func (h *Content) UpdateInfo(ctx *gin.Context) {
@@ -643,7 +302,7 @@ func (h *Content) UpdateInfo(ctx *gin.Context) {
 
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
@@ -665,48 +324,14 @@ func (h *Content) UpdateInfo(ctx *gin.Context) {
 
 	form, err := ctx.MultipartForm()
 	if err != nil {
-		ctx.String(http.StatusBadRequest, fmt.Sprintf("get form err: %s", err.Error()))
+		ctx.Error(err)
 		return
 	}
 	covers := form.File["covers"]
 
-	uploadFile := func(file *multipart.FileHeader) (string, error) {
-		filename := filepath.Base(file.Filename)
-		ext := filepath.Ext(file.Filename)
-
-		src, err := file.Open()
-		if err != nil {
-			return "", err
-		}
-		defer src.Close()
-
-		hash := sha256.New()
-		if _, err := io.Copy(hash, src); err != nil {
-			return "", err
-		}
-		src.Seek(0, io.SeekStart)
-		_, err = hash.Write([]byte(filename))
-		if err != nil {
-			return "", err
-		}
-
-		objectName := hex.EncodeToString(hash.Sum(nil)) + ext
-
-		putLen, err := h.minioClient.PutObject(h.minioBucket, objectName, src, -1,
-			minio.PutObjectOptions{ContentType: file.Header["Content-Type"][0]})
-		if err != nil {
-			return "", err
-		}
-
-		if putLen != file.Size {
-			return "", err
-		}
-		return objectName, err
-	}
-
 	coverResources := make(map[string]string)
 	for i, cover := range covers {
-		objectName, err := uploadFile(cover)
+		objectName, err := uploadFile(cover, h.minioClient, h.minioBucket)
 		if err != nil {
 			ctx.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
 			return
@@ -737,8 +362,7 @@ func (h *Content) UpdateInfo(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -755,7 +379,7 @@ func (h *Content) DeleteInfo(ctx *gin.Context) {
 
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
@@ -765,10 +389,8 @@ func (h *Content) DeleteInfo(ctx *gin.Context) {
 		Uid:    principal,
 		InfoID: infoID,
 	})
-
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -777,8 +399,7 @@ func (h *Content) DeleteInfo(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -796,65 +417,45 @@ func (h *Content) GetUserFavThumb(ctx *gin.Context) {
 
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
-	page, err := strconv.ParseUint(ctx.DefaultQuery("page", "0"), 10, 32)
-	if err != nil && err.(*strconv.NumError).Num != "" {
-		log.Error(ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
-		return
-	}
-
-	size, err := strconv.ParseUint(ctx.DefaultQuery("size", "10"), 10, 32)
-	if err != nil && err.(*strconv.NumError).Num != "" {
-		log.Error(ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+	page, size, sorts, err := extractPageSizeSort(ctx)
+	if err != nil {
+		ctx.Error(err)
 		return
 	}
 
-	var sorts []*content.Sort
-	if ctx.Query("sort") != "" {
-		sorts, err = buildSort(ctx.Query("sort"))
-		if err != nil {
-			log.Error(ErrOrderNotCorrect)
-			ctx.AbortWithError(http.StatusInternalServerError, ErrOrderNotCorrect)
-			return
-		}
-	}
-
-	// TODO: get uid
 	var resp *content.InfoIDsResp
 	if strings.Contains(ctx.Request.RequestURI, "favorite") {
 		resp, err = contentClient.GetUserFavorite(ctx, &content.UIDPageReq{
-			Page:  uint32(page),
-			Size:  uint32(size),
+			Page:  page,
+			Size:  size,
 			Sorts: sorts,
 			Uid:   principal,
 		})
 	} else if strings.Contains(ctx.Request.RequestURI, "thumbUp") {
 		resp, err = contentClient.GetUserThumbUp(ctx, &content.UIDPageReq{
-			Page:  uint32(page),
-			Size:  uint32(size),
+			Page:  page,
+			Size:  size,
 			Sorts: sorts,
 			Uid:   principal,
 		})
 	} else {
 		resp, err = contentClient.GetUserThumbDown(ctx, &content.UIDPageReq{
-			Page:  uint32(page),
-			Size:  uint32(size),
+			Page:  page,
+			Size:  size,
 			Sorts: sorts,
 			Uid:   principal,
 		})
 	}
 
-	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+	var buf bytes.Buffer
+	if err = h.marshaler.Marshal(&buf, resp); err != nil {
+		ctx.Error(err)
 		return
 	}
-
-	ctx.JSON(http.StatusOK, resp)
+	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
 }
 
 func (h *Content) GetInfoFavThumb(ctx *gin.Context) {
@@ -866,65 +467,51 @@ func (h *Content) GetInfoFavThumb(ctx *gin.Context) {
 
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
-	page, err := strconv.ParseUint(ctx.DefaultQuery("page", "0"), 10, 32)
-	if err != nil && err.(*strconv.NumError).Num != "" {
-		log.Error(ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+	page, size, sorts, err := extractPageSizeSort(ctx)
+	if err != nil {
+		ctx.Error(err)
 		return
-	}
-
-	size, err := strconv.ParseUint(ctx.DefaultQuery("size", "10"), 10, 32)
-	if err != nil && err.(*strconv.NumError).Num != "" {
-		log.Error(ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
-		return
-	}
-
-	var sorts []*content.Sort
-	if ctx.Query("sort") != "" {
-		sorts, err = buildSort(ctx.Query("sort"))
-		if err != nil {
-			log.Error(ErrOrderNotCorrect)
-			ctx.AbortWithError(http.StatusInternalServerError, ErrOrderNotCorrect)
-			return
-		}
 	}
 
 	infoID := ctx.Param("id")
 	var resp *content.UserIDsResp
 	if strings.Contains(ctx.Request.RequestURI, "favorite") {
 		resp, err = contentClient.GetInfoFavorite(ctx, &content.InfoIDPageReq{
-			Page:   uint32(page),
-			Size:   uint32(size),
+			Page:   page,
+			Size:   size,
 			Sorts:  sorts,
 			InfoID: infoID,
 		})
 	} else if strings.Contains(ctx.Request.RequestURI, "thumbUp") {
 		resp, err = contentClient.GetInfoThumbUp(ctx, &content.InfoIDPageReq{
-			Page:   uint32(page),
-			Size:   uint32(size),
+			Page:   page,
+			Size:   size,
 			Sorts:  sorts,
 			InfoID: infoID,
 		})
 	} else {
 		resp, err = contentClient.GetInfoThumbDown(ctx, &content.InfoIDPageReq{
-			Page:   uint32(page),
-			Size:   uint32(size),
+			Page:   page,
+			Size:   size,
 			Sorts:  sorts,
 			InfoID: infoID,
 		})
 	}
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, resp)
+	var buf bytes.Buffer
+	if err = h.marshaler.Marshal(&buf, resp); err != nil {
+		ctx.Error(err)
+		return
+	}
+	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
 }
 
 func (h *Content) FavThumb(ctx *gin.Context) {
@@ -937,7 +524,7 @@ func (h *Content) FavThumb(ctx *gin.Context) {
 
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
@@ -960,8 +547,7 @@ func (h *Content) FavThumb(ctx *gin.Context) {
 	}
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -978,7 +564,7 @@ func (h *Content) DeleteFavThumb(ctx *gin.Context) {
 
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
@@ -1001,8 +587,7 @@ func (h *Content) DeleteFavThumb(ctx *gin.Context) {
 	}
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -1013,30 +598,14 @@ func (h *Content) GetAllSegments(ctx *gin.Context) {
 	// extract the client from the context
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
-		return
-	}
-	page, err := strconv.ParseUint(ctx.DefaultQuery("page", "0"), 10, 32)
-	if err != nil && err.(*strconv.NumError).Num != "" {
-		log.Error(ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
-	size, err := strconv.ParseUint(ctx.DefaultQuery("size", "10"), 10, 32)
-	if err != nil && err.(*strconv.NumError).Num != "" {
-		log.Error(ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+	page, size, sorts, err := extractPageSizeSort(ctx)
+	if err != nil {
+		ctx.Error(err)
 		return
-	}
-
-	var sorts []*content.Sort
-	if ctx.Query("sorts") != "" {
-		sorts, err = buildSort(ctx.Query("sorts"))
-		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
 	}
 
 	var labels []string
@@ -1048,122 +617,50 @@ func (h *Content) GetAllSegments(ctx *gin.Context) {
 	resp, err := contentClient.GetSegments(ctx, &content.GetSegmentsReq{
 		InfoID: infoID,
 		Labels: labels,
-		Page:   uint32(page),
-		Size:   uint32(size),
+		Page:   page,
+		Size:   size,
 		Sorts:  sorts,
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
-	type segmentResult struct {
-		ID     string   `json:"id"`
-		InfoID string   `json:"infoID"`
-		No     uint64   `json:"no"`
-		Title  string   `json:"title"`
-		Labels []string `json:"labels"`
+	var buf bytes.Buffer
+	if err = h.marshaler.Marshal(&buf, resp); err != nil {
+		ctx.Error(err)
+		return
 	}
-	results := make([]*segmentResult, 0, len(resp.Segments))
-	for _, seg := range resp.Segments {
-		results = append(results, &segmentResult{
-			ID:     seg.Id,
-			InfoID: seg.InfoID,
-			No:     seg.No,
-			Title:  seg.Title,
-			Labels: seg.Labels,
-		})
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"total_count": resp.TotalCount,
-		"items":       results,
-	})
+	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
 }
 
 func (h *Content) GetSegmentDetail(ctx *gin.Context) {
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
 	infoID := ctx.Param("id")
 	segID := ctx.Param("segID")
 
-	//page, err := strconv.ParseUint(ctx.DefaultQuery("page", "0"), 10, 32)
-	//if err != nil && err.(*strconv.NumError).Num != "" {
-	//	log.Error(ErrCaptchaNotCorrect)
-	//	ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
-	//	return
-	//}
-	//
-	//size, err := strconv.ParseUint(ctx.DefaultQuery("size", "10"), 10, 32)
-	//if err != nil && err.(*strconv.NumError).Num != "" {
-	//	log.Error(ErrCaptchaNotCorrect)
-	//	ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
-	//	return
-	//}
-
-	seg, err := contentClient.GetSegment(ctx, &content.SegmentOneReq{
+	resp, err := contentClient.GetSegment(ctx, &content.SegmentOneReq{
 		InfoID: infoID,
 		SegID:  segID,
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
-	values, err := contentClient.GetValues(ctx, &content.GetValuesReq{
-		InfoID: infoID,
-		SegID:  segID,
-		Page:   0,
-		Size:   100,
-	})
-
-	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+	var buf bytes.Buffer
+	if err = h.marshaler.Marshal(&buf, resp); err != nil {
+		ctx.Error(err)
 		return
 	}
-
-	type valueResult struct {
-		ID    string `json:"id"`
-		Value string `json:"value"`
-	}
-
-	valuesResult := make([]*valueResult, 0, len(values.Values))
-	for _, v := range values.Values {
-		valuesResult = append(valuesResult, &valueResult{
-			ID:    v.Id,
-			Value: v.Value,
-		})
-	}
-
-	type segmentResult struct {
-		ID         string         `json:"id"`
-		InfoID     string         `json:"infoID"`
-		No         uint64         `json:"no"`
-		Title      string         `json:"title"`
-		Labels     []string       `json:"labels"`
-		TotalCount uint64         `json:"totalCount"`
-		Values     []*valueResult `json:"values"`
-	}
-
-	resp := &segmentResult{
-		ID:         seg.Id,
-		InfoID:     seg.InfoID,
-		No:         seg.No,
-		Title:      seg.Title,
-		Labels:     seg.Labels,
-		TotalCount: values.TotalCount,
-		Values:     valuesResult,
-	}
-	ctx.JSON(http.StatusOK, resp)
+	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
 }
 
 func (h *Content) PublishSegment(ctx *gin.Context) {
@@ -1177,7 +674,7 @@ func (h *Content) PublishSegment(ctx *gin.Context) {
 	infoID := ctx.Param("id")
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
@@ -1187,8 +684,7 @@ func (h *Content) PublishSegment(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -1200,8 +696,7 @@ func (h *Content) PublishSegment(ctx *gin.Context) {
 	var req publishSegmentReq
 	err = ctx.Bind(&req)
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -1213,8 +708,7 @@ func (h *Content) PublishSegment(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -1233,7 +727,7 @@ func (h *Content) UpdateSegment(ctx *gin.Context) {
 	segID := ctx.Param("segID")
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
@@ -1244,8 +738,7 @@ func (h *Content) UpdateSegment(ctx *gin.Context) {
 	var req updateSegmentReq
 	err = ctx.Bind(&req)
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -1255,8 +748,7 @@ func (h *Content) UpdateSegment(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -1269,8 +761,7 @@ func (h *Content) UpdateSegment(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -1287,7 +778,7 @@ func (h *Content) DeleteSegment(ctx *gin.Context) {
 
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
@@ -1300,8 +791,7 @@ func (h *Content) DeleteSegment(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -1311,12 +801,48 @@ func (h *Content) DeleteSegment(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
 	ctx.Status(http.StatusOK)
+}
+
+func (h *Content) GetAllValues(ctx *gin.Context) {
+	contentClient, ok := clients.ContentFromContext(ctx)
+	if !ok {
+		ctx.Error(ErrClientNotFound)
+		return
+	}
+
+	infoID := ctx.Param("id")
+	segID := ctx.Param("segID")
+
+	page, size, sorts, err := extractPageSizeSort(ctx)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	resp, err := contentClient.GetValues(ctx, &content.GetValuesReq{
+		InfoID: infoID,
+		SegID:  segID,
+		Page:   page,
+		Size:   size,
+		Sorts:  sorts,
+	})
+
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	var buf bytes.Buffer
+	if err = h.marshaler.Marshal(&buf, resp); err != nil {
+		ctx.Error(err)
+		return
+	}
+	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
 }
 
 func (h *Content) InsertValue(ctx *gin.Context) {
@@ -1332,7 +858,7 @@ func (h *Content) InsertValue(ctx *gin.Context) {
 
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
@@ -1342,8 +868,7 @@ func (h *Content) InsertValue(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -1358,7 +883,7 @@ func (h *Content) InsertValue(ctx *gin.Context) {
 		return
 	}
 
-	objectName, err := h.uploadFile(file[0])
+	objectName, err := uploadFile(file[0], h.minioClient, h.minioBucket)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
 		return
@@ -1372,8 +897,7 @@ func (h *Content) InsertValue(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -1394,7 +918,7 @@ func (h *Content) UpdateValue(ctx *gin.Context) {
 
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
@@ -1404,8 +928,7 @@ func (h *Content) UpdateValue(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -1420,7 +943,7 @@ func (h *Content) UpdateValue(ctx *gin.Context) {
 		return
 	}
 
-	objectName, err := h.uploadFile(file[0])
+	objectName, err := uploadFile(file[0], h.minioClient, h.minioBucket)
 	if err != nil {
 		ctx.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
 		return
@@ -1435,8 +958,7 @@ func (h *Content) UpdateValue(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -1457,7 +979,7 @@ func (h *Content) DeleteValue(ctx *gin.Context) {
 
 	contentClient, ok := clients.ContentFromContext(ctx)
 	if !ok {
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
+		ctx.Error(ErrClientNotFound)
 		return
 	}
 
@@ -1467,8 +989,7 @@ func (h *Content) DeleteValue(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 
@@ -1479,8 +1000,7 @@ func (h *Content) DeleteValue(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		log.Error(err)
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		ctx.Error(err)
 		return
 	}
 

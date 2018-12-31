@@ -15,7 +15,7 @@ type InfoRepository interface {
 	ExistsByTitleAndAuthorAndCountry(ctx mongo.SessionContext, title, author, country string) (bool, error)
 	FindOne(ctx mongo.SessionContext, id objectid.ObjectID) (*models.Info, error)
 	FindAll(ctx mongo.SessionContext, uid string, tags []*models.TypeAndTag,
-		page uint32, size uint32, sorts []*content.Sort) ([]*models.Info, uint64, error)
+		page, size uint64, sorts []*content.Sort) ([]*models.Info, uint64, error)
 	Delete(ctx mongo.SessionContext, id objectid.ObjectID) error
 	Update(ctx mongo.SessionContext, id objectid.ObjectID, fields map[string]interface{}) error
 }
@@ -78,7 +78,7 @@ func (repo *infoRepository) FindOne(ctx mongo.SessionContext, id objectid.Object
 }
 
 func (repo *infoRepository) internalFindInfo(ctx mongo.SessionContext, uid string, tags []*models.TypeAndTag,
-	page uint32, size uint32, sorts []*content.Sort) ([]*models.Info, uint64, error) {
+	page, size uint64, sorts []*content.Sort) ([]*models.Info, uint64, error) {
 	var cur mongo.Cursor
 
 	pipeline := mongo.Pipeline{}
@@ -153,7 +153,7 @@ func (repo *infoRepository) internalFindInfo(ctx mongo.SessionContext, uid strin
 }
 
 func (repo *infoRepository) FindAll(ctx mongo.SessionContext, uid string, tags []*models.TypeAndTag,
-	page uint32, size uint32, sorts []*content.Sort) ([]*models.Info, uint64, error) {
+	page, size uint64, sorts []*content.Sort) ([]*models.Info, uint64, error) {
 	return repo.internalFindInfo(ctx, uid, tags, page, size, sorts)
 }
 

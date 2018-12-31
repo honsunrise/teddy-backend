@@ -15,7 +15,7 @@ type SegmentRepository interface {
 		infoID objectid.ObjectID, no uint64, title string, labels []string) (*models.Segment, error)
 	FindOne(ctx mongo.SessionContext, infoID objectid.ObjectID, id objectid.ObjectID) (*models.Segment, error)
 	FindAll(ctx mongo.SessionContext, infoID objectid.ObjectID,
-		labels []string, page, size uint32, sorts []*content.Sort) ([]*models.Segment, uint64, error)
+		labels []string, page, size uint64, sorts []*content.Sort) ([]*models.Segment, uint64, error)
 
 	DeleteByInfoID(ctx mongo.SessionContext, infoID objectid.ObjectID) error
 	DeleteOne(ctx mongo.SessionContext, infoID objectid.ObjectID, id objectid.ObjectID) error
@@ -72,7 +72,7 @@ func (repo *segmentRepository) FindOne(ctx mongo.SessionContext, infoID objectid
 }
 
 func (repo *segmentRepository) FindAll(ctx mongo.SessionContext,
-	infoID objectid.ObjectID, labels []string, page, size uint32, sorts []*content.Sort) ([]*models.Segment, uint64, error) {
+	infoID objectid.ObjectID, labels []string, page, size uint64, sorts []*content.Sort) ([]*models.Segment, uint64, error) {
 	pipeline := mongo.Pipeline{}
 	countPipeline := mongo.Pipeline{}
 

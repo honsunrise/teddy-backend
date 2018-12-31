@@ -13,8 +13,10 @@ import (
 
 type BehaviorRepository interface {
 	Insert(ctx mongo.SessionContext, uid string, thumb *models.BehaviorInfoItem) error
-	FindInfoByUser(ctx mongo.SessionContext, uid string, page uint32, size uint32, sorts []*content.Sort) ([]*models.BehaviorInfoItem, error)
-	FindUserByInfo(ctx mongo.SessionContext, infoID objectid.ObjectID, page uint32, size uint32, sorts []*content.Sort) ([]*models.BehaviorUserItem, error)
+	FindInfoByUser(ctx mongo.SessionContext, uid string,
+		page, size uint64, sorts []*content.Sort) ([]*models.BehaviorInfoItem, error)
+	FindUserByInfo(ctx mongo.SessionContext, infoID objectid.ObjectID,
+		page, size uint64, sorts []*content.Sort) ([]*models.BehaviorUserItem, error)
 	IsExists(ctx mongo.SessionContext, uid string, infoID objectid.ObjectID) (bool, error)
 	CountByInfo(ctx mongo.SessionContext, infoID objectid.ObjectID) (uint64, error)
 	CountByUser(ctx mongo.SessionContext, uid string) (uint64, error)
@@ -80,7 +82,7 @@ func (repo *behaviorRepository) Insert(ctx mongo.SessionContext, uid string, thu
 }
 
 func (repo *behaviorRepository) FindInfoByUser(ctx mongo.SessionContext, uid string,
-	page uint32, size uint32, sorts []*content.Sort) ([]*models.BehaviorInfoItem, error) {
+	page, size uint64, sorts []*content.Sort) ([]*models.BehaviorInfoItem, error) {
 	var cur mongo.Cursor
 	pipeline := mongo.Pipeline{
 		bson.D{{"$unwind", "$items"}},
@@ -127,7 +129,7 @@ func (repo *behaviorRepository) FindInfoByUser(ctx mongo.SessionContext, uid str
 }
 
 func (repo *behaviorRepository) FindUserByInfo(ctx mongo.SessionContext, infoID objectid.ObjectID,
-	page uint32, size uint32, sorts []*content.Sort) ([]*models.BehaviorUserItem, error) {
+	page, size uint64, sorts []*content.Sort) ([]*models.BehaviorUserItem, error) {
 	var cur mongo.Cursor
 
 	pipeline := mongo.Pipeline{

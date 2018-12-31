@@ -14,7 +14,7 @@ type TagRepository interface {
 	FindByTypeAndTag(ctx mongo.SessionContext, tp string, tag string) (*models.Tag, error)
 	FindOne(ctx mongo.SessionContext, id objectid.ObjectID) (*models.Tag, error)
 	FindAll(ctx mongo.SessionContext, tp string,
-		page uint32, size uint32, sorts []*content.Sort) ([]*models.Tag, uint64, error)
+		page, size uint64, sorts []*content.Sort) ([]*models.Tag, uint64, error)
 	IncUsage(ctx mongo.SessionContext, id objectid.ObjectID, inc int64) error
 	UpdateLastUse(ctx mongo.SessionContext, id objectid.ObjectID, lastUse time.Time) error
 	DeleteOne(ctx mongo.SessionContext, id objectid.ObjectID) error
@@ -63,7 +63,7 @@ func (repo *tagRepository) FindOne(ctx mongo.SessionContext, id objectid.ObjectI
 }
 
 func (repo *tagRepository) FindAll(ctx mongo.SessionContext, tp string,
-	page uint32, size uint32, sorts []*content.Sort) ([]*models.Tag, uint64, error) {
+	page, size uint64, sorts []*content.Sort) ([]*models.Tag, uint64, error) {
 	pipeline := mongo.Pipeline{}
 	countPipeline := mongo.Pipeline{}
 

@@ -10,6 +10,7 @@ import (
 	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/api/content/handler"
 	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
+	"github.com/zhsyourai/teddy-backend/api/nice_error"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/common/config/source/file"
 	"golang.org/x/sync/errgroup"
@@ -84,6 +85,7 @@ func main() {
 	}))
 	router.Use(clients.ContentNew(contentSrvAddrFunc))
 	router.Use(clients.CaptchaNew(captchaSrvAddrFunc))
+	router.Use(nice_error.NewNiceError())
 	content.HandlerNormal(router.Group("/v1/anon/content").Use(jwtMiddleware.Handler(true)))
 	content.HandlerAuth(router.Group("/v1/auth/content").Use(jwtMiddleware.Handler(false)))
 	content.HandlerHealth(router)

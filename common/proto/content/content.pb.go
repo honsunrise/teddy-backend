@@ -2218,7 +2218,7 @@ func (c *contentClient) DeleteSegment(ctx context.Context, in *SegmentOneReq, op
 
 func (c *contentClient) GetValues(ctx context.Context, in *GetValuesReq, opts ...grpc.CallOption) (*Values, error) {
 	out := new(Values)
-	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/GetValues", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/teddy.srv.content.Content/GetAllValues", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2622,7 +2622,7 @@ func _Content_GetValues_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/teddy.srv.content.Content/GetValues",
+		FullMethod: "/teddy.srv.content.Content/GetAllValues",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ContentServer).GetValues(ctx, req.(*GetValuesReq))
@@ -2953,7 +2953,7 @@ var _Content_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Content_DeleteSegment_Handler,
 		},
 		{
-			MethodName: "GetValues",
+			MethodName: "GetAllValues",
 			Handler:    _Content_GetValues_Handler,
 		},
 		{

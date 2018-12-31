@@ -1,6 +1,7 @@
 package gin_jwt
 
 import (
+	"github.com/casbin/casbin"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/square/go-jose.v2"
 	"gopkg.in/square/go-jose.v2/jwt"
@@ -13,17 +14,16 @@ const DefaultContextKey = "_JWT_TOKEN_KEY_"
 const DefaultLeeway = 1.0 * time.Minute
 
 type MiddlewareConfig struct {
-	Realm            string
-	SigningAlgorithm jose.SignatureAlgorithm
-	KeyFunc          func() interface{}
-	NowFunc          func() time.Time
-	ErrorHandler     func(ctx *gin.Context, err error)
-	TokenLookup      string
-	ContextKey       string
-	Audience         []string
-	Issuer           string
-	Subject          string
-	ID               string
+	Realm        string
+	KeyFunc      func() interface{}
+	NowFunc      func() time.Time
+	ErrorHandler func(ctx *gin.Context, err error)
+	TokenLookup  string
+	ContextKey   string
+	Audience     []string
+	Issuer       string
+	Subject      string
+	ID           string
 }
 
 type JwtMiddleware struct {
@@ -35,15 +35,12 @@ type JwtMiddleware struct {
 	issuer   string
 	subject  string
 	id       string
+	enforcer *casbin.Enforcer
 }
 
-func NewGinJwtMiddleware(config MiddlewareConfig) (*JwtMiddleware, error) {
+func NewGinJwtMiddleware(config MiddlewareConfig, e *casbin.Enforcer) (*JwtMiddleware, error) {
 	if config.Realm == "" {
 		return nil, ErrMissingRealm
-	}
-
-	if config.SigningAlgorithm == "" {
-		return nil, ErrMissingSigningAlgorithm
 	}
 
 	if config.NowFunc == nil {
@@ -77,6 +74,7 @@ func NewGinJwtMiddleware(config MiddlewareConfig) (*JwtMiddleware, error) {
 		issuer:   config.Issuer,
 		subject:  config.Subject,
 		id:       config.ID,
+		enforcer: e,
 	}, nil
 }
 
@@ -84,9 +82,15 @@ func (m *JwtMiddleware) Handler(isOptional bool) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token, err := m.extractToken(ctx)
 
-		if !isOptional && err != nil {
-			m.config.ErrorHandler(ctx, err)
-			return
+		if !isOptional {
+			if err != nil {
+				m.config.ErrorHandler(ctx, err)
+				return
+			}
+			user := token["sub"].(string)
+			if !m.enforcer.Enforce(user, ctx.Request.URL, ctx.Request.Method) {
+				m.config.ErrorHandler(ctx, ErrForbidden)
+			}
 		}
 
 		if err == nil {
@@ -136,12 +140,15 @@ func (m *JwtMiddleware) extractToken(ctx *gin.Context) (map[string]interface{}, 
 
 	parsedToken, err := jwt.ParseSigned(token)
 	if err != nil {
-		return nil, err
+		return nil, ErrTokenInvalid
 	}
 	c := make(map[string]interface{})
 	err = parsedToken.Claims(m.key, &c)
 	if err != nil {
-		return nil, err
+		if err == jose.ErrUnsupportedKeyType {
+			return nil, ErrInvalidKey
+		}
+		return nil, ErrTokenInvalid
 	}
 
 	if m.issuer != "" && m.issuer != c["iss"] {
