@@ -107,15 +107,15 @@ message Value {
 }
 
 message GetTagReq {
-    uint32 page = 1;
-    uint32 size = 2;
+    uint64 page = 1;
+    uint64 size = 2;
     string type = 3;
     repeated Sort sorts = 4;
 }
 
 message UIDPageReq {
-    uint32 page = 1;
-    uint32 size = 2;
+    uint64 page = 1;
+    uint64 size = 2;
     repeated Sort sorts = 3;
     string uid = 4;
 }
@@ -153,8 +153,8 @@ message EditInfoReq {
 }
 
 message GetSegmentsReq {
-    uint32 page = 1;
-    uint32 size = 2;
+    uint64 page = 1;
+    uint64 size = 2;
     string infoID = 3;
     repeated string labels = 4;
     repeated Sort sorts = 5;
@@ -228,8 +228,8 @@ message GetInfoReq {
 
 message GetInfosReq {
     string uid = 1;
-    uint32 page = 2;
-    uint32 size = 3;
+    uint64 page = 2;
+    uint64 size = 3;
     repeated Sort sorts = 4;
     string title = 5;
     repeated TagAndType tags = 6;
@@ -247,8 +247,8 @@ message InfoIDWithUIDReq {
 
 message InfoIDPageReq {
     string infoID = 1;
-    uint32 page = 2;
-    uint32 size = 3;
+    uint64 page = 2;
+    uint64 size = 3;
     repeated Sort sorts = 4;
 }
 
