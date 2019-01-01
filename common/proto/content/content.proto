@@ -210,7 +210,7 @@ message InsertValueReq {
 message EditValueReq {
     string infoID = 1;
     string segID = 3;
-    string contID = 4;
+    string valID = 4;
     google.protobuf.Timestamp time = 5;
     string value = 6;
 }
@@ -218,7 +218,7 @@ message EditValueReq {
 message ValueOneReq {
     string infoID = 1;
     string segID = 3;
-    string contID = 4;
+    string valID = 4;
 }
 
 message GetInfoReq {
