@@ -32,7 +32,7 @@ kind: ConfigMap
 metadata:
   name: {{ include "teddy.services.content.name" . }}-config
 data:
-  config.yaml: |
+  config.yaml: |-
     server:
       address: 0.0.0.0
       port: 9091
@@ -45,11 +45,13 @@ type: Opaque
 stringData:
   config.yaml: |-
     databases:
-      mongodb:
-        address: {{ .Values.mongodb.mongodbAddress -}}:{{- .Values.mongodb.mongodbPort }}
-        username: {{ .Values.mongodb.mongodbUsername }}
-        password: {{ .Values.mongodb.mongodbPassword }}
-        auth_db: {{ .Values.mongodb.mongodbDatabase }}
+      mongodb: mongodb://10.10.10.20:27017,10.10.10.20:27018,10.10.10.20:27019/admin?replicaSet=rs
+
+    object_store:
+      minio:
+        endpoint: 10.10.10.20:9000
+        access_key: D3XAED5VJMZ566FTIBCQ
+        secret_key: HYrD3cLgJgobEO2k7l51Sfqvd+OCsvN0R+ssRxY3
 {{- $root := . -}}
 {{- with .Values.services.content }}
 ---

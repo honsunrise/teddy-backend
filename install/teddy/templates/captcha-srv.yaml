@@ -45,11 +45,7 @@ type: Opaque
 stringData:
   config.yaml: |-
     databases:
-      mongodb:
-        address: {{ .Values.mongodb.mongodbAddress -}}:{{- .Values.mongodb.mongodbPort }}
-        username: {{ .Values.mongodb.mongodbUsername }}
-        password: {{ .Values.mongodb.mongodbPassword }}
-        auth_db: {{ .Values.mongodb.mongodbDatabase }}
+      mongodb: mongodb://10.10.10.20:27017,10.10.10.20:27018,10.10.10.20:27019/admin?replicaSet=rs
 {{- $root := . -}}
 {{- with .Values.services.captcha }}
 ---

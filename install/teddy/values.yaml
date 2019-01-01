@@ -2,11 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 mongodb:
-  mongodbAddress: 10.99.15.8
-  mongodbPort: 27017
-  mongodbDatabase: teddy
-  mongodbUsername: teddy
-  mongodbPassword: q4fWHzYg*frm
+  mongodbAddress: 10.10.10.20
 
 apis:
   base:
@@ -30,8 +26,8 @@ apis:
       affinity: {}
   uaa:
     version: v0
-    issuer: "uaa.teddy.com"
-    jwksUriEndpoint: "/uaa/jwks.json"
+    issuer: "uaa@teddy.com"
+    jwksUriEndpoint: "/v1/anon/uaa/jwks.json"
     deploy:
       replicas: 1
       traffic:

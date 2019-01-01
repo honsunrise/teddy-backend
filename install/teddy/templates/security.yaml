@@ -39,8 +39,8 @@ spec:
   originIsOptional: true
   origins:
     - jwt:
-        issuer: {{ .Values.apis.uaa.issuer }}
-        jwksUri: {{ printf "http://%s%s" (include "teddy.apis.uaa.name" .) .Values.apis.uaa.jwksUriEndpoint }}
+        issuer: {{ .Values.apis.uaa.issuer | quote }}
+        jwks_uri: "http://10.10.10.30:8083/v1/anon/uaa/jwks.json"
   principalBinding: USE_ORIGIN
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
@@ -93,7 +93,6 @@ spec:
   subjects:
     - properties:
         source.principal: "*"
-        request.auth.claims[roles]: "USER"
   roleRef:
     kind: ServiceRole
     name: "user"
@@ -132,8 +131,8 @@ spec:
     - services: [{{- printf "%s.%s.svc.cluster.local" (include "teddy.services.uaa.name" .) .Release.Namespace -}}]
       methods: ["POST"]
       paths:
-        - "/com.teddy.srv.uaa.UAA/Get*"
-        - "/com.teddy.srv.uaa.UAA/VerifyPassword"
+        - "/teddy.srv.uaa.UAA/Get*"
+        - "/teddy.srv.uaa.UAA/VerifyPassword"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRole
@@ -144,9 +143,9 @@ spec:
     - services: [{{- printf "%s.%s.svc.cluster.local" (include "teddy.services.uaa.name" .) .Release.Namespace -}}]
       methods: ["POST"]
       paths:
-        - "/com.teddy.srv.uaa.UAA/DeleteByUsername"
-        - "/com.teddy.srv.uaa.UAA/ChangePassword"
-        - "/com.teddy.srv.uaa.UAA/Register"
+        - "/teddy.srv.uaa.UAA/DeleteByUsername"
+        - "/teddy.srv.uaa.UAA/ChangePassword"
+        - "/teddy.srv.uaa.UAA/Register"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRoleBinding
@@ -182,7 +181,7 @@ spec:
     - services: [{{- printf "%s.%s.svc.cluster.local" (include "teddy.services.content.name" .) .Release.Namespace -}}]
       methods: ["POST"]
       paths:
-        - "/com.teddy.srv.content.Content/Get*"
+        - "/teddy.srv.content.Content/Get*"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRole
@@ -193,13 +192,13 @@ spec:
     - services: [{{- printf "%s.%s.svc.cluster.local" (include "teddy.services.content.name" .) .Release.Namespace -}}]
       methods: ["POST"]
       paths:
-        - "/com.teddy.srv.content.Content/PublishInfo"
-        - "/com.teddy.srv.content.Content/EditInfo"
-        - "/com.teddy.srv.content.Content/DeleteInfo"
-        - "/com.teddy.srv.content.Content/WatchInfo"
-        - "/com.teddy.srv.content.Content/LikeInfo"
-        - "/com.teddy.srv.content.Content/UnLikeInfo"
-        - "/com.teddy.srv.content.Content/FavoriteInfo"
+        - "/teddy.srv.content.Content/PublishInfo"
+        - "/teddy.srv.content.Content/EditInfo"
+        - "/teddy.srv.content.Content/DeleteInfo"
+        - "/teddy.srv.content.Content/WatchInfo"
+        - "/teddy.srv.content.Content/LikeInfo"
+        - "/teddy.srv.content.Content/UnLikeInfo"
+        - "/teddy.srv.content.Content/FavoriteInfo"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRoleBinding
@@ -210,7 +209,7 @@ spec:
     - user: {{ printf "cluster.local/ns/%s/sa/%s" .Release.Namespace (include "teddy.apis.content.name" .) | quote }}
   roleRef:
     kind: ServiceRole
-    name: {{ printf "%s-modifier" (include "teddy.services.content.name" .) | quote }}
+    name: {{ printf "%s-viewer" (include "teddy.services.content.name" .) | quote }}
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRoleBinding
@@ -235,7 +234,7 @@ spec:
     - services: [{{- printf "%s.%s.svc.cluster.local" (include "teddy.services.message.name" .) .Release.Namespace -}}]
       methods: ["POST"]
       paths:
-        - "/com.teddy.srv.message.Message/Get*"
+        - "/teddy.srv.message.Message/Get*"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRole
@@ -246,7 +245,7 @@ spec:
     - services: [{{- printf "%s.%s.svc.cluster.local" (include "teddy.services.message.name" .) .Release.Namespace -}}]
       methods: ["POST"]
       paths:
-        - "/com.teddy.srv.message.Message/Send*"
+        - "/teddy.srv.message.Message/Send*"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRoleBinding
@@ -283,8 +282,8 @@ spec:
     - services: [{{- printf "%s.%s.svc.cluster.local" (include "teddy.services.captcha.name" .) .Release.Namespace -}}]
       methods: ["POST"]
       paths:
-        - "/com.teddy.srv.captcha.Captcha/Get*"
-        - "/com.teddy.srv.captcha.Captcha/Verify"
+        - "/teddy.srv.captcha.Captcha/Get*"
+        - "/teddy.srv.captcha.Captcha/Verify"
 ---
 apiVersion: "rbac.istio.io/v1alpha1"
 kind: ServiceRoleBinding

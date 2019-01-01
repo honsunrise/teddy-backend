@@ -7,6 +7,8 @@ var (
 
 	ErrMissingKeyFunction = errors.New("key function is missing")
 
+	ErrMissingSigningAlgorithm = errors.New("signing algorithm is missing")
+
 	ErrContextNotHaveToken = errors.New("context not have token")
 
 	// ErrForbidden when HTTP status 403 is given

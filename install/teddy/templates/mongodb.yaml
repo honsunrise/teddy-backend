@@ -12,6 +12,12 @@ spec:
     - {{ .Values.mongodb.mongodbAddress -}}/32
   ports:
     - number: 27017
-      name: tcp
+      name: tcp-1
+      protocol: TCP
+    - number: 27018
+      name: tcp-2
+      protocol: TCP
+    - number: 27019
+      name: tcp-3
       protocol: TCP
   location: MESH_EXTERNAL
