@@ -8,22 +8,24 @@ import "github.com/golang/protobuf/ptypes/empty/empty.proto";
 import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
 
 service Content {
-    rpc GetTags (GetTagReq) returns (GetTagsResp) {}
+    rpc GetTag (GetTagsReq) returns (TagResp) {}
+    rpc GetTags (GetTagReq) returns (TagsResp) {}
 
+    rpc GetInfo (GetInfoReq) returns (InfoResp) {}
+    rpc GetInfos (GetInfosReq) returns (InfosResp) {}
     rpc PublishInfo (PublishInfoReq) returns (google.protobuf.Empty) {}
     rpc EditInfo (EditInfoReq) returns (google.protobuf.Empty) {}
-    rpc GetInfo (GetInfoReq) returns (Info) {}
-    rpc GetInfos (GetInfosReq) returns (GetInfosResp) {}
     rpc DeleteInfo (InfoOneReq) returns (google.protobuf.Empty) {}
     rpc WatchInfo (InfoOneReq) returns (google.protobuf.Empty) {}
 
-    rpc GetSegments (GetSegmentsReq) returns (Segments) {}
-    rpc GetSegment (SegmentOneReq) returns (Segment) {}
+    rpc GetSegments (GetSegmentsReq) returns (SegmentsResp) {}
+    rpc GetSegment (SegmentOneReq) returns (SegmentResp) {}
     rpc PublishSegment (PublishSegmentReq) returns (google.protobuf.Empty) {}
     rpc EditSegment (EditSegmentReq) returns (google.protobuf.Empty) {}
     rpc DeleteSegment (SegmentOneReq) returns (google.protobuf.Empty) {}
 
-    rpc GetValues(GetValuesReq) returns (Values) {}
+    rpc GetValues(GetValuesReq) returns (ValuesResp) {}
+    rpc GetValue(ValueOneReq) returns (ValueResp) {}
     rpc InsertValue (InsertValueReq) returns (google.protobuf.Empty) {}
     rpc EditValue (EditValueReq) returns (google.protobuf.Empty) {}
     rpc DeleteValue (ValueOneReq) returns (google.protobuf.Empty) {}
@@ -49,7 +51,7 @@ message Sort {
     bool asc = 2;
 }
 
-message Tag {
+message TagResp {
     string tag = 1;
     string type = 2;
     uint64 usage = 3;
@@ -57,12 +59,17 @@ message Tag {
     google.protobuf.Timestamp lastUseTime = 5;
 }
 
+message TagsResp {
+    uint64 totalCount = 1;
+    repeated TagResp items = 2;
+}
+
 message TagAndType {
     string tag = 1;
     string type = 2;
 }
 
-message Info {
+message InfoResp {
     string infoID = 1;
     string uid = 2;
     string author = 3;
@@ -88,11 +95,16 @@ message Info {
     bool canReview = 23;
     bool valid = 24;
     bool archived = 25;
-    string LatestSegmentID = 26;
-    uint64 SegmentCount = 27;
+    string latestSegmentID = 26;
+    uint64 segmentCount = 27;
 }
 
-message Segment {
+message InfosResp {
+    uint64 totalCount = 1;
+    repeated InfoResp items = 2;
+}
+
+message SegmentResp {
     string id = 1;
     string infoID = 2;
     uint64 no = 3;
@@ -100,17 +112,31 @@ message Segment {
     repeated string labels = 5;
 }
 
-message Value {
+message SegmentsResp {
+    uint64 totalCount = 1;
+    repeated SegmentResp items = 2;
+}
+
+message ValueResp {
     string id = 1;
     google.protobuf.Timestamp time = 2;
     string value = 3;
 }
 
-message GetTagReq {
+message ValuesResp {
+    uint64 totalCount = 1;
+    repeated ValueResp items = 2;
+}
+
+message GetTagsReq {
     uint64 page = 1;
     uint64 size = 2;
     string type = 3;
     repeated Sort sorts = 4;
+}
+
+message GetTagReq {
+    string id = 1;
 }
 
 message UIDPageReq {
@@ -120,10 +146,6 @@ message UIDPageReq {
     string uid = 4;
 }
 
-message GetTagsResp {
-    uint64 totalCount = 1;
-    repeated Tag tags = 2;
-}
 
 message InfoOneReq {
     string infoID = 1;
@@ -160,11 +182,6 @@ message GetSegmentsReq {
     repeated Sort sorts = 5;
 }
 
-message Segments {
-    uint64 totalCount = 1;
-    repeated Segment segments = 2;
-}
-
 message PublishSegmentReq {
     string infoID = 1;
     uint64 no = 2;
@@ -193,11 +210,6 @@ message GetValuesReq {
     string infoID = 3;
     string segID = 4;
     repeated Sort sorts = 5;
-}
-
-message Values {
-    uint64 totalCount = 1;
-    repeated Value values = 2;
 }
 
 message InsertValueReq {
@@ -233,11 +245,6 @@ message GetInfosReq {
     repeated Sort sorts = 4;
     string title = 5;
     repeated TagAndType tags = 6;
-}
-
-message GetInfosResp {
-    uint64 totalCount = 1;
-    repeated Info infos = 2;
 }
 
 message InfoIDWithUIDReq {
