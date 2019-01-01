@@ -2,6 +2,33 @@
 
 
 [[projects]]
+  digest = "1:5d3e23515e7916c152cc665eda0f7eaf6fdf8fdfe7c3dbac97049bcbd649b33f"
+  name = "github.com/Knetic/govaluate"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "d216395917cc49052c7c7094cf57f09657ca08a8"
+  version = "v3.0.0"
+
+[[projects]]
+  digest = "1:76ca0dfcbf951d1868c7449453981dba9e1f79034706d1500a5a785000f5f222"
+  name = "github.com/casbin/casbin"
+  packages = [
+    ".",
+    "config",
+    "effect",
+    "log",
+    "model",
+    "persist",
+    "persist/file-adapter",
+    "rbac",
+    "rbac/default-role-manager",
+    "util",
+  ]
+  pruneopts = "UT"
+  revision = "542e16cac74562eefac970a7d0d1467640d1f1cb"
+  version = "v1.7.0"
+
+[[projects]]
   digest = "1:6f9339c912bbdda81302633ad7e99a28dfa5a639c864061f1929510a9a64aa74"
   name = "github.com/dustin/go-humanize"
   packages = ["."]
@@ -63,14 +90,16 @@
   version = "v1.40.0"
 
 [[projects]]
-  digest = "1:5ac24c0ad5dc117fb2b6d90d205c876ec599c09cccb702a36586680e09cb20b5"
+  digest = "1:13c0df370984bb29f3045ae745483ed3938984cb50cde00ed2c1b53c403fe65d"
   name = "github.com/golang/protobuf"
   packages = [
+    "jsonpb",
     "proto",
     "ptypes",
     "ptypes/any",
     "ptypes/duration",
     "ptypes/empty",
+    "ptypes/struct",
     "ptypes/timestamp",
   ]
   pruneopts = "UT"
@@ -165,6 +194,14 @@
   version = "1.0.1"
 
 [[projects]]
+  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
   digest = "1:69b1cc331fca23d702bd72f860c6a647afd0aa9fcbc1d0659b1365e26546dd70"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
@@ -182,7 +219,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1ad084c7451519013a03afb2c4a75d7da3aff9ff8c751f9db4cda24b548f5215"
+  digest = "1:4083e5595ae0a9978f184f0956044f923b14ec8c657437d98b1946535a69e520"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
@@ -199,7 +236,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "ccf51b741dd2dc0a3f4bb1c4df128aadf2911c69"
+  revision = "cd529cd3a3867fcc8020c4d16a1e0173b0e718a7"
 
 [[projects]]
   branch = "master"
@@ -358,6 +395,7 @@
   input-imports = [
     "github.com/gin-contrib/cors",
     "github.com/gin-gonic/gin",
+    "github.com/golang/protobuf/jsonpb",
     "github.com/golang/protobuf/ptypes",
     "github.com/minio/minio-go",
     "github.com/sirupsen/logrus",
