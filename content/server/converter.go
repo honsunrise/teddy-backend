@@ -6,40 +6,40 @@ import (
 	"github.com/zhsyourai/teddy-backend/content/models"
 )
 
-func copyFromTagToPBTag(tag *models.Tag, pbtag *content.Tag) error {
-	if tag == nil || pbtag == nil {
+func copyFromTagToPBTag(tag *models.Tag, pbTag *content.TagResp) error {
+	if tag == nil || pbTag == nil {
 		return nil
 	}
-	pbtag.Tag = tag.Tag
-	pbtag.Usage = tag.Usage
-	pbtag.Type = tag.Type
+	pbTag.Tag = tag.Tag
+	pbTag.Usage = tag.Usage
+	pbTag.Type = tag.Type
 	tmp, err := ptypes.TimestampProto(tag.CreateTime)
 	if err != nil {
 		return err
 	}
-	pbtag.CreateTime = tmp
+	pbTag.CreateTime = tmp
 
 	tmp, err = ptypes.TimestampProto(tag.LastUseTime)
 	if err != nil {
 		return err
 	}
-	pbtag.LastUseTime = tmp
+	pbTag.LastUseTime = tmp
 	return nil
 }
 
-func copyFromSegmentToPBSegment(tag *models.Segment, pbtag *content.Segment) error {
-	if tag == nil || pbtag == nil {
+func copyFromSegmentToPBSegment(segment *models.Segment, pbSegment *content.SegmentResp) error {
+	if segment == nil || pbSegment == nil {
 		return nil
 	}
-	pbtag.Id = tag.ID.Hex()
-	pbtag.InfoID = tag.InfoID.Hex()
-	pbtag.No = tag.No
-	pbtag.Title = tag.Title
-	pbtag.Labels = tag.Labels
+	pbSegment.Id = segment.ID.Hex()
+	pbSegment.InfoID = segment.InfoID.Hex()
+	pbSegment.No = segment.No
+	pbSegment.Title = segment.Title
+	pbSegment.Labels = segment.Labels
 	return nil
 }
 
-func copyFromValueToPBValue(value *models.Value, pbValue *content.Value) error {
+func copyFromValueToPBValue(value *models.Value, pbValue *content.ValueResp) error {
 	if value == nil || pbValue == nil {
 		return nil
 	}

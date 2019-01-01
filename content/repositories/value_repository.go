@@ -17,7 +17,7 @@ type ValueRepository interface {
 	FindOne(ctx mongo.SessionContext, infoID objectid.ObjectID,
 		segID objectid.ObjectID, id string) (*models.Value, error)
 	FindAll(ctx mongo.SessionContext, infoID objectid.ObjectID, segID objectid.ObjectID,
-		page, size uint32, sorts []*content.Sort) ([]*models.Value, uint64, error)
+		page, size uint64, sorts []*content.Sort) ([]*models.Value, uint64, error)
 
 	DeleteAll(ctx mongo.SessionContext, infoID objectid.ObjectID, segID objectid.ObjectID) error
 	DeleteOne(ctx mongo.SessionContext, infoID objectid.ObjectID, segID objectid.ObjectID, id string) error
@@ -97,7 +97,7 @@ func (repo *valueRepository) FindOne(ctx mongo.SessionContext, infoID objectid.O
 }
 
 func (repo *valueRepository) FindAll(ctx mongo.SessionContext, infoID objectid.ObjectID, segID objectid.ObjectID,
-	page, size uint32, sorts []*content.Sort) ([]*models.Value, uint64, error) {
+	page, size uint64, sorts []*content.Sort) ([]*models.Value, uint64, error) {
 
 	seg := models.Segment{}
 	filter := bson.D{

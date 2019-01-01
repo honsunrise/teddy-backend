@@ -69,8 +69,49 @@ type contentHandler struct {
 	thumbDownRepo repositories.BehaviorRepository
 }
 
-func (h *contentHandler) GetValues(ctx context.Context, req *content.GetValuesReq) (*content.Values, error) {
-	var resp content.Values
+func (h *contentHandler) GetValue(ctx context.Context, req *content.ValueOneReq) (*content.ValueResp, error) {
+	var resp content.ValueResp
+	if err := validateValueOneReq(req); err != nil {
+		return nil, err
+	}
+
+	infoID, err := objectid.FromHex(req.InfoID)
+	if err != nil {
+		return nil, err
+	}
+
+	segID, err := objectid.FromHex(req.SegID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = h.client.UseSession(ctx, func(sessionContext mongo.SessionContext) error {
+		var err error
+		value, err := h.valueRepo.FindOne(sessionContext, infoID, segID, req.ValID)
+
+		if err != nil {
+			return err
+		}
+
+		resp.Id = value.ID
+		resp.Value = value.Value
+		var pbTime *timestamp.Timestamp
+		pbTime, err = ptypes.TimestampProto(value.Time)
+		if err != nil {
+			return err
+		}
+		resp.Time = pbTime
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+func (h *contentHandler) GetValues(ctx context.Context, req *content.GetValuesReq) (*content.ValuesResp, error) {
+	var resp content.ValuesResp
 	if err := validateGetValuesReq(req); err != nil {
 		return nil, err
 	}
@@ -93,13 +134,13 @@ func (h *contentHandler) GetValues(ctx context.Context, req *content.GetValuesRe
 			return err
 		}
 
-		result := make([]*content.Value, 0, len(values))
+		result := make([]*content.ValueResp, 0, len(values))
 		for _, value := range values {
-			pbValue := &content.Value{}
+			pbValue := &content.ValueResp{}
 			copyFromValueToPBValue(value, pbValue)
 			result = append(result, pbValue)
 		}
-		resp.Values = result
+		resp.Items = result
 		resp.TotalCount = totalCount
 		return nil
 	})
@@ -222,7 +263,7 @@ func (h *contentHandler) EditValue(ctx context.Context, req *content.EditValueRe
 			updateMap["value"] = req.Value
 		}
 
-		err = h.valueRepo.Update(sessionContext, infoID, segment.ID, req.ContID, updateMap)
+		err = h.valueRepo.Update(sessionContext, infoID, segment.ID, req.ValID, updateMap)
 		if err != nil {
 			return err
 		}
@@ -253,7 +294,7 @@ func (h *contentHandler) DeleteValue(ctx context.Context, req *content.ValueOneR
 
 	err = h.client.UseSession(ctx, func(sessionContext mongo.SessionContext) error {
 		var err error
-		err = h.valueRepo.DeleteOne(sessionContext, infoID, segID, req.ContID)
+		err = h.valueRepo.DeleteOne(sessionContext, infoID, segID, req.ValID)
 		if err != nil {
 			return err
 		}
@@ -266,8 +307,8 @@ func (h *contentHandler) DeleteValue(ctx context.Context, req *content.ValueOneR
 	return &resp, nil
 }
 
-func (h *contentHandler) GetSegments(ctx context.Context, req *content.GetSegmentsReq) (*content.Segments, error) {
-	var resp content.Segments
+func (h *contentHandler) GetSegments(ctx context.Context, req *content.GetSegmentsReq) (*content.SegmentsResp, error) {
+	var resp content.SegmentsResp
 	if err := validateGetSegmentsReq(req); err != nil {
 		return nil, err
 	}
@@ -285,13 +326,13 @@ func (h *contentHandler) GetSegments(ctx context.Context, req *content.GetSegmen
 			return err
 		}
 
-		result := make([]*content.Segment, 0, len(segments))
+		result := make([]*content.SegmentResp, 0, len(segments))
 		for _, segment := range segments {
-			pbSegment := &content.Segment{}
+			pbSegment := &content.SegmentResp{}
 			copyFromSegmentToPBSegment(segment, pbSegment)
 			result = append(result, pbSegment)
 		}
-		resp.Segments = result
+		resp.Items = result
 		resp.TotalCount = totalCount
 		return nil
 	})
@@ -302,8 +343,8 @@ func (h *contentHandler) GetSegments(ctx context.Context, req *content.GetSegmen
 	return &resp, nil
 }
 
-func (h *contentHandler) GetSegment(ctx context.Context, req *content.SegmentOneReq) (*content.Segment, error) {
-	var resp content.Segment
+func (h *contentHandler) GetSegment(ctx context.Context, req *content.SegmentOneReq) (*content.SegmentResp, error) {
+	var resp content.SegmentResp
 	if err := validateSegmentOneReq(req); err != nil {
 		return nil, err
 	}
@@ -506,8 +547,8 @@ func (h *contentHandler) DeleteSegment(ctx context.Context, req *content.Segment
 	return &resp, nil
 }
 
-func (h *contentHandler) GetTags(ctx context.Context, req *content.GetTagReq) (*content.GetTagsResp, error) {
-	var resp content.GetTagsResp
+func (h *contentHandler) GetTags(ctx context.Context, req *content.GetTagsReq) (*content.TagsResp, error) {
+	var resp content.TagsResp
 	if err := validateGetTagsReq(req); err != nil {
 		return nil, err
 	}
@@ -520,14 +561,44 @@ func (h *contentHandler) GetTags(ctx context.Context, req *content.GetTagReq) (*
 			return err
 		}
 
-		result := make([]*content.Tag, 0, len(tags))
+		result := make([]*content.TagResp, 0, len(tags))
 		for _, tag := range tags {
-			pbTag := &content.Tag{}
+			pbTag := &content.TagResp{}
 			copyFromTagToPBTag(tag, pbTag)
 			result = append(result, pbTag)
 		}
-		resp.Tags = result
+		resp.Items = result
 		resp.TotalCount = totalCount
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+func (h *contentHandler) GetTag(ctx context.Context, req *content.GetTagReq) (*content.TagResp, error) {
+	var resp content.TagResp
+	if err := validateGetTagReq(req); err != nil {
+		return nil, err
+	}
+
+	tagID, err := objectid.FromHex(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = h.client.UseSession(ctx, func(sessionContext mongo.SessionContext) error {
+		var err error
+		tag, err := h.tagRepo.FindOne(sessionContext, tagID)
+
+		if err != nil {
+			return err
+		}
+
+		resp.Tag = tag.Tag
+		resp.Type = tag.Type
 		return nil
 	})
 
@@ -745,7 +816,7 @@ func (h *contentHandler) EditInfo(ctx context.Context, req *content.EditInfoReq)
 	return &resp, nil
 }
 
-func (h *contentHandler) fillInfo(sessionContext mongo.SessionContext, uid string, info *models.Info) (*content.Info, error) {
+func (h *contentHandler) fillInfo(sessionContext mongo.SessionContext, uid string, info *models.Info) (*content.InfoResp, error) {
 	isThumbUp, err := h.thumbUpRepo.IsExists(sessionContext, uid, info.ID)
 	if err != nil {
 		return nil, err
@@ -826,7 +897,7 @@ func (h *contentHandler) fillInfo(sessionContext mongo.SessionContext, uid strin
 		})
 	}
 
-	resp := &content.Info{
+	resp := &content.InfoResp{
 		InfoID:  info.ID.Hex(),
 		Uid:     info.UID,
 		Title:   info.Title,
@@ -870,8 +941,8 @@ func (h *contentHandler) fillInfo(sessionContext mongo.SessionContext, uid strin
 	return resp, nil
 }
 
-func (h *contentHandler) GetInfo(ctx context.Context, req *content.GetInfoReq) (*content.Info, error) {
-	var resp *content.Info
+func (h *contentHandler) GetInfo(ctx context.Context, req *content.GetInfoReq) (*content.InfoResp, error) {
+	var resp *content.InfoResp
 	var err error
 	if err = validateGetInfoReq(req); err != nil {
 		return nil, err
@@ -901,8 +972,8 @@ func (h *contentHandler) GetInfo(ctx context.Context, req *content.GetInfoReq) (
 	return resp, nil
 }
 
-func (h *contentHandler) GetInfos(ctx context.Context, req *content.GetInfosReq) (*content.GetInfosResp, error) {
-	var resp content.GetInfosResp
+func (h *contentHandler) GetInfos(ctx context.Context, req *content.GetInfosReq) (*content.InfosResp, error) {
+	var resp content.InfosResp
 	if err := validateGetInfosReq(req); err != nil {
 		return nil, err
 	}
@@ -931,7 +1002,7 @@ func (h *contentHandler) GetInfos(ctx context.Context, req *content.GetInfosReq)
 			return err
 		}
 
-		pInfos := make([]*content.Info, 0, len(infos))
+		pInfos := make([]*content.InfoResp, 0, len(infos))
 		for _, info := range infos {
 			pInfo, err := h.fillInfo(sessionContext, req.Uid, info)
 			if err != nil {
@@ -939,7 +1010,7 @@ func (h *contentHandler) GetInfos(ctx context.Context, req *content.GetInfosReq)
 			}
 			pInfos = append(pInfos, pInfo)
 		}
-		resp.Infos = pInfos
+		resp.Items = pInfos
 		resp.TotalCount = totalCount
 		return nil
 	})

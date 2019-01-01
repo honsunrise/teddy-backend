@@ -21,7 +21,11 @@ func validatePublishInfoReq(req *content.PublishInfoReq) error {
 	return nil
 }
 
-func validateGetTagsReq(req *content.GetTagReq) error {
+func validateGetTagsReq(req *content.GetTagsReq) error {
+	return nil
+}
+
+func validateGetTagReq(req *content.GetTagReq) error {
 	return nil
 }
 
