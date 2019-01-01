@@ -8,8 +8,8 @@ import "github.com/golang/protobuf/ptypes/empty/empty.proto";
 import "github.com/golang/protobuf/ptypes/timestamp/timestamp.proto";
 
 service Content {
-    rpc GetTag (GetTagsReq) returns (TagResp) {}
-    rpc GetTags (GetTagReq) returns (TagsResp) {}
+    rpc GetTag (GetTagReq) returns (TagResp) {}
+    rpc GetTags (GetTagsReq) returns (TagsResp) {}
 
     rpc GetInfo (GetInfoReq) returns (InfoResp) {}
     rpc GetInfos (GetInfosReq) returns (InfosResp) {}
