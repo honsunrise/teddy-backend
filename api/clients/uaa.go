@@ -2,7 +2,6 @@ package clients
 
 import (
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/proto/uaa"
 	"google.golang.org/grpc"
 	"sync"
@@ -11,9 +10,8 @@ import (
 var uaaKey = "__teddy_uaa_client_key__"
 
 // FromContext retrieves the client from the Context
-func UaaFromContext(ctx *gin.Context) (uaa.UAAClient, bool) {
-	c, ok := ctx.Value(uaaKey).(uaa.UAAClient)
-	return c, ok
+func UaaFromContext(ctx *gin.Context) uaa.UAAClient {
+	return ctx.Value(uaaKey).(uaa.UAAClient)
 }
 
 // Client returns a wrapper for the UaaClient
@@ -27,14 +25,12 @@ func UaaNew(f AddressFunc) gin.HandlerFunc {
 
 			addr, err := f()
 			if err != nil {
-				log.Errorf("Get uaa address error %v", err)
-				ctx.Next()
+				ctx.Error(err)
 				return
 			}
 			conn, err := grpc.Dial(addr, grpc.WithInsecure())
 			if err != nil {
-				log.Errorf("Dial to uaa server error %v", err)
-				ctx.Next()
+				ctx.Error(err)
 				return
 			}
 			client = uaa.NewUAAClient(conn)

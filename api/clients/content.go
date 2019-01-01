@@ -1,7 +1,6 @@
 package clients
 
 import (
-	log "github.com/sirupsen/logrus"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -12,9 +11,8 @@ import (
 var contentKey = "__teddy_content_client_key__"
 
 // FromContext retrieves the client from the Context
-func ContentFromContext(ctx *gin.Context) (content.ContentClient, bool) {
-	c, ok := ctx.Value(contentKey).(content.ContentClient)
-	return c, ok
+func ContentFromContext(ctx *gin.Context) content.ContentClient {
+	return ctx.Value(contentKey).(content.ContentClient)
 }
 
 // Client returns a wrapper for the UaaClient
@@ -27,14 +25,12 @@ func ContentNew(f AddressFunc) gin.HandlerFunc {
 			defer lock.Unlock()
 			addr, err := f()
 			if err != nil {
-				log.Errorf("Get content address error %v", err)
-				ctx.Next()
+				ctx.Error(err)
 				return
 			}
 			conn, err := grpc.Dial(addr, grpc.WithInsecure())
 			if err != nil {
-				log.Errorf("Dial to content server error %v", err)
-				ctx.Next()
+				ctx.Error(err)
 				return
 			}
 			client = content.NewContentClient(conn)
