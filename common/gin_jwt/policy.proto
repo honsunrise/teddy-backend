@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package gin_jwt;
+
+option go_package = "gin_jwt";
+
+import "github.com/golang/protobuf/ptypes/empty/empty.proto";
+
+service PolicyAdapter {
+    rpc loadPolicy(google.protobuf.Empty) returns (Policy) {}
+    rpc savePolicy(Policy) returns (google.protobuf.Empty) {}
+    rpc addPolicy(AddPolicyReq) returns (google.protobuf.Empty) {}
+    rpc removePolicy(RemovePolicyReq) returns (google.protobuf.Empty) {}
+    rpc removeFilteredPolicy(RemoveFilteredPolicyReq) returns (google.protobuf.Empty) {}
+}
+
+message Policy {
+    repeated string rules = 1;
+}
+
+message AddPolicyReq {
+    string sec = 1;
+    string ptype = 2;
+    repeated string rule = 3;
+}
+
+message RemovePolicyReq {
+    string sec = 1;
+    string ptype = 2;
+    repeated string rule = 3;
+}
+
+message RemoveFilteredPolicyReq {
+    string sec = 1;
+    string ptype = 2;
+    string fieldIndex = 3;
+    repeated string fieldValues = 4;
+}
+
