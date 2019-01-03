@@ -1,8 +1,6 @@
 syntax = "proto3";
 
-package gin_jwt;
-
-option go_package = "gin_jwt";
+package grpcadapter;
 
 import "github.com/golang/protobuf/ptypes/empty/empty.proto";
 
@@ -33,7 +31,6 @@ message RemovePolicyReq {
 message RemoveFilteredPolicyReq {
     string sec = 1;
     string ptype = 2;
-    string fieldIndex = 3;
+    int64 fieldIndex = 3;
     repeated string fieldValues = 4;
 }
-
