@@ -2,6 +2,7 @@ package gin_jwt
 
 import (
 	"github.com/casbin/casbin"
+	"github.com/casbin/casbin/persist"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/square/go-jose.v2"
 	"gopkg.in/square/go-jose.v2/jwt"
@@ -35,10 +36,11 @@ type JwtMiddleware struct {
 	issuer   string
 	subject  string
 	id       string
+	adapter  *persist.Adapter
 	enforcer *casbin.Enforcer
 }
 
-func NewGinJwtMiddleware(config MiddlewareConfig, e *casbin.Enforcer) (*JwtMiddleware, error) {
+func NewGinJwtMiddleware(config MiddlewareConfig, adapter *persist.Adapter) (*JwtMiddleware, error) {
 	if config.Realm == "" {
 		return nil, ErrMissingRealm
 	}
@@ -66,6 +68,11 @@ func NewGinJwtMiddleware(config MiddlewareConfig, e *casbin.Enforcer) (*JwtMiddl
 		config.ContextKey = DefaultContextKey
 	}
 
+	enforcer, err := casbin.NewEnforcerSafe(casbin.NewModel(CasbinModel), adapter)
+	if err != nil {
+		return nil, err
+	}
+
 	return &JwtMiddleware{
 		config:   config,
 		key:      config.KeyFunc(),
@@ -74,7 +81,8 @@ func NewGinJwtMiddleware(config MiddlewareConfig, e *casbin.Enforcer) (*JwtMiddl
 		issuer:   config.Issuer,
 		subject:  config.Subject,
 		id:       config.ID,
-		enforcer: e,
+		adapter:  adapter,
+		enforcer: enforcer,
 	}, nil
 }
 
@@ -101,9 +109,9 @@ func (m *JwtMiddleware) Handler(isOptional bool) gin.HandlerFunc {
 	}
 }
 
-func (m *JwtMiddleware) ExtractToken(ctx *gin.Context) (map[string]interface{}, error) {
+func (m *JwtMiddleware) ExtractClaims(ctx *gin.Context, key string) (interface{}, error) {
 	if token, ok := ctx.Get(m.config.ContextKey); ok {
-		return token.(map[string]interface{}), nil
+		return token.(map[string]interface{})[key], nil
 	} else {
 		return nil, ErrContextNotHaveToken
 	}

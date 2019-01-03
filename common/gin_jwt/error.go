@@ -1,9 +1,13 @@
 package gin_jwt
 
-import "errors"
+import (
+	"errors"
+	"github.com/zhsyourai/teddy-backend/common/nice_error"
+	"net/http"
+)
 
 var (
-	ErrMissingRealm = errors.New("realm is missing")
+	ErrMissingRealm = nice_error.DefineNiceError(http.StatusInternalServerError, "realm is missing", "please set realm")
 
 	ErrMissingKeyFunction = errors.New("key function is missing")
 
