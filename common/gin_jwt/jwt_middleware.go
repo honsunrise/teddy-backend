@@ -104,11 +104,60 @@ func (m *JwtMiddleware) Handler() gin.HandlerFunc {
 	}
 }
 
-func (m *JwtMiddleware) ExtractClaims(ctx *gin.Context, key string) (interface{}, error) {
+func (m *JwtMiddleware) ExtractClaims(ctx *gin.Context, key string) interface{} {
 	if token, ok := ctx.Get(m.config.ContextKey); ok {
-		return token.(map[string]interface{})[key], nil
+		return token.(map[string]interface{})[key]
 	} else {
-		return nil, ErrContextNotHaveToken
+		// should never happen
+		panic(ErrContextNotHaveToken)
+	}
+}
+
+func (m *JwtMiddleware) ExtractSub(ctx *gin.Context) string {
+	if token, ok := ctx.Get(m.config.ContextKey); ok {
+		return token.(map[string]interface{})["sub"].(string)
+	} else {
+		return ""
+	}
+}
+
+func (m *JwtMiddleware) ExtractIss(ctx *gin.Context) string {
+	if token, ok := ctx.Get(m.config.ContextKey); ok {
+		return token.(map[string]interface{})["iss"].(string)
+	} else {
+		return ""
+	}
+}
+
+func (m *JwtMiddleware) ExtractJTI(ctx *gin.Context) string {
+	if token, ok := ctx.Get(m.config.ContextKey); ok {
+		return token.(map[string]interface{})["jti"].(string)
+	} else {
+		return ""
+	}
+}
+
+func (m *JwtMiddleware) ExtractNBF(ctx *gin.Context) time.Time {
+	if token, ok := ctx.Get(m.config.ContextKey); ok {
+		return time.Unix(int64(token.(map[string]interface{})["nbf"].(float64)), 0)
+	} else {
+		return time.Time{}
+	}
+}
+
+func (m *JwtMiddleware) ExtractEXP(ctx *gin.Context) time.Time {
+	if token, ok := ctx.Get(m.config.ContextKey); ok {
+		return time.Unix(int64(token.(map[string]interface{})["exp"].(float64)), 0)
+	} else {
+		return time.Time{}
+	}
+}
+
+func (m *JwtMiddleware) ExtractIAT(ctx *gin.Context) time.Time {
+	if token, ok := ctx.Get(m.config.ContextKey); ok {
+		return time.Unix(int64(token.(map[string]interface{})["iat"].(float64)), 0)
+	} else {
+		return time.Time{}
 	}
 }
 
