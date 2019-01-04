@@ -86,25 +86,20 @@ func NewGinJwtMiddleware(config MiddlewareConfig, adapter *persist.Adapter) (*Jw
 	}, nil
 }
 
-func (m *JwtMiddleware) Handler(isOptional bool) gin.HandlerFunc {
+func (m *JwtMiddleware) Handler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token, err := m.extractToken(ctx)
-
-		if !isOptional {
-			if err != nil {
-				m.config.ErrorHandler(ctx, err)
-				return
-			}
-			user := token["sub"].(string)
-			if !m.enforcer.Enforce(user, ctx.Request.URL, ctx.Request.Method) {
-				m.config.ErrorHandler(ctx, ErrForbidden)
-			}
+		if err != nil {
+			m.config.ErrorHandler(ctx, err)
+			return
+		}
+		user := token["sub"].(string)
+		if !m.enforcer.Enforce(user, ctx.Request.URL, ctx.Request.Method) {
+			m.config.ErrorHandler(ctx, ErrForbidden)
+			return
 		}
 
-		if err == nil {
-			ctx.Set(m.config.ContextKey, token)
-		}
-
+		ctx.Set(m.config.ContextKey, token)
 		ctx.Next()
 	}
 }
