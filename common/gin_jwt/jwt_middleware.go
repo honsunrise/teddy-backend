@@ -36,11 +36,11 @@ type JwtMiddleware struct {
 	issuer   string
 	subject  string
 	id       string
-	adapter  *persist.Adapter
+	adapter  persist.Adapter
 	enforcer *casbin.Enforcer
 }
 
-func NewGinJwtMiddleware(config MiddlewareConfig, adapter *persist.Adapter) (*JwtMiddleware, error) {
+func NewGinJwtMiddleware(config MiddlewareConfig, adapter persist.Adapter) (*JwtMiddleware, error) {
 	if config.Realm == "" {
 		return nil, ErrMissingRealm
 	}
