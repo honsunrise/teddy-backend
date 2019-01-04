@@ -9,10 +9,11 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
 	"github.com/zhsyourai/teddy-backend/api/content/handler"
-	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
-	"github.com/zhsyourai/teddy-backend/api/nice_error"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/common/config/source/file"
+	"github.com/zhsyourai/teddy-backend/common/gin_jwt"
+	"github.com/zhsyourai/teddy-backend/common/grpcadapter"
+	"github.com/zhsyourai/teddy-backend/common/nice_error"
 	"golang.org/x/sync/errgroup"
 	"net/http"
 	"time"
@@ -45,15 +46,24 @@ func main() {
 		log.Fatal(err)
 	}
 
+	target, err := uaaSrvAddrFunc()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	adapter, err := grpcadapter.NewAdapter(target)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	jwtMiddleware, err := gin_jwt.NewGinJwtMiddleware(gin_jwt.MiddlewareConfig{
-		Realm:            "uaa.teddy.com",
-		Issuer:           "uaa@teddy.com",
-		SigningAlgorithm: "RS256",
-		KeyFunc:          gin_jwt.RemoteFetchFunc("http://10.10.10.30:8083/v1/anon/uaa/jwks.json", 24*time.Hour),
+		Realm:   "uaa.teddy.com",
+		Issuer:  "uaa@teddy.com",
+		KeyFunc: gin_jwt.RemoteFetchFunc("http://10.10.10.30:8083/v1/anon/uaa/jwks.json", 24*time.Hour),
 		Audience: []string{
 			"content",
 		},
-	})
+	}, adapter)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -86,8 +96,9 @@ func main() {
 	router.Use(clients.ContentNew(contentSrvAddrFunc))
 	router.Use(clients.CaptchaNew(captchaSrvAddrFunc))
 	router.Use(nice_error.NewNiceError())
-	content.HandlerNormal(router.Group("/v1/anon/content").Use(jwtMiddleware.Handler(true)))
-	content.HandlerAuth(router.Group("/v1/auth/content").Use(jwtMiddleware.Handler(false)))
+	router.Use(jwtMiddleware.Handler())
+	content.HandlerNormal(router.Group("/v1/anon/content"))
+	content.HandlerAuth(router.Group("/v1/auth/content"))
 	content.HandlerHealth(router)
 
 	// For normal request

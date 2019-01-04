@@ -33,3 +33,16 @@ func contentSrvAddrFunc() (string, error) {
 	}
 	return fmt.Sprintf("%s:%d", contentSrvDomain, addrs[0].Port), nil
 }
+
+func uaaSrvAddrFunc() (string, error) {
+	const uaaSrvDomain = "srv-uaa"
+	_, addrs, err := net.LookupSRV("grpc", "tcp", uaaSrvDomain)
+	if err != nil {
+		log.Errorf("Lookup srv error %v", err)
+		return "", err
+	}
+	for _, addr := range addrs {
+		log.Infof("%s SRV is %v", uaaSrvDomain, addr)
+	}
+	return fmt.Sprintf("%s:%d", uaaSrvDomain, addrs[0].Port), nil
+}

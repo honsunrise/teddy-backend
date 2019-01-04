@@ -4,7 +4,9 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/common/config/source/file"
+	"github.com/zhsyourai/teddy-backend/common/grpcadapter"
 	"github.com/zhsyourai/teddy-backend/uaa/components"
+	"github.com/zhsyourai/teddy-backend/uaa/mongo-grpcadapter"
 	"google.golang.org/grpc"
 	grpcHealth "google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
@@ -70,6 +72,9 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 	uaa.RegisterUAAServer(grpcServer, accountSrv)
+
+	policyAdapterServer := mongogrpcadapter.NewServer(mongodbClient, "teddy", "casbin_rule")
+	grpcadapter.RegisterPolicyAdapterServer(grpcServer, policyAdapterServer)
 
 	healthSrv := grpcHealth.NewServer()
 	grpc_health_v1.RegisterHealthServer(grpcServer, healthSrv)

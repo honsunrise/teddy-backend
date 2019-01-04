@@ -82,12 +82,12 @@
   version = "v1.3.0"
 
 [[projects]]
-  digest = "1:c914c5f07b45352e70e55d147661667b45e69f01e4ba94ddd260d62a4c0b1aa9"
+  digest = "1:8b4bb15de2e698d359eeec15c42453567c98972a70c8619946050360ec02ec32"
   name = "github.com/go-ini/ini"
   packages = ["."]
   pruneopts = "UT"
-  revision = "a9da9309fb4822643ceebb765f80025c35ac19a1"
-  version = "v1.40.0"
+  revision = "6ed8d5f64cd79a498d1f3fab5880cc376ce41bbe"
+  version = "v1.41.0"
 
 [[projects]]
   digest = "1:13c0df370984bb29f3045ae745483ed3938984cb50cde00ed2c1b53c403fe65d"
@@ -219,16 +219,17 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4083e5595ae0a9978f184f0956044f923b14ec8c657437d98b1946535a69e520"
+  digest = "1:49350e2883566faf6278ad9251a49c7cafd9b5861d8f3dd3c9a833ace62fc443"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
-    "api/gin_jwt",
-    "api/nice_error",
     "common/config",
     "common/config/coder/json",
     "common/config/coder/yaml",
     "common/config/source/file",
+    "common/gin_jwt",
+    "common/grpcadapter",
+    "common/nice_error",
     "common/proto/captcha",
     "common/proto/content",
     "common/proto/message",
@@ -236,7 +237,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "cd529cd3a3867fcc8020c4d16a1e0173b0e718a7"
+  revision = "4327ce694f9e7b7a117b7cb37e1a63a2c68c419a"
 
 [[projects]]
   branch = "master"
@@ -251,7 +252,7 @@
     "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
+  revision = "ff983b9c42bc9fbf91556e191cc8efb585c16908"
 
 [[projects]]
   branch = "master"
@@ -279,7 +280,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:aa9c91c18e69320666ef54b345fbd9fc110452c24fb3361497d1b619dd696521"
+  digest = "1:396d4228b57507f3320229d47bb2d3d0f0a0a0ae27e193c2f36cb5c152d3dcab"
   name = "golang.org/x/sys"
   packages = [
     "cpu",
@@ -287,7 +288,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "9a3f9b0469bbc6b8802087ae5c0af9f61502de01"
+  revision = "82a175fd1598e8a172e58ebdf5ed262bb29129e5"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -369,7 +370,7 @@
   version = "v8.18.2"
 
 [[projects]]
-  digest = "1:550221cdc42e1ad44a1942d01c4135c30f6808b61dbad3c52d325e01d8e7cc07"
+  digest = "1:a4cde1eec9a17eb2399a50c6e1a9fe3fde039994de058f9dbf6592d157bfe97b"
   name = "gopkg.in/square/go-jose.v2"
   packages = [
     ".",
@@ -378,8 +379,8 @@
     "jwt",
   ]
   pruneopts = "UT"
-  revision = "72415094398e2f013bf50b76fd6de36df47938ea"
-  version = "v2.2.1"
+  revision = "e94fb177d3668d35ab39c61cbb2f311550557e83"
+  version = "v2.2.2"
 
 [[projects]]
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
@@ -400,10 +401,11 @@
     "github.com/minio/minio-go",
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/api/clients",
-    "github.com/zhsyourai/teddy-backend/api/gin_jwt",
-    "github.com/zhsyourai/teddy-backend/api/nice_error",
     "github.com/zhsyourai/teddy-backend/common/config",
     "github.com/zhsyourai/teddy-backend/common/config/source/file",
+    "github.com/zhsyourai/teddy-backend/common/gin_jwt",
+    "github.com/zhsyourai/teddy-backend/common/grpcadapter",
+    "github.com/zhsyourai/teddy-backend/common/nice_error",
     "github.com/zhsyourai/teddy-backend/common/proto/content",
     "github.com/zhsyourai/teddy-backend/common/types",
     "golang.org/x/sync/errgroup",

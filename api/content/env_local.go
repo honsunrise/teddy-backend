@@ -15,3 +15,8 @@ func contentSrvAddrFunc() (string, error) {
 	const contentSrvDomain = "srv-content"
 	return fmt.Sprintf("%s:%d", contentSrvDomain, 9091), nil
 }
+
+func uaaSrvAddrFunc() (string, error) {
+	const uaaSrvDomain = "srv-uaa"
+	return fmt.Sprintf("%s:%d", uaaSrvDomain, 9093), nil
+}
