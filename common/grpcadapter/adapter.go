@@ -3,10 +3,8 @@ package grpcadapter
 import (
 	"context"
 	"github.com/casbin/casbin/model"
-	"github.com/casbin/casbin/util"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
-	"strings"
 )
 
 type Adapter struct {
@@ -25,16 +23,14 @@ func NewAdapter(target string) (*Adapter, error) {
 	return &a, nil
 }
 
-func loadPolicyLine(line string, model model.Model) {
-	if line == "" {
+func loadPolicyRule(policy *Policy, model model.Model) {
+	if policy == nil {
 		return
 	}
 
-	tokens := strings.Split(line, ", ")
-
-	key := tokens[0]
+	key := policy.Ptype
 	sec := key[:1]
-	model[sec][key].Policy = append(model[sec][key].Policy, tokens[1:])
+	model[sec][key].Policy = append(model[sec][key].Policy, policy.Rule)
 }
 
 func (a *Adapter) LoadPolicy(model model.Model) error {
@@ -43,28 +39,32 @@ func (a *Adapter) LoadPolicy(model model.Model) error {
 		return err
 	}
 	for _, line := range resp.Rules {
-		loadPolicyLine(line, model)
+		loadPolicyRule(line, model)
 	}
 	return nil
 }
 
 func (a *Adapter) SavePolicy(model model.Model) error {
-	var rules []string
+	var rules []*Policy
 	for ptype, ast := range model["p"] {
 		for _, rule := range ast.Policy {
-			tmp := ptype + ", " + util.ArrayToString(rule)
-			rules = append(rules, tmp)
+			rules = append(rules, &Policy{
+				Ptype: ptype,
+				Rule:  rule,
+			})
 		}
 	}
 
 	for ptype, ast := range model["g"] {
 		for _, rule := range ast.Policy {
-			tmp := ptype + ", " + util.ArrayToString(rule)
-			rules = append(rules, tmp)
+			rules = append(rules, &Policy{
+				Ptype: ptype,
+				Rule:  rule,
+			})
 		}
 	}
 
-	_, err := a.client.SavePolicy(context.Background(), &Policy{
+	_, err := a.client.SavePolicy(context.Background(), &Policies{
 		Rules: rules,
 	})
 	return err

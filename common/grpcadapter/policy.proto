@@ -5,15 +5,20 @@ package grpcadapter;
 import "github.com/golang/protobuf/ptypes/empty/empty.proto";
 
 service PolicyAdapter {
-    rpc loadPolicy(google.protobuf.Empty) returns (Policy) {}
-    rpc savePolicy(Policy) returns (google.protobuf.Empty) {}
+    rpc loadPolicy(google.protobuf.Empty) returns (Policies) {}
+    rpc savePolicy(Policies) returns (google.protobuf.Empty) {}
     rpc addPolicy(AddPolicyReq) returns (google.protobuf.Empty) {}
     rpc removePolicy(RemovePolicyReq) returns (google.protobuf.Empty) {}
     rpc removeFilteredPolicy(RemoveFilteredPolicyReq) returns (google.protobuf.Empty) {}
 }
 
 message Policy {
-    repeated string rules = 1;
+    string ptype = 1;
+    repeated string rule = 2;
+}
+
+message Policies {
+    repeated Policy rules = 1;
 }
 
 message AddPolicyReq {
