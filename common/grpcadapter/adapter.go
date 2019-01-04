@@ -38,17 +38,17 @@ func (a *Adapter) LoadPolicy(model model.Model) error {
 	if err != nil {
 		return err
 	}
-	for _, line := range resp.Rules {
+	for _, line := range resp.Policies {
 		loadPolicyRule(line, model)
 	}
 	return nil
 }
 
 func (a *Adapter) SavePolicy(model model.Model) error {
-	var rules []*Policy
+	var policies []*Policy
 	for ptype, ast := range model["p"] {
 		for _, rule := range ast.Policy {
-			rules = append(rules, &Policy{
+			policies = append(policies, &Policy{
 				Ptype: ptype,
 				Rule:  rule,
 			})
@@ -57,7 +57,7 @@ func (a *Adapter) SavePolicy(model model.Model) error {
 
 	for ptype, ast := range model["g"] {
 		for _, rule := range ast.Policy {
-			rules = append(rules, &Policy{
+			policies = append(policies, &Policy{
 				Ptype: ptype,
 				Rule:  rule,
 			})
@@ -65,7 +65,7 @@ func (a *Adapter) SavePolicy(model model.Model) error {
 	}
 
 	_, err := a.client.SavePolicy(context.Background(), &Policies{
-		Rules: rules,
+		Policies: policies,
 	})
 	return err
 }

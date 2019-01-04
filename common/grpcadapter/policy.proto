@@ -18,7 +18,7 @@ message Policy {
 }
 
 message Policies {
-    repeated Policy rules = 1;
+    repeated Policy policies = 1;
 }
 
 message AddPolicyReq {
