@@ -73,11 +73,6 @@ func NewGinJwtMiddleware(config MiddlewareConfig, adapter persist.Adapter) (*Jwt
 		return nil, err
 	}
 
-	err = enforcer.LoadPolicy()
-	if err != nil {
-		return nil, err
-	}
-
 	return &JwtMiddleware{
 		config:   config,
 		key:      config.KeyFunc(),
@@ -99,7 +94,7 @@ func (m *JwtMiddleware) Handler() gin.HandlerFunc {
 			return
 		}
 		user := token["sub"].(string)
-		if !m.enforcer.Enforce(user, ctx.Request.URL, ctx.Request.Method) {
+		if !m.enforcer.Enforce(user, ctx.Request.URL.Path, ctx.Request.Method) {
 			m.config.ErrorHandler(ctx, ErrForbidden)
 			return
 		}
