@@ -93,8 +93,11 @@ func (m *JwtMiddleware) Handler() gin.HandlerFunc {
 			m.config.ErrorHandler(ctx, err)
 			return
 		}
-		user := token["sub"].(string)
-		if !m.enforcer.Enforce(user, ctx.Request.URL.Path, ctx.Request.Method) {
+		sub := ""
+		if token != nil {
+			sub = token["sub"].(string)
+		}
+		if !m.enforcer.Enforce(sub, ctx.Request.URL.Path, ctx.Request.Method) {
 			m.config.ErrorHandler(ctx, ErrForbidden)
 			return
 		}
@@ -162,33 +165,31 @@ func (m *JwtMiddleware) ExtractIAT(ctx *gin.Context) time.Time {
 }
 
 func (m *JwtMiddleware) extractToken(ctx *gin.Context) (map[string]interface{}, error) {
-	var token, originToken string
+	var token string
 
 	parts := strings.SplitN(m.config.TokenLookup, ":", 3)
 	switch parts[0] {
 	case "header":
-		originToken = ctx.Request.Header.Get(parts[1])
+		originToken := ctx.Request.Header.Get(parts[1])
 		if originToken == "" {
-			return nil, ErrEmptyAuthHeader
+			return nil, nil
 		}
+		tmpParts := strings.SplitN(originToken, " ", 2)
+		if !(len(tmpParts) == 2 && tmpParts[0] == parts[2]) {
+			return nil, ErrInvalidAuthHeader
+		}
+		token = tmpParts[1]
 	case "query":
-		originToken = ctx.Query(parts[1])
-		if originToken == "" {
-			return nil, ErrEmptyQueryToken
+		token = ctx.Query(parts[1])
+		if token == "" {
+			return nil, nil
 		}
 	case "cookie":
-		originToken, _ = ctx.Cookie(parts[1])
-		if originToken == "" {
-			return nil, ErrEmptyCookieToken
+		token, _ = ctx.Cookie(parts[1])
+		if token == "" {
+			return nil, nil
 		}
 	}
-
-	tmpParts := strings.SplitN(originToken, " ", 2)
-	if !(len(tmpParts) == 2 && tmpParts[0] == parts[2]) {
-		return nil, ErrInvalidAuthHeader
-	}
-
-	token = tmpParts[1]
 
 	parsedToken, err := jwt.ParseSigned(token)
 	if err != nil {
