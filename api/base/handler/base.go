@@ -38,12 +38,9 @@ func (h *Base) HandlerHealth(root gin.IRoutes) {
 }
 
 func (h *Base) ReturnOK(ctx *gin.Context) {
-	type okResp struct {
-		Status string `json:"status"`
-	}
-	var jsonResp okResp
-	jsonResp.Status = "OK"
-	ctx.JSON(http.StatusOK, &jsonResp)
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "OK",
+	})
 }
 
 func (h *Base) GetCaptchaId(ctx *gin.Context) {

@@ -253,6 +253,11 @@ func (h *Content) PublishInfo(ctx *gin.Context) {
 	var req publishInfoReq
 	err := ctx.Bind(&req)
 	if err != nil {
+		return
+	}
+
+	contentTime, err := ptypes.TimestampProto(req.ContentTime)
+	if err != nil {
 		ctx.Error(err)
 		return
 	}
@@ -296,6 +301,7 @@ func (h *Content) PublishInfo(ctx *gin.Context) {
 		Tags:           tags,
 		CanReview:      req.CanReview,
 		CoverResources: coverResources,
+		ContentTime:    contentTime,
 	})
 
 	if err != nil {
@@ -321,6 +327,11 @@ func (h *Content) UpdateInfo(ctx *gin.Context) {
 	}
 	var req updateInfoReq
 	err := ctx.Bind(&req)
+	if err != nil {
+		return
+	}
+
+	contentTime, err := ptypes.TimestampProto(req.ContentTime)
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -363,6 +374,7 @@ func (h *Content) UpdateInfo(ctx *gin.Context) {
 		Tags:           tags,
 		CanReview:      req.CanReview,
 		CoverResources: coverResources,
+		ContentTime:    contentTime,
 	})
 
 	if err != nil {
@@ -668,7 +680,6 @@ func (h *Content) UpdateSegment(ctx *gin.Context) {
 	var req updateSegmentReq
 	err := ctx.Bind(&req)
 	if err != nil {
-		ctx.Error(err)
 		return
 	}
 
