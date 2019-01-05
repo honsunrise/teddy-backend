@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"reflect"
 )
 
 func NewNiceError() gin.HandlerFunc {
@@ -13,28 +14,28 @@ func NewNiceError() gin.HandlerFunc {
 	}
 }
 
-func DefineNiceError(code int, text string) *CodeGinError {
-	return &CodeGinError{
-		Error: gin.Error{
-			Type: gin.ErrorTypePublic,
-			Err:  errors.New(text),
+func DefineNiceError(code int, text string) *gin.Error {
+	return &gin.Error{
+		Type: gin.ErrorTypePublic,
+		Err:  errors.New(text),
+		Meta: map[string]interface{}{
+			"nice_err_code": code,
 		},
-		Code: code,
 	}
 }
 
-func DefinePrivateNiceError(code int, text string) *CodeGinError {
-	return &CodeGinError{
-		Error: gin.Error{
-			Type: gin.ErrorTypePrivate,
-			Err:  errors.New(text),
+func DefinePrivateNiceError(code int, text string) *gin.Error {
+	return &gin.Error{
+		Type: gin.ErrorTypePrivate,
+		Err:  errors.New(text),
+		Meta: map[string]interface{}{
+			"nice_err_code": code,
 		},
-		Code: code,
 	}
 }
 
 type CodeGinError struct {
-	gin.Error
+	Err  gin.Error
 	Code int
 }
 
@@ -43,32 +44,38 @@ type niceError struct{}
 func (ne *niceError) process(c *gin.Context) {
 	c.Next()
 
-	var err interface{}
-	err = c.Errors.Last()
+	err := c.Errors.Last()
 	if err != nil {
-		if codeErr, ok := err.(*CodeGinError); ok {
+		if err.IsType(gin.ErrorTypeBind) {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"msg":    "binding request error",
+				"detail": "request content missing field",
+			})
+		} else if err.IsType(gin.ErrorTypePublic) {
 			title := "internal server error"
-			if codeErr.Code == http.StatusForbidden {
+			code := http.StatusInternalServerError
+
+			if err.Meta != nil {
+				value := reflect.ValueOf(err.Meta)
+				switch value.Kind() {
+				case reflect.Map:
+					code = int(value.MapIndex(reflect.ValueOf("nice_err_code")).Int())
+				}
+			}
+			if code == http.StatusForbidden {
 				title = "forbidden"
-			} else if codeErr.Code == http.StatusUnauthorized {
+			} else if code == http.StatusUnauthorized {
 				title = "unauthorized"
 			}
-			c.JSON(codeErr.Code, gin.H{
+			c.JSON(code, gin.H{
 				"title":  title,
-				"detail": codeErr.Error.Error(),
+				"detail": err.Error(),
 			})
 		} else {
-			if err.(*gin.Error).IsType(gin.ErrorTypeBind) {
-				c.JSON(http.StatusBadRequest, gin.H{
-					"msg":    "binding request error",
-					"detail": "request content missing field",
-				})
-			} else {
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"title":  "internal server error",
-					"detail": err.(*gin.Error).Error(),
-				})
-			}
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "internal server error",
+				"detail": err.Error(),
+			})
 		}
 	}
 }
