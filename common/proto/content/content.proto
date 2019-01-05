@@ -160,6 +160,7 @@ message PublishInfoReq {
     repeated TagAndType tags = 6;
     map<string, string> coverResources = 7;
     bool canReview = 8;
+    google.protobuf.Timestamp contentTime = 9;
 }
 
 message EditInfoReq {
@@ -172,6 +173,7 @@ message EditInfoReq {
     repeated TagAndType tags = 7;
     map<string, string> coverResources = 8;
     bool canReview = 9;
+    google.protobuf.Timestamp contentTime = 10;
 }
 
 message GetSegmentsReq {
