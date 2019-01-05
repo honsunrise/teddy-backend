@@ -57,7 +57,7 @@ func main() {
 	}
 
 	jwtMiddleware, err := gin_jwt.NewGinJwtMiddleware(gin_jwt.MiddlewareConfig{
-		Realm:   "uaa.teddy.com",
+		Realm:   "content.teddy.com",
 		Issuer:  "uaa@teddy.com",
 		KeyFunc: gin_jwt.RemoteFetchFunc("http://10.10.10.30:8083/v1/anon/uaa/jwks.json", 24*time.Hour),
 		Audience: []string{
@@ -97,8 +97,8 @@ func main() {
 	router.Use(clients.CaptchaNew(captchaSrvAddrFunc))
 	router.Use(nice_error.NewNiceError())
 	router.Use(jwtMiddleware.Handler())
-	content.HandlerNormal(router.Group("/v1/anon/content"))
-	content.HandlerAuth(router.Group("/v1/auth/content"))
+	content.HandlerNormal(router.Group("/v1/anon/content").Use(jwtMiddleware.Handler()))
+	content.HandlerAuth(router.Group("/v1/auth/content").Use(jwtMiddleware.Handler()))
 	content.HandlerHealth(router)
 
 	// For normal request

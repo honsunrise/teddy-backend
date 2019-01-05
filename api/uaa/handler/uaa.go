@@ -8,7 +8,7 @@ import (
 	"github.com/golang/protobuf/ptypes/timestamp"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
-	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
+	"github.com/zhsyourai/teddy-backend/common/gin_jwt"
 	"github.com/zhsyourai/teddy-backend/common/proto/captcha"
 	"github.com/zhsyourai/teddy-backend/common/proto/message"
 	"github.com/zhsyourai/teddy-backend/common/proto/uaa"
@@ -38,7 +38,7 @@ func (h *Uaa) HandlerNormal(root gin.IRoutes) {
 }
 
 func (h *Uaa) HandlerAuth(root gin.IRoutes) {
-	root.Any("/logout", h.Logout)
+	root.POST("/logout", h.Logout)
 	root.POST("/changePassword", h.ChangePassword)
 }
 
@@ -53,6 +53,10 @@ func (h *Uaa) ReturnOK(ctx *gin.Context) {
 }
 
 func (h *Uaa) Register(ctx *gin.Context) {
+	uaaClient := clients.UaaFromContext(ctx)
+	captchaClient := clients.CaptchaFromContext(ctx)
+	messageClient := clients.MessageFromContext(ctx)
+
 	if ctx.Query("type") == "email" {
 		// parse body
 		type registerReq struct {
@@ -66,20 +70,6 @@ func (h *Uaa) Register(ctx *gin.Context) {
 		err := ctx.Bind(&body)
 		if err != nil {
 			ctx.Error(err)
-			return
-		}
-
-		// extract the client from the context
-		uaaClient, ok := clients.UaaFromContext(ctx)
-		if !ok {
-			ctx.Error(ErrClientNotFound).SetType(gin.ErrorTypePublic)
-			return
-		}
-
-		// extract the client from the context
-		captchaClient, ok := clients.CaptchaFromContext(ctx)
-		if !ok {
-			ctx.Error(ErrClientNotFound).SetType(gin.ErrorTypePublic)
 			return
 		}
 
@@ -123,34 +113,32 @@ func (h *Uaa) Register(ctx *gin.Context) {
 		})
 
 		// This step can happen error and will ignore
-		messageClient, ok := clients.MessageFromContext(ctx)
-		if ok {
-			// Send welcome email
-			timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
-			defer cancel()
-			messageClient.SendEmail(timeoutCtx, &message.SendEmailReq{
-				Email:    response.Email,
-				Topic:    "Welcome " + response.Username,
-				Content:  "Hi " + response.Username,
-				SendTime: ptypes.TimestampNow(),
-			})
+		// Send welcome email
+		timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+		messageClient.SendEmail(timeoutCtx, &message.SendEmailReq{
+			Email:    response.Email,
+			Topic:    "Welcome " + response.Username,
+			Content:  "Hi " + response.Username,
+			SendTime: ptypes.TimestampNow(),
+		})
 
-			// Send welcome inbox
-			timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
-			defer cancel()
-			messageClient.SendInBox(timeoutCtx, &message.SendInBoxReq{
-				Uid:      response.Uid,
-				Topic:    "Welcome " + body.Username,
-				Content:  "Hi " + body.Username,
-				SendTime: ptypes.TimestampNow(),
-			})
-		}
+		// Send welcome inbox
+		timeoutCtx, cancel = context.WithTimeout(ctx, 10*time.Second)
+		defer cancel()
+		messageClient.SendInBox(timeoutCtx, &message.SendInBoxReq{
+			Uid:      response.Uid,
+			Topic:    "Welcome " + body.Username,
+			Content:  "Hi " + body.Username,
+			SendTime: ptypes.TimestampNow(),
+		})
 	} else {
 		ctx.Error(ErrRegisterTypeNotSupport).SetType(gin.ErrorTypePublic)
 	}
 }
 
 func (h *Uaa) Login(ctx *gin.Context) {
+	uaaClient := clients.UaaFromContext(ctx)
 
 	// parse body
 	type loginReq struct {
@@ -162,13 +150,6 @@ func (h *Uaa) Login(ctx *gin.Context) {
 	err := ctx.Bind(&body)
 	if err != nil {
 		ctx.Error(err)
-		return
-	}
-
-	// extract the client from the context
-	uaaClient, ok := clients.UaaFromContext(ctx)
-	if !ok {
-		ctx.Error(ErrClientNotFound).SetType(gin.ErrorTypePublic)
 		return
 	}
 
@@ -186,7 +167,6 @@ func (h *Uaa) Login(ctx *gin.Context) {
 
 	token, err := h.generator.GenerateJwt(24*time.Hour, response.Uid, []string{"uaa", "content", "message"}, jwt.MapClaims{
 		"username": response.Username,
-		"roles":    response.Roles,
 	})
 	if err != nil {
 		ctx.Error(err)
@@ -205,13 +185,10 @@ func (h *Uaa) Logout(ctx *gin.Context) {
 }
 
 func (h *Uaa) ChangePassword(ctx *gin.Context) {
-	authPayload, err := h.middle.ExtractToken(ctx)
-	if err == gin_jwt.ErrContextNotHaveToken {
-		ctx.Error(err)
-		return
-	}
-	principal := authPayload["sub"].(string)
-	// roles := authPayload["roles"].([]string)
+	captchaClient := clients.CaptchaFromContext(ctx)
+	uaaClient := clients.UaaFromContext(ctx)
+
+	principal := h.middle.ExtractSub(ctx)
 
 	// parse body
 	type changePasswordReq struct {
@@ -221,17 +198,9 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 		CaptchaSolution string `json:"captcha_solution"`
 	}
 	var body changePasswordReq
-	err = ctx.Bind(&body)
+	err := ctx.Bind(&body)
 	if err != nil {
 		ctx.Error(err)
-		return
-	}
-
-	// extract the client from the context
-	captchaClient, ok := clients.CaptchaFromContext(ctx)
-	if !ok {
-		log.Error(ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
 
@@ -247,13 +216,6 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 		log.Error(ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusInternalServerError, ErrCaptchaNotCorrect)
 		return
-	}
-
-	// extract the client from the context
-	uaaClient, ok := clients.UaaFromContext(ctx)
-	if !ok {
-		log.Error(ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 	}
 
 	// make request
@@ -273,6 +235,10 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 }
 
 func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
+	messageClient := clients.MessageFromContext(ctx)
+	captchaClient := clients.CaptchaFromContext(ctx)
+	uaaClient := clients.UaaFromContext(ctx)
+
 	now := time.Now()
 	// parse body
 	type sendEmailCaptchaReq struct {
@@ -287,13 +253,6 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 		return
 	}
 
-	// extract the client from the context
-	uaaClient, ok := clients.UaaFromContext(ctx)
-	if !ok {
-		ctx.Error(ErrClientNotFound).SetType(gin.ErrorTypePublic)
-		return
-	}
-
 	timeoutCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	tmpAccount, err := uaaClient.GetOne(timeoutCtx, &uaa.GetOneReq{
@@ -302,14 +261,6 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 
 	if err == nil && tmpAccount != nil {
 		ctx.Error(ErrAccountExists).SetType(gin.ErrorTypePublic)
-		return
-	}
-
-	// extract the client from the context
-	captchaClient, ok := clients.CaptchaFromContext(ctx)
-	if !ok {
-		log.Error(ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
 
@@ -324,14 +275,6 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	if err != nil || !rsp.Correct {
 		log.Error(ErrCaptchaNotCorrect)
 		ctx.AbortWithError(http.StatusBadRequest, ErrCaptchaNotCorrect)
-		return
-	}
-
-	// extract the client from the context
-	messageClient, ok := clients.MessageFromContext(ctx)
-	if !ok {
-		log.Error("message client not found")
-		ctx.AbortWithError(http.StatusInternalServerError, ErrClientNotFound)
 		return
 	}
 

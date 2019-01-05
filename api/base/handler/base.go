@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhsyourai/teddy-backend/api/clients"
-	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
+	"github.com/zhsyourai/teddy-backend/common/gin_jwt"
 	"github.com/zhsyourai/teddy-backend/common/proto/captcha"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -47,11 +47,7 @@ func (h *Base) ReturnOK(ctx *gin.Context) {
 }
 
 func (h *Base) GetCaptchaId(ctx *gin.Context) {
-	captchaClient, ok := clients.CaptchaFromContext(ctx)
-	if !ok {
-		ctx.Error(ErrClientNotFound)
-		return
-	}
+	captchaClient := clients.CaptchaFromContext(ctx)
 
 	idResp, err := captchaClient.GetCaptchaId(ctx, &captcha.GetCaptchaIdReq{
 		Len: 6,
@@ -70,11 +66,7 @@ func (h *Base) GetCaptchaId(ctx *gin.Context) {
 }
 
 func (h *Base) GetCaptchaData(ctx *gin.Context) {
-	captchaClient, ok := clients.CaptchaFromContext(ctx)
-	if !ok {
-		ctx.Error(ErrClientNotFound)
-		return
-	}
+	captchaClient := clients.CaptchaFromContext(ctx)
 
 	idStr := ctx.Param("id")
 	ext := path.Ext(idStr)

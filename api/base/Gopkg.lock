@@ -2,6 +2,33 @@
 
 
 [[projects]]
+  digest = "1:5d3e23515e7916c152cc665eda0f7eaf6fdf8fdfe7c3dbac97049bcbd649b33f"
+  name = "github.com/Knetic/govaluate"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "d216395917cc49052c7c7094cf57f09657ca08a8"
+  version = "v3.0.0"
+
+[[projects]]
+  digest = "1:76ca0dfcbf951d1868c7449453981dba9e1f79034706d1500a5a785000f5f222"
+  name = "github.com/casbin/casbin"
+  packages = [
+    ".",
+    "config",
+    "effect",
+    "log",
+    "model",
+    "persist",
+    "persist/file-adapter",
+    "rbac",
+    "rbac/default-role-manager",
+    "util",
+  ]
+  pruneopts = "UT"
+  revision = "542e16cac74562eefac970a7d0d1467640d1f1cb"
+  version = "v1.7.0"
+
+[[projects]]
   digest = "1:abeb38ade3f32a92943e5be54f55ed6d6e3b6602761d74b4aab4c9dd45c18abd"
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
@@ -126,12 +153,20 @@
   version = "1.0.1"
 
 [[projects]]
-  digest = "1:69b1cc331fca23d702bd72f860c6a647afd0aa9fcbc1d0659b1365e26546dd70"
+  digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
+  version = "v0.8.1"
+
+[[projects]]
+  digest = "1:87c2e02fb01c27060ccc5ba7c5a407cc91147726f8f40b70cceeedbc52b1f3a8"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   pruneopts = "UT"
-  revision = "bcd833dfe83d3cebad139e4a29ed79cb2318bf95"
-  version = "v1.2.0"
+  revision = "e1e72e9de974bd926e5c56f83753fba2df402ce5"
+  version = "v1.3.0"
 
 [[projects]]
   digest = "1:03aa6e485e528acb119fb32901cf99582c380225fc7d5a02758e08b180cb56c3"
@@ -143,16 +178,17 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:736a28ee0e271f4930aa731907185a1be88601b256106f3f784bde2f015262fc"
+  digest = "1:2259d24c7f38f5267c8f7cc7dcfc442204dd1bccf971ef5ba001b4ba33bed07d"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
-    "api/gin_jwt",
-    "api/nice_error",
     "common/config",
     "common/config/coder/json",
     "common/config/coder/yaml",
     "common/config/source/file",
+    "common/gin_jwt",
+    "common/grpcadapter",
+    "common/nice_error",
     "common/proto/captcha",
     "common/proto/content",
     "common/proto/message",
@@ -160,7 +196,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "599d90c375ac02b5cf245e2db20cb56dc661ca2e"
+  revision = "d227253e1c3f504ae98e99276b290c2e165db231"
 
 [[projects]]
   branch = "master"
@@ -173,7 +209,7 @@
     "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
+  revision = "ff983b9c42bc9fbf91556e191cc8efb585c16908"
 
 [[projects]]
   branch = "master"
@@ -201,14 +237,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3d5e79e10549fd9119cbefd614b6d351ef5bd0be2f2b103a4199788e784cbc68"
+  digest = "1:191cccd950a4aeadb60306062f2bdc2f924d750d0156ec6c691b17211bfd7349"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "b4a75ba826a64a70990f11a225237acd6ef35c9f"
+  revision = "82a175fd1598e8a172e58ebdf5ed262bb29129e5"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -290,7 +326,7 @@
   version = "v8.18.2"
 
 [[projects]]
-  digest = "1:550221cdc42e1ad44a1942d01c4135c30f6808b61dbad3c52d325e01d8e7cc07"
+  digest = "1:a4cde1eec9a17eb2399a50c6e1a9fe3fde039994de058f9dbf6592d157bfe97b"
   name = "gopkg.in/square/go-jose.v2"
   packages = [
     ".",
@@ -299,8 +335,8 @@
     "jwt",
   ]
   pruneopts = "UT"
-  revision = "72415094398e2f013bf50b76fd6de36df47938ea"
-  version = "v2.2.1"
+  revision = "e94fb177d3668d35ab39c61cbb2f311550557e83"
+  version = "v2.2.2"
 
 [[projects]]
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
@@ -318,10 +354,11 @@
     "github.com/gin-gonic/gin",
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/api/clients",
-    "github.com/zhsyourai/teddy-backend/api/gin_jwt",
-    "github.com/zhsyourai/teddy-backend/api/nice_error",
     "github.com/zhsyourai/teddy-backend/common/config",
     "github.com/zhsyourai/teddy-backend/common/config/source/file",
+    "github.com/zhsyourai/teddy-backend/common/gin_jwt",
+    "github.com/zhsyourai/teddy-backend/common/grpcadapter",
+    "github.com/zhsyourai/teddy-backend/common/nice_error",
     "github.com/zhsyourai/teddy-backend/common/proto/captcha",
     "github.com/zhsyourai/teddy-backend/common/types",
     "golang.org/x/sync/errgroup",

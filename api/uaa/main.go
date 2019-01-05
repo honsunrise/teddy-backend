@@ -9,11 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/clients"
-	"github.com/zhsyourai/teddy-backend/api/gin_jwt"
-	"github.com/zhsyourai/teddy-backend/api/nice_error"
 	"github.com/zhsyourai/teddy-backend/api/uaa/handler"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/common/config/source/file"
+	"github.com/zhsyourai/teddy-backend/common/gin_jwt"
+	"github.com/zhsyourai/teddy-backend/common/grpcadapter"
+	"github.com/zhsyourai/teddy-backend/common/nice_error"
 	"golang.org/x/sync/errgroup"
 	"io/ioutil"
 	"net/http"
@@ -66,17 +67,27 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	target, err := uaaSrvAddrFunc()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	adapter, err := grpcadapter.NewAdapter(target)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	jwtMiddleware, err := gin_jwt.NewGinJwtMiddleware(gin_jwt.MiddlewareConfig{
-		Realm:            "uaa.teddy.com",
-		Issuer:           "uaa@teddy.com",
-		SigningAlgorithm: SigningAlgorithm,
+		Realm:  "uaa.teddy.com",
+		Issuer: "uaa@teddy.com",
 		KeyFunc: func() interface{} {
 			return key.Public()
 		},
 		Audience: []string{
 			"uaa",
 		},
-	})
+	}, adapter)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -106,8 +117,8 @@ func main() {
 	router.Use(clients.CaptchaNew(captchaSrvAddrFunc))
 	router.Use(nice_error.NewNiceError())
 
-	uaa.HandlerNormal(router.Group("/v1/anon/uaa").Use(jwtMiddleware.Handler(true)))
-	uaa.HandlerAuth(router.Group("/v1/auth/uaa").Use(jwtMiddleware.Handler(false)))
+	uaa.HandlerNormal(router.Group("/v1/anon/uaa").Use(jwtMiddleware.Handler()))
+	uaa.HandlerAuth(router.Group("/v1/auth/uaa").Use(jwtMiddleware.Handler()))
 	uaa.HandlerHealth(router)
 
 	// For normal request
