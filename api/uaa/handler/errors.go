@@ -1,15 +1,15 @@
 package handler
 
-import "github.com/zhsyourai/teddy-backend/common/nice_error"
+import (
+	"github.com/zhsyourai/teddy-backend/common/nice_error"
+	"net/http"
+)
 
-var ErrClientNotFound = nice_error.DefineNiceError(404, "Client not found",
-	"server client instance create error, please try again later")
-
-var ErrCaptchaNotCorrect = nice_error.DefineNiceError(404, "Captcha not correct",
+var ErrCaptchaNotCorrect = nice_error.DefineNiceError(http.StatusBadRequest,
 	"correct not correct, please check again")
 
-var ErrRegisterTypeNotSupport = nice_error.DefineNiceError(404, "Register type not support",
+var ErrRegisterTypeNotSupport = nice_error.DefineNiceError(http.StatusNotFound,
 	"register type mistake, please check your request")
 
-var ErrAccountExists = nice_error.DefineNiceError(404, "Account exists",
+var ErrAccountExists = nice_error.DefineNiceError(http.StatusBadRequest,
 	"account has been register, please check your request")

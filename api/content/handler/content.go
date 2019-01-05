@@ -158,20 +158,48 @@ func (h *Content) GetInfos(ctx *gin.Context) {
 		return
 	}
 
+	type queryReq struct {
+		Tags             string    `form:"tags"`
+		Country          string    `form:"country"`
+		ContentTimeStart time.Time `form:"contentTimeStart" time_format:"2006-01-02T15:04:05Z07:00"`
+		ContentTimeEnd   time.Time `form:"contentTimeEnd" time_format:"2006-01-02T15:04:05Z07:00"`
+	}
+	var req queryReq
+
+	err = ctx.BindQuery(&req)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
 	var tags []*content.TagAndType
-	if ctx.Query("tags") != "" {
+	if req.Tags != "" {
 		tags, err = buildTags(ctx.Query("tags"))
 		if err != nil {
 			ctx.Error(err)
 			return
 		}
 	}
+
+	contentTimeStart, err := ptypes.TimestampProto(req.ContentTimeStart)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+	contentTimeEnd, err := ptypes.TimestampProto(req.ContentTimeEnd)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
 	resp, err := contentClient.GetInfos(ctx, &content.GetInfosReq{
-		Uid:   principal,
-		Page:  page,
-		Size:  size,
-		Tags:  tags,
-		Sorts: sorts,
+		Uid:       principal,
+		Page:      page,
+		Size:      size,
+		Tags:      tags,
+		Sorts:     sorts,
+		Country:   req.Country,
+		StartTime: contentTimeStart,
+		EndTime:   contentTimeEnd,
 	})
 	if err != nil {
 		ctx.Error(err)

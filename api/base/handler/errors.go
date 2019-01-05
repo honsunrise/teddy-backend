@@ -1,9 +1,9 @@
 package handler
 
-import "github.com/zhsyourai/teddy-backend/common/nice_error"
+import (
+	"github.com/zhsyourai/teddy-backend/common/nice_error"
+	"net/http"
+)
 
-var ErrClientNotFound = nice_error.DefineNiceError(404, "Client not found", "server client "+
-	"instance create error, please try again later")
-
-var ErrCaptchaNotFound = nice_error.DefineNiceError(404, "Captcha not found", "captcha id invalid,"+
+var ErrCaptchaNotFound = nice_error.DefineNiceError(http.StatusNotFound, "captcha id invalid,"+
 	" please check again")
