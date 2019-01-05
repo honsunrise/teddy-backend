@@ -1,7 +1,6 @@
 package gin_jwt
 
 import (
-	"errors"
 	"github.com/zhsyourai/teddy-backend/common/nice_error"
 	"net/http"
 )
@@ -9,21 +8,20 @@ import (
 var (
 	ErrMissingRealm = nice_error.DefineNiceError(http.StatusInternalServerError, "realm is missing", "please set realm")
 
-	ErrMissingKeyFunction = errors.New("key function is missing")
+	ErrMissingKeyFunction = nice_error.DefineNiceError(http.StatusInternalServerError, "key function is missing", "please set key function")
 
-	ErrMissingSigningAlgorithm = errors.New("signing algorithm is missing")
+	ErrMissingSigningAlgorithm = nice_error.DefineNiceError(http.StatusInternalServerError, "signing algorithm is missing", "please set signing algorithm")
 
-	ErrContextNotHaveToken = errors.New("context not have token")
+	ErrInvalidKey = nice_error.DefineNiceError(http.StatusInternalServerError, "unauthorized", "key invalid")
+
+	ErrContextNotHaveToken = nice_error.DefineNiceError(http.StatusInternalServerError, "context not have token", "please concat admin")
 
 	// ErrForbidden when HTTP status 403 is given
-	ErrForbidden = errors.New("you don't have permission to access this resource")
+	ErrForbidden = nice_error.DefineNiceError(http.StatusForbidden, "forbidden", "you don't have permission to access this resource")
 
 	// ErrExpiredToken indicates JWT token has expired. Can't refresh.
-	ErrTokenInvalid = errors.New("token is invalid")
+	ErrTokenInvalid = nice_error.DefineNiceError(http.StatusUnauthorized, "unauthorized", "token is invalid")
 
 	// ErrInvalidAuthHeader indicates auth header is invalid, could for example have the wrong Realm name
-	ErrInvalidAuthHeader = errors.New("auth header is invalid")
-
-	// ErrInvalidKey indicates the the given public key is invalid
-	ErrInvalidKey = errors.New("key invalid")
+	ErrInvalidAuthHeader = nice_error.DefineNiceError(http.StatusUnauthorized, "unauthorized", "auth header is invalid")
 )

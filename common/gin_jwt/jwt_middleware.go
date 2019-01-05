@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"gopkg.in/square/go-jose.v2"
 	"gopkg.in/square/go-jose.v2/jwt"
-	"net/http"
 	"strings"
 	"time"
 )
@@ -60,7 +59,7 @@ func NewGinJwtMiddleware(config MiddlewareConfig, adapter persist.Adapter) (*Jwt
 	if config.ErrorHandler == nil {
 		config.ErrorHandler = func(ctx *gin.Context, err error) {
 			ctx.Header("WWW-Authenticate", "JWT realm="+config.Realm)
-			ctx.AbortWithError(http.StatusUnauthorized, err)
+			ctx.Error(err)
 		}
 	}
 
