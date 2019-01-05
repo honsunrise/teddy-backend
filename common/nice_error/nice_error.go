@@ -59,7 +59,7 @@ func (ne *niceError) process(c *gin.Context) {
 				value := reflect.ValueOf(err.Meta)
 				switch value.Kind() {
 				case reflect.Map:
-					code = int(value.MapIndex(reflect.ValueOf("nice_err_code")).Int())
+					code = int(reflect.ValueOf(value.MapIndex(reflect.ValueOf("nice_err_code")).Interface()).Int())
 				}
 			}
 			if code == http.StatusForbidden {
