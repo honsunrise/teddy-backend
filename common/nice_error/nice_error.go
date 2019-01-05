@@ -1,7 +1,7 @@
 package nice_error
 
 import (
-	"fmt"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -13,22 +13,29 @@ func NewNiceError() gin.HandlerFunc {
 	}
 }
 
-func DefineNiceError(code int, title string, detail string) *NiceError {
-	return &NiceError{
-		Code:   code,
-		Title:  title,
-		Detail: detail,
+func DefineNiceError(code int, text string) *CodeGinError {
+	return &CodeGinError{
+		Error: gin.Error{
+			Type: gin.ErrorTypePublic,
+			Err:  errors.New(text),
+		},
+		Code: code,
 	}
 }
 
-type NiceError struct {
-	Code   int    `json:"code"`
-	Title  string `json:"title"`
-	Detail string `json:"detail"`
+func DefinePrivateNiceError(code int, text string) *CodeGinError {
+	return &CodeGinError{
+		Error: gin.Error{
+			Type: gin.ErrorTypePrivate,
+			Err:  errors.New(text),
+		},
+		Code: code,
+	}
 }
 
-func (ne *NiceError) Error() string {
-	return fmt.Sprintf("<%s> %s", ne.Title, ne.Detail)
+type CodeGinError struct {
+	gin.Error
+	Code int
 }
 
 type niceError struct{}
@@ -36,35 +43,32 @@ type niceError struct{}
 func (ne *niceError) process(c *gin.Context) {
 	c.Next()
 
-	err := c.Errors.Last()
+	var err interface{}
+	err = c.Errors.Last()
 	if err != nil {
-		realErr := err.Err
-		if err.IsType(gin.ErrorTypePublic) {
-			switch realErr.(type) {
-			case *NiceError:
-				toNe := realErr.(*NiceError)
-				c.JSON(toNe.Code, gin.H{
-					"title":  toNe.Title,
-					"detail": toNe.Detail,
-				})
-			default:
-				toErr := realErr.(error)
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"title":  "Internal Server Error",
-					"detail": toErr.Error(),
-				})
+		if codeErr, ok := err.(*CodeGinError); ok {
+			title := "internal server error"
+			if codeErr.Code == http.StatusForbidden {
+				title = "forbidden"
+			} else if codeErr.Code == http.StatusUnauthorized {
+				title = "unauthorized"
 			}
-		} else if err.IsType(gin.ErrorTypeBind) {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"title":  "Binding Request Error",
-				"detail": "request content missing field",
+			c.JSON(codeErr.Code, gin.H{
+				"title":  title,
+				"detail": codeErr.Error.Error(),
 			})
 		} else {
-			toErr := realErr.(error)
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"title":  "Internal Server Error",
-				"detail": toErr.Error(),
-			})
+			if err.(*gin.Error).IsType(gin.ErrorTypeBind) {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"msg":    "binding request error",
+					"detail": "request content missing field",
+				})
+			} else {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"title":  "internal server error",
+					"detail": err.(*gin.Error).Error(),
+				})
+			}
 		}
 	}
 }
