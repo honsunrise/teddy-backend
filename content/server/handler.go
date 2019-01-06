@@ -151,8 +151,8 @@ func (h *contentHandler) GetValues(ctx context.Context, req *content.GetValuesRe
 	return &resp, nil
 }
 
-func (h *contentHandler) InsertValue(ctx context.Context, req *content.InsertValueReq) (*empty.Empty, error) {
-	var resp empty.Empty
+func (h *contentHandler) InsertValue(ctx context.Context, req *content.InsertValueReq) (*content.InsertValueResp, error) {
+	var resp content.InsertValueResp
 	if err := validateInsertValueReq(req); err != nil {
 		return nil, err
 	}
@@ -203,6 +203,7 @@ func (h *contentHandler) InsertValue(ctx context.Context, req *content.InsertVal
 		if err != nil {
 			return err
 		}
+		resp.ValueID = value.ID
 		return nil
 	})
 
@@ -378,8 +379,8 @@ func (h *contentHandler) GetSegment(ctx context.Context, req *content.SegmentOne
 	return &resp, nil
 }
 
-func (h *contentHandler) PublishSegment(ctx context.Context, req *content.PublishSegmentReq) (*empty.Empty, error) {
-	var resp empty.Empty
+func (h *contentHandler) PublishSegment(ctx context.Context, req *content.PublishSegmentReq) (*content.PublishSegmentResp, error) {
+	var resp content.PublishSegmentResp
 	if err := validatePublishSegmentReq(req); err != nil {
 		return nil, err
 	}
@@ -433,6 +434,7 @@ func (h *contentHandler) PublishSegment(ctx context.Context, req *content.Publis
 		if err != nil {
 			return err
 		}
+		resp.SegID = segment.ID.Hex()
 		return nil
 	})
 
@@ -608,8 +610,8 @@ func (h *contentHandler) GetTag(ctx context.Context, req *content.GetTagReq) (*c
 	return &resp, nil
 }
 
-func (h *contentHandler) PublishInfo(ctx context.Context, req *content.PublishInfoReq) (*empty.Empty, error) {
-	var resp empty.Empty
+func (h *contentHandler) PublishInfo(ctx context.Context, req *content.PublishInfoReq) (*content.PublishInfoResp, error) {
+	var resp content.PublishInfoResp
 	if err := validatePublishInfoReq(req); err != nil {
 		return nil, err
 	}
@@ -658,6 +660,11 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *content.PublishIn
 			return ErrInfoExists
 		}
 
+		contentTime, err := ptypes.Timestamp(req.ContentTime)
+		if err != nil {
+			return err
+		}
+
 		info := models.Info{
 			ID:               objectid.New(),
 			UID:              req.Uid,
@@ -674,6 +681,7 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *content.PublishIn
 			LatestModifyTime: now,
 			CanReview:        req.CanReview,
 			Archived:         false,
+			ContentTime:      contentTime,
 			LatestSegmentID:  objectid.NilObjectID,
 			SegmentCount:     0,
 		}
@@ -682,6 +690,8 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *content.PublishIn
 		if err != nil {
 			return err
 		}
+
+		resp.InfoID = info.ID.Hex()
 		return nil
 	})
 
@@ -991,10 +1001,21 @@ func (h *contentHandler) GetInfos(ctx context.Context, req *content.GetInfosReq)
 			})
 		}
 
+		startTime, err := ptypes.Timestamp(req.StartTime)
+		if err != nil {
+			return err
+		}
+
+		endTime, err := ptypes.Timestamp(req.EndTime)
+		if err != nil {
+			return err
+		}
+
 		var infos []*models.Info
 		var totalCount uint64
 		if req.Title == "" {
-			infos, totalCount, err = h.infoRepo.FindAll(sessionContext, "", tags, req.Page, req.Size, req.Sorts)
+			infos, totalCount, err = h.infoRepo.FindAll(sessionContext, "", req.Country,
+				&startTime, &endTime, tags, req.Page, req.Size, req.Sorts)
 		} else {
 			//TODO: search use elasticsearch
 		}

@@ -292,7 +292,7 @@ func (h *Content) PublishInfo(ctx *gin.Context) {
 		})
 	}
 
-	_, err = contentClient.PublishInfo(ctx, &content.PublishInfoReq{
+	resp, err := contentClient.PublishInfo(ctx, &content.PublishInfoReq{
 		Uid:            principal,
 		Author:         req.Author,
 		Summary:        req.Summary,
@@ -309,7 +309,12 @@ func (h *Content) PublishInfo(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	var buf bytes.Buffer
+	if err = h.marshaler.Marshal(&buf, resp); err != nil {
+		ctx.Error(err)
+		return
+	}
+	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
 }
 
 func (h *Content) UpdateInfo(ctx *gin.Context) {
@@ -651,7 +656,7 @@ func (h *Content) PublishSegment(ctx *gin.Context) {
 		return
 	}
 
-	_, err = contentClient.PublishSegment(ctx, &content.PublishSegmentReq{
+	resp, err := contentClient.PublishSegment(ctx, &content.PublishSegmentReq{
 		InfoID: infoID,
 		No:     req.No,
 		Labels: req.Labels,
@@ -663,7 +668,12 @@ func (h *Content) PublishSegment(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	var buf bytes.Buffer
+	if err = h.marshaler.Marshal(&buf, resp); err != nil {
+		ctx.Error(err)
+		return
+	}
+	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
 }
 
 func (h *Content) UpdateSegment(ctx *gin.Context) {
@@ -831,7 +841,7 @@ func (h *Content) InsertValue(ctx *gin.Context) {
 		return
 	}
 
-	_, err = contentClient.InsertValue(ctx, &content.InsertValueReq{
+	resp, err := contentClient.InsertValue(ctx, &content.InsertValueReq{
 		InfoID: infoID,
 		SegID:  segID,
 		Time:   ptypes.TimestampNow(),
@@ -843,7 +853,12 @@ func (h *Content) InsertValue(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	var buf bytes.Buffer
+	if err = h.marshaler.Marshal(&buf, resp); err != nil {
+		ctx.Error(err)
+		return
+	}
+	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
 }
 
 func (h *Content) UpdateValue(ctx *gin.Context) {

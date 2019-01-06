@@ -122,12 +122,12 @@
   version = "v1.2.1"
 
 [[projects]]
-  digest = "1:69b1cc331fca23d702bd72f860c6a647afd0aa9fcbc1d0659b1365e26546dd70"
+  digest = "1:87c2e02fb01c27060ccc5ba7c5a407cc91147726f8f40b70cceeedbc52b1f3a8"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   pruneopts = "UT"
-  revision = "bcd833dfe83d3cebad139e4a29ed79cb2318bf95"
-  version = "v1.2.0"
+  revision = "e1e72e9de974bd926e5c56f83753fba2df402ce5"
+  version = "v1.3.0"
 
 [[projects]]
   branch = "master"
@@ -147,7 +147,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3068bfc3d454497fcbfd6c4e2695de3056d084a8fe05bc629d9eb055a85458b8"
+  digest = "1:4cb1c23b2417b84b3e871b8738244d924048b5395875042afad064e1677df66b"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "common/config",
@@ -158,7 +158,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "03dec9e17051ce40b3bff25a33fe5abb87de6f97"
+  revision = "e3072830cd402d6c5a5ba50aafe83a76d8521678"
 
 [[projects]]
   branch = "master"
@@ -204,7 +204,7 @@
     "windows",
   ]
   pruneopts = "UT"
-  revision = "82a175fd1598e8a172e58ebdf5ed262bb29129e5"
+  revision = "badf5585203e739f88c2c6cd34188a6f54b5d619"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"

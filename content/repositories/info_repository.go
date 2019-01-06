@@ -7,6 +7,7 @@ import (
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/zhsyourai/teddy-backend/common/proto/content"
 	"github.com/zhsyourai/teddy-backend/content/models"
+	"time"
 )
 
 type InfoRepository interface {
@@ -14,7 +15,7 @@ type InfoRepository interface {
 	IncWatchCount(ctx mongo.SessionContext, id objectid.ObjectID, count int64) error
 	ExistsByTitleAndAuthorAndCountry(ctx mongo.SessionContext, title, author, country string) (bool, error)
 	FindOne(ctx mongo.SessionContext, id objectid.ObjectID) (*models.Info, error)
-	FindAll(ctx mongo.SessionContext, uid string, tags []*models.TypeAndTag,
+	FindAll(ctx mongo.SessionContext, uid, country string, startTime, endTime *time.Time, tags []*models.TypeAndTag,
 		page, size uint64, sorts []*content.Sort) ([]*models.Info, uint64, error)
 	Delete(ctx mongo.SessionContext, id objectid.ObjectID) error
 	Update(ctx mongo.SessionContext, id objectid.ObjectID, fields map[string]interface{}) error
@@ -77,20 +78,31 @@ func (repo *infoRepository) FindOne(ctx mongo.SessionContext, id objectid.Object
 	return &info, nil
 }
 
-func (repo *infoRepository) internalFindInfo(ctx mongo.SessionContext, uid string, tags []*models.TypeAndTag,
+func (repo *infoRepository) internalFindInfo(ctx mongo.SessionContext, uid, country string,
+	startTime, endTime *time.Time, tags []*models.TypeAndTag,
 	page, size uint64, sorts []*content.Sort) ([]*models.Info, uint64, error) {
 	var cur mongo.Cursor
 
 	pipeline := mongo.Pipeline{}
 	countPipeline := mongo.Pipeline{}
 
-	var dynFilter = make(bson.D, 0, 2)
+	var dynFilter = make(bson.D, 0, 5)
 	if uid != "" {
 		dynFilter = append(dynFilter, bson.E{Key: "uid", Value: uid})
 	}
 	if len(tags) != 0 {
 		dynFilter = append(dynFilter, bson.E{Key: "tags", Value: bson.D{{"$all", tags}}})
 	}
+	if country != "" {
+		dynFilter = append(dynFilter, bson.E{Key: "country", Value: country})
+	}
+	if startTime != nil {
+		dynFilter = append(dynFilter, bson.E{Key: "contentTime", Value: bson.D{{"$gte", startTime}}})
+	}
+	if endTime != nil {
+		dynFilter = append(dynFilter, bson.E{Key: "contentTime", Value: bson.D{{"$lt", endTime}}})
+	}
+
 	if len(dynFilter) != 0 {
 		pipeline = append(pipeline, bson.D{{"$match", dynFilter}})
 		countPipeline = append(countPipeline, bson.D{{"$match", dynFilter}})
@@ -152,9 +164,10 @@ func (repo *infoRepository) internalFindInfo(ctx mongo.SessionContext, uid strin
 	return items, uint64(totalCount), nil
 }
 
-func (repo *infoRepository) FindAll(ctx mongo.SessionContext, uid string, tags []*models.TypeAndTag,
+func (repo *infoRepository) FindAll(ctx mongo.SessionContext, uid, country string,
+	startTime, endTime *time.Time, tags []*models.TypeAndTag,
 	page, size uint64, sorts []*content.Sort) ([]*models.Info, uint64, error) {
-	return repo.internalFindInfo(ctx, uid, tags, page, size, sorts)
+	return repo.internalFindInfo(ctx, uid, country, startTime, endTime, tags, page, size, sorts)
 }
 
 func (repo *infoRepository) Delete(ctx mongo.SessionContext, id objectid.ObjectID) error {
