@@ -13,20 +13,20 @@ service Content {
 
     rpc GetInfo (GetInfoReq) returns (InfoResp) {}
     rpc GetInfos (GetInfosReq) returns (InfosResp) {}
-    rpc PublishInfo (PublishInfoReq) returns (google.protobuf.Empty) {}
+    rpc PublishInfo (PublishInfoReq) returns (PublishInfoResp) {}
     rpc EditInfo (EditInfoReq) returns (google.protobuf.Empty) {}
     rpc DeleteInfo (InfoOneReq) returns (google.protobuf.Empty) {}
     rpc WatchInfo (InfoOneReq) returns (google.protobuf.Empty) {}
 
     rpc GetSegments (GetSegmentsReq) returns (SegmentsResp) {}
     rpc GetSegment (SegmentOneReq) returns (SegmentResp) {}
-    rpc PublishSegment (PublishSegmentReq) returns (google.protobuf.Empty) {}
+    rpc PublishSegment (PublishSegmentReq) returns (PublishSegmentResp) {}
     rpc EditSegment (EditSegmentReq) returns (google.protobuf.Empty) {}
     rpc DeleteSegment (SegmentOneReq) returns (google.protobuf.Empty) {}
 
     rpc GetValues(GetValuesReq) returns (ValuesResp) {}
     rpc GetValue(ValueOneReq) returns (ValueResp) {}
-    rpc InsertValue (InsertValueReq) returns (google.protobuf.Empty) {}
+    rpc InsertValue (InsertValueReq) returns (InsertValueResp) {}
     rpc EditValue (EditValueReq) returns (google.protobuf.Empty) {}
     rpc DeleteValue (ValueOneReq) returns (google.protobuf.Empty) {}
 
@@ -163,6 +163,10 @@ message PublishInfoReq {
     google.protobuf.Timestamp contentTime = 9;
 }
 
+message PublishInfoResp {
+    string infoID = 1;
+}
+
 message EditInfoReq {
     string infoID = 1;
     string uid = 2;
@@ -192,6 +196,10 @@ message PublishSegmentReq {
     map<string, string> content = 5;
 }
 
+message PublishSegmentResp {
+    string segID = 1;
+}
+
 message EditSegmentReq {
     string infoID = 1;
     string segID = 2;
@@ -219,6 +227,10 @@ message InsertValueReq {
     string segID = 3;
     google.protobuf.Timestamp time = 4;
     string value = 5;
+}
+
+message InsertValueResp {
+    string valueID = 1;
 }
 
 message EditValueReq {
