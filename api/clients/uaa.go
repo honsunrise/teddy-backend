@@ -3,7 +3,6 @@ package clients
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhsyourai/teddy-backend/common/proto/uaa"
-	"google.golang.org/grpc"
 	"sync"
 )
 
@@ -15,27 +14,21 @@ func UaaFromContext(ctx *gin.Context) uaa.UAAClient {
 }
 
 // Client returns a wrapper for the UaaClient
-func UaaNew(f AddressFunc) gin.HandlerFunc {
+func UaaNew(addr string, srv bool) gin.HandlerFunc {
 	var client uaa.UAAClient = nil
 	lock := sync.Mutex{}
 	return func(ctx *gin.Context) {
 		if client == nil {
 			lock.Lock()
 			defer lock.Unlock()
-
-			addr, err := f()
-			if err != nil {
-				ctx.Error(err)
-				return
-			}
-			conn, err := grpc.Dial(addr, grpc.WithInsecure())
+			conn, err := getGRPCConn(addr, srv)
 			if err != nil {
 				ctx.Error(err)
 				return
 			}
 			client = uaa.NewUAAClient(conn)
 		}
-		ctx.Set(uaaKey, client)
+		ctx.Set(messageKey, client)
 		ctx.Next()
 	}
 }

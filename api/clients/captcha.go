@@ -3,7 +3,6 @@ package clients
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhsyourai/teddy-backend/common/proto/captcha"
-	"google.golang.org/grpc"
 	"sync"
 )
 
@@ -15,26 +14,21 @@ func CaptchaFromContext(ctx *gin.Context) captcha.CaptchaClient {
 }
 
 // Client returns a wrapper for the UaaClient
-func CaptchaNew(f AddressFunc) gin.HandlerFunc {
+func CaptchaNew(addr string, srv bool) gin.HandlerFunc {
 	var client captcha.CaptchaClient = nil
 	lock := sync.Mutex{}
 	return func(ctx *gin.Context) {
 		if client == nil {
 			lock.Lock()
 			defer lock.Unlock()
-			addr, err := f()
-			if err != nil {
-				ctx.Error(err)
-				return
-			}
-			conn, err := grpc.Dial(addr, grpc.WithInsecure())
+			conn, err := getGRPCConn(addr, srv)
 			if err != nil {
 				ctx.Error(err)
 				return
 			}
 			client = captcha.NewCaptchaClient(conn)
 		}
-		ctx.Set(captchaKey, client)
+		ctx.Set(messageKey, client)
 		ctx.Next()
 	}
 }
