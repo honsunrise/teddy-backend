@@ -30,6 +30,5 @@ func ContentNew(addr string) gin.HandlerFunc {
 			client = content.NewContentClient(conn)
 		}
 		ctx.Set(contentKey, client)
-		ctx.Next()
 	}
 }

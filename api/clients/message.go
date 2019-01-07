@@ -30,6 +30,5 @@ func MessageNew(addr string) gin.HandlerFunc {
 			client = message.NewMessageClient(conn)
 		}
 		ctx.Set(messageKey, client)
-		ctx.Next()
 	}
 }

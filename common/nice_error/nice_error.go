@@ -47,7 +47,7 @@ func (ne *niceError) process(c *gin.Context) {
 	err := c.Errors.Last()
 	if err != nil {
 		if err.IsType(gin.ErrorTypeBind) {
-			c.JSON(http.StatusBadRequest, gin.H{
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"msg":    "binding request error",
 				"detail": "request content missing field",
 			})
@@ -67,12 +67,12 @@ func (ne *niceError) process(c *gin.Context) {
 			} else if code == http.StatusUnauthorized {
 				title = "unauthorized"
 			}
-			c.JSON(code, gin.H{
+			c.AbortWithStatusJSON(code, gin.H{
 				"title":  title,
 				"detail": err.Error(),
 			})
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"title":  "internal server error",
 				"detail": err.Error(),
 			})

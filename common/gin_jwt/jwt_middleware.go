@@ -102,7 +102,6 @@ func (m *JwtMiddleware) Handler() gin.HandlerFunc {
 		}
 
 		ctx.Set(m.config.ContextKey, token)
-		ctx.Next()
 	}
 }
 

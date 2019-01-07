@@ -30,6 +30,5 @@ func CaptchaNew(addr string) gin.HandlerFunc {
 			client = captcha.NewCaptchaClient(conn)
 		}
 		ctx.Set(captchaKey, client)
-		ctx.Next()
 	}
 }

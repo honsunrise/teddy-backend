@@ -30,6 +30,5 @@ func UaaNew(addr string) gin.HandlerFunc {
 			client = uaa.NewUAAClient(conn)
 		}
 		ctx.Set(uaaKey, client)
-		ctx.Next()
 	}
 }
