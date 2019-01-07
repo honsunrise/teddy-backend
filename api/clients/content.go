@@ -29,7 +29,7 @@ func ContentNew(addr string) gin.HandlerFunc {
 			}
 			client = content.NewContentClient(conn)
 		}
-		ctx.Set(messageKey, client)
+		ctx.Set(contentKey, client)
 		ctx.Next()
 	}
 }

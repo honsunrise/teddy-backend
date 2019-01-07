@@ -29,7 +29,7 @@ func CaptchaNew(addr string) gin.HandlerFunc {
 			}
 			client = captcha.NewCaptchaClient(conn)
 		}
-		ctx.Set(messageKey, client)
+		ctx.Set(captchaKey, client)
 		ctx.Next()
 	}
 }
