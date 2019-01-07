@@ -3,6 +3,7 @@ package clients
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhsyourai/teddy-backend/common/proto/captcha"
+	"google.golang.org/grpc"
 	"sync"
 )
 
@@ -21,7 +22,7 @@ func CaptchaNew(addr string, srv bool) gin.HandlerFunc {
 		if client == nil {
 			lock.Lock()
 			defer lock.Unlock()
-			conn, err := getGRPCConn(addr, srv)
+			conn, err := grpc.Dial(addr, grpc.WithInsecure())
 			if err != nil {
 				ctx.Error(err)
 				return
