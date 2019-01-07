@@ -158,7 +158,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "e3072830cd402d6c5a5ba50aafe83a76d8521678"
+  revision = "0c17d2ad550874bacb9d5dba47a9912ea05c3894"
 
 [[projects]]
   branch = "master"
@@ -197,14 +197,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:191cccd950a4aeadb60306062f2bdc2f924d750d0156ec6c691b17211bfd7349"
+  digest = "1:c4f2af053602f247b8625846cd88dfbf9295e3d02e82c58c27ebe3be06bef80c"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "badf5585203e739f88c2c6cd34188a6f54b5d619"
+  revision = "cb59ee3660675d463e86971646692ea3e470021c"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"

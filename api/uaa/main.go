@@ -25,6 +25,10 @@ var (
 	g errgroup.Group
 )
 
+const captchaSrvDomain = "dns:///srv-captcha:9090"
+const messageSrvDomain = "dns:///srv-message:9092"
+const uaaSrvDomain = "dns:///srv-uaa:9093"
+
 func init() {
 	log.SetReportCaller(true)
 }
@@ -68,12 +72,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	target, err := uaaSrvAddrFunc()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	adapter, err := grpcadapter.NewAdapter(target)
+	adapter, err := grpcadapter.NewAdapter(uaaSrvDomain)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -112,9 +111,9 @@ func main() {
 		AllowAllOrigins:  true,
 		MaxAge:           24 * time.Hour,
 	}))
-	router.Use(clients.MessageNew(messageSrvAddrFunc))
-	router.Use(clients.UaaNew(uaaSrvAddrFunc))
-	router.Use(clients.CaptchaNew(captchaSrvAddrFunc))
+	router.Use(clients.MessageNew(messageSrvDomain))
+	router.Use(clients.UaaNew(uaaSrvDomain))
+	router.Use(clients.CaptchaNew(captchaSrvDomain))
 	router.Use(nice_error.NewNiceError())
 
 	uaa.HandlerNormal(router.Group("/v1/anon/uaa").Use(jwtMiddleware.Handler()))

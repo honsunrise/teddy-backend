@@ -122,12 +122,12 @@
   version = "v1.2.1"
 
 [[projects]]
-  digest = "1:69b1cc331fca23d702bd72f860c6a647afd0aa9fcbc1d0659b1365e26546dd70"
+  digest = "1:87c2e02fb01c27060ccc5ba7c5a407cc91147726f8f40b70cceeedbc52b1f3a8"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   pruneopts = "UT"
-  revision = "bcd833dfe83d3cebad139e4a29ed79cb2318bf95"
-  version = "v1.2.0"
+  revision = "e1e72e9de974bd926e5c56f83753fba2df402ce5"
+  version = "v1.3.0"
 
 [[projects]]
   branch = "master"
@@ -147,7 +147,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:02d2a4bd2cb12c9a35a5bf8daf9d430a10f2a3c35a0a08e23b33602b8eddfe8c"
+  digest = "1:cee0a846d370ba60fbc4987103d86cc0d6b808a2bb2d3d0e2b79dff6dbdf1dda"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "common/config",
@@ -156,10 +156,9 @@
     "common/config/source/file",
     "common/proto/message",
     "common/types",
-    "common/utils",
   ]
   pruneopts = "UT"
-  revision = "7fb14fe914edb54cd563f91f4c1098e534227199"
+  revision = "d138df938d61832aa35a6a40b4614a6f82aff362"
 
 [[projects]]
   branch = "master"
@@ -170,7 +169,7 @@
     "ssh/terminal",
   ]
   pruneopts = "UT"
-  revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
+  revision = "ff983b9c42bc9fbf91556e191cc8efb585c16908"
 
 [[projects]]
   branch = "master"
@@ -190,22 +189,22 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:5e4d81c50cffcb124b899e4f3eabec3930c73532f0096c27f94476728ba03028"
+  digest = "1:75515eedc0dc2cb0b40372008b616fa2841d831c63eedd403285ff286c593295"
   name = "golang.org/x/sync"
   packages = ["semaphore"]
   pruneopts = "UT"
-  revision = "42b317875d0fa942474b76e1b46a6060d720ae6e"
+  revision = "37e7f081c4d4c64e13b10787722085407fe5d15f"
 
 [[projects]]
   branch = "master"
-  digest = "1:d0c37951b9d5107f44e2222ba08311a113bf094a244544915eda6a3f87f12c45"
+  digest = "1:c4f2af053602f247b8625846cd88dfbf9295e3d02e82c58c27ebe3be06bef80c"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "8ff4e546d48be377a38a3ab13ef2dd4dd8dce06a"
+  revision = "cb59ee3660675d463e86971646692ea3e470021c"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -236,7 +235,7 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "a1fde740824669f161e97af4237fb80b8734444d"
+  revision = "bd9b4fb69e2ffd37621a6caa54dcbead29b546f2"
 
 [[projects]]
   digest = "1:03af1505694005143ff6dc5d0e2802c8200ddb618b1d3f7201482f53798b99b4"
@@ -318,7 +317,6 @@
     "github.com/zhsyourai/teddy-backend/common/config/source/file",
     "github.com/zhsyourai/teddy-backend/common/proto/message",
     "github.com/zhsyourai/teddy-backend/common/types",
-    "github.com/zhsyourai/teddy-backend/common/utils",
     "google.golang.org/grpc",
     "google.golang.org/grpc/health",
     "google.golang.org/grpc/health/grpc_health_v1",

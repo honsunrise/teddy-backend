@@ -122,12 +122,12 @@
   version = "v0.0.18"
 
 [[projects]]
-  digest = "1:a204f9aa04d3305be0d4d8f69f42aee6c649a8f9f9a8dbbbaff54bdad5ce50c7"
+  digest = "1:e878dfe6e3fb9f3dcd1df02a2fb20ec0cfa2cefb5dc3f09746099a14b91e9774"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   pruneopts = "T"
-  revision = "bcd833dfe83d3cebad139e4a29ed79cb2318bf95"
-  version = "v1.2.0"
+  revision = "e1e72e9de974bd926e5c56f83753fba2df402ce5"
+  version = "v1.3.0"
 
 [[projects]]
   branch = "master"
@@ -147,7 +147,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7c7bc861a860174949fd851047b4b88e313e16b58169e29455bd7cb39462485e"
+  digest = "1:4c61409edbe3378ffe0f77186f995220be7ce5fdbcddf5bf796920794b702a9b"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "common/config",
@@ -156,21 +156,20 @@
     "common/config/source/file",
     "common/proto/captcha",
     "common/types",
-    "common/utils",
   ]
   pruneopts = "T"
-  revision = "afb5bde67e645a3bcae323e5fa423d50f7fee6d6"
+  revision = "9d9cb417778111a97e591f144919faec756c3d16"
 
 [[projects]]
   branch = "master"
-  digest = "1:d470cb69884835b1800e93ceceb85afcf981ea647e61d99398a76af7a95bad6a"
+  digest = "1:5f6a40f74aa9639cfcdaccb526d14a6a7c18900ea8f339416a43a580beb32c34"
   name = "golang.org/x/crypto"
   packages = [
     "pbkdf2",
     "ssh/terminal",
   ]
   pruneopts = "T"
-  revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
+  revision = "ff983b9c42bc9fbf91556e191cc8efb585c16908"
 
 [[projects]]
   branch = "master"
@@ -190,22 +189,22 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c20b4d66e71aae7504855ab3cf6ad99b68134712dd0ed4786144136fb14c66e9"
+  digest = "1:6932d1ef4294f3ea819748e89d1003f5df3804b20b84b5f1c60f8f1d7c933e2d"
   name = "golang.org/x/sync"
   packages = ["semaphore"]
   pruneopts = "T"
-  revision = "42b317875d0fa942474b76e1b46a6060d720ae6e"
+  revision = "37e7f081c4d4c64e13b10787722085407fe5d15f"
 
 [[projects]]
   branch = "master"
-  digest = "1:aa469d73e14584061fd0f3a4c7527554ead40d74ca2a063acf6814b6ca9562f5"
+  digest = "1:a417fe94258c78492c674d038597951f6624960c86511e8f84a8ddd56c0765a5"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "T"
-  revision = "8ff4e546d48be377a38a3ab13ef2dd4dd8dce06a"
+  revision = "1775db3f06b568179d273425900dd09125831dd5"
 
 [[projects]]
   digest = "1:6164911cb5e94e8d8d5131d646613ff82c14f5a8ce869de2f6d80d9889df8c5a"
@@ -232,11 +231,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1119ca20856adc40ca72eded119b9d9b594f80144841dd2a1f89d26d4ab407d6"
+  digest = "1:8c7bf8f974d0b63a83834e83b6dd39c2b40d61d409d76172c81d67eba8fee4a8"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "T"
-  revision = "a1fde740824669f161e97af4237fb80b8734444d"
+  revision = "bd9b4fb69e2ffd37621a6caa54dcbead29b546f2"
 
 [[projects]]
   digest = "1:c32026b4d2b9f7240ad72edf0dffca4e5863d5edc1ea25416d64929926b5ac67"
@@ -300,10 +299,11 @@
     "github.com/zhsyourai/teddy-backend/common/config/source/file",
     "github.com/zhsyourai/teddy-backend/common/proto/captcha",
     "github.com/zhsyourai/teddy-backend/common/types",
-    "github.com/zhsyourai/teddy-backend/common/utils",
     "google.golang.org/grpc",
+    "google.golang.org/grpc/codes",
     "google.golang.org/grpc/health",
     "google.golang.org/grpc/health/grpc_health_v1",
+    "google.golang.org/grpc/status",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
