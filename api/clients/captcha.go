@@ -15,7 +15,7 @@ func CaptchaFromContext(ctx *gin.Context) captcha.CaptchaClient {
 }
 
 // Client returns a wrapper for the UaaClient
-func CaptchaNew(addr string, srv bool) gin.HandlerFunc {
+func CaptchaNew(addr string) gin.HandlerFunc {
 	var client captcha.CaptchaClient = nil
 	lock := sync.Mutex{}
 	return func(ctx *gin.Context) {

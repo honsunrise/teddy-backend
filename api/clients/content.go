@@ -15,7 +15,7 @@ func ContentFromContext(ctx *gin.Context) content.ContentClient {
 }
 
 // Client returns a wrapper for the UaaClient
-func ContentNew(addr string, srv bool) gin.HandlerFunc {
+func ContentNew(addr string) gin.HandlerFunc {
 	var client content.ContentClient = nil
 	lock := sync.Mutex{}
 	return func(ctx *gin.Context) {

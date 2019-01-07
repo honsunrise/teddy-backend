@@ -15,7 +15,7 @@ func MessageFromContext(ctx *gin.Context) message.MessageClient {
 }
 
 // Client returns a wrapper for the UaaClient
-func MessageNew(addr string, srv bool) gin.HandlerFunc {
+func MessageNew(addr string) gin.HandlerFunc {
 	var client message.MessageClient = nil
 	lock := sync.Mutex{}
 	return func(ctx *gin.Context) {
