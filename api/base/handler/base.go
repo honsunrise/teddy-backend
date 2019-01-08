@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhsyourai/teddy-backend/api/clients"
+	"github.com/zhsyourai/teddy-backend/api/errors"
 	"github.com/zhsyourai/teddy-backend/common/gin_jwt"
 	"github.com/zhsyourai/teddy-backend/common/proto/captcha"
 	"google.golang.org/grpc/codes"
@@ -50,7 +51,7 @@ func (h *Base) GetCaptchaId(ctx *gin.Context) {
 		Len: 6,
 	})
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -68,8 +69,12 @@ func (h *Base) GetCaptchaData(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	ext := path.Ext(idStr)
 	id := idStr[:len(idStr)-len(ext)]
-	if ext == "" || id == "" {
-		ctx.Status(http.StatusNotFound)
+	if ext == "" {
+		errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaIDNotFound)
+		return
+	}
+	if id == "" {
+		errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaExtNotSupport)
 		return
 	}
 
@@ -90,9 +95,9 @@ func (h *Base) GetCaptchaData(ctx *gin.Context) {
 		})
 		if err != nil {
 			if status.Code(err) == codes.NotFound {
-				ctx.Error(ErrCaptchaNotFound).SetType(gin.ErrorTypePublic)
+				errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaIDNotFound)
 			} else {
-				ctx.Error(err)
+				errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 			}
 			return
 		}
@@ -109,9 +114,9 @@ func (h *Base) GetCaptchaData(ctx *gin.Context) {
 		})
 		if err != nil {
 			if status.Code(err) == codes.NotFound {
-				ctx.Error(ErrCaptchaNotFound).SetType(gin.ErrorTypePublic)
+				errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaIDNotFound)
 			} else {
-				ctx.Error(err)
+				errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 			}
 			return
 		}
@@ -120,7 +125,7 @@ func (h *Base) GetCaptchaData(ctx *gin.Context) {
 		}
 		ctx.Data(http.StatusOK, contentType, resp.VoiceWav)
 	default:
-		ctx.Status(http.StatusNotFound)
+		errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaExtNotSupport)
 		return
 	}
 }

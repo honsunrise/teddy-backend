@@ -1,0 +1,112 @@
+version: '3.3'
+
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+
+  minio:
+    image: minio/minio
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+    environment:
+      MINIO_ACCESS_KEY: FSBDQFL0XWDCP243O49Q
+      MINIO_SECRET_KEY: T9xikDYZaobOqfDwV38SAqzxDTjZvcZHDo6I36VN
+    command: server /data
+
+  srv-message:
+    depends_on:
+      - db
+    image: srv-message:latest
+    restart: always
+    configs:
+      - source: srv_message_config
+        target: /app
+
+  srv-content:
+    depends_on:
+      - db
+      - minio
+    image: srv-content:latest
+    restart: always
+    configs:
+      - source: srv_content_config
+        target: /app
+
+  srv-captcha:
+    depends_on:
+      - db
+    image: srv-captcha:latest
+    restart: always
+    configs:
+      - source: srv_captcha_config
+        target: /app
+
+  srv-uaa:
+    depends_on:
+      - db
+    image: srv-uaa:latest
+    restart: always
+    configs:
+      - source: srv_uaa_config
+        target: /app
+
+  api-base:
+    depends_on:
+      - db
+    image: wordpress:latest
+    ports:
+      - "8000:80"
+    restart: always
+    configs:
+      - source: api_base_config
+        target: /app
+
+  api-content:
+    depends_on:
+      - db
+    image: wordpress:latest
+    ports:
+      - "8000:80"
+    restart: always
+    configs:
+      - source: api_content_config
+        target: /app
+
+  api-message:
+    depends_on:
+      - db
+    image: wordpress:latest
+    ports:
+      - "8000:80"
+    restart: always
+    configs:
+      - source: api_message_config
+        target: /app
+
+  api-uaa:
+    depends_on:
+      - db
+    image: wordpress:latest
+    ports:
+      - "8000:80"
+    restart: always
+    configs:
+      - source: api_uaa_config
+        target: /app
+
+configs:
+  srv_message_config:
+
+volumes:
+  db_data: {}
+  minio_data: {}

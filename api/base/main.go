@@ -11,7 +11,6 @@ import (
 	"github.com/zhsyourai/teddy-backend/common/config/source/file"
 	"github.com/zhsyourai/teddy-backend/common/gin_jwt"
 	"github.com/zhsyourai/teddy-backend/common/grpcadapter"
-	"github.com/zhsyourai/teddy-backend/common/nice_error"
 	"golang.org/x/sync/errgroup"
 	"net/http"
 	"time"
@@ -71,7 +70,6 @@ func main() {
 		MaxAge:           24 * time.Hour,
 	}))
 	router.Use(clients.CaptchaNew(captchaSrvDomain))
-	router.Use(nice_error.NewNiceError())
 	base.HandlerNormal(router.Group("/v1/anon/base").Use(jwtMiddleware.Handler()))
 	base.HandlerAuth(router.Group("/v1/auth/base").Use(jwtMiddleware.Handler()))
 	base.HandlerHealth(router)
