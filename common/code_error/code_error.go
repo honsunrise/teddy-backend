@@ -3,53 +3,72 @@ package code_error
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"reflect"
 )
 
-func NewCodeError(filterType gin.ErrorType) gin.HandlerFunc {
-	ne := codeError{
-		filterType: filterType,
-	}
-	return func(context *gin.Context) {
-		ne.process(context)
+type Error struct {
+	traceID  interface{}
+	code     int
+	httpCode int
+	err      string
+}
+
+func (e *Error) Error() string {
+	return e.err
+}
+
+func (e *Error) SetTraceID(traceID interface{}) {
+	e.traceID = traceID
+}
+
+func DefineCodeError(httpCode, code int, text string) *Error {
+	return &Error{
+		code:     code,
+		err:      text,
+		httpCode: httpCode,
 	}
 }
 
-func DefineCodeError(code int, text string) *gin.Error {
-	return &gin.Error{
-		Type: gin.ErrorTypePublic,
-		Err:  errors.New(text),
-		Meta: map[string]interface{}{
-			"_err_code_": code,
-		},
-	}
+type Config struct {
+	DefaultHttpCode int
+	DefaultErrCode  int
 }
 
-func AbortWithError(ctx *gin.Context, code int, err error) {
-	ctx.Abort()
-	ctx.Status(code)
-	ctx.Error(err)
+func NewCodeError(config Config) *codeError {
+	if config.DefaultHttpCode == 0 {
+		panic(errors.New("please set default http code"))
+	}
+	if config.DefaultErrCode == 0 {
+		panic(errors.New("please set default error code"))
+	}
+
+	return &codeError{Config: config}
 }
 
 type codeError struct {
-	filterType gin.ErrorType
+	Config
 }
 
-func (ne *codeError) process(c *gin.Context) {
-	c.Next()
-
-	err := c.Errors.Last()
-
-	if err != nil && err.IsType(ne.filterType) && c.Writer.Size() <= 0 {
-		code := -1
-		if err.Meta != nil {
-			value := reflect.ValueOf(err.Meta)
-			switch value.Kind() {
-			case reflect.Map:
-				code = int(reflect.ValueOf(value.MapIndex(reflect.ValueOf("_err_code_")).Interface()).Int())
-			}
+func (ne *codeError) AbortWithErrorJSON(ctx *gin.Context, err error) {
+	code := ne.DefaultErrCode
+	httpCode := ne.DefaultHttpCode
+	var traceID interface{} = nil
+	switch err.(type) {
+	case *Error:
+		httpCode = err.(*Error).httpCode
+		code = err.(*Error).code
+		if err.(*Error).traceID != nil {
+			traceID = err.(*Error).traceID
 		}
-		c.JSON(-1, gin.H{
+	}
+
+	if traceID != nil {
+		ctx.AbortWithStatusJSON(httpCode, gin.H{
+			"code":    code,
+			"detail":  err.Error(),
+			"traceID": traceID,
+		})
+	} else {
+		ctx.AbortWithStatusJSON(httpCode, gin.H{
 			"code":   code,
 			"detail": err.Error(),
 		})
