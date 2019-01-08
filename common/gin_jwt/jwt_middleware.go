@@ -29,8 +29,7 @@ type MiddlewareConfig struct {
 
 type JwtMiddleware struct {
 	config   MiddlewareConfig
-	key      interface{}
-	priKey   interface{}
+	keyFunc  func() interface{}
 	nowFunc  func() time.Time
 	audience []string
 	issuer   string
@@ -59,14 +58,16 @@ func NewGinJwtMiddleware(config MiddlewareConfig, adapter persist.Adapter) (*Jwt
 
 	if config.ErrorHandler == nil {
 		config.ErrorHandler = func(ctx *gin.Context, err error) {
+			ctx.Abort()
 			ctx.Header("WWW-Authenticate", "JWT realm="+config.Realm)
 			if err == ErrForbidden {
-				ctx.AbortWithError(http.StatusForbidden, err)
+				ctx.Status(http.StatusForbidden)
 			} else if err == ErrTokenInvalid {
-				ctx.AbortWithError(http.StatusUnauthorized, err)
+				ctx.Status(http.StatusUnauthorized)
 			} else {
-				ctx.AbortWithError(http.StatusInternalServerError, err)
+				ctx.Status(http.StatusInternalServerError)
 			}
+			ctx.Error(err)
 		}
 	}
 
@@ -81,7 +82,7 @@ func NewGinJwtMiddleware(config MiddlewareConfig, adapter persist.Adapter) (*Jwt
 
 	return &JwtMiddleware{
 		config:   config,
-		key:      config.KeyFunc(),
+		keyFunc:  config.KeyFunc,
 		nowFunc:  config.NowFunc,
 		audience: config.Audience,
 		issuer:   config.Issuer,
@@ -207,7 +208,7 @@ func (m *JwtMiddleware) extractToken(ctx *gin.Context) (map[string]interface{}, 
 		return nil, ErrTokenInvalid
 	}
 	c := make(map[string]interface{})
-	err = parsedToken.Claims(m.key, &c)
+	err = parsedToken.Claims(m.keyFunc(), &c)
 	if err != nil {
 		if err == jose.ErrUnsupportedKeyType {
 			return nil, ErrInvalidKey
