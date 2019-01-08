@@ -58,16 +58,14 @@ func NewGinJwtMiddleware(config MiddlewareConfig, adapter persist.Adapter) (*Jwt
 
 	if config.ErrorHandler == nil {
 		config.ErrorHandler = func(ctx *gin.Context, err error) {
-			ctx.Abort()
 			ctx.Header("WWW-Authenticate", "JWT realm="+config.Realm)
 			if err == ErrForbidden {
-				ctx.Status(http.StatusForbidden)
+				ctx.AbortWithStatus(http.StatusForbidden)
 			} else if err == ErrTokenInvalid {
-				ctx.Status(http.StatusUnauthorized)
+				ctx.AbortWithStatus(http.StatusUnauthorized)
 			} else {
-				ctx.Status(http.StatusInternalServerError)
+				ctx.AbortWithStatus(http.StatusInternalServerError)
 			}
-			ctx.Error(err)
 		}
 	}
 
