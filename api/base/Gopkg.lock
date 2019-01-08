@@ -178,11 +178,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d64aeb9d1ad600f62a3e3613bdf500b10762f6ae1ae01e72b078b1e7ee75787c"
+  digest = "1:b701d5d440ce135ee62fbccb49bd903c956982f217fbca09765f6e2192868ccf"
   name = "github.com/zhsyourai/teddy-backend"
   packages = [
     "api/clients",
-    "common/code_error",
+    "api/errors",
     "common/config",
     "common/config/coder/json",
     "common/config/coder/yaml",
@@ -196,7 +196,7 @@
     "common/types",
   ]
   pruneopts = "UT"
-  revision = "2eef9ab568dfe58bbed0f4bc41bfbc968d5ef2af"
+  revision = "7d5dd1cad114b49c5a3a71c473f5694f2cee2f55"
 
 [[projects]]
   branch = "master"
@@ -354,7 +354,7 @@
     "github.com/gin-gonic/gin",
     "github.com/sirupsen/logrus",
     "github.com/zhsyourai/teddy-backend/api/clients",
-    "github.com/zhsyourai/teddy-backend/common/code_error",
+    "github.com/zhsyourai/teddy-backend/api/errors",
     "github.com/zhsyourai/teddy-backend/common/config",
     "github.com/zhsyourai/teddy-backend/common/config/source/file",
     "github.com/zhsyourai/teddy-backend/common/gin_jwt",

@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/zhsyourai/teddy-backend/api/base/handler"
 	"github.com/zhsyourai/teddy-backend/api/clients"
+	"github.com/zhsyourai/teddy-backend/api/errors"
 	"github.com/zhsyourai/teddy-backend/common/config"
 	"github.com/zhsyourai/teddy-backend/common/config/source/file"
 	"github.com/zhsyourai/teddy-backend/common/gin_jwt"
@@ -49,6 +50,16 @@ func main() {
 		KeyFunc: gin_jwt.RemoteFetchFunc("http://10.10.10.30:8083/v1/anon/uaa/jwks.json", 24*time.Hour),
 		Audience: []string{
 			"base",
+		},
+		ErrorHandler: func(ctx *gin.Context, err error) {
+			ctx.Header("WWW-Authenticate", "JWT realm="+config.Realm)
+			if err == gin_jwt.ErrForbidden {
+				errors.AbortWithErrorJSON(ctx, errors.ErrForbidden)
+			} else if err == gin_jwt.ErrTokenInvalid {
+				errors.AbortWithErrorJSON(ctx, errors.ErrUnauthorized)
+			} else {
+				errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
+			}
 		},
 	}, adapter)
 	if err != nil {

@@ -69,11 +69,11 @@ func (h *Base) GetCaptchaData(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	ext := path.Ext(idStr)
 	id := idStr[:len(idStr)-len(ext)]
-	if ext == "" {
+	if id == "" {
 		errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaIDNotFound)
 		return
 	}
-	if id == "" {
+	if ext == "" {
 		errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaExtNotSupport)
 		return
 	}

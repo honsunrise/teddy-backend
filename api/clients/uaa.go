@@ -2,6 +2,7 @@ package clients
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/zhsyourai/teddy-backend/api/errors"
 	"github.com/zhsyourai/teddy-backend/common/proto/uaa"
 	"google.golang.org/grpc"
 	"sync"
@@ -24,7 +25,7 @@ func UaaNew(addr string) gin.HandlerFunc {
 			defer lock.Unlock()
 			conn, err := grpc.Dial(addr, grpc.WithInsecure())
 			if err != nil {
-				ctx.Error(err)
+				errors.AbortWithErrorJSON(ctx, errors.ErrGRPCDial)
 				return
 			}
 			client = uaa.NewUAAClient(conn)
