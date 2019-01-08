@@ -25,6 +25,12 @@ func DefineCodeError(code int, text string) *gin.Error {
 	}
 }
 
+func AbortWithError(ctx *gin.Context, code int, err error) {
+	ctx.Abort()
+	ctx.Status(code)
+	ctx.Error(err)
+}
+
 type codeError struct {
 	filterType gin.ErrorType
 }
