@@ -1,21 +1,20 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"github.com/mongodb/mongo-go-driver/mongo"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	grpcHealth "google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"net"
-	"teddy-backend/common/config/source/file"
-	"teddy-backend/common/grpcadapter"
+	"teddy-backend/common/proto/uaa"
+	"teddy-backend/pkg/config"
+	"teddy-backend/pkg/config/source/file"
+	"teddy-backend/pkg/grpcadapter"
 	"teddy-backend/uaa/components"
 	"teddy-backend/uaa/mongo-grpcadapter"
-
-	"context"
-	"github.com/mongodb/mongo-go-driver/mongo"
-	"teddy-backend/common/config"
-	"teddy-backend/common/proto/uaa"
 	"teddy-backend/uaa/repositories"
 	"teddy-backend/uaa/server"
 )
