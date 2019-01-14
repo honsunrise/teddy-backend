@@ -1,13 +1,13 @@
 package models
 
 import (
-	"github.com/mongodb/mongo-go-driver/bson/objectid"
+	"github.com/mongodb/mongo-go-driver/bson/primitive"
 	"time"
 )
 
 type BehaviorInfoItem struct {
-	InfoId objectid.ObjectID `bson:"infoId"`
-	Time   time.Time         `bson:"time"`
+	InfoId primitive.ObjectID `bson:"infoId"`
+	Time   time.Time          `bson:"time"`
 }
 
 type BehaviorUserItem struct {
@@ -16,7 +16,7 @@ type BehaviorUserItem struct {
 }
 
 type Behavior struct {
-	Id        objectid.ObjectID   `bson:"_id"`
+	Id        primitive.ObjectID  `bson:"_id"`
 	UID       string              `bson:"uid"`
 	FirstTime time.Time           `bson:"firstTime"`
 	LastTime  time.Time           `bson:"lastTime"`

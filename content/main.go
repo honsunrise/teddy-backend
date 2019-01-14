@@ -1,20 +1,19 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"github.com/mongodb/mongo-go-driver/mongo"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	grpcHealth "google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"net"
-	"teddy-backend/common/config/source/file"
 	"teddy-backend/common/proto/content"
 	"teddy-backend/content/server"
-
-	"context"
-	"github.com/mongodb/mongo-go-driver/mongo"
-	"teddy-backend/common/config"
+	"teddy-backend/pkg/config"
+	"teddy-backend/pkg/config/source/file"
 )
 
 func init() {

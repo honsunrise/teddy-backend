@@ -3,7 +3,7 @@ package repositories
 import (
 	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
-	"github.com/mongodb/mongo-go-driver/bson/objectid"
+	"github.com/mongodb/mongo-go-driver/bson/primitive"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"teddy-backend/common/proto/content"
 	"teddy-backend/content/models"
@@ -12,16 +12,16 @@ import (
 type SegmentRepository interface {
 	Insert(ctx mongo.SessionContext, segment *models.Segment) error
 	FindByInfoIDAndNoAndTitleAndLabels(ctx mongo.SessionContext,
-		infoID objectid.ObjectID, no uint64, title string, labels []string) (*models.Segment, error)
-	FindOne(ctx mongo.SessionContext, infoID objectid.ObjectID, id objectid.ObjectID) (*models.Segment, error)
-	FindAll(ctx mongo.SessionContext, infoID objectid.ObjectID,
+		infoID primitive.ObjectID, no uint64, title string, labels []string) (*models.Segment, error)
+	FindOne(ctx mongo.SessionContext, infoID primitive.ObjectID, id primitive.ObjectID) (*models.Segment, error)
+	FindAll(ctx mongo.SessionContext, infoID primitive.ObjectID,
 		labels []string, page, size uint64, sorts []*content.Sort) ([]*models.Segment, uint64, error)
 
-	DeleteByInfoID(ctx mongo.SessionContext, infoID objectid.ObjectID) error
-	DeleteOne(ctx mongo.SessionContext, infoID objectid.ObjectID, id objectid.ObjectID) error
-	DeleteMany(ctx mongo.SessionContext, ids []objectid.ObjectID) error
+	DeleteByInfoID(ctx mongo.SessionContext, infoID primitive.ObjectID) error
+	DeleteOne(ctx mongo.SessionContext, infoID primitive.ObjectID, id primitive.ObjectID) error
+	DeleteMany(ctx mongo.SessionContext, ids []primitive.ObjectID) error
 
-	Update(ctx mongo.SessionContext, id objectid.ObjectID, fields map[string]interface{}) error
+	Update(ctx mongo.SessionContext, id primitive.ObjectID, fields map[string]interface{}) error
 }
 
 func NewSegmentRepository(client *mongo.Client) (SegmentRepository, error) {
@@ -35,7 +35,7 @@ type segmentRepository struct {
 }
 
 func (repo *segmentRepository) FindByInfoIDAndNoAndTitleAndLabels(ctx mongo.SessionContext,
-	infoID objectid.ObjectID, no uint64, title string, labels []string) (*models.Segment, error) {
+	infoID primitive.ObjectID, no uint64, title string, labels []string) (*models.Segment, error) {
 	var segment models.Segment
 	filter := bson.D{
 		{"infoID", infoID},
@@ -52,7 +52,7 @@ func (repo *segmentRepository) FindByInfoIDAndNoAndTitleAndLabels(ctx mongo.Sess
 }
 
 func (repo *segmentRepository) Insert(ctx mongo.SessionContext, segment *models.Segment) error {
-	segment.ID = objectid.New()
+	segment.ID = primitive.NewObjectID()
 	_, err := repo.collections.InsertOne(ctx, segment)
 	if err != nil {
 		return err
@@ -60,7 +60,7 @@ func (repo *segmentRepository) Insert(ctx mongo.SessionContext, segment *models.
 	return nil
 }
 
-func (repo *segmentRepository) FindOne(ctx mongo.SessionContext, infoID objectid.ObjectID, id objectid.ObjectID) (*models.Segment, error) {
+func (repo *segmentRepository) FindOne(ctx mongo.SessionContext, infoID primitive.ObjectID, id primitive.ObjectID) (*models.Segment, error) {
 	var segment models.Segment
 	filter := bson.D{{"_id", id}, {"infoID", infoID}}
 	result := repo.collections.FindOne(ctx, filter)
@@ -72,7 +72,7 @@ func (repo *segmentRepository) FindOne(ctx mongo.SessionContext, infoID objectid
 }
 
 func (repo *segmentRepository) FindAll(ctx mongo.SessionContext,
-	infoID objectid.ObjectID, labels []string, page, size uint64, sorts []*content.Sort) ([]*models.Segment, uint64, error) {
+	infoID primitive.ObjectID, labels []string, page, size uint64, sorts []*content.Sort) ([]*models.Segment, uint64, error) {
 	pipeline := mongo.Pipeline{}
 	countPipeline := mongo.Pipeline{}
 
@@ -147,7 +147,7 @@ func (repo *segmentRepository) FindAll(ctx mongo.SessionContext,
 	return items, uint64(totalCount), nil
 }
 
-func (repo *segmentRepository) DeleteByInfoID(ctx mongo.SessionContext, infoID objectid.ObjectID) error {
+func (repo *segmentRepository) DeleteByInfoID(ctx mongo.SessionContext, infoID primitive.ObjectID) error {
 	filter := bson.D{{"infoID", infoID}}
 	dr, err := repo.collections.DeleteOne(ctx, filter)
 	if err != nil {
@@ -158,7 +158,7 @@ func (repo *segmentRepository) DeleteByInfoID(ctx mongo.SessionContext, infoID o
 	return nil
 }
 
-func (repo *segmentRepository) DeleteOne(ctx mongo.SessionContext, infoID objectid.ObjectID, id objectid.ObjectID) error {
+func (repo *segmentRepository) DeleteOne(ctx mongo.SessionContext, infoID primitive.ObjectID, id primitive.ObjectID) error {
 	filter := bson.D{{"_id", id}, {"infoID", infoID}}
 	dr, err := repo.collections.DeleteOne(ctx, filter)
 	if err != nil {
@@ -169,7 +169,7 @@ func (repo *segmentRepository) DeleteOne(ctx mongo.SessionContext, infoID object
 	return nil
 }
 
-func (repo *segmentRepository) DeleteMany(ctx mongo.SessionContext, ids []objectid.ObjectID) error {
+func (repo *segmentRepository) DeleteMany(ctx mongo.SessionContext, ids []primitive.ObjectID) error {
 	filter := bson.D{{"_id", bson.D{{"$in", ids}}}}
 	dr, err := repo.collections.DeleteOne(ctx, filter)
 	if err != nil {
@@ -180,7 +180,7 @@ func (repo *segmentRepository) DeleteMany(ctx mongo.SessionContext, ids []object
 	return nil
 }
 
-func (repo *segmentRepository) Update(ctx mongo.SessionContext, id objectid.ObjectID, fields map[string]interface{}) error {
+func (repo *segmentRepository) Update(ctx mongo.SessionContext, id primitive.ObjectID, fields map[string]interface{}) error {
 	filter := bson.D{{"_id", id}}
 	var bsonFields = make(bson.D, 0, len(fields))
 	for k, v := range fields {

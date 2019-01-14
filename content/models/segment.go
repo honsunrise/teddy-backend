@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/mongodb/mongo-go-driver/bson/objectid"
+	"github.com/mongodb/mongo-go-driver/bson/primitive"
 	"time"
 )
 
@@ -12,12 +12,12 @@ type Value struct {
 }
 
 type Segment struct {
-	ID         objectid.ObjectID `bson:"_id"`
-	InfoID     objectid.ObjectID `bson:"infoID"`
-	Title      string            `bson:"title"`
-	No         uint64            `bson:"no"`
-	Labels     []string          `bson:"labels"`
-	Values     []Value           `bson:"values"`
-	Count      uint64            `bson:"count"`
-	WatchCount uint64            `bson:"watchCount"`
+	ID         primitive.ObjectID `bson:"_id"`
+	InfoID     primitive.ObjectID `bson:"infoID"`
+	Title      string             `bson:"title"`
+	No         uint64             `bson:"no"`
+	Labels     []string           `bson:"labels"`
+	Values     []Value            `bson:"values"`
+	Count      uint64             `bson:"count"`
+	WatchCount uint64             `bson:"watchCount"`
 }

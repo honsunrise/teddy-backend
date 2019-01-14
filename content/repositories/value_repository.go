@@ -3,27 +3,27 @@ package repositories
 import (
 	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
-	"github.com/mongodb/mongo-go-driver/bson/objectid"
+	"github.com/mongodb/mongo-go-driver/bson/primitive"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/mongodb/mongo-go-driver/options"
+	"github.com/mongodb/mongo-go-driver/mongo/options"
 	"teddy-backend/common/proto/content"
 	"teddy-backend/content/models"
 )
 
 type ValueRepository interface {
-	Insert(ctx mongo.SessionContext, infoID objectid.ObjectID,
-		segID objectid.ObjectID, value *models.Value) error
+	Insert(ctx mongo.SessionContext, infoID primitive.ObjectID,
+		segID primitive.ObjectID, value *models.Value) error
 
-	FindOne(ctx mongo.SessionContext, infoID objectid.ObjectID,
-		segID objectid.ObjectID, id string) (*models.Value, error)
-	FindAll(ctx mongo.SessionContext, infoID objectid.ObjectID, segID objectid.ObjectID,
+	FindOne(ctx mongo.SessionContext, infoID primitive.ObjectID,
+		segID primitive.ObjectID, id string) (*models.Value, error)
+	FindAll(ctx mongo.SessionContext, infoID primitive.ObjectID, segID primitive.ObjectID,
 		page, size uint64, sorts []*content.Sort) ([]*models.Value, uint64, error)
 
-	DeleteAll(ctx mongo.SessionContext, infoID objectid.ObjectID, segID objectid.ObjectID) error
-	DeleteOne(ctx mongo.SessionContext, infoID objectid.ObjectID, segID objectid.ObjectID, id string) error
-	DeleteMany(ctx mongo.SessionContext, infoID objectid.ObjectID, segID objectid.ObjectID, ids []string) error
+	DeleteAll(ctx mongo.SessionContext, infoID primitive.ObjectID, segID primitive.ObjectID) error
+	DeleteOne(ctx mongo.SessionContext, infoID primitive.ObjectID, segID primitive.ObjectID, id string) error
+	DeleteMany(ctx mongo.SessionContext, infoID primitive.ObjectID, segID primitive.ObjectID, ids []string) error
 
-	Update(ctx mongo.SessionContext, infoID objectid.ObjectID, segID objectid.ObjectID,
+	Update(ctx mongo.SessionContext, infoID primitive.ObjectID, segID primitive.ObjectID,
 		id string, fields map[string]interface{}) error
 }
 
@@ -37,8 +37,8 @@ type valueRepository struct {
 	collections *mongo.Collection
 }
 
-func (repo *valueRepository) Insert(ctx mongo.SessionContext, infoID objectid.ObjectID,
-	segID objectid.ObjectID, value *models.Value) error {
+func (repo *valueRepository) Insert(ctx mongo.SessionContext, infoID primitive.ObjectID,
+	segID primitive.ObjectID, value *models.Value) error {
 	result := repo.collections.FindOne(ctx, bson.D{{"_id", segID}, {"infoID", infoID}})
 	if err := result.Decode(nil); err != nil {
 		return err
@@ -63,8 +63,8 @@ func (repo *valueRepository) Insert(ctx mongo.SessionContext, infoID objectid.Ob
 	return nil
 }
 
-func (repo *valueRepository) FindOne(ctx mongo.SessionContext, infoID objectid.ObjectID,
-	segID objectid.ObjectID, id string) (*models.Value, error) {
+func (repo *valueRepository) FindOne(ctx mongo.SessionContext, infoID primitive.ObjectID,
+	segID primitive.ObjectID, id string) (*models.Value, error) {
 	pipeline := mongo.Pipeline{
 		bson.D{{"$unwind", "$values"}},
 		bson.D{{"$match", bson.D{
@@ -96,7 +96,7 @@ func (repo *valueRepository) FindOne(ctx mongo.SessionContext, infoID objectid.O
 	}
 }
 
-func (repo *valueRepository) FindAll(ctx mongo.SessionContext, infoID objectid.ObjectID, segID objectid.ObjectID,
+func (repo *valueRepository) FindAll(ctx mongo.SessionContext, infoID primitive.ObjectID, segID primitive.ObjectID,
 	page, size uint64, sorts []*content.Sort) ([]*models.Value, uint64, error) {
 
 	seg := models.Segment{}
@@ -144,7 +144,7 @@ func (repo *valueRepository) FindAll(ctx mongo.SessionContext, infoID objectid.O
 	return items, totalCount, nil
 }
 
-func (repo *valueRepository) DeleteAll(ctx mongo.SessionContext, infoID objectid.ObjectID, segID objectid.ObjectID) error {
+func (repo *valueRepository) DeleteAll(ctx mongo.SessionContext, infoID primitive.ObjectID, segID primitive.ObjectID) error {
 	filter := bson.D{
 		{"_id", segID},
 		{"infoID", infoID},
@@ -167,7 +167,7 @@ func (repo *valueRepository) DeleteAll(ctx mongo.SessionContext, infoID objectid
 	}
 }
 
-func (repo *valueRepository) DeleteOne(ctx mongo.SessionContext, infoID objectid.ObjectID, segID objectid.ObjectID, id string) error {
+func (repo *valueRepository) DeleteOne(ctx mongo.SessionContext, infoID primitive.ObjectID, segID primitive.ObjectID, id string) error {
 	filter := bson.D{
 		{"_id", segID},
 		{"infoID", infoID},
@@ -190,7 +190,7 @@ func (repo *valueRepository) DeleteOne(ctx mongo.SessionContext, infoID objectid
 	}
 }
 
-func (repo *valueRepository) DeleteMany(ctx mongo.SessionContext, infoID objectid.ObjectID, segID objectid.ObjectID, ids []string) error {
+func (repo *valueRepository) DeleteMany(ctx mongo.SessionContext, infoID primitive.ObjectID, segID primitive.ObjectID, ids []string) error {
 	filter := bson.D{
 		{"_id", segID},
 		{"infoID", infoID},
@@ -213,7 +213,7 @@ func (repo *valueRepository) DeleteMany(ctx mongo.SessionContext, infoID objecti
 	}
 }
 
-func (repo *valueRepository) Update(ctx mongo.SessionContext, infoID objectid.ObjectID, segID objectid.ObjectID,
+func (repo *valueRepository) Update(ctx mongo.SessionContext, infoID primitive.ObjectID, segID primitive.ObjectID,
 	id string, fields map[string]interface{}) error {
 	filter := bson.D{
 		{"_id", segID},

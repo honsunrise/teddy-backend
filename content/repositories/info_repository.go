@@ -3,7 +3,7 @@ package repositories
 import (
 	"fmt"
 	"github.com/mongodb/mongo-go-driver/bson"
-	"github.com/mongodb/mongo-go-driver/bson/objectid"
+	"github.com/mongodb/mongo-go-driver/bson/primitive"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"teddy-backend/common/proto/content"
 	"teddy-backend/content/models"
@@ -12,13 +12,13 @@ import (
 
 type InfoRepository interface {
 	Insert(ctx mongo.SessionContext, info *models.Info) error
-	IncWatchCount(ctx mongo.SessionContext, id objectid.ObjectID, count int64) error
+	IncWatchCount(ctx mongo.SessionContext, id primitive.ObjectID, count int64) error
 	ExistsByTitleAndAuthorAndCountry(ctx mongo.SessionContext, title, author, country string) (bool, error)
-	FindOne(ctx mongo.SessionContext, id objectid.ObjectID) (*models.Info, error)
+	FindOne(ctx mongo.SessionContext, id primitive.ObjectID) (*models.Info, error)
 	FindAll(ctx mongo.SessionContext, uid, country string, startTime, endTime *time.Time, tags []*models.TypeAndTag,
 		page, size uint64, sorts []*content.Sort) ([]*models.Info, uint64, error)
-	Delete(ctx mongo.SessionContext, id objectid.ObjectID) error
-	Update(ctx mongo.SessionContext, id objectid.ObjectID, fields map[string]interface{}) error
+	Delete(ctx mongo.SessionContext, id primitive.ObjectID) error
+	Update(ctx mongo.SessionContext, id primitive.ObjectID, fields map[string]interface{}) error
 }
 
 func NewInfoRepository(client *mongo.Client) (InfoRepository, error) {
@@ -48,7 +48,7 @@ func (repo *infoRepository) ExistsByTitleAndAuthorAndCountry(ctx mongo.SessionCo
 }
 
 func (repo *infoRepository) Insert(ctx mongo.SessionContext, info *models.Info) error {
-	info.ID = objectid.New()
+	info.ID = primitive.NewObjectID()
 	_, err := repo.collections.InsertOne(ctx, info)
 	if err != nil {
 		return err
@@ -56,7 +56,7 @@ func (repo *infoRepository) Insert(ctx mongo.SessionContext, info *models.Info) 
 	return nil
 }
 
-func (repo *infoRepository) IncWatchCount(ctx mongo.SessionContext, id objectid.ObjectID, count int64) error {
+func (repo *infoRepository) IncWatchCount(ctx mongo.SessionContext, id primitive.ObjectID, count int64) error {
 	filter := bson.D{{"_id", id}}
 	update := bson.D{{"$inc", bson.D{{Key: "watchCount", Value: count}}}}
 	ur, err := repo.collections.UpdateOne(ctx, filter, update)
@@ -68,7 +68,7 @@ func (repo *infoRepository) IncWatchCount(ctx mongo.SessionContext, id objectid.
 	return nil
 }
 
-func (repo *infoRepository) FindOne(ctx mongo.SessionContext, id objectid.ObjectID) (*models.Info, error) {
+func (repo *infoRepository) FindOne(ctx mongo.SessionContext, id primitive.ObjectID) (*models.Info, error) {
 	var info models.Info
 	filter := bson.D{{"_id", id}}
 	err := repo.collections.FindOne(ctx, filter).Decode(&info)
@@ -170,7 +170,7 @@ func (repo *infoRepository) FindAll(ctx mongo.SessionContext, uid, country strin
 	return repo.internalFindInfo(ctx, uid, country, startTime, endTime, tags, page, size, sorts)
 }
 
-func (repo *infoRepository) Delete(ctx mongo.SessionContext, id objectid.ObjectID) error {
+func (repo *infoRepository) Delete(ctx mongo.SessionContext, id primitive.ObjectID) error {
 	filter := bson.D{{"_id", id}}
 	dr, err := repo.collections.DeleteOne(ctx, filter)
 	if err != nil {
@@ -181,7 +181,7 @@ func (repo *infoRepository) Delete(ctx mongo.SessionContext, id objectid.ObjectI
 	return nil
 }
 
-func (repo *infoRepository) Update(ctx mongo.SessionContext, id objectid.ObjectID, fields map[string]interface{}) error {
+func (repo *infoRepository) Update(ctx mongo.SessionContext, id primitive.ObjectID, fields map[string]interface{}) error {
 	filter := bson.D{{"_id", id}}
 	var bsonFields = make(bson.D, 0, len(fields))
 	for k, v := range fields {

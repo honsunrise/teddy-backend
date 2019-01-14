@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"github.com/mongodb/mongo-go-driver/bson"
-	"github.com/mongodb/mongo-go-driver/bson/objectid"
+	"github.com/mongodb/mongo-go-driver/bson/primitive"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"teddy-backend/common/proto/content"
 	"teddy-backend/content/models"
@@ -12,13 +12,13 @@ import (
 type TagRepository interface {
 	Insert(ctx mongo.SessionContext, tag *models.Tag) error
 	FindByTypeAndTag(ctx mongo.SessionContext, tp string, tag string) (*models.Tag, error)
-	FindOne(ctx mongo.SessionContext, id objectid.ObjectID) (*models.Tag, error)
+	FindOne(ctx mongo.SessionContext, id primitive.ObjectID) (*models.Tag, error)
 	FindAll(ctx mongo.SessionContext, tp string,
 		page, size uint64, sorts []*content.Sort) ([]*models.Tag, uint64, error)
-	IncUsage(ctx mongo.SessionContext, id objectid.ObjectID, inc int64) error
-	UpdateLastUse(ctx mongo.SessionContext, id objectid.ObjectID, lastUse time.Time) error
-	DeleteOne(ctx mongo.SessionContext, id objectid.ObjectID) error
-	DeleteMany(ctx mongo.SessionContext, ids []objectid.ObjectID) error
+	IncUsage(ctx mongo.SessionContext, id primitive.ObjectID, inc int64) error
+	UpdateLastUse(ctx mongo.SessionContext, id primitive.ObjectID, lastUse time.Time) error
+	DeleteOne(ctx mongo.SessionContext, id primitive.ObjectID) error
+	DeleteMany(ctx mongo.SessionContext, ids []primitive.ObjectID) error
 }
 
 func NewTagRepository(client *mongo.Client) (TagRepository, error) {
@@ -32,7 +32,7 @@ type tagRepository struct {
 }
 
 func (repo *tagRepository) Insert(ctx mongo.SessionContext, tag *models.Tag) error {
-	tag.ID = objectid.New()
+	tag.ID = primitive.NewObjectID()
 	_, err := repo.collections.InsertOne(ctx, tag)
 	if err != nil {
 		return err
@@ -51,7 +51,7 @@ func (repo *tagRepository) FindByTypeAndTag(ctx mongo.SessionContext, tp string,
 	return &tagEntry, nil
 }
 
-func (repo *tagRepository) FindOne(ctx mongo.SessionContext, id objectid.ObjectID) (*models.Tag, error) {
+func (repo *tagRepository) FindOne(ctx mongo.SessionContext, id primitive.ObjectID) (*models.Tag, error) {
 	var tagEntry models.Tag
 	filter := bson.D{{"_id", id}}
 	result := repo.collections.FindOne(ctx, filter)
@@ -130,7 +130,7 @@ func (repo *tagRepository) FindAll(ctx mongo.SessionContext, tp string,
 	return items, totalCount, nil
 }
 
-func (repo *tagRepository) IncUsage(ctx mongo.SessionContext, id objectid.ObjectID, inc int64) error {
+func (repo *tagRepository) IncUsage(ctx mongo.SessionContext, id primitive.ObjectID, inc int64) error {
 	filter := bson.D{{"_id", id}}
 	update := bson.D{{"$inc", bson.D{{Key: "usage", Value: inc}}}}
 	ur, err := repo.collections.UpdateOne(ctx, filter, update)
@@ -142,7 +142,7 @@ func (repo *tagRepository) IncUsage(ctx mongo.SessionContext, id objectid.Object
 	return nil
 }
 
-func (repo *tagRepository) UpdateLastUse(ctx mongo.SessionContext, id objectid.ObjectID, lastUse time.Time) error {
+func (repo *tagRepository) UpdateLastUse(ctx mongo.SessionContext, id primitive.ObjectID, lastUse time.Time) error {
 	filter := bson.D{{"_id", id}}
 	update := bson.D{{"$set", bson.D{{Key: "lastUseTime", Value: lastUse}}}}
 	ur, err := repo.collections.UpdateOne(ctx, filter, update)
@@ -154,7 +154,7 @@ func (repo *tagRepository) UpdateLastUse(ctx mongo.SessionContext, id objectid.O
 	return nil
 }
 
-func (repo *tagRepository) DeleteOne(ctx mongo.SessionContext, id objectid.ObjectID) error {
+func (repo *tagRepository) DeleteOne(ctx mongo.SessionContext, id primitive.ObjectID) error {
 	filter := bson.D{{"_id", id}}
 	_, err := repo.collections.DeleteOne(ctx, filter)
 	if err != nil {
@@ -163,7 +163,7 @@ func (repo *tagRepository) DeleteOne(ctx mongo.SessionContext, id objectid.Objec
 	return nil
 }
 
-func (repo *tagRepository) DeleteMany(ctx mongo.SessionContext, ids []objectid.ObjectID) error {
+func (repo *tagRepository) DeleteMany(ctx mongo.SessionContext, ids []primitive.ObjectID) error {
 	filter := bson.D{{"_id", bson.D{{"$in", ids}}}}
 	_, err := repo.collections.DeleteOne(ctx, filter)
 	if err != nil {

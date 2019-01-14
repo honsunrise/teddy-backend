@@ -4,7 +4,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/golang/protobuf/ptypes/timestamp"
-	"github.com/mongodb/mongo-go-driver/bson/objectid"
+	"github.com/mongodb/mongo-go-driver/bson/primitive"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/rs/xid"
 	log "github.com/sirupsen/logrus"
@@ -75,12 +75,12 @@ func (h *contentHandler) GetValue(ctx context.Context, req *content.ValueOneReq)
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.InfoID)
+	infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 	if err != nil {
 		return nil, err
 	}
 
-	segID, err := objectid.FromHex(req.SegID)
+	segID, err := primitive.ObjectIDFromHex(req.SegID)
 	if err != nil {
 		return nil, err
 	}
@@ -116,12 +116,12 @@ func (h *contentHandler) GetValues(ctx context.Context, req *content.GetValuesRe
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.InfoID)
+	infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 	if err != nil {
 		return nil, err
 	}
 
-	segID, err := objectid.FromHex(req.SegID)
+	segID, err := primitive.ObjectIDFromHex(req.SegID)
 	if err != nil {
 		return nil, err
 	}
@@ -157,12 +157,12 @@ func (h *contentHandler) InsertValue(ctx context.Context, req *content.InsertVal
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.InfoID)
+	infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 	if err != nil {
 		return nil, err
 	}
 
-	segID, err := objectid.FromHex(req.SegID)
+	segID, err := primitive.ObjectIDFromHex(req.SegID)
 	if err != nil {
 		return nil, err
 	}
@@ -219,12 +219,12 @@ func (h *contentHandler) EditValue(ctx context.Context, req *content.EditValueRe
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.InfoID)
+	infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 	if err != nil {
 		return nil, err
 	}
 
-	segID, err := objectid.FromHex(req.SegID)
+	segID, err := primitive.ObjectIDFromHex(req.SegID)
 	if err != nil {
 		return nil, err
 	}
@@ -283,12 +283,12 @@ func (h *contentHandler) DeleteValue(ctx context.Context, req *content.ValueOneR
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.InfoID)
+	infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 	if err != nil {
 		return nil, ErrInternal
 	}
 
-	segID, err := objectid.FromHex(req.SegID)
+	segID, err := primitive.ObjectIDFromHex(req.SegID)
 	if err != nil {
 		return nil, ErrInternal
 	}
@@ -314,7 +314,7 @@ func (h *contentHandler) GetSegments(ctx context.Context, req *content.GetSegmen
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.InfoID)
+	infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 	if err != nil {
 		return nil, err
 	}
@@ -350,12 +350,12 @@ func (h *contentHandler) GetSegment(ctx context.Context, req *content.SegmentOne
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.InfoID)
+	infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 	if err != nil {
 		return nil, err
 	}
 
-	segID, err := objectid.FromHex(req.SegID)
+	segID, err := primitive.ObjectIDFromHex(req.SegID)
 	if err != nil {
 		return nil, err
 	}
@@ -385,7 +385,7 @@ func (h *contentHandler) PublishSegment(ctx context.Context, req *content.Publis
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.InfoID)
+	infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 	if err != nil {
 		return nil, err
 	}
@@ -420,7 +420,7 @@ func (h *contentHandler) PublishSegment(ctx context.Context, req *content.Publis
 		}
 
 		segment := models.Segment{
-			ID:         objectid.New(),
+			ID:         primitive.NewObjectID(),
 			InfoID:     infoID,
 			No:         req.No,
 			Title:      req.Title,
@@ -450,12 +450,12 @@ func (h *contentHandler) EditSegment(ctx context.Context, req *content.EditSegme
 		return nil, err
 	}
 
-	segID, err := objectid.FromHex(req.SegID)
+	segID, err := primitive.ObjectIDFromHex(req.SegID)
 	if err != nil {
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.InfoID)
+	infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 	if err != nil {
 		return nil, err
 	}
@@ -524,12 +524,12 @@ func (h *contentHandler) DeleteSegment(ctx context.Context, req *content.Segment
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.InfoID)
+	infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 	if err != nil {
 		return nil, ErrInternal
 	}
 
-	segID, err := objectid.FromHex(req.SegID)
+	segID, err := primitive.ObjectIDFromHex(req.SegID)
 	if err != nil {
 		return nil, ErrInternal
 	}
@@ -586,7 +586,7 @@ func (h *contentHandler) GetTag(ctx context.Context, req *content.GetTagReq) (*c
 		return nil, err
 	}
 
-	tagID, err := objectid.FromHex(req.Id)
+	tagID, err := primitive.ObjectIDFromHex(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -666,7 +666,7 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *content.PublishIn
 		}
 
 		info := models.Info{
-			ID:               objectid.New(),
+			ID:               primitive.NewObjectID(),
 			UID:              req.Uid,
 			Title:            req.Title,
 			Author:           req.Author,
@@ -682,7 +682,7 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *content.PublishIn
 			CanReview:        req.CanReview,
 			Archived:         false,
 			ContentTime:      contentTime,
-			LatestSegmentID:  objectid.NilObjectID,
+			LatestSegmentID:  primitive.NilObjectID,
 			SegmentCount:     0,
 		}
 
@@ -701,22 +701,22 @@ func (h *contentHandler) PublishInfo(ctx context.Context, req *content.PublishIn
 	return &resp, nil
 }
 
-func difference(a, b []objectid.ObjectID) ([]objectid.ObjectID, []objectid.ObjectID) {
-	ma := map[objectid.ObjectID]bool{}
+func difference(a, b []primitive.ObjectID) ([]primitive.ObjectID, []primitive.ObjectID) {
+	ma := map[primitive.ObjectID]bool{}
 	for _, x := range a {
 		ma[x] = true
 	}
-	mb := map[objectid.ObjectID]bool{}
+	mb := map[primitive.ObjectID]bool{}
 	for _, x := range b {
 		mb[x] = true
 	}
-	ab := make([]objectid.ObjectID, 0, 20)
+	ab := make([]primitive.ObjectID, 0, 20)
 	for _, x := range a {
 		if _, ok := mb[x]; !ok {
 			ab = append(ab, x)
 		}
 	}
-	ba := make([]objectid.ObjectID, 0, 20)
+	ba := make([]primitive.ObjectID, 0, 20)
 	for _, x := range a {
 		if _, ok := mb[x]; !ok {
 			ab = append(ab, x)
@@ -731,7 +731,7 @@ func (h *contentHandler) EditInfo(ctx context.Context, req *content.EditInfoReq)
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.InfoID)
+	infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 	if err != nil {
 		return nil, err
 	}
@@ -760,7 +760,7 @@ func (h *contentHandler) EditInfo(ctx context.Context, req *content.EditInfoReq)
 			return err
 		}
 
-		curTagIDs := make([]objectid.ObjectID, 0, len(curInfo.Tags))
+		curTagIDs := make([]primitive.ObjectID, 0, len(curInfo.Tags))
 		for _, v := range curInfo.Tags {
 			result, err := h.tagRepo.FindByTypeAndTag(sessionContext, v.Type, v.Tag)
 			if err != nil {
@@ -770,7 +770,7 @@ func (h *contentHandler) EditInfo(ctx context.Context, req *content.EditInfoReq)
 			curTagIDs = append(curTagIDs, result.ID)
 		}
 
-		tagIDs := make([]objectid.ObjectID, 0, len(req.Tags))
+		tagIDs := make([]primitive.ObjectID, 0, len(req.Tags))
 		tags := make([]*models.TypeAndTag, 0, len(req.Tags))
 		for _, v := range req.Tags {
 			result, err := h.tagRepo.FindByTypeAndTag(sessionContext, v.Type, v.Tag)
@@ -958,7 +958,7 @@ func (h *contentHandler) GetInfo(ctx context.Context, req *content.GetInfoReq) (
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.InfoID)
+	infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 	if err != nil {
 		return nil, err
 	}
@@ -1050,7 +1050,7 @@ func (h *contentHandler) DeleteInfo(ctx context.Context, req *content.InfoOneReq
 
 	err := h.client.UseSession(ctx, func(sessionContext mongo.SessionContext) error {
 		var err error
-		infoID, err := objectid.FromHex(req.InfoID)
+		infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 		if err != nil {
 			return err
 		}
@@ -1077,7 +1077,7 @@ func (h *contentHandler) WatchInfo(ctx context.Context, req *content.InfoOneReq)
 
 	err := h.client.UseSession(ctx, func(sessionContext mongo.SessionContext) error {
 		var err error
-		infoID, err := objectid.FromHex(req.InfoID)
+		infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 		if err != nil {
 			return err
 		}
@@ -1104,7 +1104,7 @@ func (h *contentHandler) _behaviorInsert(ctx context.Context,
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.InfoID)
+	infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 	if err != nil {
 		return nil, err
 	}
@@ -1191,7 +1191,7 @@ func (h *contentHandler) _behaviorFindUserByInfo(ctx context.Context,
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.InfoID)
+	infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 	if err != nil {
 		return nil, err
 	}
@@ -1231,7 +1231,7 @@ func (h *contentHandler) _behaviorDelete(ctx context.Context,
 		return nil, err
 	}
 
-	infoID, err := objectid.FromHex(req.InfoID)
+	infoID, err := primitive.ObjectIDFromHex(req.InfoID)
 	if err != nil {
 		return nil, err
 	}
