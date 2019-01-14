@@ -1,8 +1,8 @@
 package env
 
 import (
-	"github.com/zhsyourai/teddy-backend/common/config"
 	"strings"
+	"teddy-backend/common/config"
 )
 
 type strippedPrefixKey struct{}

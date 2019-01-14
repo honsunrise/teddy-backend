@@ -2,8 +2,8 @@ package server
 
 import (
 	"github.com/golang/protobuf/ptypes/timestamp"
-	"github.com/zhsyourai/teddy-backend/common/proto/message"
-	"github.com/zhsyourai/teddy-backend/message/models"
+	"teddy-backend/common/proto/message"
+	"teddy-backend/message/models"
 )
 
 func copyFromInBoxItemToPBInBoxItem(item *models.InBoxItem, pbitem *message.InBoxItem) {

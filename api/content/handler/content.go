@@ -7,11 +7,11 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/minio/minio-go"
-	"github.com/zhsyourai/teddy-backend/api/clients"
-	"github.com/zhsyourai/teddy-backend/common/gin_jwt"
-	"github.com/zhsyourai/teddy-backend/common/proto/content"
 	"net/http"
 	"strings"
+	"teddy-backend/api/clients"
+	"teddy-backend/common/gin_jwt"
+	"teddy-backend/common/proto/content"
 	"time"
 )
 

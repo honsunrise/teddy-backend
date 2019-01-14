@@ -2,8 +2,8 @@ package server
 
 import (
 	"github.com/golang/protobuf/ptypes"
-	"github.com/zhsyourai/teddy-backend/common/proto/uaa"
-	"github.com/zhsyourai/teddy-backend/uaa/models"
+	"teddy-backend/common/proto/uaa"
+	"teddy-backend/uaa/models"
 )
 
 func copyFromAccountToPBAccount(acc *models.Account, pbacc *uaa.Account) error {

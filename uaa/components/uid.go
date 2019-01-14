@@ -1,8 +1,8 @@
 package components
 
 import (
-	"github.com/zhsyourai/teddy-backend/uaa/repositories"
 	"math/rand"
+	"teddy-backend/uaa/repositories"
 )
 
 type UidGenerator interface {

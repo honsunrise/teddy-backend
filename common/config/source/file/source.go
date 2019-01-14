@@ -2,12 +2,12 @@
 package file
 
 import (
-	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/common/config/coder/json"
-	"github.com/zhsyourai/teddy-backend/common/config/coder/yaml"
 	"io/ioutil"
 	"os"
 	"path"
+	"teddy-backend/common/config"
+	"teddy-backend/common/config/coder/json"
+	"teddy-backend/common/config/coder/yaml"
 	"time"
 )
 

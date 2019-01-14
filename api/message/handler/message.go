@@ -5,10 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/prometheus/common/log"
-	"github.com/zhsyourai/teddy-backend/api/clients"
-	"github.com/zhsyourai/teddy-backend/common/proto/message"
-	"github.com/zhsyourai/teddy-backend/common/types"
 	"net/http"
+	"teddy-backend/api/clients"
+	"teddy-backend/common/proto/message"
+	"teddy-backend/common/types"
 	"time"
 )
 

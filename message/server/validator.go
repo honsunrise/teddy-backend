@@ -1,6 +1,6 @@
 package server
 
-import "github.com/zhsyourai/teddy-backend/common/proto/message"
+import "teddy-backend/common/proto/message"
 
 func validateSendEmailReq(req *message.SendEmailReq) error {
 	return nil

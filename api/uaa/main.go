@@ -8,16 +8,16 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/api/clients"
-	"github.com/zhsyourai/teddy-backend/api/uaa/handler"
-	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/common/config/source/file"
-	"github.com/zhsyourai/teddy-backend/common/gin_jwt"
-	"github.com/zhsyourai/teddy-backend/common/grpcadapter"
-	"github.com/zhsyourai/teddy-backend/common/nice_error"
 	"golang.org/x/sync/errgroup"
 	"io/ioutil"
 	"net/http"
+	"teddy-backend/api/clients"
+	"teddy-backend/api/uaa/handler"
+	"teddy-backend/common/config"
+	"teddy-backend/common/config/source/file"
+	"teddy-backend/common/gin_jwt"
+	"teddy-backend/common/grpcadapter"
+	"teddy-backend/common/nice_error"
 	"time"
 )
 
@@ -115,7 +115,6 @@ func main() {
 	router.Use(clients.UaaNew(uaaSrvDomain))
 	router.Use(clients.CaptchaNew(captchaSrvDomain))
 	router.Use(nice_error.NewNiceError())
-
 	uaa.HandlerNormal(router.Group("/v1/anon/uaa").Use(jwtMiddleware.Handler()))
 	uaa.HandlerAuth(router.Group("/v1/auth/uaa").Use(jwtMiddleware.Handler()))
 	uaa.HandlerHealth(router)

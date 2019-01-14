@@ -1,9 +1,9 @@
 package server
 
 import (
-	"github.com/zhsyourai/teddy-backend/common/proto/captcha"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"teddy-backend/common/proto/captcha"
 )
 
 func validateGetCaptchaIdReq(req *captcha.GetCaptchaIdReq) error {

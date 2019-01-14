@@ -2,15 +2,15 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/zhsyourai/teddy-backend/api/clients"
-	"github.com/zhsyourai/teddy-backend/api/errors"
-	"github.com/zhsyourai/teddy-backend/common/gin_jwt"
-	"github.com/zhsyourai/teddy-backend/common/proto/captcha"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"net/http"
 	"path"
 	"strings"
+	"teddy-backend/api/clients"
+	"teddy-backend/api/errors"
+	"teddy-backend/common/gin_jwt"
+	"teddy-backend/common/proto/captcha"
 )
 
 type Base struct {

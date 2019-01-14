@@ -5,12 +5,12 @@ import (
 	"encoding/hex"
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go"
-	"github.com/zhsyourai/teddy-backend/common/proto/content"
 	"io"
 	"mime/multipart"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"teddy-backend/common/proto/content"
 )
 
 func buildTags(tag string) ([]*content.TagAndType, error) {

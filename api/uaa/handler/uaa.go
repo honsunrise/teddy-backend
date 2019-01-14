@@ -7,12 +7,12 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/api/clients"
-	"github.com/zhsyourai/teddy-backend/common/gin_jwt"
-	"github.com/zhsyourai/teddy-backend/common/proto/captcha"
-	"github.com/zhsyourai/teddy-backend/common/proto/message"
-	"github.com/zhsyourai/teddy-backend/common/proto/uaa"
 	"net/http"
+	"teddy-backend/api/clients"
+	"teddy-backend/common/gin_jwt"
+	"teddy-backend/common/proto/captcha"
+	"teddy-backend/common/proto/message"
+	"teddy-backend/common/proto/uaa"
 	"time"
 )
 

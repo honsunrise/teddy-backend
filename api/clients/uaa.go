@@ -2,10 +2,10 @@ package clients
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/zhsyourai/teddy-backend/api/errors"
-	"github.com/zhsyourai/teddy-backend/common/proto/uaa"
 	"google.golang.org/grpc"
 	"sync"
+	"teddy-backend/api/errors"
+	"teddy-backend/common/proto/uaa"
 )
 
 var uaaKey = "__teddy_uaa_client_key__"

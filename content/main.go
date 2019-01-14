@@ -4,17 +4,17 @@ import (
 	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/common/config/source/file"
-	"github.com/zhsyourai/teddy-backend/common/proto/content"
-	"github.com/zhsyourai/teddy-backend/content/server"
 	"google.golang.org/grpc"
 	grpcHealth "google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"net"
+	"teddy-backend/common/config/source/file"
+	"teddy-backend/common/proto/content"
+	"teddy-backend/content/server"
 
 	"context"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/zhsyourai/teddy-backend/common/config"
+	"teddy-backend/common/config"
 )
 
 func init() {

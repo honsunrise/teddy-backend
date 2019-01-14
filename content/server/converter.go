@@ -2,8 +2,8 @@ package server
 
 import (
 	"github.com/golang/protobuf/ptypes"
-	"github.com/zhsyourai/teddy-backend/common/proto/content"
-	"github.com/zhsyourai/teddy-backend/content/models"
+	"teddy-backend/common/proto/content"
+	"teddy-backend/content/models"
 )
 
 func copyFromTagToPBTag(tag *models.Tag, pbTag *content.TagResp) error {

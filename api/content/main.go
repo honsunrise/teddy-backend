@@ -7,15 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/api/clients"
-	"github.com/zhsyourai/teddy-backend/api/content/handler"
-	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/common/config/source/file"
-	"github.com/zhsyourai/teddy-backend/common/gin_jwt"
-	"github.com/zhsyourai/teddy-backend/common/grpcadapter"
-	"github.com/zhsyourai/teddy-backend/common/nice_error"
 	"golang.org/x/sync/errgroup"
 	"net/http"
+	"teddy-backend/api/clients"
+	"teddy-backend/api/content/handler"
+	"teddy-backend/common/config"
+	"teddy-backend/common/config/source/file"
+	"teddy-backend/common/gin_jwt"
+	"teddy-backend/common/grpcadapter"
+	"teddy-backend/common/nice_error"
 	"time"
 )
 
@@ -95,7 +95,6 @@ func main() {
 	router.Use(clients.ContentNew(contentSrvDomain))
 	router.Use(clients.CaptchaNew(captchaSrvDomain))
 	router.Use(nice_error.NewNiceError())
-	router.Use(jwtMiddleware.Handler())
 	content.HandlerNormal(router.Group("/v1/anon/content").Use(jwtMiddleware.Handler()))
 	content.HandlerAuth(router.Group("/v1/auth/content").Use(jwtMiddleware.Handler()))
 	content.HandlerHealth(router)

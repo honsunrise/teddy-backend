@@ -2,9 +2,9 @@ package commands
 
 import (
 	"fmt"
-	"github.com/zhsyourai/teddy-backend/cli/version"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"os"
+	"teddy-backend/cli/version"
 )
 
 var app = kingpin.New("teddy-cli", "Teddy backend command line tools")

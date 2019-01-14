@@ -4,8 +4,8 @@ import (
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/zhsyourai/teddy-backend/common/proto/content"
-	"github.com/zhsyourai/teddy-backend/content/models"
+	"teddy-backend/common/proto/content"
+	"teddy-backend/content/models"
 	"time"
 )
 

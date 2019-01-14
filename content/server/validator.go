@@ -1,6 +1,6 @@
 package server
 
-import "github.com/zhsyourai/teddy-backend/common/proto/content"
+import "teddy-backend/common/proto/content"
 
 func validatePublishInfoReq(req *content.PublishInfoReq) error {
 	if req.Uid == "" {

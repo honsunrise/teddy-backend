@@ -8,10 +8,10 @@ import (
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/rs/xid"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/common/proto/content"
-	"github.com/zhsyourai/teddy-backend/content/models"
-	"github.com/zhsyourai/teddy-backend/content/repositories"
 	"golang.org/x/net/context"
+	"teddy-backend/common/proto/content"
+	"teddy-backend/content/models"
+	"teddy-backend/content/repositories"
 	"time"
 )
 

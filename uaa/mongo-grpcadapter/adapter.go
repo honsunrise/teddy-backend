@@ -7,7 +7,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/zhsyourai/teddy-backend/common/grpcadapter"
+	"teddy-backend/common/grpcadapter"
 )
 
 // CasbinRule represents a rule in Casbin.

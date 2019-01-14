@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/zhsyourai/teddy-backend/common/proto/uaa"
+	"teddy-backend/common/proto/uaa"
 )
 
 func validateRegisterNormalReq(req *uaa.RegisterNormalReq) error {

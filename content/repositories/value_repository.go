@@ -6,8 +6,8 @@ import (
 	"github.com/mongodb/mongo-go-driver/bson/objectid"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/mongodb/mongo-go-driver/options"
-	"github.com/zhsyourai/teddy-backend/common/proto/content"
-	"github.com/zhsyourai/teddy-backend/content/models"
+	"teddy-backend/common/proto/content"
+	"teddy-backend/content/models"
 )
 
 type ValueRepository interface {

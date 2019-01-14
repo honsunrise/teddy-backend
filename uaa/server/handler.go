@@ -7,11 +7,11 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/common/proto/uaa"
-	"github.com/zhsyourai/teddy-backend/uaa/components"
-	"github.com/zhsyourai/teddy-backend/uaa/models"
-	"github.com/zhsyourai/teddy-backend/uaa/repositories"
 	"golang.org/x/crypto/bcrypt"
+	"teddy-backend/common/proto/uaa"
+	"teddy-backend/uaa/components"
+	"teddy-backend/uaa/models"
+	"teddy-backend/uaa/repositories"
 	"time"
 )
 

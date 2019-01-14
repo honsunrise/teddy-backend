@@ -5,11 +5,11 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/rs/xid"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/common/proto/message"
-	"github.com/zhsyourai/teddy-backend/message/models"
-	"github.com/zhsyourai/teddy-backend/message/repositories"
 	"gopkg.in/gomail.v2"
 	"sync"
+	"teddy-backend/common/proto/message"
+	"teddy-backend/message/models"
+	"teddy-backend/message/repositories"
 	"time"
 )
 

@@ -1,7 +1,7 @@
 package file
 
 import (
-	"github.com/zhsyourai/teddy-backend/common/config"
+	"teddy-backend/common/config"
 )
 
 type filePathKey struct{}

@@ -6,10 +6,10 @@ import (
 	"github.com/dchest/captcha"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/captcha/models"
-	"github.com/zhsyourai/teddy-backend/captcha/repositories"
-	captchaProto "github.com/zhsyourai/teddy-backend/common/proto/captcha"
 	"math/rand"
+	"teddy-backend/captcha/models"
+	"teddy-backend/captcha/repositories"
+	captchaProto "teddy-backend/common/proto/captcha"
 	"time"
 )
 

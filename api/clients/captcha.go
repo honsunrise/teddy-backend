@@ -2,10 +2,10 @@ package clients
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/zhsyourai/teddy-backend/api/errors"
-	"github.com/zhsyourai/teddy-backend/common/proto/captcha"
 	"google.golang.org/grpc"
 	"sync"
+	"teddy-backend/api/errors"
+	"teddy-backend/common/proto/captcha"
 )
 
 var captchaKey = "__teddy_captcha_client_key__"

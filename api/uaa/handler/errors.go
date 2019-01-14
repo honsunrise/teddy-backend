@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/zhsyourai/teddy-backend/common/nice_error"
 	"net/http"
+	"teddy-backend/common/nice_error"
 )
 
 var ErrCaptchaNotCorrect = nice_error.DefineNiceError(http.StatusBadRequest,

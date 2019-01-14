@@ -5,15 +5,15 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/api/base/handler"
-	"github.com/zhsyourai/teddy-backend/api/clients"
-	"github.com/zhsyourai/teddy-backend/api/errors"
-	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/common/config/source/file"
-	"github.com/zhsyourai/teddy-backend/common/gin_jwt"
-	"github.com/zhsyourai/teddy-backend/common/grpcadapter"
 	"golang.org/x/sync/errgroup"
 	"net/http"
+	"teddy-backend/api/base/handler"
+	"teddy-backend/api/clients"
+	"teddy-backend/api/errors"
+	"teddy-backend/common/config"
+	"teddy-backend/common/config/source/file"
+	"teddy-backend/common/gin_jwt"
+	"teddy-backend/common/grpcadapter"
 	"time"
 )
 
@@ -52,11 +52,13 @@ func main() {
 			"base",
 		},
 		ErrorHandler: func(ctx *gin.Context, err error) {
-			ctx.Header("WWW-Authenticate", "JWT realm="+config.Realm)
+			ctx.Header("WWW-Authenticate", "JWT realm=base.teddy.com")
 			if err == gin_jwt.ErrForbidden {
 				errors.AbortWithErrorJSON(ctx, errors.ErrForbidden)
 			} else if err == gin_jwt.ErrTokenInvalid {
 				errors.AbortWithErrorJSON(ctx, errors.ErrUnauthorized)
+			} else if err == gin_jwt.ErrInvalidKey {
+				errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 			} else {
 				errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 			}

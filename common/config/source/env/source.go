@@ -2,9 +2,9 @@ package env
 
 import (
 	"github.com/imdario/mergo"
-	"github.com/zhsyourai/teddy-backend/common/config"
 	"os"
 	"strings"
+	"teddy-backend/common/config"
 	"time"
 )
 

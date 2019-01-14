@@ -3,18 +3,18 @@ package main
 import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
-	"github.com/zhsyourai/teddy-backend/common/config/source/file"
 	"google.golang.org/grpc"
 	grpcHealth "google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"net"
+	"teddy-backend/common/config/source/file"
 
 	"context"
 	"github.com/mongodb/mongo-go-driver/mongo"
-	"github.com/zhsyourai/teddy-backend/captcha/repositories"
-	"github.com/zhsyourai/teddy-backend/captcha/server"
-	"github.com/zhsyourai/teddy-backend/common/config"
-	"github.com/zhsyourai/teddy-backend/common/proto/captcha"
+	"teddy-backend/captcha/repositories"
+	"teddy-backend/captcha/server"
+	"teddy-backend/common/config"
+	"teddy-backend/common/proto/captcha"
 )
 
 func init() {
