@@ -2,7 +2,7 @@ package yaml
 
 import (
 	"github.com/ghodss/yaml"
-	"teddy-backend/common/config"
+	"teddy-backend/pkg/config"
 )
 
 type yamlEncoder struct{}

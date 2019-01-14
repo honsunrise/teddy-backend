@@ -7,4 +7,7 @@ const (
 	ErrCodeForbidden
 	ErrCodeCaptchaIDNotFound
 	ErrCodeCaptchaExtNotSupport
+	ErrCodeCaptchaNotCorrect
+	ErrCodeRegisterTypeNotSupport
+	ErrCodeAccountExists
 )

@@ -10,10 +10,10 @@ import (
 	"teddy-backend/api/base/handler"
 	"teddy-backend/api/clients"
 	"teddy-backend/api/errors"
-	"teddy-backend/common/config"
-	"teddy-backend/common/config/source/file"
 	"teddy-backend/common/gin_jwt"
-	"teddy-backend/common/grpcadapter"
+	"teddy-backend/pkg/config"
+	"teddy-backend/pkg/config/source/file"
+	"teddy-backend/pkg/grpcadapter"
 	"time"
 )
 

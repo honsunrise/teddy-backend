@@ -21,3 +21,12 @@ var ErrCaptchaIDNotFound = DefineCodeError(http.StatusNotFound, ErrCodeCaptchaID
 
 var ErrCaptchaExtNotSupport = DefineCodeError(http.StatusBadRequest, ErrCodeCaptchaExtNotSupport,
 	"captcha format not support")
+
+var ErrCaptchaNotCorrect = DefineCodeError(http.StatusBadRequest, ErrCodeCaptchaNotCorrect,
+	"correct not correct, please check again")
+
+var ErrRegisterTypeNotSupport = DefineCodeError(http.StatusNotFound, ErrCodeRegisterTypeNotSupport,
+	"register type mistake, please check your request")
+
+var ErrAccountExists = DefineCodeError(http.StatusBadRequest, ErrCodeAccountExists,
+	"account has been register, please check your request")

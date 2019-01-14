@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"teddy-backend/common/config"
-	"teddy-backend/common/config/coder/json"
-	"teddy-backend/common/config/coder/yaml"
+	"teddy-backend/pkg/config"
+	"teddy-backend/pkg/config/coder/json"
+	"teddy-backend/pkg/config/coder/yaml"
 	"time"
 )
 

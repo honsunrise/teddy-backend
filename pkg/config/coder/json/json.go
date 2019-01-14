@@ -2,7 +2,7 @@ package json
 
 import (
 	"encoding/json"
-	"teddy-backend/common/config"
+	"teddy-backend/pkg/config"
 )
 
 type jsonEncoder struct{}

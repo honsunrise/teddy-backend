@@ -1,7 +1,7 @@
 package file
 
 import (
-	"teddy-backend/common/config"
+	"teddy-backend/pkg/config"
 )
 
 type filePathKey struct{}

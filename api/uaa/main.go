@@ -13,11 +13,10 @@ import (
 	"net/http"
 	"teddy-backend/api/clients"
 	"teddy-backend/api/uaa/handler"
-	"teddy-backend/common/config"
-	"teddy-backend/common/config/source/file"
 	"teddy-backend/common/gin_jwt"
-	"teddy-backend/common/grpcadapter"
-	"teddy-backend/common/nice_error"
+	"teddy-backend/pkg/config"
+	"teddy-backend/pkg/config/source/file"
+	"teddy-backend/pkg/grpcadapter"
 	"time"
 )
 
@@ -114,7 +113,7 @@ func main() {
 	router.Use(clients.MessageNew(messageSrvDomain))
 	router.Use(clients.UaaNew(uaaSrvDomain))
 	router.Use(clients.CaptchaNew(captchaSrvDomain))
-	router.Use(nice_error.NewNiceError())
+
 	uaa.HandlerNormal(router.Group("/v1/anon/uaa").Use(jwtMiddleware.Handler()))
 	uaa.HandlerAuth(router.Group("/v1/auth/uaa").Use(jwtMiddleware.Handler()))
 	uaa.HandlerHealth(router)

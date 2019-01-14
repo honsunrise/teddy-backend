@@ -9,6 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"teddy-backend/api/clients"
+	"teddy-backend/api/errors"
 	"teddy-backend/common/gin_jwt"
 	"teddy-backend/common/proto/captcha"
 	"teddy-backend/common/proto/message"
@@ -82,11 +83,11 @@ func (h *Uaa) Register(ctx *gin.Context) {
 				Code: body.Captcha,
 			})
 			if err != nil || !rsp.Correct {
-				ctx.Error(ErrCaptchaNotCorrect).SetType(gin.ErrorTypePublic)
+				errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaNotCorrect)
 				return
 			}
 		} else {
-			ctx.Error(ErrCaptchaNotCorrect).SetType(gin.ErrorTypePublic)
+			errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaNotCorrect)
 			return
 		}
 
@@ -132,7 +133,8 @@ func (h *Uaa) Register(ctx *gin.Context) {
 			SendTime: ptypes.TimestampNow(),
 		})
 	} else {
-		ctx.Error(ErrRegisterTypeNotSupport).SetType(gin.ErrorTypePublic)
+		errors.AbortWithErrorJSON(ctx, errors.ErrRegisterTypeNotSupport)
+		return
 	}
 }
 
@@ -210,8 +212,7 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 	})
 
 	if err != nil || !rsp.Correct {
-		log.Error(ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusInternalServerError, ErrCaptchaNotCorrect)
+		errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaNotCorrect)
 		return
 	}
 
@@ -256,7 +257,7 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	})
 
 	if err == nil && tmpAccount != nil {
-		ctx.Error(ErrAccountExists).SetType(gin.ErrorTypePublic)
+		errors.AbortWithErrorJSON(ctx, errors.ErrAccountExists)
 		return
 	}
 
@@ -269,8 +270,7 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	})
 
 	if err != nil || !rsp.Correct {
-		log.Error(ErrCaptchaNotCorrect)
-		ctx.AbortWithError(http.StatusBadRequest, ErrCaptchaNotCorrect)
+		errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaNotCorrect)
 		return
 	}
 
