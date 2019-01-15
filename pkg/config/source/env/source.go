@@ -4,7 +4,7 @@ import (
 	"github.com/imdario/mergo"
 	"os"
 	"strings"
-	"teddy-backend/common/config"
+	"teddy-backend/internal/config"
 	"time"
 )
 

@@ -1,21 +1,24 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -h "$SOURCE" ]] ; do SOURCE="$(readlink "$SOURCE")"; done
+DIR="$( cd -P "$( dirname "$SOURCE" )/.." && pwd )"
 
-pushd uaa
+pushd "$DIR/uaa"
 make build
-popd
+popd > /dev/null
 
-pushd message
+pushd "$DIR/message"
 make build
-popd
+popd > /dev/null
 
-pushd content
+pushd "$DIR/content"
 make build
-popd
+popd > /dev/null
 
-pushd captcha
+pushd "$DIR/captcha"
 make build
-popd
+popd > /dev/null
 
 pushd api/uaa
 make build

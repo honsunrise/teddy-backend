@@ -2,7 +2,7 @@ package env
 
 import (
 	"strings"
-	"teddy-backend/common/config"
+	"teddy-backend/internal/config"
 )
 
 type strippedPrefixKey struct{}
