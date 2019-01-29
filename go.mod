@@ -33,7 +33,6 @@ require (
 	golang.org/x/net v0.0.0-20190110200230-915654e7eabc
 	golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4
 	google.golang.org/grpc v1.17.0
-	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/ini.v1 v1.41.0 // indirect

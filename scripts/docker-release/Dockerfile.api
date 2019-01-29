@@ -1,0 +1,8 @@
+FROM alpine:latest
+
+ARG TEDDY_CMD=UNSPECIFIED
+
+RUN mkdir /app
+WORKDIR /app
+COPY ${TEDDY_CMD} .
+ENTRYPOINT [ "/app/${TEDDY_CMD}" ]

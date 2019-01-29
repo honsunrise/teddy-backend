@@ -1,0 +1,14 @@
+FROM alpine:latest
+
+ARG TEDDY_CMD=UNSPECIFIED
+
+RUN apk update && \
+    apk add ca-certificates wget && \
+    update-ca-certificates
+RUN GRPC_HEALTH_PROBE_VERSION=v0.2.0 && \
+    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
+    chmod +x /bin/grpc_health_probe
+RUN mkdir /app
+WORKDIR /app
+COPY ${TEDDY_CMD} .
+ENTRYPOINT [ "/app/${TEDDY_CMD}" ]

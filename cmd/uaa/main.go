@@ -10,13 +10,13 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"net"
 	"teddy-backend/internal/components"
-	"teddy-backend/internal/mongo-grpcadapter"
 	uaaProto "teddy-backend/internal/proto/uaa"
 	"teddy-backend/internal/repositories"
 	"teddy-backend/internal/server/uaa"
 	"teddy-backend/pkg/config"
 	"teddy-backend/pkg/config/source/file"
 	"teddy-backend/pkg/grpcadapter"
+	"teddy-backend/pkg/mongo-grpcadapter"
 )
 
 func init() {
