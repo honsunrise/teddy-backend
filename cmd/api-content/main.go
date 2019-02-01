@@ -9,6 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 	"net/http"
+	"os"
 	"teddy-backend/internal/clients"
 	"teddy-backend/internal/gin_jwt"
 	"teddy-backend/internal/handler/content"
@@ -27,6 +28,8 @@ const contentSrvDomain = "dns:///srv-content:9091"
 const uaaSrvDomain = "dns:///srv-uaa:9093"
 
 func init() {
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.InfoLevel)
 	log.SetReportCaller(true)
 }
 

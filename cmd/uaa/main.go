@@ -9,6 +9,7 @@ import (
 	grpcHealth "google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"net"
+	"os"
 	"teddy-backend/internal/components"
 	uaaProto "teddy-backend/internal/proto/uaa"
 	"teddy-backend/internal/repositories"
@@ -20,6 +21,8 @@ import (
 )
 
 func init() {
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.InfoLevel)
 	log.SetReportCaller(true)
 }
 

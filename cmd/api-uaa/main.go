@@ -11,6 +11,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"teddy-backend/internal/clients"
 	"teddy-backend/internal/gin_jwt"
 	"teddy-backend/internal/handler/uaa"
@@ -29,6 +30,8 @@ const messageSrvDomain = "dns:///srv-message:9092"
 const uaaSrvDomain = "dns:///srv-uaa:9093"
 
 func init() {
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.InfoLevel)
 	log.SetReportCaller(true)
 }
 

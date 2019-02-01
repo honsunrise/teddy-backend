@@ -1,6 +1,9 @@
 package errors
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
+)
 
 type Error struct {
 	traceID  interface{}
@@ -26,6 +29,8 @@ func DefineCodeError(httpCode, code int, text string) *Error {
 }
 
 func AbortWithErrorJSON(ctx *gin.Context, err *Error) {
+	log.Error(err)
+
 	if err.traceID != nil {
 		ctx.AbortWithStatusJSON(err.httpCode, gin.H{
 			"code":    err.code,
