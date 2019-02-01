@@ -33,6 +33,8 @@ services:
       - MONGODB_PRIMARY_PORT_NUMBER=27017
 
   mongo-cli:
+    networks:
+      - overlay
     image: 'bitnami/mongodb:latest'
 
   minio:
