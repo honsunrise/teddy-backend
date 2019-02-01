@@ -16,10 +16,13 @@ services:
       - overlay
     depends_on:
       - mongodb-primary
+    deploy:
+      replicas: 1
     environment:
       - MONGODB_REPLICA_SET_MODE=secondary
       - MONGODB_PRIMARY_HOST=mongodb-primary
       - MONGODB_PRIMARY_PORT_NUMBER=27017
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-secondary
 
   mongodb-arbiter:
     image: 'bitnami/mongodb:latest'
