@@ -107,6 +107,8 @@ func (h *Uaa) Register(ctx *gin.Context) {
 			return
 		}
 
+		h.middle.AddUser(response.Uid, "user")
+
 		ctx.JSON(http.StatusOK, gin.H{
 			"uid":   response.Uid,
 			"roles": response.Roles,

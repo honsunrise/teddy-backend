@@ -87,8 +87,3 @@ db.casbin_rule.insert({ptype: "p", v0: "user", v1: "/v1/auth/content/thumbDown/i
 db.casbin_rule.insert({ptype: "p", v0: "user", v1: "/v1/auth/content/thumbDown/info/:id", v2: "DELETE"});
 
 // for admin group
-
-// user groups
-db.casbin_rule.insert({ptype: "g", v0: "6887778051", v1: "user"});
-db.casbin_rule.insert({ptype: "g", v0: "5187196715", v1: "user"});
-db.casbin_rule.insert({ptype: "g", v0: "3378493719", v1: "user"});

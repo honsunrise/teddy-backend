@@ -36,7 +36,7 @@ type JwtMiddleware struct {
 	subject  string
 	id       string
 	adapter  persist.Adapter
-	enforcer *casbin.Enforcer
+	enforcer *casbin.SyncedEnforcer
 }
 
 func NewGinJwtMiddleware(config MiddlewareConfig, adapter persist.Adapter) (*JwtMiddleware, error) {
@@ -73,7 +73,7 @@ func NewGinJwtMiddleware(config MiddlewareConfig, adapter persist.Adapter) (*Jwt
 		config.ContextKey = DefaultContextKey
 	}
 
-	enforcer, err := casbin.NewEnforcerSafe(casbin.NewModel(CasbinModel), adapter)
+	enforcer, err := casbin.NewSyncedEnforcerSafe(casbin.NewModel(CasbinModel), adapter)
 	if err != nil {
 		return nil, err
 	}
@@ -109,6 +109,11 @@ func (m *JwtMiddleware) Handler() gin.HandlerFunc {
 
 		ctx.Set(m.config.ContextKey, token)
 	}
+}
+
+func (m *JwtMiddleware) AddUser(uid string) error {
+	m.enforcer.AddRoleForUser(uid, "user")
+	return nil
 }
 
 func (m *JwtMiddleware) ExtractClaims(ctx *gin.Context, key string) interface{} {
