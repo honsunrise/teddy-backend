@@ -7,6 +7,12 @@ import (
 var ErrUnknown = DefineCodeError(http.StatusInternalServerError, ErrCodeUnknown,
 	"unknown error")
 
+var ErrBadRequest = DefineCodeError(http.StatusBadRequest, ErrCodeBadRequest,
+	"bad request")
+
+var ErrUsernameOrPasswordNotCorrect = DefineCodeError(http.StatusUnauthorized, ErrCodeUsernameOrPasswordNotCorrect,
+	"username or password not correct")
+
 var ErrGRPCDial = DefineCodeError(http.StatusInternalServerError, ErrCodeInternal,
 	"internal error, try again latter")
 
@@ -23,7 +29,7 @@ var ErrCaptchaExtNotSupport = DefineCodeError(http.StatusBadRequest, ErrCodeCapt
 	"captcha format not support")
 
 var ErrCaptchaNotCorrect = DefineCodeError(http.StatusBadRequest, ErrCodeCaptchaNotCorrect,
-	"correct not correct, please check again")
+	"captcha not correct, please check again")
 
 var ErrRegisterTypeNotSupport = DefineCodeError(http.StatusNotFound, ErrCodeRegisterTypeNotSupport,
 	"register type mistake, please check your request")

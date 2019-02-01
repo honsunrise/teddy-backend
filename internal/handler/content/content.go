@@ -11,6 +11,7 @@ import (
 	"strings"
 	"teddy-backend/internal/clients"
 	"teddy-backend/internal/gin_jwt"
+	"teddy-backend/internal/handler/errors"
 	"teddy-backend/internal/proto/content"
 	"time"
 )
@@ -104,7 +105,7 @@ func (h *Content) GetTags(ctx *gin.Context) {
 
 	page, size, sorts, err := extractPageSizeSort(ctx)
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -115,13 +116,13 @@ func (h *Content) GetTags(ctx *gin.Context) {
 		Sorts: sorts,
 	})
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
 	var buf bytes.Buffer
 	if err = h.marshaler.Marshal(&buf, resp); err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -136,13 +137,13 @@ func (h *Content) GetTag(ctx *gin.Context) {
 		Id: tagID,
 	})
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
 	var buf bytes.Buffer
 	if err = h.marshaler.Marshal(&buf, resp); err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
@@ -154,7 +155,7 @@ func (h *Content) GetInfos(ctx *gin.Context) {
 
 	page, size, sorts, err := extractPageSizeSort(ctx)
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -168,26 +169,26 @@ func (h *Content) GetInfos(ctx *gin.Context) {
 
 	err = ctx.BindQuery(&req)
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 	var tags []*content.TagAndType
 	if req.Tags != "" {
 		tags, err = buildTags(ctx.Query("tags"))
 		if err != nil {
-			ctx.Error(err)
+			errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 			return
 		}
 	}
 
 	contentTimeStart, err := ptypes.TimestampProto(req.ContentTimeStart)
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 	contentTimeEnd, err := ptypes.TimestampProto(req.ContentTimeEnd)
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -202,13 +203,13 @@ func (h *Content) GetInfos(ctx *gin.Context) {
 		EndTime:   contentTimeEnd,
 	})
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
 	var buf bytes.Buffer
 	if err = h.marshaler.Marshal(&buf, resp); err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -225,13 +226,13 @@ func (h *Content) GetInfo(ctx *gin.Context) {
 		Uid:    principal,
 	})
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
 	var buf bytes.Buffer
 	if err = h.marshaler.Marshal(&buf, resp); err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
@@ -258,7 +259,7 @@ func (h *Content) PublishInfo(ctx *gin.Context) {
 
 	contentTime, err := ptypes.TimestampProto(req.ContentTime)
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -305,13 +306,13 @@ func (h *Content) PublishInfo(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
 	var buf bytes.Buffer
 	if err = h.marshaler.Marshal(&buf, resp); err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
@@ -338,13 +339,13 @@ func (h *Content) UpdateInfo(ctx *gin.Context) {
 
 	contentTime, err := ptypes.TimestampProto(req.ContentTime)
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
 	form, err := ctx.MultipartForm()
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 	covers := form.File["covers"]
@@ -383,7 +384,7 @@ func (h *Content) UpdateInfo(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -400,7 +401,7 @@ func (h *Content) DeleteInfo(ctx *gin.Context) {
 		InfoID: infoID,
 	})
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -409,7 +410,7 @@ func (h *Content) DeleteInfo(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -424,7 +425,7 @@ func (h *Content) GetUserFavThumb(ctx *gin.Context) {
 
 	page, size, sorts, err := extractPageSizeSort(ctx)
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -454,7 +455,7 @@ func (h *Content) GetUserFavThumb(ctx *gin.Context) {
 
 	var buf bytes.Buffer
 	if err = h.marshaler.Marshal(&buf, resp); err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
@@ -465,7 +466,7 @@ func (h *Content) GetInfoFavThumb(ctx *gin.Context) {
 
 	page, size, sorts, err := extractPageSizeSort(ctx)
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -495,13 +496,13 @@ func (h *Content) GetInfoFavThumb(ctx *gin.Context) {
 	}
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
 	var buf bytes.Buffer
 	if err = h.marshaler.Marshal(&buf, resp); err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
@@ -531,7 +532,7 @@ func (h *Content) FavThumb(ctx *gin.Context) {
 	}
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -562,7 +563,7 @@ func (h *Content) DeleteFavThumb(ctx *gin.Context) {
 	}
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -574,7 +575,7 @@ func (h *Content) GetSegments(ctx *gin.Context) {
 
 	page, size, sorts, err := extractPageSizeSort(ctx)
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -593,13 +594,13 @@ func (h *Content) GetSegments(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
 	var buf bytes.Buffer
 	if err = h.marshaler.Marshal(&buf, resp); err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
@@ -617,13 +618,13 @@ func (h *Content) GetSegment(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
 	var buf bytes.Buffer
 	if err = h.marshaler.Marshal(&buf, resp); err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
@@ -640,7 +641,7 @@ func (h *Content) PublishSegment(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -652,7 +653,7 @@ func (h *Content) PublishSegment(ctx *gin.Context) {
 	var req publishSegmentReq
 	err = ctx.Bind(&req)
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -664,13 +665,13 @@ func (h *Content) PublishSegment(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
 	var buf bytes.Buffer
 	if err = h.marshaler.Marshal(&buf, resp); err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
@@ -699,7 +700,7 @@ func (h *Content) UpdateSegment(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -712,7 +713,7 @@ func (h *Content) UpdateSegment(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -732,7 +733,7 @@ func (h *Content) DeleteSegment(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -742,7 +743,7 @@ func (h *Content) DeleteSegment(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -757,7 +758,7 @@ func (h *Content) GetValues(ctx *gin.Context) {
 
 	page, size, sorts, err := extractPageSizeSort(ctx)
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -770,13 +771,13 @@ func (h *Content) GetValues(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
 	var buf bytes.Buffer
 	if err = h.marshaler.Marshal(&buf, resp); err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
@@ -795,13 +796,13 @@ func (h *Content) GetValue(ctx *gin.Context) {
 		ValID:  valID,
 	})
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
 	var buf bytes.Buffer
 	if err = h.marshaler.Marshal(&buf, resp); err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
@@ -820,7 +821,7 @@ func (h *Content) InsertValue(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -849,13 +850,13 @@ func (h *Content) InsertValue(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
 	var buf bytes.Buffer
 	if err = h.marshaler.Marshal(&buf, resp); err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 	ctx.Data(http.StatusOK, jsonContentType, buf.Bytes())
@@ -875,7 +876,7 @@ func (h *Content) UpdateValue(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -905,7 +906,7 @@ func (h *Content) UpdateValue(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -926,7 +927,7 @@ func (h *Content) DeleteValue(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 
@@ -937,7 +938,7 @@ func (h *Content) DeleteValue(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
 		return
 	}
 

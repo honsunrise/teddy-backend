@@ -5,6 +5,8 @@ const (
 	ErrCodeInternal
 	ErrCodeUnauthorized
 	ErrCodeForbidden
+	ErrCodeBadRequest
+	ErrCodeUsernameOrPasswordNotCorrect
 	ErrCodeCaptchaIDNotFound
 	ErrCodeCaptchaExtNotSupport
 	ErrCodeCaptchaNotCorrect

@@ -3,6 +3,7 @@ package content
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go"
 	"io"
@@ -12,6 +13,9 @@ import (
 	"strings"
 	"teddy-backend/internal/proto/content"
 )
+
+var ErrOrderNotCorrect = errors.New("order not correct must be asc or desc")
+var ErrTagNotCorrect = errors.New("tag not correct must have type and tag")
 
 func buildTags(tag string) ([]*content.TagAndType, error) {
 	rawTags := strings.Split(tag, ",")
