@@ -46,7 +46,7 @@ services:
     command: server /data
 
   srv-message:
-    image: srv-message:latest
+    image: teddy/message:latest
     restart: always
     networks:
       - overlay
@@ -55,7 +55,7 @@ services:
       - ./secrets/srv_message/:/app/secret/
 
   srv-content:
-    image: srv-content:latest
+    image: teddy/content:latest
     restart: always
     networks:
       - overlay
@@ -64,7 +64,7 @@ services:
       - ./secrets/srv_content/:/app/secret/
 
   srv-captcha:
-    image: srv-captcha:latest
+    image: teddy/captcha:latest
     restart: always
     networks:
       - overlay
@@ -73,7 +73,7 @@ services:
       - ./secrets/srv_captcha/:/app/secret/
 
   srv-uaa:
-    image: srv-uaa:latest
+    image: teddy/uaa:latest
     restart: always
     networks:
       - overlay
@@ -82,7 +82,7 @@ services:
       - ./secrets/srv_uaa/:/app/secret/
 
   api-base:
-    image: api-base:latest
+    image: teddy/api-base:latest
     ports:
       - "8080:8080"
     restart: always
@@ -92,7 +92,7 @@ services:
       - ./configs/api_base/:/app/config/
 
   api-content:
-    image: api-content:latest
+    image: teddy/api-content:latest
     ports:
       - "8081:8081"
     restart: always
@@ -103,7 +103,7 @@ services:
       - ./secrets/api_content/:/app/secret/
 
   api-uaa:
-    image: api-uaa:latest
+    image: teddy/api-uaa:latest
     ports:
       - "8083:8083"
     restart: always
