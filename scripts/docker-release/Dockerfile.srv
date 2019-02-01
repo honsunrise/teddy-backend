@@ -10,5 +10,5 @@ RUN GRPC_HEALTH_PROBE_VERSION=v0.2.0 && \
     chmod +x /bin/grpc_health_probe
 RUN mkdir /app
 WORKDIR /app
-COPY $TEDDY_CMD .
-ENTRYPOINT /app/$TEDDY_CMD
+COPY $TEDDY_CMD main
+ENTRYPOINT ["/app/main"]
