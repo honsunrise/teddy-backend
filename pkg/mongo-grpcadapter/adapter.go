@@ -1,12 +1,13 @@
-package mongoadapter
+package mongo_grpcadapter
 
 import (
 	"context"
 	"fmt"
 	"github.com/casbin/casbin/model"
-	"github.com/casbin/casbin/persist"
+	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/mongodb/mongo-go-driver/bson"
 	"github.com/mongodb/mongo-go-driver/mongo"
+	"teddy-backend/pkg/grpcadapter"
 )
 
 // CasbinRule represents a rule in Casbin.
@@ -28,7 +29,7 @@ type adapter struct {
 
 // NewAdapter is the constructor for Adapter. If database name is not provided
 // in the Mongo URL, 'casbin' will be used as database name.
-func NewAdapter(client *mongo.Client, database string, collection string) persist.Adapter {
+func NewServer(client *mongo.Client, database string, collection string) grpcadapter.PolicyAdapterServer {
 	a := &adapter{
 		client:     client,
 		collection: client.Database(database).Collection(collection),
@@ -108,111 +109,118 @@ func savePolicyLine(ptype string, rule []string) CasbinRule {
 	return line
 }
 
-func (a *adapter) LoadPolicy(model model.Model) error {
-	cur, err := a.collection.Find(context.Background(), bson.D{})
+func (a *adapter) LoadPolicy(ctx context.Context, req *empty.Empty) (*grpcadapter.Policies, error) {
+	var policies []*grpcadapter.Policy
+
+	cur, err := a.collection.Find(ctx, bson.D{})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	for cur.Next(context.Background()) {
+	for cur.Next(ctx) {
 		rule := CasbinRule{}
 		err = cur.Decode(&rule)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		loadPolicyLine(rule, model)
+		policies = append(policies, &grpcadapter.Policy{
+			Ptype: rule.PType,
+			Rule: []string{
+				rule.V0,
+				rule.V1,
+				rule.V2,
+				rule.V3,
+				rule.V4,
+				rule.V5,
+			},
+		})
 	}
-	return nil
+	return &grpcadapter.Policies{
+		Policies: policies,
+	}, nil
 }
 
-func (a *adapter) SavePolicy(model model.Model) error {
-	if err := a.collection.Drop(context.Background()); err != nil {
-		return err
+func (a *adapter) SavePolicy(ctx context.Context, req *grpcadapter.Policies) (*empty.Empty, error) {
+	if err := a.collection.Drop(ctx); err != nil {
+		return nil, err
 	}
 
 	var lines []interface{}
 
-	for ptype, ast := range model["p"] {
-		for _, rule := range ast.Policy {
-			line := savePolicyLine(ptype, rule)
-			lines = append(lines, &line)
-		}
+	for _, policy := range req.Policies {
+		line := savePolicyLine(policy.Ptype, policy.Rule)
+		lines = append(lines, &line)
 	}
 
-	for ptype, ast := range model["g"] {
-		for _, rule := range ast.Policy {
-			line := savePolicyLine(ptype, rule)
-			lines = append(lines, &line)
-		}
-	}
-
-	_, err := a.collection.InsertMany(context.Background(), lines)
+	_, err := a.collection.InsertMany(ctx, lines)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &empty.Empty{}, nil
 }
 
-func (a *adapter) AddPolicy(sec string, ptype string, rule []string) error {
-	line := savePolicyLine(ptype, rule)
-	_, err := a.collection.InsertOne(context.Background(), line)
+func (a *adapter) AddPolicy(ctx context.Context, req *grpcadapter.AddPolicyReq) (*empty.Empty, error) {
+	line := savePolicyLine(req.Ptype, req.Rule)
+	_, err := a.collection.InsertOne(ctx, line)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &empty.Empty{}, nil
 }
 
-func (a *adapter) RemovePolicy(sec string, ptype string, rule []string) error {
+func (a *adapter) RemovePolicy(ctx context.Context, req *grpcadapter.RemovePolicyReq) (*empty.Empty, error) {
 	filter := bson.D{
-		{"ptype", ptype},
+		{"ptype", req.Ptype},
 	}
 
-	for i, v := range rule {
+	for i, v := range req.Rule {
 		filter = append(filter, bson.E{Key: fmt.Sprintf("v%d", i), Value: v})
 	}
 
-	_, err := a.collection.DeleteOne(context.Background(), filter)
+	_, err := a.collection.DeleteOne(ctx, filter)
 	if err != nil {
 		switch err {
 		case mongo.ErrNoDocuments:
-			return nil
+			return &empty.Empty{}, nil
 		default:
-			return err
+			return nil, err
 		}
 	}
-	return nil
+	return &empty.Empty{}, nil
 }
 
-func (a *adapter) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error {
+func (a *adapter) RemoveFilteredPolicy(ctx context.Context, req *grpcadapter.RemoveFilteredPolicyReq) (*empty.Empty, error) {
+	fieldIndex := req.FieldIndex
+	fieldValues := req.FieldValues
 	filter := bson.D{
-		{"ptype", ptype},
+		{"ptype", req.Ptype},
 	}
 
-	if fieldIndex <= 0 && 0 < fieldIndex+len(fieldValues) {
+	if fieldIndex <= 0 && 0 < fieldIndex+int64(len(fieldValues)) {
 		if fieldValues[0-fieldIndex] != "" {
 			filter = append(filter, bson.E{Key: "v0", Value: fieldValues[0-fieldIndex]})
 		}
 	}
-	if fieldIndex <= 1 && 1 < fieldIndex+len(fieldValues) {
+	if fieldIndex <= 1 && 1 < fieldIndex+int64(len(fieldValues)) {
 		if fieldValues[1-fieldIndex] != "" {
 			filter = append(filter, bson.E{Key: "v1", Value: fieldValues[0-fieldIndex]})
 		}
 	}
-	if fieldIndex <= 2 && 2 < fieldIndex+len(fieldValues) {
+	if fieldIndex <= 2 && 2 < fieldIndex+int64(len(fieldValues)) {
 		if fieldValues[2-fieldIndex] != "" {
 			filter = append(filter, bson.E{Key: "v2", Value: fieldValues[0-fieldIndex]})
 		}
 	}
-	if fieldIndex <= 3 && 3 < fieldIndex+len(fieldValues) {
+	if fieldIndex <= 3 && 3 < fieldIndex+int64(len(fieldValues)) {
 		if fieldValues[3-fieldIndex] != "" {
 			filter = append(filter, bson.E{Key: "v3", Value: fieldValues[0-fieldIndex]})
 		}
 	}
-	if fieldIndex <= 4 && 4 < fieldIndex+len(fieldValues) {
+	if fieldIndex <= 4 && 4 < fieldIndex+int64(len(fieldValues)) {
 		if fieldValues[4-fieldIndex] != "" {
 			filter = append(filter, bson.E{Key: "v4", Value: fieldValues[0-fieldIndex]})
 		}
 	}
-	if fieldIndex <= 5 && 5 < fieldIndex+len(fieldValues) {
+	if fieldIndex <= 5 && 5 < fieldIndex+int64(len(fieldValues)) {
 		if fieldValues[5-fieldIndex] != "" {
 			filter = append(filter, bson.E{Key: "v5", Value: fieldValues[0-fieldIndex]})
 		}
@@ -220,7 +228,7 @@ func (a *adapter) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int,
 
 	_, err := a.collection.DeleteMany(context.Background(), filter)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &empty.Empty{}, nil
 }

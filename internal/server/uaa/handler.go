@@ -3,7 +3,6 @@ package uaa
 import (
 	"context"
 	"errors"
-	"github.com/casbin/casbin/persist"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/mongodb/mongo-go-driver/mongo"
@@ -17,19 +16,17 @@ import (
 )
 
 func NewAccountServer(repo repositories.AccountRepository,
-	uidGen components.UidGenerator, adapter persist.Adapter) (uaa.UAAServer, error) {
+	uidGen components.UidGenerator) (uaa.UAAServer, error) {
 
 	return &accountHandler{
-		repo:    repo,
-		uidGen:  uidGen,
-		adapter: adapter,
+		repo:   repo,
+		uidGen: uidGen,
 	}, nil
 }
 
 type accountHandler struct {
-	repo    repositories.AccountRepository
-	uidGen  components.UidGenerator
-	adapter persist.Adapter
+	repo   repositories.AccountRepository
+	uidGen components.UidGenerator
 }
 
 func (h *accountHandler) GetAll(ctx context.Context, req *uaa.GetAllReq) (*uaa.GetAllResp, error) {
@@ -117,8 +114,6 @@ func (h *accountHandler) RegisterByNormal(ctx context.Context, req *uaa.Register
 		log.Error(err)
 		return nil, err
 	}
-
-	h.adapter.AddPolicy("g", "g", []string{account.UID, "user"})
 
 	var resp uaa.Account
 	copyFromAccountToPBAccount(&account, &resp)

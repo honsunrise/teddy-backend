@@ -16,7 +16,7 @@ import (
 	"teddy-backend/pkg/config"
 	"teddy-backend/pkg/config/source/file"
 	"teddy-backend/pkg/grpcadapter"
-	"teddy-backend/pkg/mongo-adapter"
+	"teddy-backend/pkg/mongo-grpcadapter"
 )
 
 func init() {
@@ -59,9 +59,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// New cabin mongo adapter
-	adapter := mongoadapter.NewAdapter(mongodbClient, "teddy", "casbin_rule")
-
 	// New Handler
 	accountSrv, err := uaa.NewAccountServer(accountRepo, uidGenerator, adapter)
 	if err != nil {
@@ -76,7 +73,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	uaaProto.RegisterUAAServer(grpcServer, accountSrv)
 
-	policyAdapterServer := grpcadapter.NewServer(adapter)
+	policyAdapterServer := mongo_grpcadapter.NewServer(mongodbClient, "teddy", "casbin_rule")
 	grpcadapter.RegisterPolicyAdapterServer(grpcServer, policyAdapterServer)
 
 	healthSrv := grpcHealth.NewServer()
