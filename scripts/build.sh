@@ -83,7 +83,7 @@ function teddy::build_docker_for_srv() {
     for PLATFORM in $(find ${LOCAL_OUTPUT_BINPATH} -mindepth 1 -maxdepth 1 -type d); do
         OSARCH=$(basename ${PLATFORM})
         if [[ ${OSARCH} == "linux_amd64" ]]; then
-            docker build --no-cache "--build-arg=TEDDY_CMD=${CMD_NAME}" \
+            docker build --no-cache --build-arg TEDDY_CMD=${CMD_NAME} \
                 -t teddy/${CMD_NAME} -f "${ROOT_DIR}/scripts/docker-release/Dockerfile.srv" ${PLATFORM}
             break
         fi
