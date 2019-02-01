@@ -32,8 +32,7 @@ services:
 
   minio:
     image: minio/minio
-    networks:
-      - overlay
+
     volumes:
       - minio_data:/data
     ports:
