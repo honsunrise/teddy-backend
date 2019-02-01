@@ -60,7 +60,7 @@ func main() {
 	}
 
 	// New Handler
-	accountSrv, err := uaa.NewAccountServer(accountRepo, uidGenerator, adapter)
+	accountSrv, err := uaa.NewAccountServer(accountRepo, uidGenerator)
 	if err != nil {
 		log.Fatal(err)
 	}
