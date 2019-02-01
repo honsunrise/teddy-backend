@@ -7,7 +7,6 @@ services:
       - overlay
     environment:
       - MONGODB_REPLICA_SET_MODE=primary
-      - MONGODB_ADVERTISED_HOSTNAME=mongodb-primasy
     volumes:
       - 'mongodb_master_data:/bitnami'
 
@@ -33,7 +32,6 @@ services:
       - MONGODB_REPLICA_SET_MODE=arbiter
       - MONGODB_PRIMARY_HOST=mongodb-primary
       - MONGODB_PRIMARY_PORT_NUMBER=27017
-      - MONGODB_ADVERTISED_HOSTNAME=mongodb-arbiter
 
   mongo-cli:
     networks:
