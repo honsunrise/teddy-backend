@@ -103,9 +103,6 @@ services:
     configs:
       - source: api_base_config
         target: /app/config
-    secrets:
-      - source: api_base_secret
-        target: /app/secret
 
   api-content:
     image: api-content:latest
