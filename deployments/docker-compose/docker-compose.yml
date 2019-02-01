@@ -50,48 +50,36 @@ services:
     restart: always
     networks:
       - overlay
-    configs:
-      - source: srv_message_config
-        target: /app/config
-    secrets:
-      - source: srv_message_secret
-        target: /app/secret
+    volumes:
+      - ./configs/srv_message/:/app/config/
+      - ./secrets/srv_message/:/app/secret/
 
   srv-content:
     image: srv-content:latest
     restart: always
     networks:
       - overlay
-    configs:
-      - source: srv_content_config
-        target: /app/config
-    secrets:
-      - source: srv_content_secret
-        target: /app/secret
+    volumes:
+      - ./configs/srv_content/:/app/config/
+      - ./secrets/srv_content/:/app/secret/
 
   srv-captcha:
     image: srv-captcha:latest
     restart: always
     networks:
       - overlay
-    configs:
-      - source: srv_captcha_config
-        target: /app/config
-    secrets:
-      - source: srv_captcha_secret
-        target: /app/secret
+    volumes:
+      - ./configs/srv_captcha/:/app/config/
+      - ./secrets/srv_captcha/:/app/secret/
 
   srv-uaa:
     image: srv-uaa:latest
     restart: always
     networks:
       - overlay
-    configs:
-      - source: srv_uaa_config
-        target: /app/config
-    secrets:
-      - source: srv_uaa_secret
-        target: /app/secret
+    volumes:
+      - ./configs/srv_uaa/:/app/config/
+      - ./secrets/srv_uaa/:/app/secret/
 
   api-base:
     image: api-base:latest
@@ -100,9 +88,8 @@ services:
     restart: always
     networks:
       - overlay
-    configs:
-      - source: api_base_config
-        target: /app/config
+    volumes:
+      - ./configs/api_base/:/app/config/
 
   api-content:
     image: api-content:latest
@@ -111,12 +98,9 @@ services:
     restart: always
     networks:
       - overlay
-    configs:
-      - source: api_content_config
-        target: /app/secret
-    secrets:
-      - source: api_content_secret
-        target: /app/secret
+    volumes:
+      - ./configs/api_content/:/app/config/
+      - ./secrets/api_content/:/app/secret/
 
   api-uaa:
     image: api-uaa:latest
@@ -125,42 +109,9 @@ services:
     restart: always
     networks:
       - overlay
-    configs:
-      - source: api_uaa_config
-        target: /app/config
-    secrets:
-      - source: api_uaa_secret
-        target: /app/secret
-
-configs:
-  srv_message_config:
-    file: ./configs/srv_message/config.yaml
-  srv_content_config:
-    file: ./configs/srv_content/config.yaml
-  srv_captcha_config:
-    file: ./configs/srv_captcha/config.yaml
-  srv_uaa_config:
-    file: ./configs/srv_uaa/config.yaml
-  api_content_config:
-    file: ./configs/api_content/config.yaml
-  api_base_config:
-    file: ./configs/api_base/config.yaml
-  api_uaa_config:
-    file: ./configs/api_uaa/config.yaml
-
-secrets:
-  srv_message_secret:
-    file: ./secrets/srv_message/config.yaml
-  srv_content_secret:
-    file: ./secrets/srv_content/config.yaml
-  srv_captcha_secret:
-    file: ./secrets/srv_captcha/config.yaml
-  srv_uaa_secret:
-    file: ./secrets/srv_uaa/config.yaml
-  api_uaa_secret:
-    file: ./secrets/api_uaa/config.yaml
-  api_content_secret:
-    file: ./secrets/api_content/config.yaml
+    volumes:
+      - ./configs/api_uaa/:/app/config/
+      - ./secrets/api_uaa/:/app/secret/
 
 volumes:
   mongodb_master_data:
