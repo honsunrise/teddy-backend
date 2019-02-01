@@ -70,6 +70,7 @@ func (h *Uaa) Register(ctx *gin.Context) {
 		var body registerReq
 		err := ctx.Bind(&body)
 		if err != nil {
+			errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaNotCorrect)
 			return
 		}
 
@@ -103,7 +104,7 @@ func (h *Uaa) Register(ctx *gin.Context) {
 			},
 		})
 		if err != nil {
-			ctx.Error(err)
+			errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaNotCorrect)
 			return
 		}
 
@@ -152,6 +153,7 @@ func (h *Uaa) Login(ctx *gin.Context) {
 	var body loginReq
 	err := ctx.Bind(&body)
 	if err != nil {
+		errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaNotCorrect)
 		return
 	}
 
@@ -163,7 +165,7 @@ func (h *Uaa) Login(ctx *gin.Context) {
 		Password:  body.Password,
 	})
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaNotCorrect)
 		return
 	}
 
@@ -171,7 +173,7 @@ func (h *Uaa) Login(ctx *gin.Context) {
 		"username": response.Username,
 	})
 	if err != nil {
-		ctx.Error(err)
+		errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaNotCorrect)
 		return
 	}
 
@@ -202,6 +204,7 @@ func (h *Uaa) ChangePassword(ctx *gin.Context) {
 	var body changePasswordReq
 	err := ctx.Bind(&body)
 	if err != nil {
+		errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaNotCorrect)
 		return
 	}
 
@@ -249,6 +252,7 @@ func (h *Uaa) SendEmailCaptcha(ctx *gin.Context) {
 	var body sendEmailCaptchaReq
 	err := ctx.Bind(&body)
 	if err != nil {
+		errors.AbortWithErrorJSON(ctx, errors.ErrCaptchaNotCorrect)
 		return
 	}
 

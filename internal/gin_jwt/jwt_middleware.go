@@ -78,6 +78,8 @@ func NewGinJwtMiddleware(config MiddlewareConfig, adapter persist.Adapter) (*Jwt
 		return nil, err
 	}
 
+	enforcer.StartAutoLoadPolicy(10 * time.Second)
+
 	return &JwtMiddleware{
 		config:   config,
 		keyFunc:  config.KeyFunc,
@@ -109,11 +111,6 @@ func (m *JwtMiddleware) Handler() gin.HandlerFunc {
 
 		ctx.Set(m.config.ContextKey, token)
 	}
-}
-
-func (m *JwtMiddleware) AddUser(uid string) error {
-	m.enforcer.AddRoleForUser(uid, "user")
-	return nil
 }
 
 func (m *JwtMiddleware) ExtractClaims(ctx *gin.Context, key string) interface{} {
