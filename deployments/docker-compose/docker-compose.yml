@@ -32,6 +32,9 @@ services:
       - MONGODB_PRIMARY_HOST=mongodb-primary
       - MONGODB_PRIMARY_PORT_NUMBER=27017
 
+  mongo-cli:
+    image: 'bitnami/mongodb:latest'
+
   minio:
     image: minio/minio
     networks:
