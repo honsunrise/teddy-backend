@@ -47,7 +47,7 @@ func main() {
 	jwtMiddleware, err := gin_jwt.NewGinJwtMiddleware(gin_jwt.MiddlewareConfig{
 		Realm:   "base.teddy.com",
 		Issuer:  "uaa@teddy.com",
-		KeyFunc: gin_jwt.RemoteFetchFunc("http://10.10.10.30:8083/v1/anon/uaa/jwks.json", 24*time.Hour),
+		KeyFunc: gin_jwt.RemoteFetchFunc("http:///api-uaa:8083/v1/anon/uaa/jwks.json", 24*time.Hour),
 		Audience: []string{
 			"base",
 		},

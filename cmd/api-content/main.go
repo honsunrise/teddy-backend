@@ -42,6 +42,16 @@ func main() {
 		log.Fatal(err)
 	}
 
+	confSecret, err := config.NewConfig(file.NewSource(file.WithFormat(config.Yaml), file.WithPath("secret/config.yaml")))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = confSecret.Scan(&confType)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	adapter, err := grpcadapter.NewAdapter(uaaSrvDomain)
 	if err != nil {
 		log.Fatal(err)
@@ -50,7 +60,7 @@ func main() {
 	jwtMiddleware, err := gin_jwt.NewGinJwtMiddleware(gin_jwt.MiddlewareConfig{
 		Realm:   "content.teddy.com",
 		Issuer:  "uaa@teddy.com",
-		KeyFunc: gin_jwt.RemoteFetchFunc("http://10.10.10.30:8083/v1/anon/uaa/jwks.json", 24*time.Hour),
+		KeyFunc: gin_jwt.RemoteFetchFunc("http://api-uaa:8083/v1/anon/uaa/jwks.json", 24*time.Hour),
 		Audience: []string{
 			"content",
 		},
