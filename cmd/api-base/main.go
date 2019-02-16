@@ -104,6 +104,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	healthHandler, err := base.NewHealthHandler(jwtMiddleware)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Create RESTful server (using Gin)
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
@@ -113,15 +118,16 @@ func main() {
 		AllowAllOrigins:  true,
 		MaxAge:           24 * time.Hour,
 	}))
-	router.Use(clients.CaptchaNew(captchaSrvDomain))
-	baseHandler.HandlerNormal(router.Group("/v1/anon/base").Use(jwtMiddleware.Handler()))
-	baseHandler.HandlerAuth(router.Group("/v1/auth/base").Use(jwtMiddleware.Handler()))
-	baseHandler.HandlerHealth(router)
+	healthHandler.Handler(router)
 
-	router.Use(clients.CaptchaNew(captchaSrvDomain))
-	imageHandler.HandlerNormal(router.Group("/v1/anon/image").Use(jwtMiddleware.Handler()))
-	imageHandler.HandlerAuth(router.Group("/v1/auth/image").Use(jwtMiddleware.Handler()))
-	imageHandler.HandlerHealth(router)
+	baseGroup := router.Group("/v1/anon/base")
+	baseGroup.Use(clients.CaptchaNew(captchaSrvDomain))
+	baseHandler.HandlerNormal(baseGroup.Use(jwtMiddleware.Handler()))
+	baseHandler.HandlerAuth(baseGroup.Use(jwtMiddleware.Handler()))
+
+	imageGroup := router.Group("/v1/anon/image")
+	imageHandler.HandlerNormal(imageGroup.Use(jwtMiddleware.Handler()))
+	imageHandler.HandlerAuth(imageGroup.Use(jwtMiddleware.Handler()))
 
 	// For normal request
 	srv1 := http.Server{
