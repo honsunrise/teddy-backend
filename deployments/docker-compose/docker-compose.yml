@@ -77,6 +77,7 @@ services:
     restart: always
     volumes:
       - ./configs/api_base/:/app/config/
+      - ./secrets/api_base/:/app/secret/
 
   api-content:
     image: teddy/api-content:latest

@@ -6,6 +6,8 @@ db.casbin_rule.insert({ptype: "p", v0: "", v1: "/v1/anon/base/captcha/:id", v2: 
 
 db.casbin_rule.insert({ptype: "p", v0: "", v1: "/v1/anon/base/profile/:id", v2: "GET"});
 
+db.casbin_rule.insert({ptype: "p", v0: "", v1: "/v1/anon/image/:id", v2: "GET"});
+
 db.casbin_rule.insert({ptype: "p", v0: "", v1: "/v1/anon/uaa/register", v2: "POST"});
 db.casbin_rule.insert({ptype: "p", v0: "", v1: "/v1/anon/uaa/login", v2: "POST"});
 db.casbin_rule.insert({ptype: "p", v0: "", v1: "/v1/anon/uaa/sendEmailCaptcha", v2: "POST"});
