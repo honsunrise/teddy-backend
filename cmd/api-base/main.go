@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/minio/minio-go"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 	"net/http"
@@ -11,7 +13,7 @@ import (
 	"teddy-backend/internal/clients"
 	"teddy-backend/internal/gin_jwt"
 	"teddy-backend/internal/handler/base"
-	"teddy-backend/internal/handler/errors"
+	handlerErrors "teddy-backend/internal/handler/errors"
 	"teddy-backend/pkg/config"
 	"teddy-backend/pkg/config/source/file"
 	"teddy-backend/pkg/grpcadapter"
@@ -42,6 +44,16 @@ func main() {
 		log.Fatal(err)
 	}
 
+	confSecret, err := config.NewConfig(file.NewSource(file.WithFormat(config.Yaml), file.WithPath("secret/config.yaml")))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = confSecret.Scan(&confType)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	adapter, err := grpcadapter.NewAdapter(uaaSrvDomain)
 	if err != nil {
 		log.Fatal(err)
@@ -57,13 +69,13 @@ func main() {
 		ErrorHandler: func(ctx *gin.Context, err error) {
 			ctx.Header("WWW-Authenticate", "JWT realm=base.teddy.com")
 			if err == gin_jwt.ErrForbidden {
-				errors.AbortWithErrorJSON(ctx, errors.ErrForbidden)
+				handlerErrors.AbortWithErrorJSON(ctx, handlerErrors.ErrForbidden)
 			} else if err == gin_jwt.ErrTokenInvalid {
-				errors.AbortWithErrorJSON(ctx, errors.ErrUnauthorized)
+				handlerErrors.AbortWithErrorJSON(ctx, handlerErrors.ErrUnauthorized)
 			} else if err == gin_jwt.ErrInvalidKey {
-				errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
+				handlerErrors.AbortWithErrorJSON(ctx, handlerErrors.ErrUnknown)
 			} else {
-				errors.AbortWithErrorJSON(ctx, errors.ErrUnknown)
+				handlerErrors.AbortWithErrorJSON(ctx, handlerErrors.ErrUnknown)
 			}
 		},
 	}, adapter)
@@ -72,6 +84,22 @@ func main() {
 	}
 
 	baseHandler, err := base.NewBaseHandler(jwtMiddleware)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	minioConfig := confType.ObjectStore["minio"]
+	if minioConfig == nil {
+		log.Fatal(errors.New("missing minio config"))
+	}
+
+	// Initialize minio client object.
+	minioClient, err := minio.New(minioConfig.Endpoint, minioConfig.AccessKey, minioConfig.SecretKey, false)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	imageHandler, err := base.NewImageHandler(jwtMiddleware, minioClient, minioConfig.Bucket)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -89,6 +117,11 @@ func main() {
 	baseHandler.HandlerNormal(router.Group("/v1/anon/base").Use(jwtMiddleware.Handler()))
 	baseHandler.HandlerAuth(router.Group("/v1/auth/base").Use(jwtMiddleware.Handler()))
 	baseHandler.HandlerHealth(router)
+
+	router.Use(clients.CaptchaNew(captchaSrvDomain))
+	imageHandler.HandlerNormal(router.Group("/v1/anon/image").Use(jwtMiddleware.Handler()))
+	imageHandler.HandlerAuth(router.Group("/v1/auth/image").Use(jwtMiddleware.Handler()))
+	imageHandler.HandlerHealth(router)
 
 	// For normal request
 	srv1 := http.Server{
