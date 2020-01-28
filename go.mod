@@ -37,4 +37,7 @@ require (
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/ini.v1 v1.41.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.2.2
+	upper.io/db.v3 v3.6.3+incompatible
 )
+
+go 1.13
